@@ -63,25 +63,10 @@ const HeroSection = () => {
             
             <div className="gsap-hero-attribution mt-12 space-y-4 max-w-lg mx-auto md:mx-0">
               <div className="flex flex-col gap-2 text-center md:flex-row md:gap-4 md:items-start md:text-left">
-                <span className="font-mono text-xs text-cyber-pink/70 uppercase tracking-widest md:pt-1 md:shrink-0">
-                  For Artists:
-                </span>
                 <p className="text-zinc-300 text-sm leading-relaxed">
-                  100 true fans are worth more than 100,000 streams; exposure won't pay the bills, and your life's work is worth more than fractions of a penny.
+                  100 fans invested in your success are worth more than 100,000 streams.
                 </p>
               </div>
-              <AsciiDivider />
-              <div className="flex flex-col gap-2 text-center md:flex-row md:gap-4 md:items-start md:text-left">
-                <span className="font-mono text-xs text-lavender/70 uppercase tracking-widest md:pt-1 md:shrink-0">
-                  For Fans:
-                </span>
-                <p className="text-zinc-300 text-sm leading-relaxed">
-                  You have spent years curating music on platforms that can delete your playlists tomorrow.
-                  These platforms are built on a model of exploitation and control.
-                  When you collect a music NFT on doba, it is yours forever.
-                </p>
-              </div>
-
             </div>
 
           </div>
