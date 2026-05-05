@@ -22,7 +22,7 @@ const Navbar = () => {
             href="#" 
             className="bg-lavender text-void px-6 py-2 rounded-xl text-sm font-bold transition-all duration-300 hover:scale-105 active:scale-95"
           >
-            Sign In
+            Sign Up
           </a>
         </div>
       </div>
