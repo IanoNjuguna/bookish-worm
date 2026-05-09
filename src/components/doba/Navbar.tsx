@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
+import { AuthButton } from "./AuthButton";
 
 const Navbar = () => {
-
   return (
     <motion.nav
       initial={{ y: -20, opacity: 0 }}
@@ -18,12 +18,7 @@ const Navbar = () => {
 
         </div>
         <div className="flex items-center gap-6">
-          <a 
-            href="#" 
-            className="bg-lavender text-void px-6 py-2 rounded-xl text-sm font-bold transition-all duration-300 hover:scale-105 active:scale-95"
-          >
-            Sign Up
-          </a>
+          <AuthButton />
         </div>
       </div>
     </motion.nav>
@@ -31,5 +26,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-
-
