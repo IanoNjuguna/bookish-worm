@@ -4,6 +4,16 @@ The protocol bypasses traditional industry middlemen to establish a direct, trus
 
 Join us as a [`contributor`](CONTRIBUTION.md)
 
+## License
+
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0).
+
+Unlike the standard GPL, the AGPL requires that if you modify this software and
+run it on a server to offer network services to the public, you must make your
+modified source code available to those remote users under the same license.
+
+See the [LICENSE](LICENSE.md) for the full legal text.
+
 ## Architecture
 
 Doba utilises Cardano Blockchain as the settlement layer and IPFS for storage of metadata and media files.
