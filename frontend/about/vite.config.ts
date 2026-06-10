@@ -14,10 +14,15 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [
-    react(), 
+    react(),
     mode === "development" && componentTagger(),
     nodePolyfills()
   ].filter(Boolean),
+  build: {
+    //export prod assets into the go module
+    outDir: path.resolve(__dirname, '../../backend/internal/domains/about/dist'),
+    emptyOutDir: true,
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
