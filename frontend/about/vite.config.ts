@@ -19,6 +19,11 @@ export default defineConfig({
     react(),
     nodePolyfills()
   ],
+  resolve: {
+	  alias: {
+		  "@": path.resolve(__dirname, "./src"),
+	  },
+  },
   build: {
     //export prod assets into the go module
     outDir: path.resolve(__dirname, '../../backend/internal/domains/about/dist'),
@@ -39,11 +44,6 @@ export default defineConfig({
           }
         }
       }
-    },
-    resolve: {
-      alias: {
-        "@": path.resolve(__dirname, "./src"),
-      },
     },
   }
 });
