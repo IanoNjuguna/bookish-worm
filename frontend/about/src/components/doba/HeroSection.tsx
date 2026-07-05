@@ -96,7 +96,7 @@ const HeroSection = () => {
 
             <div className="gsap-hero-buttons pt-4">
               <button className="bg-lavender text-void w-full py-4 rounded-xl font-bold transition-all duration-300 hover:scale-[1.02] active:scale-95">
-                Launch App
+                Learn More
               </button>
             </div>
           </div>
