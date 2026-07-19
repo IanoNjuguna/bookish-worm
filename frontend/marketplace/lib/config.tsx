@@ -1,9 +1,19 @@
 import { QueryClient } from '@tanstack/react-query';
 
-export const CARDANO_NETWORK = 'Mainnet' as const;
+const rawNetwork = (process.env.NEXT_PUBLIC_CARDANO_NETWORK || 'Mainnet').trim().toLowerCase();
+export const CARDANO_NETWORK = rawNetwork === 'preprod' ? 'Preprod' : 'Mainnet';
 
-const rawBlockfrostProjectId = (process.env.NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_MAINNET || '').trim();
+const rawBlockfrostProjectId = (
+	CARDANO_NETWORK === 'Mainnet'
+		? process.env.NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_MAINNET
+		: process.env.NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_PREPROD
+).trim() || (process.env.NEXT_PUBLIC_BLOCKFROST_PROJECT_ID || '').trim();
+
 export const BLOCKFROST_PROJECT_ID = rawBlockfrostProjectId.replace(/^['\"]|['\"]$/g, '');
+
+export const BLOCKFROST_URL = CARDANO_NETWORK === 'Mainnet'
+	? 'https://cardano-mainnet.blockfrost.io/api/v0'
+	: 'https://cardano-preprod.blockfrost.io/api/v0';
 
 export const MINTING_POLICY_ID = process.env.NEXT_PUBLIC_MINTING_POLICY_ID || '';
 

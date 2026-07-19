@@ -6,13 +6,36 @@ import { getTrack } from './database'
 
 let apiInstance: BlockFrostAPI | null = null
 
+const RUNTIME_NETWORK = (process.env.CARDANO_NETWORK || process.env.NEXT_PUBLIC_CARDANO_NETWORK || 'mainnet').toLowerCase()
+
+function resolveBlockfrostProjectId(): string {
+	const direct = process.env.BLOCKFROST_PROJECT_ID?.trim()
+	if (direct) return direct
+
+	if (RUNTIME_NETWORK === 'preprod') {
+		return (
+			process.env.NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_PREPROD
+			|| process.env.NEXT_PUBLIC_BLOCKFROST_PROJECT_ID
+			|| ''
+		).trim()
+	}
+
+	return (
+		process.env.NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_MAINNET
+		|| process.env.NEXT_PUBLIC_BLOCKFROST_PROJECT_ID
+		|| ''
+	).trim()
+}
+
 function getBlockfrostApi(): BlockFrostAPI {
 	if (apiInstance) return apiInstance
-	const projectId = process.env.BLOCKFROST_PROJECT_ID
+	const projectId = resolveBlockfrostProjectId()
 	if (!projectId) {
-		throw new Error('BLOCKFROST_PROJECT_ID is missing')
+		throw new Error('Blockfrost project ID is missing. Set BLOCKFROST_PROJECT_ID on core-api (preferred), or provide NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_MAINNET/PREPROD.')
 	}
-	const network = projectId.startsWith('mainnet')
+	const network = RUNTIME_NETWORK === 'mainnet' || RUNTIME_NETWORK === 'preprod' || RUNTIME_NETWORK === 'preview'
+		? RUNTIME_NETWORK
+		: projectId.startsWith('mainnet')
 		? 'mainnet'
 		: projectId.startsWith('preview')
 		? 'preview'
@@ -68,9 +91,9 @@ async function koiosGetStakeAssets(stakeAddress: string): Promise<{ unit: string
 // ─── Ownership Verification ───────────────────────────────────────────────────
 
 export async function verifyOwnershipOnChain(userAddress: string, tokenId: number): Promise<boolean> {
-	const projectId = process.env.BLOCKFROST_PROJECT_ID || ''
+	const projectId = resolveBlockfrostProjectId()
 	if (!projectId) {
-		logger.warn('Blockfrost project ID is not configured.')
+		logger.warn('Blockfrost project ID is not configured. Set BLOCKFROST_PROJECT_ID on core-api.')
 		return false
 	}
 
@@ -137,9 +160,9 @@ export async function verifyOwnershipOnChain(userAddress: string, tokenId: numbe
 }
 
 export async function getRemainingFractionsOnChain(policyId: string, ticker: string, tokenId: number): Promise<number | null> {
-	const projectId = process.env.BLOCKFROST_PROJECT_ID || ''
+	const projectId = resolveBlockfrostProjectId()
 	if (!projectId) {
-		logger.warn('Blockfrost project ID is not configured.')
+		logger.warn('Blockfrost project ID is not configured. Set BLOCKFROST_PROJECT_ID on core-api.')
 		return null
 	}
 

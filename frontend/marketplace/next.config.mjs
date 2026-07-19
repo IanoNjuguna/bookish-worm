@@ -30,7 +30,7 @@ const nextConfig = {
         source: '/api-backend/:path*',
         destination: process.env.NEXT_PUBLIC_API_URL
           ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')}/:path*`
-          : 'https://doba-api-494043112081.us-central1.run.app/:path*',
+          : 'http://localhost:3001/:path*',
       },
     ]
   },
