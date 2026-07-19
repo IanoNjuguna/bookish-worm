@@ -11,7 +11,7 @@
 
 ### Smart Contracts (`contracts/`)
 
-- [x] **Add 1% platform fee output to `distribution` validator** — `treasury: Address` + `fee_bps: Int` parameters added; Buy redeemer now verifies a treasury output ≥ `price_lovelace * fee_bps / 10000`
+- [x] **Add 5% platform fee output to `distribution` validator** — `treasury: Address` + `fee_bps: Int` parameters added; Buy redeemer now verifies a treasury output ≥ `price_lovelace * fee_bps / 10000`
 - [x] **Add ADA price enforcement to `distribution` validator** — `DisDatum` now carries `price_lovelace`; Buy redeemer validates payment and datum preservation
 - [x] **Add `UpdatePrice` redeemer to `distribution` validator** — owner can update price in datum without releasing tokens
 - [x] **Rename obfuscated redeemer fields** — `a/b/tn` → `action/amount/token_name` across all three validators

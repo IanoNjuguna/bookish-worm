@@ -21,8 +21,8 @@ interface UserProfile {
 	avatar_url: string | null
 }
 
-const formatAddress = (addr: string) => {
-	if (!addr || addr.length <= 19) return addr
+const formatAddress = (addr: string | null | undefined) => {
+	if (!addr || addr.length <= 19) return addr || ''
 	return `${addr.substring(0, 10)}...${addr.substring(addr.length - 9)}`
 }
 
@@ -264,7 +264,7 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 							activeWalletIcon === 'utxos' ? (
 								<IconWallet size={16} className="text-[#FF1F8A]" />
 							) : (
-								<img src={activeWalletIcon} alt={walletName} className="w-5 h-5 object-contain rounded-none" />
+								<img src={activeWalletIcon} alt={walletName || 'Wallet'} className="w-5 h-5 object-contain rounded-none" />
 							)
 						) : (
 							<div className="w-1.5 h-1.5 rounded-none bg-blue-500 animate-pulse" />

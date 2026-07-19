@@ -11,7 +11,7 @@ import { EXPLORER_URL } from '@/lib/config'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { useAudio } from '@/components/AudioProvider'
-import { buyFractionOnChain, formatTxError } from '@/lib/contractHelper'
+import { buyFractionOnChain, formatTxError, isUserDeclinedTxError } from '@/lib/contractHelper'
 import { IconPlayerPlay as Play, IconPlayerPause as Pause, IconPlayerSkipBack as SkipBack, IconPlayerSkipForward as SkipForward } from '@tabler/icons-react'
 
 const formatTokenId = (id: string | number) => {
@@ -228,7 +228,11 @@ export default function NowPlayingSidebar({ track, isVisible, onClose }: NowPlay
 		} catch (error: any) {
 			console.error('Sidebar: Collection Error', error)
 			if (mainToast) {
-				toast.error(formatTxError(error), { id: mainToast })
+				if (isUserDeclinedTxError(error)) {
+					toast.info('You declined the transaction.', { id: mainToast })
+				} else {
+					toast.error(formatTxError(error), { id: mainToast })
+				}
 			}
 		} finally {
 			setIsMinting(false)

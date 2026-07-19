@@ -35,7 +35,15 @@ export function DepositView() {
 
 	return (
 		<div className="max-w-md mx-auto animate-fade-in">
-			<div className="glass p-8 relative overflow-hidden text-center space-y-8 bg-[#FAF9F6] dark:bg-[#0D0D12]/80 border border-midnight/10 dark:border-white/10">
+			<div className="glass p-6 relative overflow-hidden space-y-8 bg-[#FAF9F6] dark:bg-[#0D0D12]/80 border border-midnight/10 dark:border-white/10">
+				<div className="flex justify-between items-center border-b border-white/5 pb-4">
+					<h3 className="text-lg font-bold text-midnight dark:text-white uppercase tracking-wider flex items-center gap-2">
+						<span className="w-1.5 h-4 bg-cyber-pink inline-block"></span>
+						Deposit Assets
+					</h3>
+					<span className="text-[10px] text-midnight/70 dark:text-white/60 font-bold uppercase">Cardano Network</span>
+				</div>
+
 				<div className="relative flex justify-center">
 					<div className="p-4 bg-midnight/5 dark:bg-white/[0.03] border border-midnight/10 dark:border-white/10 rounded-none relative">
 						<div className="bg-[#0D0D12] p-4 overflow-hidden shadow-[0_0_30px_rgba(183,148,244,0.1)] border border-midnight/10 dark:border-white/5 rounded-none">
@@ -61,7 +69,7 @@ export function DepositView() {
 				<div className="space-y-4 flex flex-col items-center">
 					<div
 						onClick={handleCopy}
-						className="group flex items-center justify-center gap-4 p-4 bg-midnight/5 dark:bg-black/40 border border-midnight/10 dark:border-white/10 hover:border-midnight/20 dark:border-white/20 transition-all cursor-pointer overflow-hidden rounded-none w-full"
+						className="group flex items-center justify-center gap-4 p-4 bg-midnight/5 dark:bg-black/40 border border-midnight/10 dark:border-white/10 hover:border-midnight/20 dark:hover:border-white/20 transition-all cursor-pointer overflow-hidden rounded-none w-full"
 					>
 						<code className="text-[13px] font-mono text-midnight/80 dark:text-white/80 select-all break-all">
 							{address}
@@ -87,9 +95,7 @@ export function DepositView() {
 						</div>
 					</div>
 
-					<div className="flex items-center justify-center gap-2">
-						<span className="text-xs font-mono font-bold tracking-wider text-[#FF1F8A]">CARDANO PREPROD NETWORK</span>
-					</div>
+					<div className="h-0"></div>
 				</div>
 			</div>
 

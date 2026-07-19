@@ -97,7 +97,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
       {/* Mobile Menu */}
       {headerMenuOpen && (
         <div className="lg:hidden fixed inset-0 top-16 z-[60] animate-slide-in-down bg-[rgba(250,249,246,0.95)] dark:bg-[rgba(13,13,18,0.95)] backdrop-blur-md overflow-hidden">
-          <nav className="flex flex-col p-4 pb-32 space-y-2 h-full overflow-y-auto">
+          <nav className="mobile-menu-scroll flex flex-col p-4 pb-32 space-y-2 h-full">
             <div className="px-0 py-2">
               <h2 className="text-sm font-semibold uppercase tracking-wider text-purple-400">
                 {tNav('navigation')}
@@ -141,7 +141,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
       {/* Main Layout */}
       <div className="flex flex-col lg:flex-row flex-1 mt-16 lg:overflow-hidden">
         <aside className="hidden lg:flex w-[20vw] flex-col bg-transparent overflow-y-auto overflow-x-hidden relative">
-          <nav className="flex flex-col p-4 overflow-y-auto overflow-x-hidden flex-1 relative">
+          <nav className="sidebar-scroll flex flex-col p-4 overflow-x-hidden flex-1 relative">
             {/* Navigation Section */}
             <div className="relative flex flex-col space-y-1 pb-4">
               {/* Vertical Segment for Navigation */}

@@ -142,6 +142,110 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /* Desktop sidebar scrollbar: hidden by default, reveals on hover, inset look */
+  .sidebar-scroll {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+
+  .sidebar-scroll:hover {
+    scrollbar-color: rgba(183, 148, 244, 0.55) transparent;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+    min-height: 48px;
+    transition: background 160ms ease;
+  }
+
+  .sidebar-scroll:hover::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      180deg,
+      rgba(183, 148, 244, 0.62),
+      rgba(255, 31, 138, 0.54)
+    );
+    background-clip: content-box;
+  }
+
+  .dark .sidebar-scroll:hover {
+    scrollbar-color: rgba(255, 255, 255, 0.32) transparent;
+  }
+
+  .dark .sidebar-scroll:hover::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.32),
+      rgba(183, 148, 244, 0.45)
+    );
+    background-clip: content-box;
+  }
+
+  /* Mobile slide-down menu scrollbar: same reveal pattern with larger touch target */
+  .mobile-menu-scroll {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    scrollbar-width: auto;
+    scrollbar-color: transparent transparent;
+  }
+
+  .mobile-menu-scroll:hover {
+    scrollbar-color: rgba(183, 148, 244, 0.6) transparent;
+  }
+
+  .mobile-menu-scroll::-webkit-scrollbar {
+    width: 16px;
+  }
+
+  .mobile-menu-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .mobile-menu-scroll::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+    min-height: 72px;
+    transition: background 160ms ease;
+  }
+
+  .mobile-menu-scroll:hover::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      180deg,
+      rgba(183, 148, 244, 0.68),
+      rgba(255, 31, 138, 0.58)
+    );
+    background-clip: content-box;
+  }
+
+  .dark .mobile-menu-scroll:hover {
+    scrollbar-color: rgba(255, 255, 255, 0.38) transparent;
+  }
+
+  .dark .mobile-menu-scroll:hover::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.4),
+      rgba(183, 148, 244, 0.52)
+    );
+    background-clip: content-box;
+  }
 }
 
 @keyframes slideUpSpring {

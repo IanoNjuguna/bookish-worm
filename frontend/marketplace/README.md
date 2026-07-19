@@ -1,10 +1,9 @@
-# Doba Protocol
+# Doba World
 
 <div align="center">
   <img src="https://img.shields.io/badge/Cardano-0033AD?style=for-the-badge&logo=cardano&logoColor=white" alt="Cardano" />
   <img src="https://img.shields.io/badge/Next.js_14-000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />
   <img src="https://img.shields.io/badge/Bun-fbf0df?style=for-the-badge&logo=bun&logoColor=black" alt="Bun" />
-  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
   <img src="https://img.shields.io/badge/AGPL-3.0-red?style=for-the-badge" alt="License: AGPL-3.0" />
 </div>
 
@@ -20,10 +19,12 @@ Doba implements a decoupled, high-performance monorepo architecture.
 
 ```mermaid
 graph TD
-    A[Client Browser] -->|Lucid Evolution| B(Next.js 14 App Router)
-    B <-->|CIP-30 JWT Auth| C{Bun Core API}
-    C<--> E[(Cardano Blockchain)]
-    C <--> D[(SQLite Data Layer)]
+   A[Client Browser] -->|Lucid Evolution| B(Next.js 14 App Router)
+   B -->|Mint payload + tx assembly| D[lib/contractHelper.ts]
+   B <-->|CIP-30 JWT Auth| C{Bun Core API}
+   D <-->|Catalog + auth data| C
+   C <--> E[(SQLite Data Layer)]
+   D -->|Unsigned Cardano transaction| F[(Cardano Blockchain)]
 ```
 
 ### 1. Frontend Client (`/`)
@@ -42,6 +43,7 @@ A fast, lightweight data ingestion and session management layer.
 - **Runtime:** Bun
 - **Database:** SQLite (`doba.db`)
 - **Role:** Manages off-chain metadata, persistent user profiles, stream analytics, and cryptographic JWT issuance via native signature validation.
+- **Minting support:** Provides the catalog and auth data used by the frontend mint flow; the actual Cardano transaction assembly happens in the client-side Lucid helper in `lib/contractHelper.ts`.
 
 ---
 
@@ -60,21 +62,21 @@ Doba operates without traditional passwords through public-key cryptography for 
 
 The minting pipeline is designed to eliminate front-end calculation errors and prevent UTXO contention:
 
-1. **Initiation:** The client queries local UTXOs via Lucid and transmits them to the Python `tx-builder`.
-2. **State Validation:** The microservice verifies on-chain asset pricing and multi-party collaborator splits from the secure database.
-3. **Construction:** Optimal UTXOs are selected, network fees is calculated exact network fees, and Lovelaces are allocated across all split recipients.
-4. **Execution:** The backend returns an unsigned CBOR hex. The client prompts the user for a final signature and submits the transaction directly to the Cardano network.
+1. **Initiation:** The client prepares the mint payload in `lib/contractHelper.ts` and reads the release data needed for the transaction.
+2. **State Validation:** The frontend validates track count, album structure, pricing inputs, and wallet state, then computes the album total as $n \times$ the individual mint price before building the transaction.
+3. **Construction:** The Lucid helper selects the relevant UTXOs, calculates fees, and builds the unsigned Cardano transaction with the correct per-track or per-album payment amount.
+4. **Execution:** The client prompts the user for a final signature and submits the transaction directly to the Cardano network.
 
 ---
 
 ## UI/UX Engineering
 
-The visual language of Doba adheres to a brutalist aesthetic:
+The visual language of Doba is a dark-first, editorial interface with sharp geometry and neon accents:
 
-- **Geometry:** 0px `border-radius` enforced globally across all DOM elements.
-- **Palette:** High-contrast Dark Mode featuring *Midnight Black*, *Cyber Pink*, *Lavender*, and *Neon Green* active states.
-- **Typography:** *Neue Machina* (Display/Headers) paired with *IBM Plex Mono* (Technical/Data).
-- **Motion:** Purposeful micro-interactions including kinetic backdrop blurs, subtle scaling pulses, and segmented layout dividers.
+- **Geometry:** Flat surfaces with zero-radius composition, using squared cards, controls, and dividers.
+- **Palette:** High-contrast monochrome foundations with *Midnight Black* backgrounds, *Cyber Pink* primary actions, and *Lavender* accents.
+- **Typography:** *Chivo* for UI text and headings, paired with *Space Mono* and *IBM Plex Mono* for technical and numeric surfaces.
+- **Motion:** Lightweight micro-interactions such as subtle pulses, hover scaling, and segmented layout transitions.
 
 ---
 
@@ -97,12 +99,12 @@ The visual language of Doba adheres to a brutalist aesthetic:
 2. **Dependency Resolution:**
 
    ```bash
-   # Frontend & Bun API
+   # Frontend & Bun core API
    bun install
    ```
 
 3. **Launch Stack:**
-   A single command orchestrates the entire monorepo (Next.js client, Bun API, and FastAPI service).
+   A single command orchestrates the frontend and Bun core API.
 
    ```bash
    bun run dev:all

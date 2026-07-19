@@ -17,9 +17,6 @@ export default function SendMoneyDashboard() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold mb-2">{tNav('sendLabel')}</h2>
-      </div>
       {isPlayerConnected ? (
         <SendFunds />
       ) : (

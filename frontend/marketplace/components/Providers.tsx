@@ -25,6 +25,33 @@ const CardanoContext = createContext<CardanoContextType>({
 	address: null,
 	stakeAddress: null,
 	walletName: null,
+	walletApi: null,
+	lucid: null,
+	sessionSeedPhrase: null,
+	connect: async () => {},
+	connectFromSeed: async () => {},
+	disconnect: () => {},
+});
+
+
+export function CardanoProvider({ children }: { children: React.ReactNode }) {
+	const [isConnected, setIsConnected] = useState(false);
+	const [address, setAddress] = useState<string | null>(null);
+	const [stakeAddress, setStakeAddress] = useState<string | null>(null);
+	const [walletName, setWalletName] = useState<string | null>(null);
+	const [walletApi, setWalletApi] = useState<any | null>(null);
+	const [lucid, setLucid] = useState<any | null>(null);
+	const [isConnecting, setIsConnecting] = useState(false);
+	const [sessionSeedPhrase, setSessionSeedPhrase] = useState<string | null>(null);
+
+	useEffect(() => {
+		const checkConnection = async () => {
+			if (typeof window !== "undefined") {
+				const savedWallet = localStorage.getItem("doba_connected_wallet");
+				if (savedWallet && !isConnected && !isConnecting) {
+					connect(savedWallet).catch((err) => {
+						console.warn("Auto-reconnection failed:", err);
+					});
 				}
 			}
 		};
@@ -35,6 +62,10 @@ const CardanoContext = createContext<CardanoContextType>({
 	const initializeLucid = async (wallet: string, seedPhrase?: string) => {
 		setIsConnecting(true);
 		try {
+			if (wallet === "utxos" && !seedPhrase && typeof window !== "undefined") {
+				seedPhrase = sessionStorage.getItem("doba_session_seed") || undefined;
+			}
+
 			// Dynamically import Lucid & Blockfrost to prevent SSR compilation errors
 			const { Lucid, Blockfrost } = await import("@lucid-evolution/lucid");
 
@@ -88,9 +119,9 @@ const CardanoContext = createContext<CardanoContextType>({
 
 							if (!selectedWallet || typeof selectedWallet.signMessage !== "function") {
 								throw new Error("Seed wallet signer is unavailable");
+								}
 
-
-							return await selectedWallet.signMessage(address, payload);
+								return await selectedWallet.signMessage(address, payload);
 						},
 					});
 				} catch (e: any) {
@@ -152,6 +183,14 @@ const CardanoContext = createContext<CardanoContextType>({
 	};
 
 	const connect = async (wallet: string) => {
+		if (wallet === "utxos" && typeof window !== "undefined") {
+			const savedSeed = sessionStorage.getItem("doba_session_seed");
+			if (!savedSeed) {
+				throw new Error("Social login session expired. Please sign in again.");
+			}
+			await initializeLucid(wallet, savedSeed);
+			return;
+		}
 		await initializeLucid(wallet);
 	};
 

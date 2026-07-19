@@ -19,7 +19,7 @@ interface AnalyticsData {
 }
 
 export default function AnalyticsView() {
-	const { getValidToken, isAuthenticated } = useAudio()
+	const { getValidToken, isAuthenticated, isCheckingAuth } = useAudio()
 	const { resolvedTheme } = useTheme()
 	const [mounted, setMounted] = useState(false)
 	const [data, setData] = useState<AnalyticsData | null>(null)
@@ -59,10 +59,14 @@ export default function AnalyticsView() {
 	}
 
 	useEffect(() => {
+		if (isCheckingAuth) return
 		if (isAuthenticated) {
 			fetchAnalytics()
+		} else {
+			setLoading(false)
+			setError('Not authenticated')
 		}
-	}, [isAuthenticated])
+	}, [isAuthenticated, isCheckingAuth])
 
 	if (loading) {
 		return (
@@ -107,9 +111,9 @@ export default function AnalyticsView() {
 				/>
 				<MetricCard
 					label="Growth"
-					value={`${data.totalPlays > 0 ? '+100%' : '0%'}`}
+					value="N/A"
 					icon={<IconTrendingUp className="text-green-400" size={24} />}
-					subtext="Last 30 days"
+					subtext="Comparison data not wired"
 				/>
 			</div>
 

@@ -24,6 +24,21 @@ export interface TrackMintData {
 	royaltyAddress?: string;
 }
 
+export function isUserDeclinedTxError(error: unknown): boolean {
+	const lower = String((error as any)?.message || error || '').toLowerCase();
+	return (
+		lower.includes('user declined sign tx') ||
+		lower.includes('user declined') ||
+		lower.includes('user rejected') ||
+		lower.includes('user denied') ||
+		lower.includes('declined transaction') ||
+		lower.includes('rejected transaction') ||
+		lower.includes('declined to sign') ||
+		lower.includes('cancelled') ||
+		lower.includes('canceled')
+	);
+}
+
 /**
  * Derives the policy ID, locking address, and distribution address for a given creator address.
  */
@@ -55,6 +70,7 @@ export async function getContractAddresses(creatorAddress: string) {
 	if (!distroValidator) throw new Error("frac.distribution.spend validator not found in blueprint");
 
 	// Convert treasury Bech32 address to Plutus Address schema
+	if (!TREASURY_ADDRESS) throw new Error("Treasury address is not configured");
 	const { paymentCredential, stakeCredential } = getAddressDetails(TREASURY_ADDRESS);
 	if (!paymentCredential) throw new Error("Invalid treasury address configuration");
 
@@ -436,14 +452,8 @@ export function formatTxError(error: any): string {
 		return "Insufficient funds! Your wallet does not have enough ADA to cover transaction fees and on-chain UTxO storage deposits.";
 	}
 	
-	if (
-		errorString.includes("user declined") || 
-		errorString.includes("user rejected") || 
-		errorString.includes("declined to sign") ||
-		errorString.includes("canceled") ||
-		errorString.includes("cancelled")
-	) {
-		return "Transaction signature declined by user.";
+	if (isUserDeclinedTxError(error)) {
+		return "You declined the transaction.";
 	}
 
 	if (

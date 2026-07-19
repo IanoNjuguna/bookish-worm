@@ -12,7 +12,7 @@ import { GENRES } from '@/constants/genres'
 import { useCardano } from '@/components/Providers'
 import { toast } from 'sonner'
 import { useAudio } from '@/components/AudioProvider'
-import { mintTrackOnChain, formatTxError } from '@/lib/contractHelper'
+import { mintTrackOnChain, formatTxError, isUserDeclinedTxError } from '@/lib/contractHelper'
 
 interface Collaborator {
 	address: string
@@ -599,7 +599,11 @@ export default function UploadView() {
 
 		} catch (error: any) {
 			logger.error('Submit Error', error)
-			toast.error(mapUploadErrorMessage(error), { id: mainToast })
+			if (isUserDeclinedTxError(error)) {
+				toast.info('You declined the transaction.', { id: mainToast })
+			} else {
+				toast.error(mapUploadErrorMessage(error), { id: mainToast })
+			}
 		} finally {
 			setIsUploading(false)
 		}

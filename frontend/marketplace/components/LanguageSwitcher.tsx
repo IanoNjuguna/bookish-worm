@@ -42,14 +42,14 @@ export default function LanguageSwitcher() {
 			</button>
 
 			{isOpen && (
-				<div className="absolute bottom-full left-0 mb-1 min-w-[140px] bg-[#1a1a22] border border-white/[0.12] rounded-lg shadow-lg overflow-hidden z-50 animate-fade-in">
+				<div className="absolute bottom-full left-0 mb-1 min-w-[140px] bg-[rgba(250,249,246,0.98)] dark:bg-[#1a1a22] border border-midnight/[0.12] dark:border-white/[0.12] rounded-lg shadow-lg overflow-hidden z-50 animate-fade-in">
 					{routing.locales.map((loc) => (
 						<button
 							key={loc}
 							onClick={() => handleLocaleChange(loc)}
 							className={`w-full text-left px-3 py-2 text-xs transition-colors ${loc === locale
-								? 'text-[#FF1F8A] bg-midnight/[0.05] dark:bg-white/[0.05]'
-								: 'text-midnight/70 dark:text-white/70 hover:text-midnight dark:hover:text-white hover:bg-midnight/5 dark:hover:bg-white/5'
+								? 'text-[#FF1F8A] bg-[#FF1F8A]/10 dark:bg-white/[0.06]'
+								: 'text-midnight/80 dark:text-white/75 hover:text-midnight dark:hover:text-white hover:bg-midnight/[0.06] dark:hover:bg-white/[0.07]'
 								}`}
 						>
 							{t(loc)}

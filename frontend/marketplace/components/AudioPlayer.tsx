@@ -25,7 +25,7 @@ import { toast } from 'sonner'
 import { useAudio } from './AudioProvider'
 import { useCardano } from '@/components/Providers'
 import { EXPLORER_URL } from '@/lib/config'
-import { buyFractionOnChain, formatTxError } from '@/lib/contractHelper'
+import { buyFractionOnChain, formatTxError, isUserDeclinedTxError } from '@/lib/contractHelper'
 
 
 interface AudioPlayerProps {
@@ -207,7 +207,11 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
       toast.success(`"${currentTrack.title}" collected!`, { id: mainToast })
     } catch (error: any) {
       logger.error('AudioPlayer: Collection Error', error)
-      toast.error(formatTxError(error), { id: mainToast })
+      if (isUserDeclinedTxError(error)) {
+        toast.info('You declined the transaction.', { id: mainToast })
+      } else {
+        toast.error(formatTxError(error), { id: mainToast })
+      }
     } finally {
       setIsMinting(false)
     }

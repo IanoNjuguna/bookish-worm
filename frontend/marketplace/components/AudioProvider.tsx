@@ -7,7 +7,7 @@ import { useBackendAuth } from '@/hooks/useBackendAuth'
 interface AudioContextType {
 	playerState: ReturnType<typeof useAudioPlayer>
 	handlePlayTrack: (track: Track, tracks?: any[]) => void
-	effectiveAddress: string | undefined
+	effectiveAddress: string | null
 	isConnected: boolean
 	isAuthenticated: boolean
 	isCheckingAuth: boolean

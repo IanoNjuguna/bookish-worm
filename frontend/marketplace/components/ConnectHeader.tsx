@@ -10,6 +10,7 @@ import { IconCopy, IconCheck, IconExternalLink, IconLogout, IconWallet, IconChev
 import { toast } from 'sonner'
 import { EXPLORER_URL } from '@/lib/config'
 import { ThemeToggle } from './ThemeToggle'
+import NotificationsMenu from './NotificationsMenu'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -150,6 +151,7 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
 
   return (
     <div className="flex items-center gap-3 relative">
+      <NotificationsMenu />
       <ThemeToggle />
       {!isConnected ? (
         <DropdownMenu>

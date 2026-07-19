@@ -1,7 +1,7 @@
 'use client'
 
 import { logger } from '@/lib/logger'
-import { buyFractionOnChain, buyAlbumFractionsOnChain, formatTxError } from '@/lib/contractHelper'
+import { buyFractionOnChain, buyAlbumFractionsOnChain, formatTxError, isUserDeclinedTxError } from '@/lib/contractHelper'
 import React from 'react'
 import { IconPlayerPlay, IconPlayerPause, IconLoader2, IconDiamond, IconDiamondFilled, IconDisc } from '@tabler/icons-react'
 import { DobaVisualizer } from '@/components/icons/DobaVisualizer'
@@ -323,7 +323,11 @@ export default function SongCard({
 
     } catch (error: unknown) {
       logger.error('Mint Error', error)
-      toast.error(formatTxError(error), { id: mainToast })
+      if (isUserDeclinedTxError(error)) {
+        toast.info('You declined the transaction.', { id: mainToast })
+      } else {
+        toast.error(formatTxError(error), { id: mainToast })
+      }
     } finally {
       setIsMinting(false)
     }
