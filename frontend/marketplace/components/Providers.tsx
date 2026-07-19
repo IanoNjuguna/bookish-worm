@@ -76,7 +76,21 @@ export function CardanoProvider({ children }: { children: React.ReactNode }) {
 			if (seedPhrase) {
 				try {
 					lucidInstance.selectWallet.fromSeed(seedPhrase);
-					setWalletApi(null);
+					// Seed wallets are not CIP-30 extensions. Expose a minimal signData-compatible API
+					// so backend auth can verify signatures exactly like extension wallets.
+					setWalletApi({
+						signData: async (address: string, payload: string) => {
+							const selectedWallet = typeof lucidInstance.wallet === "function"
+								? lucidInstance.wallet()
+								: lucidInstance.wallet;
+
+							if (!selectedWallet || typeof selectedWallet.signMessage !== "function") {
+								throw new Error("Seed wallet signer is unavailable");
+							}
+
+							return await selectedWallet.signMessage(address, payload);
+						},
+					});
 				} catch (e: any) {
 					console.error("Wallet selection from seed failed:", e);
 					throw new Error("Invalid seed phrase");

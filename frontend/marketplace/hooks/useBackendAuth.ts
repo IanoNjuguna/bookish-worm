@@ -14,7 +14,7 @@ interface AuthData {
 }
 
 export function useBackendAuth() {
-	const { address: cardanoAddress, stakeAddress, walletName, isConnected, walletApi } = useCardano()
+	const { address: cardanoAddress, stakeAddress, walletName, isConnected, walletApi, lucid } = useCardano()
 	const [accessToken, setAccessToken] = useState<string | null>(null)
 	const [isLoading, setIsLoading] = useState(false)
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -160,9 +160,49 @@ export function useBackendAuth() {
 		}
 	}, [])
 
+	const resolveSignerApi = useCallback(async (): Promise<any | null> => {
+		if (walletApi && typeof walletApi.signData === 'function') {
+			return walletApi
+		}
+
+		// Seed/test-mode wallet fallback (no CIP-30 extension available)
+		if (walletName === 'utxos' && lucid) {
+			const selectedWallet = typeof lucid.wallet === 'function' ? lucid.wallet() : lucid.wallet
+			if (selectedWallet && typeof selectedWallet.signMessage === 'function') {
+				return {
+					signData: async (address: string, payload: string) => selectedWallet.signMessage(address, payload)
+				}
+			}
+		}
+
+		// Extension reconnect fallback in case context signer wasn't hydrated yet
+		if (walletName && walletName !== 'utxos' && typeof window !== 'undefined') {
+			try {
+				const cardanoProvider = (window as any).cardano
+				const provider = cardanoProvider?.[walletName]
+				if (provider && typeof provider.enable === 'function') {
+					const api = await provider.enable()
+					if (api && typeof api.signData === 'function') {
+						return api
+					}
+				}
+			} catch {
+				// Ignore and allow caller to surface a user-friendly message.
+			}
+		}
+
+		return null
+	}, [walletApi, walletName, lucid])
+
 	const login = useCallback(async function loginFn(isRetry = false): Promise<string | null> {
-		if (!isConnected || !walletApi || !effectiveAddress) {
+		if (!isConnected || !effectiveAddress) {
 			toast.error('Please connect your Cardano wallet first')
+			return null
+		}
+
+		const signerApi = await resolveSignerApi()
+		if (!signerApi) {
+			toast.error('Wallet signer not ready. Please reconnect and try again.')
 			return null
 		}
 
@@ -198,7 +238,10 @@ export function useBackendAuth() {
 			.join('')
 
 		try {
-			const signatureResponse = await walletApi.signData(effectiveAddress, hexMessage)
+			const signatureResponse = await signerApi.signData(effectiveAddress, hexMessage)
+			if (!signatureResponse?.signature || !signatureResponse?.key) {
+				throw new Error('Wallet returned an invalid signature payload')
+			}
 			
 			const res = await fetch(`${API_URL}/auth/login`, {
 				method: 'POST',
@@ -254,7 +297,7 @@ export function useBackendAuth() {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [isConnected, walletName, effectiveAddress, scheduleRefresh, preloadedNonce, nonceTimestamp, walletApi])
+	}, [isConnected, effectiveAddress, scheduleRefresh, preloadedNonce, nonceTimestamp, resolveSignerApi])
 
 	const getValidToken = useCallback(async () => {
 		if (typeof window === 'undefined') return null

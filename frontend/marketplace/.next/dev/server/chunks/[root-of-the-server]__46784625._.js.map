@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 40, "column": 0}, "map": {"version":3,"sources":["file:///D:/Users/icheg/Documents/bookish-worm/frontend/marketplace/i18n/routing.ts"],"sourcesContent":["import { defineRouting } from 'next-intl/routing';\r\n\r\nexport const routing = defineRouting({\r\n\tlocales: ['en', 'sw', 'fr', 'es', 'pt', 'zh', 'ja', 'ko', 'th', 'vi', 'ru', 'he', 'ar', 'uk'],\r\n\tdefaultLocale: 'en',\r\n\tlocalePrefix: 'as-needed',\r\n});\r\n\r\nexport type Locale = (typeof routing.locales)[number];\r\n"],"names":[],"mappings":";;;;AAAA;;AAEO,MAAM,UAAU,IAAA,mPAAa,EAAC;IACpC,SAAS;QAAC;QAAM;QAAM;QAAM;QAAM;QAAM;QAAM;QAAM;QAAM;QAAM;QAAM;QAAM;QAAM;QAAM;KAAK;IAC7F,eAAe;IACf,cAAc;AACf"}},
+    {"offset": {"line": 70, "column": 0}, "map": {"version":3,"sources":["file:///D:/Users/icheg/Documents/bookish-worm/frontend/marketplace/proxy.ts"],"sourcesContent":["import createMiddleware from 'next-intl/middleware';\r\nimport { routing } from './i18n/routing';\r\n\r\nexport default createMiddleware(routing);\r\n\r\nexport const config = {\r\n  matcher: ['/((?!api|_next|_vercel|.*\\\\..*).*)']\r\n};\r\n"],"names":[],"mappings":";;;;;;AAAA;AACA;;;uCAEe,IAAA,iMAAgB,EAAC,0HAAO;AAEhC,MAAM,SAAS;IACpB,SAAS;QAAC;KAAqC;AACjD"}}]
+}
