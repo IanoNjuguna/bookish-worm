@@ -1,0 +1,9749 @@
+module.exports = [
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/assert.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var __read = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__read || function(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while((n === void 0 || n-- > 0) && !(r = i.next()).done)ar.push(r.value);
+    } catch (error) {
+        e = {
+            error: error
+        };
+    } finally{
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        } finally{
+            if (e) throw e.error;
+        }
+    }
+    return ar;
+};
+var __spreadArray = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__spreadArray || function(to, from, pack) {
+    if (pack || arguments.length === 2) for(var i = 0, l = from.length, ar; i < l; i++){
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.assertBytes = exports.assertPostiveInteger = exports.assert = void 0;
+function assert(condition, errorMessage, addInfos) {
+    var args = [];
+    for(var _i = 3; _i < arguments.length; _i++){
+        args[_i - 3] = arguments[_i];
+    }
+    if (condition) return;
+    args.length > 0 && console.error.apply(console, __spreadArray([], __read(args), false));
+    addInfos && console.error(addInfos);
+    if (errorMessage instanceof Error) {
+        throw errorMessage;
+    }
+    ;
+    throw new Error(errorMessage);
+}
+exports.assert = assert;
+// keccak asserts
+function assertPostiveInteger(n) {
+    if (!Number.isSafeInteger(n) || n < 0) throw new Error("positive integer expected, not ".concat(n));
+}
+exports.assertPostiveInteger = assertPostiveInteger;
+function assertBytes(stuff) {
+    if (!(stuff instanceof Uint8Array)) throw new Error("Uint8Array expected");
+}
+exports.assertBytes = assertBytes;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/types.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.uint64Rotr = exports.uint64ToBytesBE = exports.uint64ToBytesLE = exports.isUint64 = exports.forceUint64 = exports.uint64 = exports.buffToUint5Arr = exports.byteArrToBin = exports.byteArrToHex = exports.buffToByteArr = exports.isByteArr = exports.isByte = exports.byte = exports.isUint6 = exports.isUint5 = void 0;
+var uint8array_utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+uint8array-utils@1.0.4/node_modules/@harmoniclabs/uint8array-utils/dist/index.js [app-ssr] (ecmascript)");
+var assert_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/assert.js [app-ssr] (ecmascript)");
+function isUint5(n) {
+    return typeof n === "number" && n >= 0 && n <= 31 && n === Math.round(n);
+}
+exports.isUint5 = isUint5;
+function isUint6(n) {
+    return typeof n === "number" && n >= 0 && n <= 63 && n === Math.round(n);
+}
+exports.isUint6 = isUint6;
+function byte(bint) {
+    return Number(bint) & 0xff;
+}
+exports.byte = byte;
+function isByte(n) {
+    return typeof n === "number" && n >= 0 && n <= 255 && n === Math.round(n);
+}
+exports.isByte = isByte;
+function isByteArr(something) {
+    return Array.isArray(something) && something.every(isByte);
+}
+exports.isByteArr = isByteArr;
+function buffToByteArr(buff) {
+    if (!(0, uint8array_utils_1.isUint8Array)(buff)) {
+        if (isByteArr(buff)) return buff.slice();
+        throw new Error("can't convert non-buffer to byte array");
+    }
+    return Array.from(buff);
+}
+exports.buffToByteArr = buffToByteArr;
+function byteArrToHex(bytes) {
+    if (bytes instanceof Uint8Array) bytes = Array.from(bytes);
+    return bytes.reduce(function(acc, val) {
+        return acc + val.toString(16).slice(0, 2).padStart(2, '0');
+    }, '');
+}
+exports.byteArrToHex = byteArrToHex;
+function byteArrToBin(bytes) {
+    return bytes.reduce(function(acc, val) {
+        return acc + val.toString(2).slice(0, 8).padStart(8, '0');
+    }, '');
+}
+exports.byteArrToBin = byteArrToBin;
+/**
+ * Internal method
+ *
+ * `bytes` is **padded at the end** to be a multiple of 5
+ */ function buffToUint5Arr(bytes) {
+    var result = [];
+    var bits = (0, uint8array_utils_1.isUint8Array)(bytes) ? Array.from(bytes).reduce(function(acc, n) {
+        return acc + n.toString(2).padStart(8, '0');
+    }, "") : isByteArr(bytes) ? byteArrToBin(bytes) : undefined;
+    if (bits === undefined) {
+        throw new Error("invalid input to convert ot uint5 array");
+    }
+    var mod5Len = bits.length % 5;
+    if (mod5Len !== 0) {
+        bits = bits.padEnd(bits.length + (5 - mod5Len), '0');
+    }
+    bits = bits.split('');
+    for(var i = 0; i < bits.length;){
+        result.push(Number("0b".concat(bits[i++]).concat(bits[i++]).concat(bits[i++]).concat(bits[i++]).concat(bits[i++])));
+    }
+    return result;
+}
+exports.buffToUint5Arr = buffToUint5Arr;
+function uint64(n) {
+    var _n = BigInt(n);
+    if (!isUint64(_n)) throw new Error("can't convert " + n + " to uint64");
+    return _n;
+}
+exports.uint64 = uint64;
+function forceUint64(n) {
+    return BigInt(n) & BigInt("0x" + "ff".repeat(8));
+}
+exports.forceUint64 = forceUint64;
+function isUint64(n) {
+    return typeof n === "bigint" && n >= BigInt(0) && n < BigInt("0x1" + "00".repeat(8)) // n < (1 << 64)
+    ;
+}
+exports.isUint64 = isUint64;
+function uint64ToBytesLE(uint) {
+    return [
+        byte(BigInt("0x00000000000000ff") & uint),
+        byte((BigInt("0x000000000000ff00") & uint) >> BigInt(8)),
+        byte((BigInt("0x0000000000ff0000") & uint) >> BigInt(16)),
+        byte((BigInt("0x00000000ff000000") & uint) >> BigInt(24)),
+        byte((BigInt("0x000000ff00000000") & uint) >> BigInt(32)),
+        byte((BigInt("0x0000ff0000000000") & uint) >> BigInt(40)),
+        byte((BigInt("0x00ff000000000000") & uint) >> BigInt(48)),
+        byte((BigInt("0xff00000000000000") & uint) >> BigInt(56))
+    ];
+}
+exports.uint64ToBytesLE = uint64ToBytesLE;
+function uint64ToBytesBE(uint) {
+    return uint64ToBytesLE(uint).reverse();
+}
+exports.uint64ToBytesBE = uint64ToBytesBE;
+function uint64Rotr(a, b) {
+    (0, assert_1.assert)(isUint64(a) && isUint6(b), "invalid args for 'uint64And'");
+    if (b === 0) return a;
+    var n = BigInt(b);
+    return forceUint64(forceUint64(a >> n) | forceUint64(a << BigInt(64) - n));
+}
+exports.uint64Rotr = uint64Rotr;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/base32.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.decodeBase32Bech32 = exports.decodeBase32rfc4648 = exports.encodeBase32rfc4648 = exports.BECH32_BASE32_ALPHABET = exports.rfc4648_ALPHABET = void 0;
+var types_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/types.js [app-ssr] (ecmascript)");
+var bitstream_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+bitstream@1.0.0/node_modules/@harmoniclabs/bitstream/dist/index.js [app-ssr] (ecmascript)");
+exports.rfc4648_ALPHABET = Object.freeze([
+    'a',
+    'b',
+    'c',
+    'd',
+    'e',
+    'f',
+    'g',
+    'h',
+    'i',
+    'j',
+    'k',
+    'l',
+    'm',
+    'n',
+    'o',
+    'p',
+    'q',
+    'r',
+    's',
+    't',
+    'u',
+    'v',
+    'w',
+    'x',
+    'y',
+    'z',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7'
+]);
+exports.BECH32_BASE32_ALPHABET = Object.freeze([
+    'q',
+    'p',
+    'z',
+    'r',
+    'y',
+    '9',
+    'x',
+    '8',
+    'g',
+    'f',
+    '2',
+    't',
+    'v',
+    'd',
+    'w',
+    '0',
+    's',
+    '3',
+    'j',
+    'n',
+    '5',
+    '4',
+    'k',
+    'h',
+    'c',
+    'e',
+    '6',
+    'm',
+    'u',
+    'a',
+    '7',
+    'l'
+]);
+function encodeBase32rfc4648(bytes) {
+    return (0, types_1.buffToUint5Arr)(bytes).map(function(c) {
+        return exports.rfc4648_ALPHABET[c];
+    }).join("");
+}
+exports.encodeBase32rfc4648 = encodeBase32rfc4648;
+function decodeBase32(base32Str, alpabeth) {
+    if (!Array.from(base32Str).every(function(ch) {
+        return alpabeth.includes(ch);
+    })) throw new Error("can't decode base32 a string that is not in base32 (rfc 4648); string was: " + base32Str);
+    var len = base32Str.length;
+    var bits = '';
+    for(var i = 0; i < len - 1; i++){
+        var num_1 = alpabeth.indexOf(base32Str[i].toLowerCase());
+        bits += num_1.toString(2).padStart(5, '0');
+    }
+    // last, make sure we align to byte
+    var nCut = len * 5 - 8 * Math.floor(len * 5 / 8);
+    var num = alpabeth.indexOf(base32Str[len - 1].toLowerCase());
+    var lastbits = num.toString(2).padStart(5, '0');
+    bits += lastbits.slice(0, 5 - nCut);
+    return bitstream_1.BitStream.fromBinStr(bits).toBuffer().buffer;
+}
+function decodeBase32rfc4648(base32Str) {
+    return decodeBase32(base32Str, exports.rfc4648_ALPHABET);
+}
+exports.decodeBase32rfc4648 = decodeBase32rfc4648;
+function decodeBase32Bech32(base32Str) {
+    return decodeBase32(base32Str, exports.BECH32_BASE32_ALPHABET);
+}
+exports.decodeBase32Bech32 = decodeBase32Bech32;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/bech32.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var __values = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__values || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function() {
+            if (o && i >= o.length) o = void 0;
+            return {
+                value: o && o[i++],
+                done: !o
+            };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.decodeBech32 = exports.isBech32 = exports.encodeBech32 = exports.getBech32Checksum = exports.getBech32Polymod = exports.expandBech32HumanReadablePart = void 0;
+var uint8array_utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+uint8array-utils@1.0.4/node_modules/@harmoniclabs/uint8array-utils/dist/index.js [app-ssr] (ecmascript)");
+var types_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/types.js [app-ssr] (ecmascript)");
+var base32_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/base32.js [app-ssr] (ecmascript)");
+var assert_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/assert.js [app-ssr] (ecmascript)");
+/**
+ * Expand human readable prefix of the bech32 encoding so it can be used in the checkSum
+ */ function expandBech32HumanReadablePart(hrp) {
+    var e_1, _a, e_2, _b;
+    var bytes = [];
+    try {
+        for(var hrp_1 = __values(hrp), hrp_1_1 = hrp_1.next(); !hrp_1_1.done; hrp_1_1 = hrp_1.next()){
+            var c = hrp_1_1.value;
+            bytes.push(c.charCodeAt(0) >> 5);
+        }
+    } catch (e_1_1) {
+        e_1 = {
+            error: e_1_1
+        };
+    } finally{
+        try {
+            if (hrp_1_1 && !hrp_1_1.done && (_a = hrp_1.return)) _a.call(hrp_1);
+        } finally{
+            if (e_1) throw e_1.error;
+        }
+    }
+    bytes.push(0);
+    try {
+        for(var hrp_2 = __values(hrp), hrp_2_1 = hrp_2.next(); !hrp_2_1.done; hrp_2_1 = hrp_2.next()){
+            var c = hrp_2_1.value;
+            bytes.push(c.charCodeAt(0) & 31);
+        }
+    } catch (e_2_1) {
+        e_2 = {
+            error: e_2_1
+        };
+    } finally{
+        try {
+            if (hrp_2_1 && !hrp_2_1.done && (_b = hrp_2.return)) _b.call(hrp_2);
+        } finally{
+            if (e_2) throw e_2.error;
+        }
+    }
+    return bytes;
+}
+exports.expandBech32HumanReadablePart = expandBech32HumanReadablePart;
+var BECH32_POLYMOD_GEN = Object.freeze([
+    0x3b6a57b2,
+    0x26508e6d,
+    0x1ea119fa,
+    0x3d4233dd,
+    0x2a1462b3
+]);
+/**
+ * Used as part of the bech32 checksum.
+ */ function getBech32Polymod(bytes) {
+    var e_3, _a;
+    var checksum = 1;
+    try {
+        for(var bytes_1 = __values(bytes), bytes_1_1 = bytes_1.next(); !bytes_1_1.done; bytes_1_1 = bytes_1.next()){
+            var byte_1 = bytes_1_1.value;
+            var c = checksum >> 25;
+            checksum = (checksum & 0x1fffffff) << 5 ^ byte_1;
+            for(var i = 0; i < 5; i++){
+                if ((c >> i & 1) != 0) {
+                    checksum ^= BECH32_POLYMOD_GEN[i];
+                }
+            }
+        }
+    } catch (e_3_1) {
+        e_3 = {
+            error: e_3_1
+        };
+    } finally{
+        try {
+            if (bytes_1_1 && !bytes_1_1.done && (_a = bytes_1.return)) _a.call(bytes_1);
+        } finally{
+            if (e_3) throw e_3.error;
+        }
+    }
+    return checksum;
+}
+exports.getBech32Polymod = getBech32Polymod;
+/**
+ * Generate the bech32 checksum
+ */ function getBech32Checksum(humanReadablePart, data) {
+    var checksum = getBech32Polymod(expandBech32HumanReadablePart(humanReadablePart).concat(data).concat([
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+    ])) ^ 1;
+    var chkSum = [];
+    for(var i = 0; i < 6; i++){
+        chkSum.push(checksum >> 5 * (5 - i) & 31);
+    }
+    return chkSum;
+}
+exports.getBech32Checksum = getBech32Checksum;
+/**
+ * Creates a bech32 checksummed string (used to represent Cardano addresses)
+ * @example
+ * encodeBech32("foo", textToBytes("foobar")) => "foo1vehk7cnpwgry9h96"
+ * @example
+ * encodeBech32("addr_test", hexToBytes("70a9508f015cfbcffc3d88ac4c1c934b5b82d2bb281d464672f6c49539")) => "addr_test1wz54prcptnaullpa3zkyc8ynfddc954m9qw5v3nj7mzf2wggs2uld"
+ * @param {byte[]} data - uint8 0 - 256
+ */ function encodeBech32(humanReadablePart, data) {
+    (0, assert_1.assert)(humanReadablePart.length > 0, "human-readable-part must have non-zero length");
+    var _data = (0, types_1.buffToUint5Arr)((0, uint8array_utils_1.isUint8Array)(data) ? data : new Uint8Array(data));
+    return humanReadablePart + "1" + _data.concat(getBech32Checksum(humanReadablePart, _data)).map(function(val) {
+        return base32_1.BECH32_BASE32_ALPHABET[val];
+    }).join("");
+}
+exports.encodeBech32 = encodeBech32;
+/**
+ * Verify a bech32 checksum
+ * @example
+ * isBech32("foo1vehk7cnpwgry9h96") => true
+ * @example
+ * isBech32("foo1vehk7cnpwgry9h97") => false
+ * @example
+ * isBech32("a12uel5l") => true
+ * @example
+ * isBech32("mm1crxm3i") => false
+ * @example
+ * isBech32("A1G7SGD8") => false
+ * @example
+ * isBech32("abcdef1qpzry9x8gf2tvdw0s3jn54khce6mua7lmqqqxw") => true
+ * @example
+ * isBech32("?1ezyfcl") => true
+ * @example
+ * isBech32("addr_test1wz54prcptnaullpa3zkyc8ynfddc954m9qw5v3nj7mzf2wggs2uld") => true
+ * @param {string} addr
+ * @returns {boolean}
+ */ function isBech32(addr) {
+    var e_4, _a;
+    var i = addr.indexOf("1");
+    if (i == -1 || i == 0) {
+        return false;
+    }
+    var hrp = addr.slice(0, i);
+    addr = addr.slice(i + 1);
+    var data = [];
+    try {
+        for(var addr_1 = __values(addr), addr_1_1 = addr_1.next(); !addr_1_1.done; addr_1_1 = addr_1.next()){
+            var ch = addr_1_1.value;
+            var j = base32_1.BECH32_BASE32_ALPHABET.indexOf(ch);
+            if (j == -1) {
+                return false;
+            }
+            data.push(j);
+        }
+    } catch (e_4_1) {
+        e_4 = {
+            error: e_4_1
+        };
+    } finally{
+        try {
+            if (addr_1_1 && !addr_1_1.done && (_a = addr_1.return)) _a.call(addr_1);
+        } finally{
+            if (e_4) throw e_4.error;
+        }
+    }
+    var chkSumA = data.slice(data.length - 6);
+    var chkSumB = getBech32Checksum(hrp, data.slice(0, data.length - 6));
+    for(var i_1 = 0; i_1 < 6; i_1++){
+        if (chkSumA[i_1] != chkSumB[i_1]) {
+            return false;
+        }
+    }
+    return true;
+}
+exports.isBech32 = isBech32;
+/**
+ * Decomposes a bech32 checksummed string (i.e. Cardano address), and returns the human readable part and the original bytes
+ * Throws an error if checksum is invalid.
+ * @example
+ * bytesToHex(decodeBech32("addr_test1wz54prcptnaullpa3zkyc8ynfddc954m9qw5v3nj7mzf2wggs2uld")[1]) => "70a9508f015cfbcffc3d88ac4c1c934b5b82d2bb281d464672f6c49539"
+ * @param {string} addr
+ * @returns {[humanReadablePart: string, bytes: byte[]]}
+ */ function decodeBech32(addr) {
+    (0, assert_1.assert)(isBech32(addr), "invalid bech32 addr");
+    var i = addr.indexOf("1");
+    (0, assert_1.assert)(i != -1, "bech32 address missing the '1' separator");
+    var hrp = addr.slice(0, i);
+    addr = addr.slice(i + 1);
+    var data = (0, base32_1.decodeBase32Bech32)(addr.slice(0, addr.length - 6));
+    return [
+        hrp,
+        Array.from(data)
+    ];
+}
+exports.decodeBech32 = decodeBech32;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/blake2b.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.blake2b_512 = exports.blake2b_256 = exports.blake2b_224 = exports.blake2b_128 = exports.blake2b = void 0;
+/**
+ * 64-bit unsigned addition
+ * Sets v[a,a+1] += v[b,b+1]
+ * v should be a Uint32Array
+ */ function ADD64AA(v, a, b) {
+    var o0 = v[a] + v[b];
+    var o1 = v[a + 1] + v[b + 1];
+    if (o0 >= 0x100000000) {
+        o1++;
+    }
+    v[a] = o0;
+    v[a + 1] = o1;
+}
+// 64-bit unsigned addition
+// Sets v[a,a+1] += b
+// b0 is the low 32 bits of b, b1 represents the high 32 bits
+function ADD64AC(v, a, b0, b1) {
+    var o0 = v[a] + b0;
+    if (b0 < 0) {
+        o0 += 0x100000000;
+    }
+    var o1 = v[a + 1] + b1;
+    if (o0 >= 0x100000000) {
+        o1++;
+    }
+    v[a] = o0;
+    v[a + 1] = o1;
+}
+// Little-endian byte access
+function B2B_GET32(arr, i) {
+    return arr[i] ^ arr[i + 1] << 8 ^ arr[i + 2] << 16 ^ arr[i + 3] << 24;
+}
+// G Mixing function
+// The ROTRs are inlined for speed
+function B2B_G(a, b, c, d, ix, iy) {
+    var x0 = m[ix];
+    var x1 = m[ix + 1];
+    var y0 = m[iy];
+    var y1 = m[iy + 1];
+    ADD64AA(v, a, b); // v[a,a+1] += v[b,b+1] ... in JS we must store a uint64 as two uint32s
+    ADD64AC(v, a, x0, x1); // v[a, a+1] += x ... x0 is the low 32 bits of x, x1 is the high 32 bits
+    // v[d,d+1] = (v[d,d+1] xor v[a,a+1]) rotated to the right by 32 bits
+    var xor0 = v[d] ^ v[a];
+    var xor1 = v[d + 1] ^ v[a + 1];
+    v[d] = xor1;
+    v[d + 1] = xor0;
+    ADD64AA(v, c, d);
+    // v[b,b+1] = (v[b,b+1] xor v[c,c+1]) rotated right by 24 bits
+    xor0 = v[b] ^ v[c];
+    xor1 = v[b + 1] ^ v[c + 1];
+    v[b] = xor0 >>> 24 ^ xor1 << 8;
+    v[b + 1] = xor1 >>> 24 ^ xor0 << 8;
+    ADD64AA(v, a, b);
+    ADD64AC(v, a, y0, y1);
+    // v[d,d+1] = (v[d,d+1] xor v[a,a+1]) rotated right by 16 bits
+    xor0 = v[d] ^ v[a];
+    xor1 = v[d + 1] ^ v[a + 1];
+    v[d] = xor0 >>> 16 ^ xor1 << 16;
+    v[d + 1] = xor1 >>> 16 ^ xor0 << 16;
+    ADD64AA(v, c, d);
+    // v[b,b+1] = (v[b,b+1] xor v[c,c+1]) rotated right by 63 bits
+    xor0 = v[b] ^ v[c];
+    xor1 = v[b + 1] ^ v[c + 1];
+    v[b] = xor1 >>> 31 ^ xor0 << 1;
+    v[b + 1] = xor0 >>> 31 ^ xor1 << 1;
+}
+// Initialization Vector
+var BLAKE2B_IV32 = new Uint32Array([
+    0xf3bcc908,
+    0x6a09e667,
+    0x84caa73b,
+    0xbb67ae85,
+    0xfe94f82b,
+    0x3c6ef372,
+    0x5f1d36f1,
+    0xa54ff53a,
+    0xade682d1,
+    0x510e527f,
+    0x2b3e6c1f,
+    0x9b05688c,
+    0xfb41bd6b,
+    0x1f83d9ab,
+    0x137e2179,
+    0x5be0cd19
+]);
+var SIGMA8 = [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    14,
+    10,
+    4,
+    8,
+    9,
+    15,
+    13,
+    6,
+    1,
+    12,
+    0,
+    2,
+    11,
+    7,
+    5,
+    3,
+    11,
+    8,
+    12,
+    0,
+    5,
+    2,
+    15,
+    13,
+    10,
+    14,
+    3,
+    6,
+    7,
+    1,
+    9,
+    4,
+    7,
+    9,
+    3,
+    1,
+    13,
+    12,
+    11,
+    14,
+    2,
+    6,
+    5,
+    10,
+    4,
+    0,
+    15,
+    8,
+    9,
+    0,
+    5,
+    7,
+    2,
+    4,
+    10,
+    15,
+    14,
+    1,
+    11,
+    12,
+    6,
+    8,
+    3,
+    13,
+    2,
+    12,
+    6,
+    10,
+    0,
+    11,
+    8,
+    3,
+    4,
+    13,
+    7,
+    5,
+    15,
+    14,
+    1,
+    9,
+    12,
+    5,
+    1,
+    15,
+    14,
+    13,
+    4,
+    10,
+    0,
+    7,
+    6,
+    3,
+    9,
+    2,
+    8,
+    11,
+    13,
+    11,
+    7,
+    14,
+    12,
+    1,
+    3,
+    9,
+    5,
+    0,
+    15,
+    4,
+    8,
+    6,
+    2,
+    10,
+    6,
+    15,
+    14,
+    9,
+    11,
+    3,
+    0,
+    8,
+    12,
+    2,
+    13,
+    7,
+    1,
+    4,
+    10,
+    5,
+    10,
+    2,
+    8,
+    4,
+    7,
+    6,
+    1,
+    5,
+    15,
+    11,
+    9,
+    14,
+    3,
+    12,
+    13,
+    0,
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    14,
+    10,
+    4,
+    8,
+    9,
+    15,
+    13,
+    6,
+    1,
+    12,
+    0,
+    2,
+    11,
+    7,
+    5,
+    3
+];
+// These are offsets into a uint64 buffer.
+// Multiply them all by 2 to make them offsets into a uint32 buffer,
+// because this is Javascript and we don't have uint64s
+var SIGMA82 = new Uint8Array(SIGMA8.map(function(x) {
+    return x * 2;
+}));
+// Compression function. 'last' flag indicates last block.
+// Note we're representing 16 uint64s as 32 uint32s
+var v = new Uint32Array(32);
+var m = new Uint32Array(32);
+function blake2bCompress(ctx, last) {
+    var i = 0;
+    // init work variables
+    for(i = 0; i < 16; i++){
+        v[i] = ctx.h[i];
+        v[i + 16] = BLAKE2B_IV32[i];
+    }
+    // low 64 bits of offset
+    v[24] = v[24] ^ ctx.t;
+    v[25] = v[25] ^ ctx.t / 0x100000000;
+    // high 64 bits not supported, offset may not be higher than 2**53-1
+    // last block flag set ?
+    if (last) {
+        v[28] = ~v[28];
+        v[29] = ~v[29];
+    }
+    // get little-endian words
+    for(i = 0; i < 32; i++){
+        m[i] = B2B_GET32(ctx.b, 4 * i);
+    }
+    // twelve rounds of mixing
+    // uncomment the DebugPrint calls to log the computation
+    // and match the RFC sample documentation
+    // util.debugPrint('          m[16]', m, 64)
+    for(i = 0; i < 12; i++){
+        // util.debugPrint('   (i=' + (i < 10 ? ' ' : '') + i + ') v[16]', v, 64)
+        B2B_G(0, 8, 16, 24, SIGMA82[i * 16 + 0], SIGMA82[i * 16 + 1]);
+        B2B_G(2, 10, 18, 26, SIGMA82[i * 16 + 2], SIGMA82[i * 16 + 3]);
+        B2B_G(4, 12, 20, 28, SIGMA82[i * 16 + 4], SIGMA82[i * 16 + 5]);
+        B2B_G(6, 14, 22, 30, SIGMA82[i * 16 + 6], SIGMA82[i * 16 + 7]);
+        B2B_G(0, 10, 20, 30, SIGMA82[i * 16 + 8], SIGMA82[i * 16 + 9]);
+        B2B_G(2, 12, 22, 24, SIGMA82[i * 16 + 10], SIGMA82[i * 16 + 11]);
+        B2B_G(4, 14, 16, 26, SIGMA82[i * 16 + 12], SIGMA82[i * 16 + 13]);
+        B2B_G(6, 8, 18, 28, SIGMA82[i * 16 + 14], SIGMA82[i * 16 + 15]);
+    }
+    // util.debugPrint('   (i=12) v[16]', v, 64)
+    for(i = 0; i < 16; i++){
+        ctx.h[i] = ctx.h[i] ^ v[i] ^ v[i + 16];
+    }
+// util.debugPrint('h[8]', ctx.h, 64)
+}
+/** reusable parameterBlock */ var parameterBlock = new Uint8Array(64).fill(0);
+function blake2bInit(digestSize) {
+    // state, 'param block'
+    var ctx = {
+        b: new Uint8Array(128),
+        h: new Uint32Array(16),
+        t: 0,
+        c: 0,
+        digestSize: digestSize // output length in bytes
+    };
+    // initialize parameterBlock before usage
+    parameterBlock.fill(0);
+    parameterBlock[0] = digestSize;
+    parameterBlock[2] = 1; // fanout
+    parameterBlock[3] = 1; // depth
+    // initialize hash state
+    for(var i = 0; i < 16; i++){
+        ctx.h[i] = BLAKE2B_IV32[i] ^ B2B_GET32(parameterBlock, i * 4);
+    }
+    return ctx;
+}
+// Updates a BLAKE2b streaming hash
+// Requires hash context and Uint8Array (byte array)
+function blake2bUpdate(ctx, input) {
+    for(var i = 0; i < input.length; i++){
+        if (ctx.c === 128) {
+            // buffer full ?
+            ctx.t += ctx.c; // add counters
+            blake2bCompress(ctx, false); // compress (not last)
+            ctx.c = 0; // counter to zero
+        }
+        ctx.b[ctx.c++] = input[i];
+    }
+}
+// Completes a BLAKE2b streaming hash
+// Returns a Uint8Array containing the message digest
+function blake2bFinal(ctx) {
+    ctx.t += ctx.c; // mark last block offset
+    while(ctx.c < 128){
+        // fill up with zeros
+        ctx.b[ctx.c++] = 0;
+    }
+    blake2bCompress(ctx, true); // final block flag = 1
+    // little endian convert and store
+    var out = new Uint8Array(ctx.digestSize);
+    for(var i = 0; i < ctx.digestSize; i++){
+        out[i] = ctx.h[i >> 2] >> 8 * (i & 3);
+    }
+    return out;
+}
+function blake2b(data, digestSize) {
+    if (digestSize === void 0) {
+        digestSize = 32;
+    }
+    data = new Uint8Array(data);
+    var ctx = blake2bInit(digestSize);
+    blake2bUpdate(ctx, data);
+    return blake2bFinal(ctx);
+}
+exports.blake2b = blake2b;
+function blake2b_128(data) {
+    return blake2b(data, 16);
+}
+exports.blake2b_128 = blake2b_128;
+function blake2b_224(data) {
+    return blake2b(data, 28);
+}
+exports.blake2b_224 = blake2b_224;
+function blake2b_256(data) {
+    return blake2b(data, 32);
+}
+exports.blake2b_256 = blake2b_256;
+function blake2b_512(data) {
+    return blake2b(data, 64);
+}
+exports.blake2b_512 = blake2b_512;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/_u64.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var __read = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__read || function(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while((n === void 0 || n-- > 0) && !(r = i.next()).done)ar.push(r.value);
+    } catch (error) {
+        e = {
+            error: error
+        };
+    } finally{
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        } finally{
+            if (e) throw e.error;
+        }
+    }
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.add5H = exports.add5L = exports.add4H = exports.add4L = exports.add3H = exports.add3L = exports.add = exports.rotlBL = exports.rotlBH = exports.rotlSL = exports.rotlSH = exports.rotr32L = exports.rotr32H = exports.rotrBL = exports.rotrBH = exports.rotrSL = exports.rotrSH = exports.shrSL = exports.shrSH = exports.toBig = exports.split = exports.fromBig = void 0;
+/*
+THIS IMPLEMENTATION WAS TAKEN FROM `@noble/hashes`
+
+original source: https://github.com/paulmillr/noble-hashes/blob/6ae82e75d4c354d53a488e95b1bfe9cba90bd6ff/src/_u64.ts#L1
+
+it was modified and adapted to this repository to re-use already defined stuff
+
+the main reason for copying over and not using as dependency is because of different target in the `tsconfig.json`
+
+`@noble/hashes` targets es2020, which tends to cause problems with some other (older) packages sometimes
+
+this repo targets ES5+
+*/ var U32_MASK64 = /* @__PURE__ */ BigInt(Math.pow(2, 32) - 1);
+var _32n = /* @__PURE__ */ BigInt(32);
+// We are not using BigUint64Array, because they are extremely slow as per 2022
+function fromBig(n, le) {
+    if (le === void 0) {
+        le = false;
+    }
+    if (le) return {
+        h: Number(n & U32_MASK64),
+        l: Number(n >> _32n & U32_MASK64)
+    };
+    return {
+        h: Number(n >> _32n & U32_MASK64) | 0,
+        l: Number(n & U32_MASK64) | 0
+    };
+}
+exports.fromBig = fromBig;
+function split(lst, le) {
+    var _a;
+    if (le === void 0) {
+        le = false;
+    }
+    var Ah = new Uint32Array(lst.length);
+    var Al = new Uint32Array(lst.length);
+    for(var i = 0; i < lst.length; i++){
+        var _b = fromBig(lst[i], le), h = _b.h, l = _b.l;
+        _a = __read([
+            h,
+            l
+        ], 2), Ah[i] = _a[0], Al[i] = _a[1];
+    }
+    return [
+        Ah,
+        Al
+    ];
+}
+exports.split = split;
+var toBig = function(h, l) {
+    return BigInt(h >>> 0) << _32n | BigInt(l >>> 0);
+};
+exports.toBig = toBig;
+// for Shift in [0, 32)
+var shrSH = function(h, _l, s) {
+    return h >>> s;
+};
+exports.shrSH = shrSH;
+var shrSL = function(h, l, s) {
+    return h << 32 - s | l >>> s;
+};
+exports.shrSL = shrSL;
+// Right rotate for Shift in [1, 32)
+var rotrSH = function(h, l, s) {
+    return h >>> s | l << 32 - s;
+};
+exports.rotrSH = rotrSH;
+var rotrSL = function(h, l, s) {
+    return h << 32 - s | l >>> s;
+};
+exports.rotrSL = rotrSL;
+// Right rotate for Shift in (32, 64), NOTE: 32 is special case.
+var rotrBH = function(h, l, s) {
+    return h << 64 - s | l >>> s - 32;
+};
+exports.rotrBH = rotrBH;
+var rotrBL = function(h, l, s) {
+    return h >>> s - 32 | l << 64 - s;
+};
+exports.rotrBL = rotrBL;
+// Right rotate for shift===32 (just swaps l&h)
+var rotr32H = function(_h, l) {
+    return l;
+};
+exports.rotr32H = rotr32H;
+var rotr32L = function(h, _l) {
+    return h;
+};
+exports.rotr32L = rotr32L;
+// Left rotate for Shift in [1, 32)
+var rotlSH = function(h, l, s) {
+    return h << s | l >>> 32 - s;
+};
+exports.rotlSH = rotlSH;
+var rotlSL = function(h, l, s) {
+    return l << s | h >>> 32 - s;
+};
+exports.rotlSL = rotlSL;
+// Left rotate for Shift in (32, 64), NOTE: 32 is special case.
+var rotlBH = function(h, l, s) {
+    return l << s - 32 | h >>> 64 - s;
+};
+exports.rotlBH = rotlBH;
+var rotlBL = function(h, l, s) {
+    return h << s - 32 | l >>> 64 - s;
+};
+exports.rotlBL = rotlBL;
+// JS uses 32-bit signed integers for bitwise operations which means we cannot
+// simple take carry out of low bit sum by shift, we need to use division.
+function add(Ah, Al, Bh, Bl) {
+    var l = (Al >>> 0) + (Bl >>> 0);
+    return {
+        h: Ah + Bh + (l / Math.pow(2, 32) | 0) | 0,
+        l: l | 0
+    };
+}
+exports.add = add;
+// Addition with more than 2 elements
+var add3L = function(Al, Bl, Cl) {
+    return (Al >>> 0) + (Bl >>> 0) + (Cl >>> 0);
+};
+exports.add3L = add3L;
+var add3H = function(low, Ah, Bh, Ch) {
+    return Ah + Bh + Ch + (low / Math.pow(2, 32) | 0) | 0;
+};
+exports.add3H = add3H;
+var add4L = function(Al, Bl, Cl, Dl) {
+    return (Al >>> 0) + (Bl >>> 0) + (Cl >>> 0) + (Dl >>> 0);
+};
+exports.add4L = add4L;
+var add4H = function(low, Ah, Bh, Ch, Dh) {
+    return Ah + Bh + Ch + Dh + (low / Math.pow(2, 32) | 0) | 0;
+};
+exports.add4H = add4H;
+var add5L = function(Al, Bl, Cl, Dl, El) {
+    return (Al >>> 0) + (Bl >>> 0) + (Cl >>> 0) + (Dl >>> 0) + (El >>> 0);
+};
+exports.add5L = add5L;
+var add5H = function(low, Ah, Bh, Ch, Dh, Eh) {
+    return Ah + Bh + Ch + Dh + Eh + (low / Math.pow(2, 32) | 0) | 0;
+};
+exports.add5H = add5H;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/crypto.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.crypto = void 0;
+exports.crypto = typeof globalThis === 'object' && 'crypto' in globalThis ? globalThis.crypto : undefined;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/utils.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+/*
+THIS IMPLEMENTATION WAS TAKEN FROM `@noble/hashes`
+
+original source: https://github.com/paulmillr/noble-hashes/blob/6ae82e75d4c354d53a488e95b1bfe9cba90bd6ff/src/utils.ts#L1
+
+it was modified and adapted to this repository to re-use already defined stuff
+
+the main reason for copying over and not using as dependency is because of different target in the `tsconfig.json`
+
+`@noble/hashes` targets es2020, which tends to cause problems with some other (older) packages sometimes
+
+this repo targets ES5+
+*/ /*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) */ var __awaiter = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__awaiter || function(thisArg, _arguments, P, generator) {
+    function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+            resolve(value);
+        });
+    }
+    return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+            try {
+                step(generator.next(value));
+            } catch (e) {
+                reject(e);
+            }
+        }
+        function rejected(value) {
+            try {
+                step(generator["throw"](value));
+            } catch (e) {
+                reject(e);
+            }
+        }
+        function step(result) {
+            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__generator || function(thisArg, body) {
+    var _ = {
+        label: 0,
+        sent: function() {
+            if (t[0] & 1) throw t[1];
+            return t[1];
+        },
+        trys: [],
+        ops: []
+    }, f, y, t, g;
+    return g = {
+        next: verb(0),
+        "throw": verb(1),
+        "return": verb(2)
+    }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+        return this;
+    }), g;
+    //TURBOPACK unreachable
+    ;
+    function verb(n) {
+        return function(v) {
+            return step([
+                n,
+                v
+            ]);
+        };
+    }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while(g && (g = 0, op[0] && (_ = 0)), _)try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [
+                op[0] & 2,
+                t.value
+            ];
+            switch(op[0]){
+                case 0:
+                case 1:
+                    t = op;
+                    break;
+                case 4:
+                    _.label++;
+                    return {
+                        value: op[1],
+                        done: false
+                    };
+                case 5:
+                    _.label++;
+                    y = op[1];
+                    op = [
+                        0
+                    ];
+                    continue;
+                case 7:
+                    op = _.ops.pop();
+                    _.trys.pop();
+                    continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+                        _ = 0;
+                        continue;
+                    }
+                    if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+                        _.label = op[1];
+                        break;
+                    }
+                    if (op[0] === 6 && _.label < t[1]) {
+                        _.label = t[1];
+                        t = op;
+                        break;
+                    }
+                    if (t && _.label < t[2]) {
+                        _.label = t[2];
+                        _.ops.push(op);
+                        break;
+                    }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop();
+                    continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) {
+            op = [
+                6,
+                e
+            ];
+            y = 0;
+        } finally{
+            f = t = 0;
+        }
+        if (op[0] & 5) throw op[1];
+        return {
+            value: op[0] ? op[1] : void 0,
+            done: true
+        };
+    }
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.randomBytes = exports.wrapXOFConstructorWithOpts = exports.wrapConstructorWithOpts = exports.wrapConstructor = exports.checkOpts = exports.Hash = exports.concatBytes = exports.toBytes = exports.asyncLoop = exports.nextTick = exports.hexToBytes = exports.bytesToHex = exports.byteSwap32 = exports.byteSwapIfBE = exports.byteSwap = exports.isLE = exports.rotl = exports.rotr = exports.createView = exports.u32 = exports.u8 = void 0;
+var uint8array_utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+uint8array-utils@1.0.4/node_modules/@harmoniclabs/uint8array-utils/dist/index.js [app-ssr] (ecmascript)");
+var assert_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/assert.js [app-ssr] (ecmascript)");
+var crypto_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/crypto.js [app-ssr] (ecmascript)");
+// Cast array to different type
+var u8 = function(arr) {
+    return new Uint8Array(arr.buffer, arr.byteOffset, arr.byteLength);
+};
+exports.u8 = u8;
+var u32 = function(arr) {
+    return new Uint32Array(arr.buffer, arr.byteOffset, Math.floor(arr.byteLength / 4));
+};
+exports.u32 = u32;
+// Cast array to view
+var createView = function(arr) {
+    return new DataView(arr.buffer, arr.byteOffset, arr.byteLength);
+};
+exports.createView = createView;
+// The rotate right (circular right shift) operation for uint32
+var rotr = function(word, shift) {
+    return word << 32 - shift | word >>> shift;
+};
+exports.rotr = rotr;
+// The rotate left (circular left shift) operation for uint32
+var rotl = function(word, shift) {
+    return word << shift | word >>> 32 - shift >>> 0;
+};
+exports.rotl = rotl;
+exports.isLE = new Uint8Array(new Uint32Array([
+    0x11223344
+]).buffer)[0] === 0x44;
+// The byte swap operation for uint32
+var byteSwap = function(word) {
+    return word << 24 & 0xff000000 | word << 8 & 0xff0000 | word >>> 8 & 0xff00 | word >>> 24 & 0xff;
+};
+exports.byteSwap = byteSwap;
+// Conditionally byte swap if on a big-endian platform
+exports.byteSwapIfBE = exports.isLE ? function(n) {
+    return n;
+} : function(n) {
+    return (0, exports.byteSwap)(n);
+};
+// In place byte swap for Uint32Array
+function byteSwap32(arr) {
+    for(var i = 0; i < arr.length; i++){
+        arr[i] = (0, exports.byteSwap)(arr[i]);
+    }
+}
+exports.byteSwap32 = byteSwap32;
+// Array where index 0xf0 (240) is mapped to string 'f0'
+var hexes = /* @__PURE__ */ Array.from({
+    length: 256
+}, function(_, i) {
+    return i.toString(16).padStart(2, '0');
+});
+/**
+ * @example bytesToHex(Uint8Array.from([0xca, 0xfe, 0x01, 0x23])) // 'cafe0123'
+ */ function bytesToHex(bytes) {
+    (0, assert_1.assertBytes)(bytes);
+    // pre-caching improves the speed 6x
+    var hex = '';
+    for(var i = 0; i < bytes.length; i++){
+        hex += hexes[bytes[i]];
+    }
+    return hex;
+}
+exports.bytesToHex = bytesToHex;
+// We use optimized technique to convert hex string to byte array
+var asciis = {
+    _0: 48,
+    _9: 57,
+    _A: 65,
+    _F: 70,
+    _a: 97,
+    _f: 102
+};
+function asciiToBase16(char) {
+    if (char >= asciis._0 && char <= asciis._9) return char - asciis._0;
+    if (char >= asciis._A && char <= asciis._F) return char - (asciis._A - 10);
+    if (char >= asciis._a && char <= asciis._f) return char - (asciis._a - 10);
+    return;
+}
+/**
+ * @example hexToBytes('cafe0123') // Uint8Array.from([0xca, 0xfe, 0x01, 0x23])
+ */ function hexToBytes(hex) {
+    if (typeof hex !== 'string') throw new Error('hex string expected, got ' + typeof hex);
+    var hl = hex.length;
+    var al = hl / 2;
+    if (hl % 2) throw new Error('padded hex string expected, got unpadded hex of length ' + hl);
+    var array = new Uint8Array(al);
+    for(var ai = 0, hi = 0; ai < al; ai++, hi += 2){
+        var n1 = asciiToBase16(hex.charCodeAt(hi));
+        var n2 = asciiToBase16(hex.charCodeAt(hi + 1));
+        if (n1 === undefined || n2 === undefined) {
+            var char = hex[hi] + hex[hi + 1];
+            throw new Error('hex string expected, got non-hex character "' + char + '" at index ' + hi);
+        }
+        array[ai] = n1 * 16 + n2;
+    }
+    return array;
+}
+exports.hexToBytes = hexToBytes;
+// There is no setImmediate in browser and setTimeout is slow.
+// call of async fn will return Promise, which will be fullfiled only on
+// next scheduler queue processing step and this is exactly what we need.
+var nextTick = function() {
+    return __awaiter(void 0, void 0, void 0, function() {
+        return __generator(this, function(_b) {
+            return [
+                2 /*return*/ 
+            ];
+        });
+    });
+};
+exports.nextTick = nextTick;
+// Returns control to thread each 'tick' ms to avoid blocking
+function asyncLoop(iters, tick, cb) {
+    return __awaiter(this, void 0, void 0, function() {
+        var ts, i, diff;
+        return __generator(this, function(_b) {
+            switch(_b.label){
+                case 0:
+                    ts = Date.now();
+                    i = 0;
+                    _b.label = 1;
+                case 1:
+                    if (!(i < iters)) return [
+                        3 /*break*/ ,
+                        4
+                    ];
+                    cb(i);
+                    diff = Date.now() - ts;
+                    if (diff >= 0 && diff < tick) return [
+                        3 /*break*/ ,
+                        3
+                    ];
+                    return [
+                        4 /*yield*/ ,
+                        (0, exports.nextTick)()
+                    ];
+                case 2:
+                    _b.sent();
+                    ts += diff;
+                    _b.label = 3;
+                case 3:
+                    i++;
+                    return [
+                        3 /*break*/ ,
+                        1
+                    ];
+                case 4:
+                    return [
+                        2 /*return*/ 
+                    ];
+            }
+        });
+    });
+}
+exports.asyncLoop = asyncLoop;
+/**
+ * Normalizes (non-hex) string or Uint8Array to Uint8Array.
+ * Warning: when Uint8Array is passed, it would NOT get copied.
+ * Keep in mind for future mutable operations.
+ */ function toBytes(data) {
+    if (typeof data === 'string') data = (0, uint8array_utils_1.fromUtf8)(data);
+    (0, assert_1.assertBytes)(data);
+    return data;
+}
+exports.toBytes = toBytes;
+/**
+ * Copies several Uint8Arrays into one.
+ */ function concatBytes() {
+    var arrays = [];
+    for(var _i = 0; _i < arguments.length; _i++){
+        arrays[_i] = arguments[_i];
+    }
+    var sum = 0;
+    for(var i = 0; i < arrays.length; i++){
+        var a = arrays[i];
+        (0, assert_1.assertBytes)(a);
+        sum += a.length;
+    }
+    var res = new Uint8Array(sum);
+    for(var i = 0, pad = 0; i < arrays.length; i++){
+        var a = arrays[i];
+        res.set(a, pad);
+        pad += a.length;
+    }
+    return res;
+}
+exports.concatBytes = concatBytes;
+// For runtime check if class implements interface
+var Hash = function() {
+    function Hash() {}
+    // Safe version that clones internal state
+    Hash.prototype.clone = function() {
+        return this._cloneInto();
+    };
+    return Hash;
+}();
+exports.Hash = Hash;
+var toStr = {}.toString;
+function checkOpts(defaults, opts) {
+    if (opts !== undefined && toStr.call(opts) !== '[object Object]') throw new Error('Options should be object or undefined');
+    var merged = Object.assign(defaults, opts);
+    return merged;
+}
+exports.checkOpts = checkOpts;
+function wrapConstructor(hashCons) {
+    var hashC = function(msg) {
+        return hashCons().update(toBytes(msg)).digest();
+    };
+    var tmp = hashCons();
+    hashC.outputLen = tmp.outputLen;
+    hashC.blockLen = tmp.blockLen;
+    hashC.create = function() {
+        return hashCons();
+    };
+    return hashC;
+}
+exports.wrapConstructor = wrapConstructor;
+function wrapConstructorWithOpts(hashCons) {
+    var hashC = function(msg, opts) {
+        return hashCons(opts).update(toBytes(msg)).digest();
+    };
+    var tmp = hashCons({});
+    hashC.outputLen = tmp.outputLen;
+    hashC.blockLen = tmp.blockLen;
+    hashC.create = function(opts) {
+        return hashCons(opts);
+    };
+    return hashC;
+}
+exports.wrapConstructorWithOpts = wrapConstructorWithOpts;
+function wrapXOFConstructorWithOpts(hashCons) {
+    var hashC = function(msg, opts) {
+        return hashCons(opts).update(toBytes(msg)).digest();
+    };
+    var tmp = hashCons({});
+    hashC.outputLen = tmp.outputLen;
+    hashC.blockLen = tmp.blockLen;
+    hashC.create = function(opts) {
+        return hashCons(opts);
+    };
+    return hashC;
+}
+exports.wrapXOFConstructorWithOpts = wrapXOFConstructorWithOpts;
+/**
+ * Secure PRNG. Uses `crypto.getRandomValues`, which defers to OS.
+ */ function randomBytes(bytesLength) {
+    if (bytesLength === void 0) {
+        bytesLength = 32;
+    }
+    if (crypto_1.crypto && typeof crypto_1.crypto.getRandomValues === 'function') {
+        return crypto_1.crypto.getRandomValues(new Uint8Array(bytesLength));
+    }
+    throw new Error('crypto.getRandomValues must be defined');
+}
+exports.randomBytes = randomBytes;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/keccak.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var __extends = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__extends || function() {
+    var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf || ({
+            __proto__: []
+        }) instanceof Array && function(d, b) {
+            d.__proto__ = b;
+        } || function(d, b) {
+            for(var p in b)if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+        };
+        return extendStatics(d, b);
+    };
+    return function(d, b) {
+        if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() {
+            this.constructor = d;
+        }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+}();
+var __read = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__read || function(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while((n === void 0 || n-- > 0) && !(r = i.next()).done)ar.push(r.value);
+    } catch (error) {
+        e = {
+            error: error
+        };
+    } finally{
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        } finally{
+            if (e) throw e.error;
+        }
+    }
+    return ar;
+};
+var _a;
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.keccak_512 = exports.keccak_384 = exports.keccak_256 = exports.keccak_224 = exports.Keccak = exports.keccakP = void 0;
+/*
+THIS IMPLEMENTATION WAS TAKEN FROM `@noble/hashes`
+
+original source: https://github.com/paulmillr/noble-hashes/blob/6ae82e75d4c354d53a488e95b1bfe9cba90bd6ff/src/sha3.ts#L1
+
+it was modified and adapted to this repository to re-use already defined stuff
+
+the main reason for copying over and not using as dependency is because of different target in the `tsconfig.json`
+
+`@noble/hashes` targets es2020, which tends to cause problems with some other (older) packages sometimes
+
+this repo targets ES5+
+*/ var _u64_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/_u64.js [app-ssr] (ecmascript)");
+var utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/utils.js [app-ssr] (ecmascript)");
+var assert_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/assert.js [app-ssr] (ecmascript)");
+// SHA3 (keccak) is based on a new design: basically, the internal state is bigger than output size.
+// It's called a sponge function.
+// Various per round constants calculations
+var SHA3_PI = [];
+var SHA3_ROTL = [];
+var _SHA3_IOTA = [];
+var _0n = /** @__PURE__ */ BigInt(0);
+var _1n = /** @__PURE__ */ BigInt(1);
+var _2n = /** @__PURE__ */ BigInt(2);
+var _7n = /** @__PURE__ */ BigInt(7);
+var _256n = /** @__PURE__ */ BigInt(256);
+var _0x71n = /** @__PURE__ */ BigInt(0x71);
+for(var round = 0, R = _1n, x = 1, y = 0; round < 24; round++){
+    // Pi
+    _a = __read([
+        y,
+        (2 * x + 3 * y) % 5
+    ], 2), x = _a[0], y = _a[1];
+    SHA3_PI.push(2 * (5 * y + x));
+    // Rotational
+    SHA3_ROTL.push((round + 1) * (round + 2) / 2 % 64);
+    // Iota
+    var t = _0n;
+    for(var j = 0; j < 7; j++){
+        R = (R << _1n ^ (R >> _7n) * _0x71n) % _256n;
+        if (R & _2n) t ^= _1n << (_1n << /** @__PURE__ */ BigInt(j)) - _1n;
+    }
+    _SHA3_IOTA.push(t);
+}
+var _b = __read(/** @__PURE__ */ (0, _u64_1.split)(_SHA3_IOTA, true), 2), SHA3_IOTA_H = _b[0], SHA3_IOTA_L = _b[1];
+// Left rotation (without 0, 32, 64)
+var rotlH = function(h, l, s) {
+    return s > 32 ? (0, _u64_1.rotlBH)(h, l, s) : (0, _u64_1.rotlSH)(h, l, s);
+};
+var rotlL = function(h, l, s) {
+    return s > 32 ? (0, _u64_1.rotlBL)(h, l, s) : (0, _u64_1.rotlSL)(h, l, s);
+};
+// Same as keccakf1600, but allows to skip some rounds
+function keccakP(s, rounds) {
+    if (rounds === void 0) {
+        rounds = 24;
+    }
+    var B = new Uint32Array(5 * 2);
+    // NOTE: all indices are x2 since we store state as u32 instead of u64 (bigints to slow in js)
+    for(var round = 24 - rounds; round < 24; round++){
+        // Theta θ
+        for(var x = 0; x < 10; x++)B[x] = s[x] ^ s[x + 10] ^ s[x + 20] ^ s[x + 30] ^ s[x + 40];
+        for(var x = 0; x < 10; x += 2){
+            var idx1 = (x + 8) % 10;
+            var idx0 = (x + 2) % 10;
+            var B0 = B[idx0];
+            var B1 = B[idx0 + 1];
+            var Th = rotlH(B0, B1, 1) ^ B[idx1];
+            var Tl = rotlL(B0, B1, 1) ^ B[idx1 + 1];
+            for(var y = 0; y < 50; y += 10){
+                s[x + y] ^= Th;
+                s[x + y + 1] ^= Tl;
+            }
+        }
+        // Rho (ρ) and Pi (π)
+        var curH = s[2];
+        var curL = s[3];
+        for(var t = 0; t < 24; t++){
+            var shift = SHA3_ROTL[t];
+            var Th = rotlH(curH, curL, shift);
+            var Tl = rotlL(curH, curL, shift);
+            var PI = SHA3_PI[t];
+            curH = s[PI];
+            curL = s[PI + 1];
+            s[PI] = Th;
+            s[PI + 1] = Tl;
+        }
+        // Chi (χ)
+        for(var y = 0; y < 50; y += 10){
+            for(var x = 0; x < 10; x++)B[x] = s[y + x];
+            for(var x = 0; x < 10; x++)s[y + x] ^= ~B[(x + 2) % 10] & B[(x + 4) % 10];
+        }
+        // Iota (ι)
+        s[0] ^= SHA3_IOTA_H[round];
+        s[1] ^= SHA3_IOTA_L[round];
+    }
+    B.fill(0);
+}
+exports.keccakP = keccakP;
+var Keccak = function(_super) {
+    __extends(Keccak, _super);
+    // NOTE: we accept arguments in bytes instead of bits here.
+    function Keccak(blockLen, suffix, outputLen, enableXOF, rounds) {
+        if (enableXOF === void 0) {
+            enableXOF = false;
+        }
+        if (rounds === void 0) {
+            rounds = 24;
+        }
+        var _this = _super.call(this) || this;
+        _this.blockLen = blockLen;
+        _this.suffix = suffix;
+        _this.outputLen = outputLen;
+        _this.enableXOF = enableXOF;
+        _this.rounds = rounds;
+        _this.pos = 0;
+        _this.posOut = 0;
+        _this.finished = false;
+        _this.destroyed = false;
+        // Can be passed from user as dkLen
+        (0, assert_1.assertPostiveInteger)(outputLen);
+        // 1600 = 5x5 matrix of 64bit.  1600 bits === 200 bytes
+        if (0 >= _this.blockLen || _this.blockLen >= 200) throw new Error('Sha3 supports only keccak-f1600 function');
+        _this.state = new Uint8Array(200);
+        _this.state32 = (0, utils_1.u32)(_this.state);
+        return _this;
+    }
+    Keccak.prototype.keccak = function() {
+        if (!utils_1.isLE) (0, utils_1.byteSwap32)(this.state32);
+        keccakP(this.state32, this.rounds);
+        if (!utils_1.isLE) (0, utils_1.byteSwap32)(this.state32);
+        this.posOut = 0;
+        this.pos = 0;
+    };
+    Keccak.prototype.update = function(data) {
+        this.assertExists();
+        var _a = this, blockLen = _a.blockLen, state = _a.state;
+        data = (0, utils_1.toBytes)(data);
+        var len = data.length;
+        for(var pos = 0; pos < len;){
+            var take = Math.min(blockLen - this.pos, len - pos);
+            for(var i = 0; i < take; i++)state[this.pos++] ^= data[pos++];
+            if (this.pos === blockLen) this.keccak();
+        }
+        return this;
+    };
+    Keccak.prototype.finish = function() {
+        if (this.finished) return;
+        this.finished = true;
+        var _a = this, state = _a.state, suffix = _a.suffix, pos = _a.pos, blockLen = _a.blockLen;
+        // Do the padding
+        state[pos] ^= suffix;
+        if ((suffix & 0x80) !== 0 && pos === blockLen - 1) this.keccak();
+        state[blockLen - 1] ^= 0x80;
+        this.keccak();
+    };
+    Keccak.prototype.writeInto = function(out) {
+        this.assertExists(false);
+        if (!(out instanceof Uint8Array)) throw new Error("Uint8Array expected");
+        this.finish();
+        var bufferOut = this.state;
+        var blockLen = this.blockLen;
+        for(var pos = 0, len = out.length; pos < len;){
+            if (this.posOut >= blockLen) this.keccak();
+            var take = Math.min(blockLen - this.posOut, len - pos);
+            out.set(bufferOut.subarray(this.posOut, this.posOut + take), pos);
+            this.posOut += take;
+            pos += take;
+        }
+        return out;
+    };
+    Keccak.prototype.xofInto = function(out) {
+        // Sha3/Keccak usage with XOF is probably mistake, only SHAKE instances can do XOF
+        if (!this.enableXOF) throw new Error('XOF is not possible for this instance');
+        return this.writeInto(out);
+    };
+    Keccak.prototype.xof = function(bytes) {
+        (0, assert_1.assertPostiveInteger)(bytes);
+        return this.xofInto(new Uint8Array(bytes));
+    };
+    Keccak.prototype.digestInto = function(out) {
+        // output(out, this);
+        if (!(out instanceof Uint8Array)) throw new Error("Uint8Array expected");
+        var min = this.outputLen;
+        if (out.length < min) throw new Error("digestInto() expects output buffer of length at least ".concat(min));
+        if (this.finished) throw new Error('digest() was already called');
+        this.writeInto(out);
+        this.destroy();
+        return out;
+    };
+    Keccak.prototype.digest = function() {
+        return this.digestInto(new Uint8Array(this.outputLen));
+    };
+    Keccak.prototype.destroy = function() {
+        this.destroyed = true;
+        this.state.fill(0);
+    };
+    Keccak.prototype._cloneInto = function(to) {
+        var _a = this, blockLen = _a.blockLen, suffix = _a.suffix, outputLen = _a.outputLen, rounds = _a.rounds, enableXOF = _a.enableXOF;
+        to || (to = new Keccak(blockLen, suffix, outputLen, enableXOF, rounds));
+        to.state32.set(this.state32);
+        to.pos = this.pos;
+        to.posOut = this.posOut;
+        to.finished = this.finished;
+        to.rounds = rounds;
+        // Suffix can change in cSHAKE
+        to.suffix = suffix;
+        to.outputLen = outputLen;
+        to.enableXOF = enableXOF;
+        to.destroyed = this.destroyed;
+        return to;
+    };
+    Keccak.prototype.assertExists = function(checkFinished) {
+        if (checkFinished === void 0) {
+            checkFinished = true;
+        }
+        if (this.destroyed) throw new Error('Hash instance has been destroyed');
+        if (checkFinished && this.finished) throw new Error('Hash#digest() has already been called');
+    };
+    return Keccak;
+}(utils_1.Hash);
+exports.Keccak = Keccak;
+var gen = function(suffix, blockLen, outputLen) {
+    return (0, utils_1.wrapConstructor)(function() {
+        return new Keccak(blockLen, suffix, outputLen);
+    });
+};
+// export const sha3_224 = /** @__PURE__ */ gen(0x06, 144, 224 / 8);
+// /**
+//  * SHA3-256 hash function
+//  * @param message - that would be hashed
+//  */
+// export const sha3_256 = /** @__PURE__ */ gen(0x06, 136, 256 / 8);
+// export const sha3_384 = /** @__PURE__ */ gen(0x06, 104, 384 / 8);
+// export const sha3_512 = /** @__PURE__ */ gen(0x06, 72, 512 / 8);
+exports.keccak_224 = gen(0x01, 144, 224 / 8);
+/**
+ * keccak-256 hash function. Different from SHA3-256.
+ * @param message - that would be hashed
+ */ exports.keccak_256 = gen(0x01, 136, 256 / 8);
+exports.keccak_384 = gen(0x01, 104, 384 / 8);
+exports.keccak_512 = gen(0x01, 72, 512 / 8); // const genShake = (suffix: number, blockLen: number, outputLen: number) =>
+ //   wrapXOFConstructorWithOpts<HashXOF<Keccak>, ShakeOpts>(
+ //     (opts: ShakeOpts = {}) =>
+ //       new Keccak(blockLen, suffix, opts.dkLen === undefined ? outputLen : opts.dkLen, true)
+ //   );
+ // 
+ // export const shake128 = /** @__PURE__ */ genShake(0x1f, 168, 128 / 8);
+ // export const shake256 = /** @__PURE__ */ genShake(0x1f, 136, 256 / 8);
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/utils.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+/*
+THIS IMPLEMENTATION WAS TAKEN FROM `@noble/hashes`
+
+original source: https://github.com/paulmillr/noble-curves/blob/38a4ca1e6b0a80c60b11bbb6b3d71e3bfabd5bbb/src/abstract/utils.ts
+
+it was modified and adapted to this repository
+
+the main reason for copying over and not using as dependency is because of different target in the `tsconfig.json`
+
+`@noble/hashes` targets es2020, which tends to cause problems with some other (older) packages sometimes
+
+this repo targets ES5+
+*/ var __read = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__read || function(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while((n === void 0 || n-- > 0) && !(r = i.next()).done)ar.push(r.value);
+    } catch (error) {
+        e = {
+            error: error
+        };
+    } finally{
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        } finally{
+            if (e) throw e.error;
+        }
+    }
+    return ar;
+};
+var __spreadArray = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__spreadArray || function(to, from, pack) {
+    if (pack || arguments.length === 2) for(var i = 0, l = from.length, ar; i < l; i++){
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
+var __values = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__values || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function() {
+            if (o && i >= o.length) o = void 0;
+            return {
+                value: o && o[i++],
+                done: !o
+            };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.validateObject = exports.createHmacDrbg = exports.bitMask = exports.bitSet = exports.bitGet = exports.bitLen = exports.utf8ToBytes = exports.equalBytes = exports.concatBytes = exports.ensureBytes = exports.numberToVarBytesBE = exports.numberToBytesLE = exports.numberToBytesBE = exports.bytesToNumberLE = exports.bytesToNumberBE = exports.hexToBytes = exports.hexToNumber = exports.numberToHexUnpadded = exports.bytesToHex = exports.abytes = exports.isBytes = void 0;
+/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */ // 100 lines of code in the file are duplicated from noble-hashes (utils).
+// This is OK: `abstract` directory does not use noble-hashes.
+// User may opt-in into using different hashing library. This way, noble-hashes
+// won't be included into their bundle.
+var _0n = BigInt(0);
+var _1n = BigInt(1);
+var _2n = BigInt(2);
+function isBytes(a) {
+    return a instanceof Uint8Array || a != null && typeof a === 'object' && a.constructor.name === 'Uint8Array';
+}
+exports.isBytes = isBytes;
+function abytes(item) {
+    if (!isBytes(item)) throw new Error('Uint8Array expected');
+}
+exports.abytes = abytes;
+// Array where index 0xf0 (240) is mapped to string 'f0'
+var hexes = /* @__PURE__ */ Array.from({
+    length: 256
+}, function(_, i) {
+    return i.toString(16).padStart(2, '0');
+});
+/**
+ * @example bytesToHex(Uint8Array.from([0xca, 0xfe, 0x01, 0x23])) // 'cafe0123'
+ */ function bytesToHex(bytes) {
+    abytes(bytes);
+    // pre-caching improves the speed 6x
+    var hex = '';
+    for(var i = 0; i < bytes.length; i++){
+        hex += hexes[bytes[i]];
+    }
+    return hex;
+}
+exports.bytesToHex = bytesToHex;
+function numberToHexUnpadded(num) {
+    var hex = num.toString(16);
+    return hex.length & 1 ? "0".concat(hex) : hex;
+}
+exports.numberToHexUnpadded = numberToHexUnpadded;
+function hexToNumber(hex) {
+    if (typeof hex !== 'string') throw new Error('hex string expected, got ' + typeof hex);
+    // Big Endian
+    return BigInt(hex === '' ? '0' : "0x".concat(hex));
+}
+exports.hexToNumber = hexToNumber;
+// We use optimized technique to convert hex string to byte array
+var asciis = {
+    _0: 48,
+    _9: 57,
+    _A: 65,
+    _F: 70,
+    _a: 97,
+    _f: 102
+};
+function asciiToBase16(char) {
+    if (char >= asciis._0 && char <= asciis._9) return char - asciis._0;
+    if (char >= asciis._A && char <= asciis._F) return char - (asciis._A - 10);
+    if (char >= asciis._a && char <= asciis._f) return char - (asciis._a - 10);
+    return;
+}
+/**
+ * @example hexToBytes('cafe0123') // Uint8Array.from([0xca, 0xfe, 0x01, 0x23])
+ */ function hexToBytes(hex) {
+    if (typeof hex !== 'string') throw new Error('hex string expected, got ' + typeof hex);
+    var hl = hex.length;
+    var al = hl / 2;
+    if (hl % 2) throw new Error('padded hex string expected, got unpadded hex of length ' + hl);
+    var array = new Uint8Array(al);
+    for(var ai = 0, hi = 0; ai < al; ai++, hi += 2){
+        var n1 = asciiToBase16(hex.charCodeAt(hi));
+        var n2 = asciiToBase16(hex.charCodeAt(hi + 1));
+        if (n1 === undefined || n2 === undefined) {
+            var char = hex[hi] + hex[hi + 1];
+            throw new Error('hex string expected, got non-hex character "' + char + '" at index ' + hi);
+        }
+        array[ai] = n1 * 16 + n2;
+    }
+    return array;
+}
+exports.hexToBytes = hexToBytes;
+// BE: Big Endian, LE: Little Endian
+function bytesToNumberBE(bytes) {
+    return hexToNumber(bytesToHex(bytes));
+}
+exports.bytesToNumberBE = bytesToNumberBE;
+function bytesToNumberLE(bytes) {
+    abytes(bytes);
+    return hexToNumber(bytesToHex(Uint8Array.from(bytes).reverse()));
+}
+exports.bytesToNumberLE = bytesToNumberLE;
+function numberToBytesBE(n, len) {
+    return hexToBytes(n.toString(16).padStart(len * 2, '0'));
+}
+exports.numberToBytesBE = numberToBytesBE;
+function numberToBytesLE(n, len) {
+    return numberToBytesBE(n, len).reverse();
+}
+exports.numberToBytesLE = numberToBytesLE;
+// Unpadded, rarely used
+function numberToVarBytesBE(n) {
+    return hexToBytes(numberToHexUnpadded(n));
+}
+exports.numberToVarBytesBE = numberToVarBytesBE;
+/**
+ * Takes hex string or Uint8Array, converts to Uint8Array.
+ * Validates output length.
+ * Will throw error for other types.
+ * @param title descriptive title for an error e.g. 'private key'
+ * @param hex hex string or Uint8Array
+ * @param expectedLength optional, will compare to result array's length
+ * @returns
+ */ function ensureBytes(title, hex, expectedLength) {
+    var res;
+    if (typeof hex === 'string') {
+        try {
+            res = hexToBytes(hex);
+        } catch (e) {
+            throw new Error("".concat(title, " must be valid hex string, got \"").concat(hex, "\". Cause: ").concat(e));
+        }
+    } else if (isBytes(hex)) {
+        // Uint8Array.from() instead of hash.slice() because node Buffer
+        // is instance of Uint8Array, and its slice() creates **mutable** copy
+        res = Uint8Array.from(hex);
+    } else {
+        throw new Error("".concat(title, " must be hex string or Uint8Array"));
+    }
+    var len = res.length;
+    if (typeof expectedLength === 'number' && len !== expectedLength) throw new Error("".concat(title, " expected ").concat(expectedLength, " bytes, got ").concat(len));
+    return res;
+}
+exports.ensureBytes = ensureBytes;
+/**
+ * Copies several Uint8Arrays into one.
+ */ function concatBytes() {
+    var arrays = [];
+    for(var _i = 0; _i < arguments.length; _i++){
+        arrays[_i] = arguments[_i];
+    }
+    var sum = 0;
+    for(var i = 0; i < arrays.length; i++){
+        var a = arrays[i];
+        abytes(a);
+        sum += a.length;
+    }
+    var res = new Uint8Array(sum);
+    for(var i = 0, pad = 0; i < arrays.length; i++){
+        var a = arrays[i];
+        res.set(a, pad);
+        pad += a.length;
+    }
+    return res;
+}
+exports.concatBytes = concatBytes;
+// Compares 2 u8a-s in kinda constant time
+function equalBytes(a, b) {
+    if (a.length !== b.length) return false;
+    var diff = 0;
+    for(var i = 0; i < a.length; i++)diff |= a[i] ^ b[i];
+    return diff === 0;
+}
+exports.equalBytes = equalBytes;
+/**
+ * @example utf8ToBytes('abc') // new Uint8Array([97, 98, 99])
+ */ function utf8ToBytes(str) {
+    if (typeof str !== 'string') throw new Error("utf8ToBytes expected string, got ".concat(typeof str));
+    return new Uint8Array(new TextEncoder().encode(str)); // https://bugzil.la/1681809
+}
+exports.utf8ToBytes = utf8ToBytes;
+// Bit operations
+/**
+ * Calculates amount of bits in a bigint.
+ * Same as `n.toString(2).length`
+ */ function bitLen(n) {
+    var len;
+    for(len = 0; n > _0n; n >>= _1n, len += 1);
+    return len;
+}
+exports.bitLen = bitLen;
+/**
+ * Gets single bit at position.
+ * NOTE: first bit position is 0 (same as arrays)
+ * Same as `!!+Array.from(n.toString(2)).reverse()[pos]`
+ */ function bitGet(n, pos) {
+    return n >> BigInt(pos) & _1n;
+}
+exports.bitGet = bitGet;
+/**
+ * Sets single bit at position.
+ */ function bitSet(n, pos, value) {
+    return n | (value ? _1n : _0n) << BigInt(pos);
+}
+exports.bitSet = bitSet;
+/**
+ * Calculate mask for N bits. Not using ** operator with bigints because of old engines.
+ * Same as BigInt(`0b${Array(i).fill('1').join('')}`)
+ */ var bitMask = function(n) {
+    return (_2n << BigInt(n - 1)) - _1n;
+};
+exports.bitMask = bitMask;
+// DRBG
+var u8n = function(data) {
+    return new Uint8Array(data);
+}; // creates Uint8Array
+var u8fr = function(arr) {
+    return Uint8Array.from(arr);
+}; // another shortcut
+/**
+ * Minimal HMAC-DRBG from NIST 800-90 for RFC6979 sigs.
+ * @returns function that will call DRBG until 2nd arg returns something meaningful
+ * @example
+ *   const drbg = createHmacDRBG<Key>(32, 32, hmac);
+ *   drbg(seed, bytesToKey); // bytesToKey must return Key or undefined
+ */ function createHmacDrbg(hashLen, qByteLen, hmacFn) {
+    if (typeof hashLen !== 'number' || hashLen < 2) throw new Error('hashLen must be a number');
+    if (typeof qByteLen !== 'number' || qByteLen < 2) throw new Error('qByteLen must be a number');
+    if (typeof hmacFn !== 'function') throw new Error('hmacFn must be a function');
+    // Step B, Step C: set hashLen to 8*ceil(hlen/8)
+    var v = u8n(hashLen); // Minimal non-full-spec HMAC-DRBG from NIST 800-90 for RFC6979 sigs.
+    var k = u8n(hashLen); // Steps B and C of RFC6979 3.2: set hashLen, in our case always same
+    var i = 0; // Iterations counter, will throw when over 1000
+    var reset = function() {
+        v.fill(1);
+        k.fill(0);
+        i = 0;
+    };
+    var h = function() {
+        var b = [];
+        for(var _i = 0; _i < arguments.length; _i++){
+            b[_i] = arguments[_i];
+        }
+        return hmacFn.apply(void 0, __spreadArray([
+            k,
+            v
+        ], __read(b), false));
+    }; // hmac(k)(v, ...values)
+    var reseed = function(seed) {
+        if (seed === void 0) {
+            seed = u8n();
+        }
+        // HMAC-DRBG reseed() function. Steps D-G
+        k = h(u8fr([
+            0x00
+        ]), seed); // k = hmac(k || v || 0x00 || seed)
+        v = h(); // v = hmac(k || v)
+        if (seed.length === 0) return;
+        k = h(u8fr([
+            0x01
+        ]), seed); // k = hmac(k || v || 0x01 || seed)
+        v = h(); // v = hmac(k || v)
+    };
+    var gen = function() {
+        // HMAC-DRBG generate() function
+        if (i++ >= 1000) throw new Error('drbg: tried 1000 values');
+        var len = 0;
+        var out = [];
+        while(len < qByteLen){
+            v = h();
+            var sl = v.slice();
+            out.push(sl);
+            len += v.length;
+        }
+        return concatBytes.apply(void 0, __spreadArray([], __read(out), false));
+    };
+    var genUntil = function(seed, pred) {
+        reset();
+        reseed(seed); // Steps D-G
+        var res = undefined; // Step H: grind until k is in [1..n-1]
+        while(!(res = pred(gen())))reseed();
+        reset();
+        return res;
+    };
+    return genUntil;
+}
+exports.createHmacDrbg = createHmacDrbg;
+// Validating curves and fields
+var validatorFns = {
+    bigint: function(val) {
+        return typeof val === 'bigint';
+    },
+    function: function(val) {
+        return typeof val === 'function';
+    },
+    boolean: function(val) {
+        return typeof val === 'boolean';
+    },
+    string: function(val) {
+        return typeof val === 'string';
+    },
+    stringOrUint8Array: function(val) {
+        return typeof val === 'string' || isBytes(val);
+    },
+    isSafeInteger: function(val) {
+        return Number.isSafeInteger(val);
+    },
+    array: function(val) {
+        return Array.isArray(val);
+    },
+    field: function(val, object) {
+        return object.Fp.isValid(val);
+    },
+    hash: function(val) {
+        return typeof val === 'function' && Number.isSafeInteger(val.outputLen);
+    }
+};
+// type Record<K extends string | number | symbol, T> = { [P in K]: T; }
+function validateObject(object, validators, optValidators) {
+    var e_1, _b, e_2, _c;
+    if (optValidators === void 0) {
+        optValidators = {};
+    }
+    var checkField = function(fieldName, type, isOptional) {
+        var checkVal = validatorFns[type];
+        if (typeof checkVal !== 'function') throw new Error("Invalid validator \"".concat(type, "\", expected function"));
+        var val = object[fieldName];
+        if (isOptional && val === undefined) return;
+        if (!checkVal(val, object)) {
+            throw new Error("Invalid param ".concat(String(fieldName), "=").concat(val, " (").concat(typeof val, "), expected ").concat(type));
+        }
+    };
+    try {
+        for(var _d = __values(Object.entries(validators)), _e = _d.next(); !_e.done; _e = _d.next()){
+            var _g = __read(_e.value, 2), fieldName = _g[0], type = _g[1];
+            checkField(fieldName, type, false);
+        }
+    } catch (e_1_1) {
+        e_1 = {
+            error: e_1_1
+        };
+    } finally{
+        try {
+            if (_e && !_e.done && (_b = _d.return)) _b.call(_d);
+        } finally{
+            if (e_1) throw e_1.error;
+        }
+    }
+    try {
+        for(var _h = __values(Object.entries(optValidators)), _j = _h.next(); !_j.done; _j = _h.next()){
+            var _k = __read(_j.value, 2), fieldName = _k[0], type = _k[1];
+            checkField(fieldName, type, true);
+        }
+    } catch (e_2_1) {
+        e_2 = {
+            error: e_2_1
+        };
+    } finally{
+        try {
+            if (_j && !_j.done && (_c = _h.return)) _c.call(_h);
+        } finally{
+            if (e_2) throw e_2.error;
+        }
+    }
+    return object;
+}
+exports.validateObject = validateObject; // validate type tests
+ // const o: { a: number; b: number; c: number } = { a: 1, b: 5, c: 6 };
+ // const z0 = validateObject(o, { a: 'isSafeInteger' }, { c: 'bigint' }); // Ok!
+ // // Should fail type-check
+ // const z1 = validateObject(o, { a: 'tmp' }, { c: 'zz' });
+ // const z2 = validateObject(o, { a: 'isSafeInteger' }, { c: 'zz' });
+ // const z3 = validateObject(o, { test: 'boolean', z: 'bug' });
+ // const z4 = validateObject(o, { a: 'boolean', z: 'bug' });
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/modular.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+/*
+THIS IMPLEMENTATION WAS TAKEN FROM `@noble/hashes`
+
+original source: https://github.com/paulmillr/noble-curves/blob/38a4ca1e6b0a80c60b11bbb6b3d71e3bfabd5bbb/src/abstract/modular.ts
+
+it was modified and adapted to this repository
+
+the main reason for copying over and not using as dependency is because of different target in the `tsconfig.json`
+
+`@noble/hashes` targets es2020, which tends to cause problems with some other (older) packages sometimes
+
+this repo targets ES5+
+*/ Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.mapHashToField = exports.getMinHashLength = exports.getFieldBytesLength = exports.hashToPrivateScalar = exports.FpSqrtEven = exports.FpSqrtOdd = exports.Field = exports.nLength = exports.FpIsSquare = exports.FpDiv = exports.FpInvertBatch = exports.FpPow = exports.validateField = exports.isNegativeLE = exports.FpSqrt = exports.tonelliShanks = exports.invert = exports.pow2 = exports.pow = exports.mod = void 0;
+/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */ // Utilities for modular arithmetics and finite fields
+var utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/utils.js [app-ssr] (ecmascript)");
+// prettier-ignore
+var _0n = BigInt(0), _1n = BigInt(1), _2n = BigInt(2), _3n = BigInt(3);
+// prettier-ignore
+var _4n = BigInt(4), _5n = BigInt(5), _8n = BigInt(8);
+// prettier-ignore
+var _9n = BigInt(9), _16n = BigInt(16);
+// Calculates a modulo b
+function mod(a, b) {
+    var result = a % b;
+    return result >= _0n ? result : b + result;
+}
+exports.mod = mod;
+/**
+ * Efficiently raise num to power and do modular division.
+ * Unsafe in some contexts: uses ladder, so can expose bigint bits.
+ * @example
+ * pow(2n, 6n, 11n) // 64n % 11n == 9n
+ */ // TODO: use field version && remove
+function pow(num, power, modulo) {
+    if (modulo <= _0n || power < _0n) throw new Error('Expected power/modulo > 0');
+    if (modulo === _1n) return _0n;
+    var res = _1n;
+    while(power > _0n){
+        if (power & _1n) res = res * num % modulo;
+        num = num * num % modulo;
+        power >>= _1n;
+    }
+    return res;
+}
+exports.pow = pow;
+// Does x ^ (2 ^ power) mod p. pow2(30, 4) == 30 ^ (2 ^ 4)
+function pow2(x, power, modulo) {
+    var res = x;
+    while(power-- > _0n){
+        res *= res;
+        res %= modulo;
+    }
+    return res;
+}
+exports.pow2 = pow2;
+// Inverses number over modulo
+function invert(number, modulo) {
+    if (number === _0n || modulo <= _0n) {
+        throw new Error("invert: expected positive integers, got n=".concat(number, " mod=").concat(modulo));
+    }
+    // Euclidean GCD https://brilliant.org/wiki/extended-euclidean-algorithm/
+    // Fermat's little theorem "CT-like" version inv(n) = n^(m-2) mod m is 30x slower.
+    var a = mod(number, modulo);
+    var b = modulo;
+    // prettier-ignore
+    var x = _0n, y = _1n, u = _1n, v = _0n;
+    while(a !== _0n){
+        // JIT applies optimization if those two lines follow each other
+        var q = b / a;
+        var r = b % a;
+        var m = x - u * q;
+        var n = y - v * q;
+        // prettier-ignore
+        b = a, a = r, x = u, y = v, u = m, v = n;
+    }
+    var gcd = b;
+    if (gcd !== _1n) throw new Error('invert: does not exist');
+    return mod(x, modulo);
+}
+exports.invert = invert;
+/**
+ * Tonelli-Shanks square root search algorithm.
+ * 1. https://eprint.iacr.org/2012/685.pdf (page 12)
+ * 2. Square Roots from 1; 24, 51, 10 to Dan Shanks
+ * Will start an infinite loop if field order P is not prime.
+ * @param P field order
+ * @returns function that takes field Fp (created from P) and number n
+ */ function tonelliShanks(P) {
+    // Legendre constant: used to calculate Legendre symbol (a | p),
+    // which denotes the value of a^((p-1)/2) (mod p).
+    // (a | p) ≡ 1    if a is a square (mod p)
+    // (a | p) ≡ -1   if a is not a square (mod p)
+    // (a | p) ≡ 0    if a ≡ 0 (mod p)
+    var legendreC = (P - _1n) / _2n;
+    var Q, S, Z;
+    // Step 1: By factoring out powers of 2 from p - 1,
+    // find q and s such that p - 1 = q*(2^s) with q odd
+    for(Q = P - _1n, S = 0; Q % _2n === _0n; Q /= _2n, S++);
+    // Step 2: Select a non-square z such that (z | p) ≡ -1 and set c ≡ zq
+    for(Z = _2n; Z < P && pow(Z, legendreC, P) !== P - _1n; Z++);
+    // Fast-path
+    if (S === 1) {
+        var p1div4_1 = (P + _1n) / _4n;
+        return function tonelliFast(Fp, n) {
+            var root = Fp.pow(n, p1div4_1);
+            if (!Fp.eql(Fp.sqr(root), n)) throw new Error('Cannot find square root');
+            return root;
+        };
+    }
+    // Slow-path
+    var Q1div2 = (Q + _1n) / _2n;
+    return function tonelliSlow(Fp, n) {
+        // Step 0: Check that n is indeed a square: (n | p) should not be ≡ -1
+        if (Fp.pow(n, legendreC) === Fp.neg(Fp.ONE)) throw new Error('Cannot find square root');
+        var r = S;
+        // TODO: will fail at Fp2/etc
+        var g = Fp.pow(Fp.mul(Fp.ONE, Z), Q); // will update both x and b
+        var x = Fp.pow(n, Q1div2); // first guess at the square root
+        var b = Fp.pow(n, Q); // first guess at the fudge factor
+        while(!Fp.eql(b, Fp.ONE)){
+            if (Fp.eql(b, Fp.ZERO)) return Fp.ZERO; // https://en.wikipedia.org/wiki/Tonelli%E2%80%93Shanks_algorithm (4. If t = 0, return r = 0)
+            // Find m such b^(2^m)==1
+            var m = 1;
+            for(var t2 = Fp.sqr(b); m < r; m++){
+                if (Fp.eql(t2, Fp.ONE)) break;
+                t2 = Fp.sqr(t2); // t2 *= t2
+            }
+            // NOTE: r-m-1 can be bigger than 32, need to convert to bigint before shift, otherwise there will be overflow
+            var ge = Fp.pow(g, _1n << BigInt(r - m - 1)); // ge = 2^(r-m-1)
+            g = Fp.sqr(ge); // g = ge * ge
+            x = Fp.mul(x, ge); // x *= ge
+            b = Fp.mul(b, g); // b *= g
+            r = m;
+        }
+        return x;
+    };
+}
+exports.tonelliShanks = tonelliShanks;
+function FpSqrt(P) {
+    // NOTE: different algorithms can give different roots, it is up to user to decide which one they want.
+    // For example there is FpSqrtOdd/FpSqrtEven to choice root based on oddness (used for hash-to-curve).
+    // P ≡ 3 (mod 4)
+    // √n = n^((P+1)/4)
+    if (P % _4n === _3n) {
+        // Not all roots possible!
+        // const ORDER =
+        //   0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaabn;
+        // const NUM = 72057594037927816n;
+        var p1div4_2 = (P + _1n) / _4n;
+        return function sqrt3mod4(Fp, n) {
+            var root = Fp.pow(n, p1div4_2);
+            // Throw if root**2 != n
+            if (!Fp.eql(Fp.sqr(root), n)) throw new Error('Cannot find square root');
+            return root;
+        };
+    }
+    // Atkin algorithm for q ≡ 5 (mod 8), https://eprint.iacr.org/2012/685.pdf (page 10)
+    if (P % _8n === _5n) {
+        var c1_1 = (P - _5n) / _8n;
+        return function sqrt5mod8(Fp, n) {
+            var n2 = Fp.mul(n, _2n);
+            var v = Fp.pow(n2, c1_1);
+            var nv = Fp.mul(n, v);
+            var i = Fp.mul(Fp.mul(nv, _2n), v);
+            var root = Fp.mul(nv, Fp.sub(i, Fp.ONE));
+            if (!Fp.eql(Fp.sqr(root), n)) throw new Error('Cannot find square root');
+            return root;
+        };
+    }
+    // P ≡ 9 (mod 16)
+    if (P % _16n === _9n) {
+    // NOTE: tonelli is too slow for bls-Fp2 calculations even on start
+    // Means we cannot use sqrt for constants at all!
+    //
+    // const c1 = Fp.sqrt(Fp.negate(Fp.ONE)); //  1. c1 = sqrt(-1) in F, i.e., (c1^2) == -1 in F
+    // const c2 = Fp.sqrt(c1);                //  2. c2 = sqrt(c1) in F, i.e., (c2^2) == c1 in F
+    // const c3 = Fp.sqrt(Fp.negate(c1));     //  3. c3 = sqrt(-c1) in F, i.e., (c3^2) == -c1 in F
+    // const c4 = (P + _7n) / _16n;           //  4. c4 = (q + 7) / 16        # Integer arithmetic
+    // sqrt = (x) => {
+    //   let tv1 = Fp.pow(x, c4);             //  1. tv1 = x^c4
+    //   let tv2 = Fp.mul(c1, tv1);           //  2. tv2 = c1 * tv1
+    //   const tv3 = Fp.mul(c2, tv1);         //  3. tv3 = c2 * tv1
+    //   let tv4 = Fp.mul(c3, tv1);           //  4. tv4 = c3 * tv1
+    //   const e1 = Fp.equals(Fp.square(tv2), x); //  5.  e1 = (tv2^2) == x
+    //   const e2 = Fp.equals(Fp.square(tv3), x); //  6.  e2 = (tv3^2) == x
+    //   tv1 = Fp.cmov(tv1, tv2, e1); //  7. tv1 = CMOV(tv1, tv2, e1)  # Select tv2 if (tv2^2) == x
+    //   tv2 = Fp.cmov(tv4, tv3, e2); //  8. tv2 = CMOV(tv4, tv3, e2)  # Select tv3 if (tv3^2) == x
+    //   const e3 = Fp.equals(Fp.square(tv2), x); //  9.  e3 = (tv2^2) == x
+    //   return Fp.cmov(tv1, tv2, e3); //  10.  z = CMOV(tv1, tv2, e3)  # Select the sqrt from tv1 and tv2
+    // }
+    }
+    // Other cases: Tonelli-Shanks algorithm
+    return tonelliShanks(P);
+}
+exports.FpSqrt = FpSqrt;
+// Little-endian check for first LE bit (last BE bit);
+var isNegativeLE = function(num, modulo) {
+    return (mod(num, modulo) & _1n) === _1n;
+};
+exports.isNegativeLE = isNegativeLE;
+// prettier-ignore
+var FIELD_FIELDS = [
+    'create',
+    'isValid',
+    'is0',
+    'neg',
+    'inv',
+    'sqrt',
+    'sqr',
+    'eql',
+    'add',
+    'sub',
+    'mul',
+    'pow',
+    'div',
+    'addN',
+    'subN',
+    'mulN',
+    'sqrN'
+];
+function validateField(field) {
+    var initial = {
+        ORDER: 'bigint',
+        MASK: 'bigint',
+        BYTES: 'isSafeInteger',
+        BITS: 'isSafeInteger'
+    };
+    var opts = FIELD_FIELDS.reduce(function(map, val) {
+        map[val] = 'function';
+        return map;
+    }, initial);
+    return (0, utils_1.validateObject)(field, opts);
+}
+exports.validateField = validateField;
+// Generic field functions
+/**
+ * Same as `pow` but for Fp: non-constant-time.
+ * Unsafe in some contexts: uses ladder, so can expose bigint bits.
+ */ function FpPow(f, num, power) {
+    // Should have same speed as pow for bigints
+    // TODO: benchmark!
+    if (power < _0n) throw new Error('Expected power > 0');
+    if (power === _0n) return f.ONE;
+    if (power === _1n) return num;
+    var p = f.ONE;
+    var d = num;
+    while(power > _0n){
+        if (power & _1n) p = f.mul(p, d);
+        d = f.sqr(d);
+        power >>= _1n;
+    }
+    return p;
+}
+exports.FpPow = FpPow;
+/**
+ * Efficiently invert an array of Field elements.
+ * `inv(0)` will return `undefined` here: make sure to throw an error.
+ */ function FpInvertBatch(f, nums) {
+    var tmp = new Array(nums.length);
+    // Walk from first to last, multiply them by each other MOD p
+    var lastMultiplied = nums.reduce(function(acc, num, i) {
+        if (f.is0(num)) return acc;
+        tmp[i] = acc;
+        return f.mul(acc, num);
+    }, f.ONE);
+    // Invert last element
+    var inverted = f.inv(lastMultiplied);
+    // Walk from last to first, multiply them by inverted each other MOD p
+    nums.reduceRight(function(acc, num, i) {
+        if (f.is0(num)) return acc;
+        tmp[i] = f.mul(acc, tmp[i]);
+        return f.mul(acc, num);
+    }, inverted);
+    return tmp;
+}
+exports.FpInvertBatch = FpInvertBatch;
+function FpDiv(f, lhs, rhs) {
+    return f.mul(lhs, typeof rhs === 'bigint' ? invert(rhs, f.ORDER) : f.inv(rhs));
+}
+exports.FpDiv = FpDiv;
+// This function returns True whenever the value x is a square in the field F.
+function FpIsSquare(f) {
+    var legendreConst = (f.ORDER - _1n) / _2n; // Integer arithmetic
+    return function(x) {
+        var p = f.pow(x, legendreConst);
+        return f.eql(p, f.ZERO) || f.eql(p, f.ONE);
+    };
+}
+exports.FpIsSquare = FpIsSquare;
+// CURVE.n lengths
+function nLength(n, nBitLength) {
+    // Bit size, byte size of CURVE.n
+    var _nBitLength = nBitLength !== undefined ? nBitLength : n.toString(2).length;
+    var nByteLength = Math.ceil(_nBitLength / 8);
+    return {
+        nBitLength: _nBitLength,
+        nByteLength: nByteLength
+    };
+}
+exports.nLength = nLength;
+/**
+ * Initializes a finite field over prime. **Non-primes are not supported.**
+ * Do not init in loop: slow. Very fragile: always run a benchmark on a change.
+ * Major performance optimizations:
+ * * a) denormalized operations like mulN instead of mul
+ * * b) same object shape: never add or remove keys
+ * * c) Object.freeze
+ * @param ORDER prime positive bigint
+ * @param bitLen how many bits the field consumes
+ * @param isLE (def: false) if encoding / decoding should be in little-endian
+ * @param redef optional faster redefinitions of sqrt and other methods
+ */ function Field(ORDER, bitLen, isLE, redef) {
+    if (isLE === void 0) {
+        isLE = false;
+    }
+    if (redef === void 0) {
+        redef = {};
+    }
+    if (ORDER <= _0n) throw new Error("Expected Field ORDER > 0, got ".concat(ORDER));
+    var _a = nLength(ORDER, bitLen), BITS = _a.nBitLength, BYTES = _a.nByteLength;
+    if (BYTES > 2048) throw new Error('Field lengths over 2048 bytes are not supported');
+    var sqrtP = FpSqrt(ORDER);
+    var f = Object.freeze({
+        ORDER: ORDER,
+        BITS: BITS,
+        BYTES: BYTES,
+        MASK: (0, utils_1.bitMask)(BITS),
+        ZERO: _0n,
+        ONE: _1n,
+        create: function(num) {
+            return mod(num, ORDER);
+        },
+        isValid: function(num) {
+            if (typeof num !== 'bigint') throw new Error("Invalid field element: expected bigint, got ".concat(typeof num));
+            return _0n <= num && num < ORDER; // 0 is valid element, but it's not invertible
+        },
+        is0: function(num) {
+            return num === _0n;
+        },
+        isOdd: function(num) {
+            return (num & _1n) === _1n;
+        },
+        neg: function(num) {
+            return mod(-num, ORDER);
+        },
+        eql: function(lhs, rhs) {
+            return lhs === rhs;
+        },
+        sqr: function(num) {
+            return mod(num * num, ORDER);
+        },
+        add: function(lhs, rhs) {
+            return mod(lhs + rhs, ORDER);
+        },
+        sub: function(lhs, rhs) {
+            return mod(lhs - rhs, ORDER);
+        },
+        mul: function(lhs, rhs) {
+            return mod(lhs * rhs, ORDER);
+        },
+        pow: function(num, power) {
+            return FpPow(f, num, power);
+        },
+        div: function(lhs, rhs) {
+            return mod(lhs * invert(rhs, ORDER), ORDER);
+        },
+        // Same as above, but doesn't normalize
+        sqrN: function(num) {
+            return num * num;
+        },
+        addN: function(lhs, rhs) {
+            return lhs + rhs;
+        },
+        subN: function(lhs, rhs) {
+            return lhs - rhs;
+        },
+        mulN: function(lhs, rhs) {
+            return lhs * rhs;
+        },
+        inv: function(num) {
+            return invert(num, ORDER);
+        },
+        sqrt: redef.sqrt || function(n) {
+            return sqrtP(f, n);
+        },
+        invertBatch: function(lst) {
+            return FpInvertBatch(f, lst);
+        },
+        // TODO: do we really need constant cmov?
+        // We don't have const-time bigints anyway, so probably will be not very useful
+        cmov: function(a, b, c) {
+            return c ? b : a;
+        },
+        toBytes: function(num) {
+            return isLE ? (0, utils_1.numberToBytesLE)(num, BYTES) : (0, utils_1.numberToBytesBE)(num, BYTES);
+        },
+        fromBytes: function(bytes) {
+            if (bytes.length !== BYTES) throw new Error("Fp.fromBytes: expected ".concat(BYTES, ", got ").concat(bytes.length));
+            return isLE ? (0, utils_1.bytesToNumberLE)(bytes) : (0, utils_1.bytesToNumberBE)(bytes);
+        }
+    });
+    return Object.freeze(f);
+}
+exports.Field = Field;
+function FpSqrtOdd(Fp, elm) {
+    if (!Fp.isOdd) throw new Error("Field doesn't have isOdd");
+    var root = Fp.sqrt(elm);
+    return Fp.isOdd(root) ? root : Fp.neg(root);
+}
+exports.FpSqrtOdd = FpSqrtOdd;
+function FpSqrtEven(Fp, elm) {
+    if (!Fp.isOdd) throw new Error("Field doesn't have isOdd");
+    var root = Fp.sqrt(elm);
+    return Fp.isOdd(root) ? Fp.neg(root) : root;
+}
+exports.FpSqrtEven = FpSqrtEven;
+/**
+ * "Constant-time" private key generation utility.
+ * Same as mapKeyToField, but accepts less bytes (40 instead of 48 for 32-byte field).
+ * Which makes it slightly more biased, less secure.
+ * @deprecated use mapKeyToField instead
+ */ function hashToPrivateScalar(hash, groupOrder, isLE) {
+    if (isLE === void 0) {
+        isLE = false;
+    }
+    hash = (0, utils_1.ensureBytes)('privateHash', hash);
+    var hashLen = hash.length;
+    var minLen = nLength(groupOrder).nByteLength + 8;
+    if (minLen < 24 || hashLen < minLen || hashLen > 1024) throw new Error("hashToPrivateScalar: expected ".concat(minLen, "-1024 bytes of input, got ").concat(hashLen));
+    var num = isLE ? (0, utils_1.bytesToNumberLE)(hash) : (0, utils_1.bytesToNumberBE)(hash);
+    return mod(num, groupOrder - _1n) + _1n;
+}
+exports.hashToPrivateScalar = hashToPrivateScalar;
+/**
+ * Returns total number of bytes consumed by the field element.
+ * For example, 32 bytes for usual 256-bit weierstrass curve.
+ * @param fieldOrder number of field elements, usually CURVE.n
+ * @returns byte length of field
+ */ function getFieldBytesLength(fieldOrder) {
+    if (typeof fieldOrder !== 'bigint') throw new Error('field order must be bigint');
+    var bitLength = fieldOrder.toString(2).length;
+    return Math.ceil(bitLength / 8);
+}
+exports.getFieldBytesLength = getFieldBytesLength;
+/**
+ * Returns minimal amount of bytes that can be safely reduced
+ * by field order.
+ * Should be 2^-128 for 128-bit curve such as P256.
+ * @param fieldOrder number of field elements, usually CURVE.n
+ * @returns byte length of target hash
+ */ function getMinHashLength(fieldOrder) {
+    var length = getFieldBytesLength(fieldOrder);
+    return length + Math.ceil(length / 2);
+}
+exports.getMinHashLength = getMinHashLength;
+/**
+ * "Constant-time" private key generation utility.
+ * Can take (n + n/2) or more bytes of uniform input e.g. from CSPRNG or KDF
+ * and convert them into private scalar, with the modulo bias being negligible.
+ * Needs at least 48 bytes of input for 32-byte private key.
+ * https://research.kudelskisecurity.com/2020/07/28/the-definitive-guide-to-modulo-bias-and-how-to-avoid-it/
+ * FIPS 186-5, A.2 https://csrc.nist.gov/publications/detail/fips/186/5/final
+ * RFC 9380, https://www.rfc-editor.org/rfc/rfc9380#section-5
+ * @param hash hash output from SHA3 or a similar function
+ * @param groupOrder size of subgroup - (e.g. secp256k1.CURVE.n)
+ * @param isLE interpret hash bytes as LE num
+ * @returns valid private scalar
+ */ function mapHashToField(key, fieldOrder, isLE) {
+    if (isLE === void 0) {
+        isLE = false;
+    }
+    var len = key.length;
+    var fieldLen = getFieldBytesLength(fieldOrder);
+    var minLen = getMinHashLength(fieldOrder);
+    // No small numbers: need to understand bias story. No huge numbers: easier to detect JS timings.
+    if (len < 16 || len < minLen || len > 1024) throw new Error("expected ".concat(minLen, "-1024 bytes of input, got ").concat(len));
+    var num = isLE ? (0, utils_1.bytesToNumberBE)(key) : (0, utils_1.bytesToNumberLE)(key);
+    // `mod(x, 11)` can sometimes produce 0. `mod(x, 10) + 1` is the same, but no 0
+    var reduced = mod(num, fieldOrder - _1n) + _1n;
+    return isLE ? (0, utils_1.numberToBytesLE)(reduced, fieldLen) : (0, utils_1.numberToBytesBE)(reduced, fieldLen);
+}
+exports.mapHashToField = mapHashToField;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/hash-to-curve.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+/*
+THIS IMPLEMENTATION WAS TAKEN FROM `@noble/hashes`
+
+original source: https://github.com/paulmillr/noble-curves/blob/38a4ca1e6b0a80c60b11bbb6b3d71e3bfabd5bbb/src/abstract/hash-to-curve.ts
+
+it was modified and adapted to this repository
+
+the main reason for copying over and not using as dependency is because of different target in the `tsconfig.json`
+
+`@noble/hashes` targets es2020, which tends to cause problems with some other (older) packages sometimes
+
+this repo targets ES5+
+*/ var __assign = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__assign || function() {
+    __assign = Object.assign || function(t) {
+        for(var s, i = 1, n = arguments.length; i < n; i++){
+            s = arguments[i];
+            for(var p in s)if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __read = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__read || function(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while((n === void 0 || n-- > 0) && !(r = i.next()).done)ar.push(r.value);
+    } catch (error) {
+        e = {
+            error: error
+        };
+    } finally{
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        } finally{
+            if (e) throw e.error;
+        }
+    }
+    return ar;
+};
+var __spreadArray = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__spreadArray || function(to, from, pack) {
+    if (pack || arguments.length === 2) for(var i = 0, l = from.length, ar; i < l; i++){
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.createHasher = exports.isogenyMap = exports.hash_to_field = exports.expand_message_xof = exports.expand_message_xmd = void 0;
+var modular_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/modular.js [app-ssr] (ecmascript)");
+var utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/utils.js [app-ssr] (ecmascript)");
+// Octet Stream to Integer. "spec" implementation of os2ip is 2.5x slower vs bytesToNumberBE.
+var os2ip = utils_1.bytesToNumberBE;
+// Integer to Octet Stream (numberToBytesBE)
+function i2osp(value, length) {
+    if (value < 0 || value >= 1 << 8 * length) {
+        throw new Error("bad I2OSP call: value=".concat(value, " length=").concat(length));
+    }
+    var res = Array.from({
+        length: length
+    }).fill(0);
+    for(var i = length - 1; i >= 0; i--){
+        res[i] = value & 0xff;
+        value >>>= 8;
+    }
+    return new Uint8Array(res);
+}
+function strxor(a, b) {
+    var arr = new Uint8Array(a.length);
+    for(var i = 0; i < a.length; i++){
+        arr[i] = a[i] ^ b[i];
+    }
+    return arr;
+}
+function anum(item) {
+    if (!Number.isSafeInteger(item)) throw new Error('number expected');
+}
+// Produces a uniformly random byte string using a cryptographic hash function H that outputs b bits
+// https://www.rfc-editor.org/rfc/rfc9380#section-5.3.1
+function expand_message_xmd(msg, DST, lenInBytes, H) {
+    (0, utils_1.abytes)(msg);
+    (0, utils_1.abytes)(DST);
+    anum(lenInBytes);
+    // https://www.rfc-editor.org/rfc/rfc9380#section-5.3.3
+    if (DST.length > 255) DST = H((0, utils_1.concatBytes)((0, utils_1.utf8ToBytes)('H2C-OVERSIZE-DST-'), DST));
+    var b_in_bytes = H.outputLen, r_in_bytes = H.blockLen;
+    var ell = Math.ceil(lenInBytes / b_in_bytes);
+    if (ell > 255) throw new Error('Invalid xmd length');
+    var DST_prime = (0, utils_1.concatBytes)(DST, i2osp(DST.length, 1));
+    var Z_pad = i2osp(0, r_in_bytes);
+    var l_i_b_str = i2osp(lenInBytes, 2); // len_in_bytes_str
+    var b = new Array(ell);
+    var b_0 = H((0, utils_1.concatBytes)(Z_pad, msg, l_i_b_str, i2osp(0, 1), DST_prime));
+    b[0] = H((0, utils_1.concatBytes)(b_0, i2osp(1, 1), DST_prime));
+    for(var i = 1; i <= ell; i++){
+        var args = [
+            strxor(b_0, b[i - 1]),
+            i2osp(i + 1, 1),
+            DST_prime
+        ];
+        b[i] = H(utils_1.concatBytes.apply(void 0, __spreadArray([], __read(args), false)));
+    }
+    var pseudo_random_bytes = utils_1.concatBytes.apply(void 0, __spreadArray([], __read(b), false));
+    return pseudo_random_bytes.slice(0, lenInBytes);
+}
+exports.expand_message_xmd = expand_message_xmd;
+// Produces a uniformly random byte string using an extendable-output function (XOF) H.
+// 1. The collision resistance of H MUST be at least k bits.
+// 2. H MUST be an XOF that has been proved indifferentiable from
+//    a random oracle under a reasonable cryptographic assumption.
+// https://www.rfc-editor.org/rfc/rfc9380#section-5.3.2
+function expand_message_xof(msg, DST, lenInBytes, k, H) {
+    (0, utils_1.abytes)(msg);
+    (0, utils_1.abytes)(DST);
+    anum(lenInBytes);
+    // https://www.rfc-editor.org/rfc/rfc9380#section-5.3.3
+    // DST = H('H2C-OVERSIZE-DST-' || a_very_long_DST, Math.ceil((lenInBytes * k) / 8));
+    if (DST.length > 255) {
+        var dkLen = Math.ceil(2 * k / 8);
+        DST = H.create({
+            dkLen: dkLen
+        }).update((0, utils_1.utf8ToBytes)('H2C-OVERSIZE-DST-')).update(DST).digest();
+    }
+    if (lenInBytes > 65535 || DST.length > 255) throw new Error('expand_message_xof: invalid lenInBytes');
+    return H.create({
+        dkLen: lenInBytes
+    }).update(msg).update(i2osp(lenInBytes, 2))// 2. DST_prime = DST || I2OSP(len(DST), 1)
+    .update(DST).update(i2osp(DST.length, 1)).digest();
+}
+exports.expand_message_xof = expand_message_xof;
+/**
+ * Hashes arbitrary-length byte strings to a list of one or more elements of a finite field F
+ * https://www.rfc-editor.org/rfc/rfc9380#section-5.2
+ * @param msg a byte string containing the message to hash
+ * @param count the number of elements of F to output
+ * @param options `{DST: string, p: bigint, m: number, k: number, expand: 'xmd' | 'xof', hash: H}`, see above
+ * @returns [u_0, ..., u_(count - 1)], a list of field elements.
+ */ function hash_to_field(msg, count, options) {
+    (0, utils_1.validateObject)(options, {
+        DST: 'stringOrUint8Array',
+        p: 'bigint',
+        m: 'isSafeInteger',
+        k: 'isSafeInteger',
+        hash: 'hash'
+    });
+    var p = options.p, k = options.k, m = options.m, hash = options.hash, expand = options.expand, _DST = options.DST;
+    (0, utils_1.abytes)(msg);
+    anum(count);
+    var DST = typeof _DST === 'string' ? (0, utils_1.utf8ToBytes)(_DST) : _DST;
+    var log2p = p.toString(2).length;
+    var L = Math.ceil((log2p + k) / 8); // section 5.1 of ietf draft link above
+    var len_in_bytes = count * m * L;
+    var prb; // pseudo_random_bytes
+    if (expand === 'xmd') {
+        prb = expand_message_xmd(msg, DST, len_in_bytes, hash);
+    } else if (expand === 'xof') {
+        prb = expand_message_xof(msg, DST, len_in_bytes, k, hash);
+    } else if (expand === '_internal_pass') {
+        // for internal tests only
+        prb = msg;
+    } else {
+        throw new Error('expand must be "xmd" or "xof"');
+    }
+    var u = new Array(count);
+    for(var i = 0; i < count; i++){
+        var e = new Array(m);
+        for(var j = 0; j < m; j++){
+            var elm_offset = L * (j + i * m);
+            var tv = prb.subarray(elm_offset, elm_offset + L);
+            e[j] = (0, modular_1.mod)(os2ip(tv), p);
+        }
+        u[i] = e;
+    }
+    return u;
+}
+exports.hash_to_field = hash_to_field;
+function isogenyMap(field, map) {
+    // Make same order as in spec
+    var COEFF = map.map(function(i) {
+        return Array.from(i).reverse();
+    });
+    return function(x, y) {
+        var _a = __read(COEFF.map(function(val) {
+            return val.reduce(function(acc, i) {
+                return field.add(field.mul(acc, x), i);
+            });
+        }), 4), xNum = _a[0], xDen = _a[1], yNum = _a[2], yDen = _a[3];
+        x = field.div(xNum, xDen); // xNum / xDen
+        y = field.mul(y, field.div(yNum, yDen)); // y * (yNum / yDev)
+        return {
+            x: x,
+            y: y
+        };
+    };
+}
+exports.isogenyMap = isogenyMap;
+function createHasher(Point, mapToCurve, def) {
+    if (typeof mapToCurve !== 'function') throw new Error('mapToCurve() must be defined');
+    return {
+        // Encodes byte string to elliptic curve.
+        // hash_to_curve from https://www.rfc-editor.org/rfc/rfc9380#section-3
+        hashToCurve: function(msg, options) {
+            var u = hash_to_field(msg, 2, __assign(__assign(__assign({}, def), {
+                DST: def.DST
+            }), options));
+            var u0 = Point.fromAffine(mapToCurve(u[0]));
+            var u1 = Point.fromAffine(mapToCurve(u[1]));
+            var P = u0.add(u1).clearCofactor();
+            P.assertValidity();
+            return P;
+        },
+        // Encodes byte string to elliptic curve.
+        // encode_to_curve from https://www.rfc-editor.org/rfc/rfc9380#section-3
+        encodeToCurve: function(msg, options) {
+            var u = hash_to_field(msg, 1, __assign(__assign(__assign({}, def), {
+                DST: def.encodeDST
+            }), options));
+            var P = Point.fromAffine(mapToCurve(u[0])).clearCofactor();
+            P.assertValidity();
+            return P;
+        }
+    };
+}
+exports.createHasher = createHasher;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/curve.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+/*
+THIS IMPLEMENTATION WAS TAKEN FROM `@noble/hashes`
+
+original source: https://github.com/paulmillr/noble-curves/blob/38a4ca1e6b0a80c60b11bbb6b3d71e3bfabd5bbb/src/abstract/curve.ts
+
+it was modified and adapted to this repository
+
+the main reason for copying over and not using as dependency is because of different target in the `tsconfig.json`
+
+`@noble/hashes` targets es2020, which tends to cause problems with some other (older) packages sometimes
+
+this repo targets ES5+
+*/ var __assign = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__assign || function() {
+    __assign = Object.assign || function(t) {
+        for(var s, i = 1, n = arguments.length; i < n; i++){
+            s = arguments[i];
+            for(var p in s)if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.validateBasic = exports.wNAF = void 0;
+/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */ // Abelian group utilities
+var modular_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/modular.js [app-ssr] (ecmascript)");
+var utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/utils.js [app-ssr] (ecmascript)");
+var _0n = BigInt(0);
+var _1n = BigInt(1);
+// Elliptic curve multiplication of Point by scalar. Fragile.
+// Scalars should always be less than curve order: this should be checked inside of a curve itself.
+// Creates precomputation tables for fast multiplication:
+// - private scalar is split by fixed size windows of W bits
+// - every window point is collected from window's table & added to accumulator
+// - since windows are different, same point inside tables won't be accessed more than once per calc
+// - each multiplication is 'Math.ceil(CURVE_ORDER / 𝑊) + 1' point additions (fixed for any scalar)
+// - +1 window is neccessary for wNAF
+// - wNAF reduces table size: 2x less memory + 2x faster generation, but 10% slower multiplication
+// TODO: Research returning 2d JS array of windows, instead of a single window. This would allow
+// windows to be in different memory locations
+function wNAF(c, bits) {
+    var constTimeNegate = function(condition, item) {
+        var neg = item.negate();
+        return condition ? neg : item;
+    };
+    var opts = function(W) {
+        var windows = Math.ceil(bits / W) + 1; // +1, because
+        var windowSize = Math.pow(2, W - 1); // -1 because we skip zero
+        return {
+            windows: windows,
+            windowSize: windowSize
+        };
+    };
+    return {
+        constTimeNegate: constTimeNegate,
+        // non-const time multiplication ladder
+        unsafeLadder: function(elm, n) {
+            var p = c.ZERO;
+            var d = elm;
+            while(n > _0n){
+                if (n & _1n) p = p.add(d);
+                d = d.double();
+                n >>= _1n;
+            }
+            return p;
+        },
+        /**
+         * Creates a wNAF precomputation window. Used for caching.
+         * Default window size is set by `utils.precompute()` and is equal to 8.
+         * Number of precomputed points depends on the curve size:
+         * 2^(𝑊−1) * (Math.ceil(𝑛 / 𝑊) + 1), where:
+         * - 𝑊 is the window size
+         * - 𝑛 is the bitlength of the curve order.
+         * For a 256-bit curve and window size 8, the number of precomputed points is 128 * 33 = 4224.
+         * @returns precomputed point tables flattened to a single array
+         */ precomputeWindow: function(elm, W) {
+            var _a = opts(W), windows = _a.windows, windowSize = _a.windowSize;
+            var points = [];
+            var p = elm;
+            var base = p;
+            for(var window_1 = 0; window_1 < windows; window_1++){
+                base = p;
+                points.push(base);
+                // =1, because we skip zero
+                for(var i = 1; i < windowSize; i++){
+                    base = base.add(p);
+                    points.push(base);
+                }
+                p = base.double();
+            }
+            return points;
+        },
+        /**
+         * Implements ec multiplication using precomputed tables and w-ary non-adjacent form.
+         * @param W window size
+         * @param precomputes precomputed tables
+         * @param n scalar (we don't check here, but should be less than curve order)
+         * @returns real and fake (for const-time) points
+         */ wNAF: function(W, precomputes, n) {
+            // TODO: maybe check that scalar is less than group order? wNAF behavious is undefined otherwise
+            // But need to carefully remove other checks before wNAF. ORDER == bits here
+            var _a = opts(W), windows = _a.windows, windowSize = _a.windowSize;
+            var p = c.ZERO;
+            var f = c.BASE;
+            var mask = BigInt(Math.pow(2, W) - 1); // Create mask with W ones: 0b1111 for W=4 etc.
+            var maxNumber = Math.pow(2, W);
+            var shiftBy = BigInt(W);
+            for(var window_2 = 0; window_2 < windows; window_2++){
+                var offset = window_2 * windowSize;
+                // Extract W bits.
+                var wbits = Number(n & mask);
+                // Shift number by W bits.
+                n >>= shiftBy;
+                // If the bits are bigger than max size, we'll split those.
+                // +224 => 256 - 32
+                if (wbits > windowSize) {
+                    wbits -= maxNumber;
+                    n += _1n;
+                }
+                // This code was first written with assumption that 'f' and 'p' will never be infinity point:
+                // since each addition is multiplied by 2 ** W, it cannot cancel each other. However,
+                // there is negate now: it is possible that negated element from low value
+                // would be the same as high element, which will create carry into next window.
+                // It's not obvious how this can fail, but still worth investigating later.
+                // Check if we're onto Zero point.
+                // Add random point inside current window to f.
+                var offset1 = offset;
+                var offset2 = offset + Math.abs(wbits) - 1; // -1 because we skip zero
+                var cond1 = window_2 % 2 !== 0;
+                var cond2 = wbits < 0;
+                if (wbits === 0) {
+                    // The most important part for const-time getPublicKey
+                    f = f.add(constTimeNegate(cond1, precomputes[offset1]));
+                } else {
+                    p = p.add(constTimeNegate(cond2, precomputes[offset2]));
+                }
+            }
+            // JIT-compiler should not eliminate f here, since it will later be used in normalizeZ()
+            // Even if the variable is still unused, there are some checks which will
+            // throw an exception, so compiler needs to prove they won't happen, which is hard.
+            // At this point there is a way to F be infinity-point even if p is not,
+            // which makes it less const-time: around 1 bigint multiply.
+            return {
+                p: p,
+                f: f
+            };
+        },
+        wNAFCached: function(P, precomputesMap, n, transform) {
+            // @ts-ignore
+            var W = P._WINDOW_SIZE || 1;
+            // Calculate precomputes on a first run, reuse them after
+            var comp = precomputesMap.get(P);
+            if (!comp) {
+                comp = this.precomputeWindow(P, W);
+                if (W !== 1) {
+                    precomputesMap.set(P, transform(comp));
+                }
+            }
+            return this.wNAF(W, comp, n);
+        }
+    };
+}
+exports.wNAF = wNAF;
+function validateBasic(curve) {
+    (0, modular_1.validateField)(curve.Fp);
+    (0, utils_1.validateObject)(curve, {
+        n: 'bigint',
+        h: 'bigint',
+        Gx: 'field',
+        Gy: 'field'
+    }, {
+        nBitLength: 'isSafeInteger',
+        nByteLength: 'isSafeInteger'
+    });
+    // Set defaults
+    return Object.freeze(__assign(__assign(__assign({}, (0, modular_1.nLength)(curve.n, curve.nBitLength)), curve), {
+        p: curve.Fp.ORDER
+    }));
+}
+exports.validateBasic = validateBasic;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/weierstrass.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+/*
+THIS IMPLEMENTATION WAS TAKEN FROM `@noble/hashes`
+
+original source: https://github.com/paulmillr/noble-curves/blob/38a4ca1e6b0a80c60b11bbb6b3d71e3bfabd5bbb/src/abstract/weierstrass.ts
+
+it was modified and adapted to this repository
+
+the main reason for copying over and not using as dependency is because of different target in the `tsconfig.json`
+
+`@noble/hashes` targets es2020, which tends to cause problems with some other (older) packages sometimes
+
+this repo targets ES5+
+*/ var __extends = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__extends || function() {
+    var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf || ({
+            __proto__: []
+        }) instanceof Array && function(d, b) {
+            d.__proto__ = b;
+        } || function(d, b) {
+            for(var p in b)if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+        };
+        return extendStatics(d, b);
+    };
+    return function(d, b) {
+        if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() {
+            this.constructor = d;
+        }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+}();
+var __assign = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__assign || function() {
+    __assign = Object.assign || function(t) {
+        for(var s, i = 1, n = arguments.length; i < n; i++){
+            s = arguments[i];
+            for(var p in s)if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __createBinding = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__createBinding || (Object.create ? function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = {
+            enumerable: true,
+            get: function() {
+                return m[k];
+            }
+        };
+    }
+    Object.defineProperty(o, k2, desc);
+} : function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+});
+var __setModuleDefault = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__setModuleDefault || (Object.create ? function(o, v) {
+    Object.defineProperty(o, "default", {
+        enumerable: true,
+        value: v
+    });
+} : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__importStar || function(mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) {
+        for(var k in mod)if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    }
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __read = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__read || function(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while((n === void 0 || n-- > 0) && !(r = i.next()).done)ar.push(r.value);
+    } catch (error) {
+        e = {
+            error: error
+        };
+    } finally{
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        } finally{
+            if (e) throw e.error;
+        }
+    }
+    return ar;
+};
+var __spreadArray = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__spreadArray || function(to, from, pack) {
+    if (pack || arguments.length === 2) for(var i = 0, l = from.length, ar; i < l; i++){
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.mapToCurveSimpleSWU = exports.SWUFpSqrtRatio = exports.weierstrass = exports.weierstrassPoints = exports.DER = void 0;
+/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */ // Short Weierstrass curve. The formula is: y² = x³ + ax + b
+var mod = __importStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/modular.js [app-ssr] (ecmascript)"));
+var ut = __importStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/utils.js [app-ssr] (ecmascript)"));
+var utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/utils.js [app-ssr] (ecmascript)");
+var curve_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/curve.js [app-ssr] (ecmascript)");
+function validatePointOpts(curve) {
+    var opts = (0, curve_1.validateBasic)(curve);
+    ut.validateObject(opts, {
+        a: 'field',
+        b: 'field'
+    }, {
+        allowedPrivateKeyLengths: 'array',
+        wrapPrivateKey: 'boolean',
+        isTorsionFree: 'function',
+        clearCofactor: 'function',
+        allowInfinityPoint: 'boolean',
+        fromBytes: 'function',
+        toBytes: 'function'
+    });
+    var endo = opts.endo, Fp = opts.Fp, a = opts.a;
+    if (endo) {
+        if (!Fp.eql(a, Fp.ZERO)) {
+            throw new Error('Endomorphism can only be defined for Koblitz curves that have a=0');
+        }
+        if (typeof endo !== 'object' || typeof endo.beta !== 'bigint' || typeof endo.splitScalar !== 'function') {
+            throw new Error('Expected endomorphism with beta: bigint and splitScalar: function');
+        }
+    }
+    return Object.freeze(__assign({}, opts));
+}
+// ASN.1 DER encoding utilities
+var b2n = ut.bytesToNumberBE, h2b = ut.hexToBytes;
+exports.DER = {
+    // asn.1 DER encoding utils
+    Err: function(_super) {
+        __extends(DERErr, _super);
+        function DERErr(m) {
+            if (m === void 0) {
+                m = '';
+            }
+            return _super.call(this, m) || this;
+        }
+        return DERErr;
+    }(Error),
+    _parseInt: function(data) {
+        var E = exports.DER.Err;
+        if (data.length < 2 || data[0] !== 0x02) throw new E('Invalid signature integer tag');
+        var len = data[1];
+        var res = data.subarray(2, len + 2);
+        if (!len || res.length !== len) throw new E('Invalid signature integer: wrong length');
+        // https://crypto.stackexchange.com/a/57734 Leftmost bit of first byte is 'negative' flag,
+        // since we always use positive integers here. It must always be empty:
+        // - add zero byte if exists
+        // - if next byte doesn't have a flag, leading zero is not allowed (minimal encoding)
+        if (res[0] & 128) throw new E('Invalid signature integer: negative');
+        if (res[0] === 0x00 && !(res[1] & 128)) throw new E('Invalid signature integer: unnecessary leading zero');
+        return {
+            d: b2n(res),
+            l: data.subarray(len + 2)
+        }; // d is data, l is left
+    },
+    toSig: function(hex) {
+        // parse DER signature
+        var E = exports.DER.Err;
+        var data = typeof hex === 'string' ? h2b(hex) : hex;
+        ut.abytes(data);
+        var l = data.length;
+        if (l < 2 || data[0] != 0x30) throw new E('Invalid signature tag');
+        if (data[1] !== l - 2) throw new E('Invalid signature: incorrect length');
+        var _a = exports.DER._parseInt(data.subarray(2)), r = _a.d, sBytes = _a.l;
+        var _b = exports.DER._parseInt(sBytes), s = _b.d, rBytesLeft = _b.l;
+        if (rBytesLeft.length) throw new E('Invalid signature: left bytes after parsing');
+        return {
+            r: r,
+            s: s
+        };
+    },
+    hexFromSig: function(sig) {
+        // Add leading zero if first byte has negative bit enabled. More details in '_parseInt'
+        var slice = function(s) {
+            return Number.parseInt(s[0], 16) & 8 ? '00' + s : s;
+        };
+        var h = function(num) {
+            var hex = num.toString(16);
+            return hex.length & 1 ? "0".concat(hex) : hex;
+        };
+        var s = slice(h(sig.s));
+        var r = slice(h(sig.r));
+        var shl = s.length / 2;
+        var rhl = r.length / 2;
+        var sl = h(shl);
+        var rl = h(rhl);
+        return "30".concat(h(rhl + shl + 4), "02").concat(rl).concat(r, "02").concat(sl).concat(s);
+    }
+};
+// Be friendly to bad ECMAScript parsers by not using bigint literals
+// prettier-ignore
+var _0n = BigInt(0), _1n = BigInt(1), _2n = BigInt(2), _3n = BigInt(3), _4n = BigInt(4);
+function weierstrassPoints(opts) {
+    var CURVE = validatePointOpts(opts);
+    var Fp = CURVE.Fp; // All curves has same field / group length as for now, but they can differ
+    var toBytes = CURVE.toBytes || function(_c, point, _isCompressed) {
+        var a = point.toAffine();
+        return ut.concatBytes(Uint8Array.from([
+            0x04
+        ]), Fp.toBytes(a.x), Fp.toBytes(a.y));
+    };
+    var fromBytes = CURVE.fromBytes || function(bytes) {
+        // const head = bytes[0];
+        var tail = bytes.subarray(1);
+        // if (head !== 0x04) throw new Error('Only non-compressed encoding is supported');
+        var x = Fp.fromBytes(tail.subarray(0, Fp.BYTES));
+        var y = Fp.fromBytes(tail.subarray(Fp.BYTES, 2 * Fp.BYTES));
+        return {
+            x: x,
+            y: y
+        };
+    };
+    /**
+     * y² = x³ + ax + b: Short weierstrass curve formula
+     * @returns y²
+     */ function weierstrassEquation(x) {
+        var a = CURVE.a, b = CURVE.b;
+        var x2 = Fp.sqr(x); // x * x
+        var x3 = Fp.mul(x2, x); // x2 * x
+        return Fp.add(Fp.add(x3, Fp.mul(x, a)), b); // x3 + a * x + b
+    }
+    // Validate whether the passed curve params are valid.
+    // We check if curve equation works for generator point.
+    // `assertValidity()` won't work: `isTorsionFree()` is not available at this point in bls12-381.
+    // ProjectivePoint class has not been initialized yet.
+    if (!Fp.eql(Fp.sqr(CURVE.Gy), weierstrassEquation(CURVE.Gx))) throw new Error('bad generator point: equation left != right');
+    // Valid group elements reside in range 1..n-1
+    function isWithinCurveOrder(num) {
+        return typeof num === 'bigint' && _0n < num && num < CURVE.n;
+    }
+    function assertGE(num) {
+        if (!isWithinCurveOrder(num)) throw new Error('Expected valid bigint: 0 < bigint < curve.n');
+    }
+    // Validates if priv key is valid and converts it to bigint.
+    // Supports options allowedPrivateKeyLengths and wrapPrivateKey.
+    function normPrivateKeyToScalar(key) {
+        var lengths = CURVE.allowedPrivateKeyLengths, nByteLength = CURVE.nByteLength, wrapPrivateKey = CURVE.wrapPrivateKey, n = CURVE.n;
+        if (lengths && typeof key !== 'bigint') {
+            if (ut.isBytes(key)) key = ut.bytesToHex(key);
+            // Normalize to hex string, pad. E.g. P521 would norm 130-132 char hex to 132-char bytes
+            if (typeof key !== 'string' || !lengths.includes(key.length)) throw new Error('Invalid key');
+            key = key.padStart(nByteLength * 2, '0');
+        }
+        var num;
+        try {
+            num = typeof key === 'bigint' ? key : ut.bytesToNumberBE((0, utils_1.ensureBytes)('private key', key, nByteLength));
+        } catch (error) {
+            throw new Error("private key must be ".concat(nByteLength, " bytes, hex or bigint, not ").concat(typeof key));
+        }
+        if (wrapPrivateKey) num = mod.mod(num, n); // disabled by default, enabled for BLS
+        assertGE(num); // num in range [1..N-1]
+        return num;
+    }
+    var pointPrecomputes = new Map();
+    function assertPrjPoint(other) {
+        if (!(other instanceof Point)) throw new Error('ProjectivePoint expected');
+    }
+    /**
+     * Projective Point works in 3d / projective (homogeneous) coordinates: (x, y, z) ∋ (x=x/z, y=y/z)
+     * Default Point works in 2d / affine coordinates: (x, y)
+     * We're doing calculations in projective, because its operations don't require costly inversion.
+     */ var Point = function() {
+        function Point(px, py, pz) {
+            this.px = px;
+            this.py = py;
+            this.pz = pz;
+            if (px == null || !Fp.isValid(px)) throw new Error('x required');
+            if (py == null || !Fp.isValid(py)) throw new Error('y required');
+            if (pz == null || !Fp.isValid(pz)) throw new Error('z required');
+        }
+        // Does not validate if the point is on-curve.
+        // Use fromHex instead, or call assertValidity() later.
+        Point.fromAffine = function(p) {
+            var _a = p || {}, x = _a.x, y = _a.y;
+            if (!p || !Fp.isValid(x) || !Fp.isValid(y)) throw new Error('invalid affine point');
+            if (p instanceof Point) throw new Error('projective point not allowed');
+            var is0 = function(i) {
+                return Fp.eql(i, Fp.ZERO);
+            };
+            // fromAffine(x:0, y:0) would produce (x:0, y:0, z:1), but we need (x:0, y:1, z:0)
+            if (is0(x) && is0(y)) return Point.ZERO;
+            return new Point(x, y, Fp.ONE);
+        };
+        Object.defineProperty(Point.prototype, "x", {
+            get: function() {
+                return this.toAffine().x;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Point.prototype, "y", {
+            get: function() {
+                return this.toAffine().y;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        /**
+         * Takes a bunch of Projective Points but executes only one
+         * inversion on all of them. Inversion is very slow operation,
+         * so this improves performance massively.
+         * Optimization: converts a list of projective points to a list of identical points with Z=1.
+         */ Point.normalizeZ = function(points) {
+            var toInv = Fp.invertBatch(points.map(function(p) {
+                return p.pz;
+            }));
+            return points.map(function(p, i) {
+                return p.toAffine(toInv[i]);
+            }).map(Point.fromAffine);
+        };
+        /**
+         * Converts hash string or Uint8Array to Point.
+         * @param hex short/long ECDSA hex
+         */ Point.fromHex = function(hex) {
+            var P = Point.fromAffine(fromBytes((0, utils_1.ensureBytes)('pointHex', hex)));
+            P.assertValidity();
+            return P;
+        };
+        // Multiplies generator point by privateKey.
+        Point.fromPrivateKey = function(privateKey) {
+            return Point.BASE.multiply(normPrivateKeyToScalar(privateKey));
+        };
+        // "Private method", don't use it directly
+        Point.prototype._setWindowSize = function(windowSize) {
+            this._WINDOW_SIZE = windowSize;
+            pointPrecomputes.delete(this);
+        };
+        // A point on curve is valid if it conforms to equation.
+        Point.prototype.assertValidity = function() {
+            if (this.is0()) {
+                // (0, 1, 0) aka ZERO is invalid in most contexts.
+                // In BLS, ZERO can be serialized, so we allow it.
+                // (0, 0, 0) is wrong representation of ZERO and is always invalid.
+                if (CURVE.allowInfinityPoint && !Fp.is0(this.py)) return;
+                throw new Error('bad point: ZERO');
+            }
+            // Some 3rd-party test vectors require different wording between here & `fromCompressedHex`
+            var _a = this.toAffine(), x = _a.x, y = _a.y;
+            // Check if x, y are valid field elements
+            if (!Fp.isValid(x) || !Fp.isValid(y)) throw new Error('bad point: x or y not FE');
+            var left = Fp.sqr(y); // y²
+            var right = weierstrassEquation(x); // x³ + ax + b
+            if (!Fp.eql(left, right)) throw new Error('bad point: equation left != right');
+            if (!this.isTorsionFree()) throw new Error('bad point: not in prime-order subgroup');
+        };
+        Point.prototype.hasEvenY = function() {
+            var y = this.toAffine().y;
+            if (Fp.isOdd) return !Fp.isOdd(y);
+            throw new Error("Field doesn't support isOdd");
+        };
+        /**
+         * Compare one point to another.
+         */ Point.prototype.equals = function(other) {
+            assertPrjPoint(other);
+            var _a = this, X1 = _a.px, Y1 = _a.py, Z1 = _a.pz;
+            var X2 = other.px, Y2 = other.py, Z2 = other.pz;
+            var U1 = Fp.eql(Fp.mul(X1, Z2), Fp.mul(X2, Z1));
+            var U2 = Fp.eql(Fp.mul(Y1, Z2), Fp.mul(Y2, Z1));
+            return U1 && U2;
+        };
+        /**
+         * Flips point to one corresponding to (x, -y) in Affine coordinates.
+         */ Point.prototype.negate = function() {
+            return new Point(this.px, Fp.neg(this.py), this.pz);
+        };
+        // Renes-Costello-Batina exception-free doubling formula.
+        // There is 30% faster Jacobian formula, but it is not complete.
+        // https://eprint.iacr.org/2015/1060, algorithm 3
+        // Cost: 8M + 3S + 3*a + 2*b3 + 15add.
+        Point.prototype.double = function() {
+            var a = CURVE.a, b = CURVE.b;
+            var b3 = Fp.mul(b, _3n);
+            var _a = this, X1 = _a.px, Y1 = _a.py, Z1 = _a.pz;
+            var X3 = Fp.ZERO, Y3 = Fp.ZERO, Z3 = Fp.ZERO; // prettier-ignore
+            var t0 = Fp.mul(X1, X1); // step 1
+            var t1 = Fp.mul(Y1, Y1);
+            var t2 = Fp.mul(Z1, Z1);
+            var t3 = Fp.mul(X1, Y1);
+            t3 = Fp.add(t3, t3); // step 5
+            Z3 = Fp.mul(X1, Z1);
+            Z3 = Fp.add(Z3, Z3);
+            X3 = Fp.mul(a, Z3);
+            Y3 = Fp.mul(b3, t2);
+            Y3 = Fp.add(X3, Y3); // step 10
+            X3 = Fp.sub(t1, Y3);
+            Y3 = Fp.add(t1, Y3);
+            Y3 = Fp.mul(X3, Y3);
+            X3 = Fp.mul(t3, X3);
+            Z3 = Fp.mul(b3, Z3); // step 15
+            t2 = Fp.mul(a, t2);
+            t3 = Fp.sub(t0, t2);
+            t3 = Fp.mul(a, t3);
+            t3 = Fp.add(t3, Z3);
+            Z3 = Fp.add(t0, t0); // step 20
+            t0 = Fp.add(Z3, t0);
+            t0 = Fp.add(t0, t2);
+            t0 = Fp.mul(t0, t3);
+            Y3 = Fp.add(Y3, t0);
+            t2 = Fp.mul(Y1, Z1); // step 25
+            t2 = Fp.add(t2, t2);
+            t0 = Fp.mul(t2, t3);
+            X3 = Fp.sub(X3, t0);
+            Z3 = Fp.mul(t2, t1);
+            Z3 = Fp.add(Z3, Z3); // step 30
+            Z3 = Fp.add(Z3, Z3);
+            return new Point(X3, Y3, Z3);
+        };
+        // Renes-Costello-Batina exception-free addition formula.
+        // There is 30% faster Jacobian formula, but it is not complete.
+        // https://eprint.iacr.org/2015/1060, algorithm 1
+        // Cost: 12M + 0S + 3*a + 3*b3 + 23add.
+        Point.prototype.add = function(other) {
+            assertPrjPoint(other);
+            var _a = this, X1 = _a.px, Y1 = _a.py, Z1 = _a.pz;
+            var X2 = other.px, Y2 = other.py, Z2 = other.pz;
+            var X3 = Fp.ZERO, Y3 = Fp.ZERO, Z3 = Fp.ZERO; // prettier-ignore
+            var a = CURVE.a;
+            var b3 = Fp.mul(CURVE.b, _3n);
+            var t0 = Fp.mul(X1, X2); // step 1
+            var t1 = Fp.mul(Y1, Y2);
+            var t2 = Fp.mul(Z1, Z2);
+            var t3 = Fp.add(X1, Y1);
+            var t4 = Fp.add(X2, Y2); // step 5
+            t3 = Fp.mul(t3, t4);
+            t4 = Fp.add(t0, t1);
+            t3 = Fp.sub(t3, t4);
+            t4 = Fp.add(X1, Z1);
+            var t5 = Fp.add(X2, Z2); // step 10
+            t4 = Fp.mul(t4, t5);
+            t5 = Fp.add(t0, t2);
+            t4 = Fp.sub(t4, t5);
+            t5 = Fp.add(Y1, Z1);
+            X3 = Fp.add(Y2, Z2); // step 15
+            t5 = Fp.mul(t5, X3);
+            X3 = Fp.add(t1, t2);
+            t5 = Fp.sub(t5, X3);
+            Z3 = Fp.mul(a, t4);
+            X3 = Fp.mul(b3, t2); // step 20
+            Z3 = Fp.add(X3, Z3);
+            X3 = Fp.sub(t1, Z3);
+            Z3 = Fp.add(t1, Z3);
+            Y3 = Fp.mul(X3, Z3);
+            t1 = Fp.add(t0, t0); // step 25
+            t1 = Fp.add(t1, t0);
+            t2 = Fp.mul(a, t2);
+            t4 = Fp.mul(b3, t4);
+            t1 = Fp.add(t1, t2);
+            t2 = Fp.sub(t0, t2); // step 30
+            t2 = Fp.mul(a, t2);
+            t4 = Fp.add(t4, t2);
+            t0 = Fp.mul(t1, t4);
+            Y3 = Fp.add(Y3, t0);
+            t0 = Fp.mul(t5, t4); // step 35
+            X3 = Fp.mul(t3, X3);
+            X3 = Fp.sub(X3, t0);
+            t0 = Fp.mul(t3, t1);
+            Z3 = Fp.mul(t5, Z3);
+            Z3 = Fp.add(Z3, t0); // step 40
+            return new Point(X3, Y3, Z3);
+        };
+        Point.prototype.subtract = function(other) {
+            return this.add(other.negate());
+        };
+        Point.prototype.is0 = function() {
+            return this.equals(Point.ZERO);
+        };
+        Point.prototype.wNAF = function(n) {
+            return wnaf.wNAFCached(this, pointPrecomputes, n, function(comp) {
+                var toInv = Fp.invertBatch(comp.map(function(p) {
+                    return p.pz;
+                }));
+                return comp.map(function(p, i) {
+                    return p.toAffine(toInv[i]);
+                }).map(Point.fromAffine);
+            });
+        };
+        /**
+         * Non-constant-time multiplication. Uses double-and-add algorithm.
+         * It's faster, but should only be used when you don't care about
+         * an exposed private key e.g. sig verification, which works over *public* keys.
+         */ Point.prototype.multiplyUnsafe = function(n) {
+            var I = Point.ZERO;
+            if (n === _0n) return I;
+            assertGE(n); // Will throw on 0
+            if (n === _1n) return this;
+            var endo = CURVE.endo;
+            if (!endo) return wnaf.unsafeLadder(this, n);
+            // Apply endomorphism
+            var _a = endo.splitScalar(n), k1neg = _a.k1neg, k1 = _a.k1, k2neg = _a.k2neg, k2 = _a.k2;
+            var k1p = I;
+            var k2p = I;
+            var d = this;
+            while(k1 > _0n || k2 > _0n){
+                if (k1 & _1n) k1p = k1p.add(d);
+                if (k2 & _1n) k2p = k2p.add(d);
+                d = d.double();
+                k1 >>= _1n;
+                k2 >>= _1n;
+            }
+            if (k1neg) k1p = k1p.negate();
+            if (k2neg) k2p = k2p.negate();
+            k2p = new Point(Fp.mul(k2p.px, endo.beta), k2p.py, k2p.pz);
+            return k1p.add(k2p);
+        };
+        /**
+         * Constant time multiplication.
+         * Uses wNAF method. Windowed method may be 10% faster,
+         * but takes 2x longer to generate and consumes 2x memory.
+         * Uses precomputes when available.
+         * Uses endomorphism for Koblitz curves.
+         * @param scalar by which the point would be multiplied
+         * @returns New point
+         */ Point.prototype.multiply = function(scalar) {
+            assertGE(scalar);
+            var n = scalar;
+            var point, fake; // Fake point is used to const-time mult
+            var endo = CURVE.endo;
+            if (endo) {
+                var _a = endo.splitScalar(n), k1neg = _a.k1neg, k1 = _a.k1, k2neg = _a.k2neg, k2 = _a.k2;
+                var _b = this.wNAF(k1), k1p = _b.p, f1p = _b.f;
+                var _d = this.wNAF(k2), k2p = _d.p, f2p = _d.f;
+                k1p = wnaf.constTimeNegate(k1neg, k1p);
+                k2p = wnaf.constTimeNegate(k2neg, k2p);
+                k2p = new Point(Fp.mul(k2p.px, endo.beta), k2p.py, k2p.pz);
+                point = k1p.add(k2p);
+                fake = f1p.add(f2p);
+            } else {
+                var _e = this.wNAF(n), p = _e.p, f = _e.f;
+                point = p;
+                fake = f;
+            }
+            // Normalize `z` for both points, but return only real one
+            return Point.normalizeZ([
+                point,
+                fake
+            ])[0];
+        };
+        /**
+         * Efficiently calculate `aP + bQ`. Unsafe, can expose private key, if used incorrectly.
+         * Not using Strauss-Shamir trick: precomputation tables are faster.
+         * The trick could be useful if both P and Q are not G (not in our case).
+         * @returns non-zero affine point
+         */ Point.prototype.multiplyAndAddUnsafe = function(Q, a, b) {
+            var G = Point.BASE; // No Strauss-Shamir trick: we have 10% faster G precomputes
+            var mul = function(P, a // Select faster multiply() method
+            ) {
+                return a === _0n || a === _1n || !P.equals(G) ? P.multiplyUnsafe(a) : P.multiply(a);
+            };
+            var sum = mul(this, a).add(mul(Q, b));
+            return sum.is0() ? undefined : sum;
+        };
+        // Converts Projective point to affine (x, y) coordinates.
+        // Can accept precomputed Z^-1 - for example, from invertBatch.
+        // (x, y, z) ∋ (x=x/z, y=y/z)
+        Point.prototype.toAffine = function(iz) {
+            var _a = this, x = _a.px, y = _a.py, z = _a.pz;
+            var is0 = this.is0();
+            // If invZ was 0, we return zero point. However we still want to execute
+            // all operations, so we replace invZ with a random number, 1.
+            if (iz == null) iz = is0 ? Fp.ONE : Fp.inv(z);
+            var ax = Fp.mul(x, iz);
+            var ay = Fp.mul(y, iz);
+            var zz = Fp.mul(z, iz);
+            if (is0) return {
+                x: Fp.ZERO,
+                y: Fp.ZERO
+            };
+            if (!Fp.eql(zz, Fp.ONE)) throw new Error('invZ was invalid');
+            return {
+                x: ax,
+                y: ay
+            };
+        };
+        Point.prototype.isTorsionFree = function() {
+            var cofactor = CURVE.h, isTorsionFree = CURVE.isTorsionFree;
+            if (cofactor === _1n) return true; // No subgroups, always torsion-free
+            if (isTorsionFree) return isTorsionFree(Point, this);
+            throw new Error('isTorsionFree() has not been declared for the elliptic curve');
+        };
+        Point.prototype.clearCofactor = function() {
+            var cofactor = CURVE.h, clearCofactor = CURVE.clearCofactor;
+            if (cofactor === _1n) return this; // Fast-path
+            if (clearCofactor) return clearCofactor(Point, this);
+            return this.multiplyUnsafe(CURVE.h);
+        };
+        Point.prototype.toRawBytes = function(isCompressed) {
+            if (isCompressed === void 0) {
+                isCompressed = true;
+            }
+            this.assertValidity();
+            return toBytes(Point, this, isCompressed);
+        };
+        Point.prototype.toHex = function(isCompressed) {
+            if (isCompressed === void 0) {
+                isCompressed = true;
+            }
+            return ut.bytesToHex(this.toRawBytes(isCompressed));
+        };
+        Point.BASE = new Point(CURVE.Gx, CURVE.Gy, Fp.ONE);
+        Point.ZERO = new Point(Fp.ZERO, Fp.ONE, Fp.ZERO);
+        return Point;
+    }();
+    var _bits = CURVE.nBitLength;
+    var wnaf = (0, curve_1.wNAF)(Point, CURVE.endo ? Math.ceil(_bits / 2) : _bits);
+    // Validate if generator point is on curve
+    return {
+        CURVE: CURVE,
+        ProjectivePoint: Point,
+        normPrivateKeyToScalar: normPrivateKeyToScalar,
+        weierstrassEquation: weierstrassEquation,
+        isWithinCurveOrder: isWithinCurveOrder
+    };
+}
+exports.weierstrassPoints = weierstrassPoints;
+function validateOpts(curve) {
+    var opts = (0, curve_1.validateBasic)(curve);
+    ut.validateObject(opts, {
+        hash: 'hash',
+        hmac: 'function',
+        randomBytes: 'function'
+    }, {
+        bits2int: 'function',
+        bits2int_modN: 'function',
+        lowS: 'boolean'
+    });
+    return Object.freeze(__assign({
+        lowS: true
+    }, opts));
+}
+function weierstrass(curveDef) {
+    var CURVE = validateOpts(curveDef);
+    var Fp = CURVE.Fp, CURVE_ORDER = CURVE.n;
+    var compressedLen = Fp.BYTES + 1; // e.g. 33 for 32
+    var uncompressedLen = 2 * Fp.BYTES + 1; // e.g. 65 for 32
+    function isValidFieldElement(num) {
+        return _0n < num && num < Fp.ORDER; // 0 is banned since it's not invertible FE
+    }
+    function modN(a) {
+        return mod.mod(a, CURVE_ORDER);
+    }
+    function invN(a) {
+        return mod.invert(a, CURVE_ORDER);
+    }
+    var _a = weierstrassPoints(__assign(__assign({}, CURVE), {
+        toBytes: function(_c, point, isCompressed) {
+            var a = point.toAffine();
+            var x = Fp.toBytes(a.x);
+            var cat = ut.concatBytes;
+            if (isCompressed) {
+                return cat(Uint8Array.from([
+                    point.hasEvenY() ? 0x02 : 0x03
+                ]), x);
+            } else {
+                return cat(Uint8Array.from([
+                    0x04
+                ]), x, Fp.toBytes(a.y));
+            }
+        },
+        fromBytes: function(bytes) {
+            var len = bytes.length;
+            var head = bytes[0];
+            var tail = bytes.subarray(1);
+            // this.assertValidity() is done inside of fromHex
+            if (len === compressedLen && (head === 0x02 || head === 0x03)) {
+                var x = ut.bytesToNumberBE(tail);
+                if (!isValidFieldElement(x)) throw new Error('Point is not on curve');
+                var y2 = weierstrassEquation(x); // y² = x³ + ax + b
+                var y = void 0;
+                try {
+                    y = Fp.sqrt(y2); // y = y² ^ (p+1)/4
+                } catch (sqrtError) {
+                    var suffix = sqrtError instanceof Error ? ': ' + sqrtError.message : '';
+                    throw new Error('Point is not on curve' + suffix);
+                }
+                var isYOdd = (y & _1n) === _1n;
+                // ECDSA
+                var isHeadOdd = (head & 1) === 1;
+                if (isHeadOdd !== isYOdd) y = Fp.neg(y);
+                return {
+                    x: x,
+                    y: y
+                };
+            } else if (len === uncompressedLen && head === 0x04) {
+                var x = Fp.fromBytes(tail.subarray(0, Fp.BYTES));
+                var y = Fp.fromBytes(tail.subarray(Fp.BYTES, 2 * Fp.BYTES));
+                return {
+                    x: x,
+                    y: y
+                };
+            } else {
+                throw new Error("Point of length ".concat(len, " was invalid. Expected ").concat(compressedLen, " compressed bytes or ").concat(uncompressedLen, " uncompressed bytes"));
+            }
+        }
+    })), Point = _a.ProjectivePoint, normPrivateKeyToScalar = _a.normPrivateKeyToScalar, weierstrassEquation = _a.weierstrassEquation, isWithinCurveOrder = _a.isWithinCurveOrder;
+    var numToNByteStr = function(num) {
+        return ut.bytesToHex(ut.numberToBytesBE(num, CURVE.nByteLength));
+    };
+    function isBiggerThanHalfOrder(number) {
+        var HALF = CURVE_ORDER >> _1n;
+        return number > HALF;
+    }
+    function normalizeS(s) {
+        return isBiggerThanHalfOrder(s) ? modN(-s) : s;
+    }
+    // slice bytes num
+    var slcNum = function(b, from, to) {
+        return ut.bytesToNumberBE(b.slice(from, to));
+    };
+    /**
+     * ECDSA signature with its (r, s) properties. Supports DER & compact representations.
+     */ var Signature = function() {
+        function Signature(r, s, recovery) {
+            this.r = r;
+            this.s = s;
+            this.recovery = recovery;
+            this.assertValidity();
+        }
+        // pair (bytes of r, bytes of s)
+        Signature.fromCompact = function(hex) {
+            var l = CURVE.nByteLength;
+            hex = (0, utils_1.ensureBytes)('compactSignature', hex, l * 2);
+            return new Signature(slcNum(hex, 0, l), slcNum(hex, l, 2 * l));
+        };
+        // DER encoded ECDSA signature
+        // https://bitcoin.stackexchange.com/questions/57644/what-are-the-parts-of-a-bitcoin-transaction-input-script
+        Signature.fromDER = function(hex) {
+            var _a = exports.DER.toSig((0, utils_1.ensureBytes)('DER', hex)), r = _a.r, s = _a.s;
+            return new Signature(r, s);
+        };
+        Signature.prototype.assertValidity = function() {
+            // can use assertGE here
+            if (!isWithinCurveOrder(this.r)) throw new Error('r must be 0 < r < CURVE.n');
+            if (!isWithinCurveOrder(this.s)) throw new Error('s must be 0 < s < CURVE.n');
+        };
+        Signature.prototype.addRecoveryBit = function(recovery) {
+            return new Signature(this.r, this.s, recovery);
+        };
+        Signature.prototype.recoverPublicKey = function(msgHash) {
+            var _a = this, r = _a.r, s = _a.s, rec = _a.recovery;
+            var h = bits2int_modN((0, utils_1.ensureBytes)('msgHash', msgHash)); // Truncate hash
+            if (rec == null || ![
+                0,
+                1,
+                2,
+                3
+            ].includes(rec)) throw new Error('recovery id invalid');
+            var radj = rec === 2 || rec === 3 ? r + CURVE.n : r;
+            if (radj >= Fp.ORDER) throw new Error('recovery id 2 or 3 invalid');
+            var prefix = (rec & 1) === 0 ? '02' : '03';
+            var R = Point.fromHex(prefix + numToNByteStr(radj));
+            var ir = invN(radj); // r^-1
+            var u1 = modN(-h * ir); // -hr^-1
+            var u2 = modN(s * ir); // sr^-1
+            var Q = Point.BASE.multiplyAndAddUnsafe(R, u1, u2); // (sr^-1)R-(hr^-1)G = -(hr^-1)G + (sr^-1)
+            if (!Q) throw new Error('point at infinify'); // unsafe is fine: no priv data leaked
+            Q.assertValidity();
+            return Q;
+        };
+        // Signatures should be low-s, to prevent malleability.
+        Signature.prototype.hasHighS = function() {
+            return isBiggerThanHalfOrder(this.s);
+        };
+        Signature.prototype.normalizeS = function() {
+            return this.hasHighS() ? new Signature(this.r, modN(-this.s), this.recovery) : this;
+        };
+        // DER-encoded
+        Signature.prototype.toDERRawBytes = function() {
+            return ut.hexToBytes(this.toDERHex());
+        };
+        Signature.prototype.toDERHex = function() {
+            return exports.DER.hexFromSig({
+                r: this.r,
+                s: this.s
+            });
+        };
+        // padded bytes of r, then padded bytes of s
+        Signature.prototype.toCompactRawBytes = function() {
+            return ut.hexToBytes(this.toCompactHex());
+        };
+        Signature.prototype.toCompactHex = function() {
+            return numToNByteStr(this.r) + numToNByteStr(this.s);
+        };
+        return Signature;
+    }();
+    var utils = {
+        isValidPrivateKey: function(privateKey) {
+            try {
+                normPrivateKeyToScalar(privateKey);
+                return true;
+            } catch (error) {
+                return false;
+            }
+        },
+        normPrivateKeyToScalar: normPrivateKeyToScalar,
+        /**
+         * Produces cryptographically secure private key from random of size
+         * (groupLen + ceil(groupLen / 2)) with modulo bias being negligible.
+         */ randomPrivateKey: function() {
+            var length = mod.getMinHashLength(CURVE.n);
+            return mod.mapHashToField(CURVE.randomBytes(length), CURVE.n);
+        },
+        /**
+         * Creates precompute table for an arbitrary EC point. Makes point "cached".
+         * Allows to massively speed-up `point.multiply(scalar)`.
+         * @returns cached point
+         * @example
+         * const fast = utils.precompute(8, ProjectivePoint.fromHex(someonesPubKey));
+         * fast.multiply(privKey); // much faster ECDH now
+         */ precompute: function(windowSize, point) {
+            if (windowSize === void 0) {
+                windowSize = 8;
+            }
+            if (point === void 0) {
+                point = Point.BASE;
+            }
+            point._setWindowSize(windowSize);
+            point.multiply(BigInt(3)); // 3 is arbitrary, just need any number here
+            return point;
+        }
+    };
+    /**
+     * Computes public key for a private key. Checks for validity of the private key.
+     * @param privateKey private key
+     * @param isCompressed whether to return compact (default), or full key
+     * @returns Public key, full when isCompressed=false; short when isCompressed=true
+     */ function getPublicKey(privateKey, isCompressed) {
+        if (isCompressed === void 0) {
+            isCompressed = true;
+        }
+        return Point.fromPrivateKey(privateKey).toRawBytes(isCompressed);
+    }
+    /**
+     * Quick and dirty check for item being public key. Does not validate hex, or being on-curve.
+     */ function isProbPub(item) {
+        var arr = ut.isBytes(item);
+        var str = typeof item === 'string';
+        var len = (arr || str) && item.length;
+        if (arr) return len === compressedLen || len === uncompressedLen;
+        if (str) return len === 2 * compressedLen || len === 2 * uncompressedLen;
+        if (item instanceof Point) return true;
+        return false;
+    }
+    /**
+     * ECDH (Elliptic Curve Diffie Hellman).
+     * Computes shared public key from private key and public key.
+     * Checks: 1) private key validity 2) shared key is on-curve.
+     * Does NOT hash the result.
+     * @param privateA private key
+     * @param publicB different public key
+     * @param isCompressed whether to return compact (default), or full key
+     * @returns shared public key
+     */ function getSharedSecret(privateA, publicB, isCompressed) {
+        if (isCompressed === void 0) {
+            isCompressed = true;
+        }
+        if (isProbPub(privateA)) throw new Error('first arg must be private key');
+        if (!isProbPub(publicB)) throw new Error('second arg must be public key');
+        var b = Point.fromHex(publicB); // check for being on-curve
+        return b.multiply(normPrivateKeyToScalar(privateA)).toRawBytes(isCompressed);
+    }
+    // RFC6979: ensure ECDSA msg is X bytes and < N. RFC suggests optional truncating via bits2octets.
+    // FIPS 186-4 4.6 suggests the leftmost min(nBitLen, outLen) bits, which matches bits2int.
+    // bits2int can produce res>N, we can do mod(res, N) since the bitLen is the same.
+    // int2octets can't be used; pads small msgs with 0: unacceptatble for trunc as per RFC vectors
+    var bits2int = CURVE.bits2int || function(bytes) {
+        // For curves with nBitLength % 8 !== 0: bits2octets(bits2octets(m)) !== bits2octets(m)
+        // for some cases, since bytes.length * 8 is not actual bitLength.
+        var num = ut.bytesToNumberBE(bytes); // check for == u8 done here
+        var delta = bytes.length * 8 - CURVE.nBitLength; // truncate to nBitLength leftmost bits
+        return delta > 0 ? num >> BigInt(delta) : num;
+    };
+    var bits2int_modN = CURVE.bits2int_modN || function(bytes) {
+        return modN(bits2int(bytes)); // can't use bytesToNumberBE here
+    };
+    // NOTE: pads output with zero as per spec
+    var ORDER_MASK = ut.bitMask(CURVE.nBitLength);
+    /**
+     * Converts to bytes. Checks if num in `[0..ORDER_MASK-1]` e.g.: `[0..2^256-1]`.
+     */ function int2octets(num) {
+        if (typeof num !== 'bigint') throw new Error('bigint expected');
+        if (!(_0n <= num && num < ORDER_MASK)) throw new Error("bigint expected < 2^".concat(CURVE.nBitLength));
+        // works with order, can have different size than numToField!
+        return ut.numberToBytesBE(num, CURVE.nByteLength);
+    }
+    // Steps A, D of RFC6979 3.2
+    // Creates RFC6979 seed; converts msg/privKey to numbers.
+    // Used only in sign, not in verify.
+    // NOTE: we cannot assume here that msgHash has same amount of bytes as curve order, this will be wrong at least for P521.
+    // Also it can be bigger for P224 + SHA256
+    function prepSig(msgHash, privateKey, opts) {
+        if (opts === void 0) {
+            opts = defaultSigOpts;
+        }
+        if ([
+            'recovered',
+            'canonical'
+        ].some(function(k) {
+            return k in opts;
+        })) throw new Error('sign() legacy options not supported');
+        var hash = CURVE.hash, randomBytes = CURVE.randomBytes;
+        var lowS = opts.lowS, prehash = opts.prehash, ent = opts.extraEntropy; // generates low-s sigs by default
+        if (lowS == null) lowS = true; // RFC6979 3.2: we skip step A, because we already provide hash
+        msgHash = (0, utils_1.ensureBytes)('msgHash', msgHash);
+        if (prehash) msgHash = (0, utils_1.ensureBytes)('prehashed msgHash', hash(msgHash));
+        // We can't later call bits2octets, since nested bits2int is broken for curves
+        // with nBitLength % 8 !== 0. Because of that, we unwrap it here as int2octets call.
+        // const bits2octets = (bits) => int2octets(bits2int_modN(bits))
+        var h1int = bits2int_modN(msgHash);
+        var d = normPrivateKeyToScalar(privateKey); // validate private key, convert to bigint
+        var seedArgs = [
+            int2octets(d),
+            int2octets(h1int)
+        ];
+        // extraEntropy. RFC6979 3.6: additional k' (optional).
+        if (ent != null && ent !== false) {
+            // K = HMAC_K(V || 0x00 || int2octets(x) || bits2octets(h1) || k')
+            var e = ent === true ? randomBytes(Fp.BYTES) : ent; // generate random bytes OR pass as-is
+            seedArgs.push((0, utils_1.ensureBytes)('extraEntropy', e)); // check for being bytes
+        }
+        var seed = ut.concatBytes.apply(ut, __spreadArray([], __read(seedArgs), false)); // Step D of RFC6979 3.2
+        var m = h1int; // NOTE: no need to call bits2int second time here, it is inside truncateHash!
+        // Converts signature params into point w r/s, checks result for validity.
+        function k2sig(kBytes) {
+            // RFC 6979 Section 3.2, step 3: k = bits2int(T)
+            var k = bits2int(kBytes); // Cannot use fields methods, since it is group element
+            if (!isWithinCurveOrder(k)) return; // Important: all mod() calls here must be done over N
+            var ik = invN(k); // k^-1 mod n
+            var q = Point.BASE.multiply(k).toAffine(); // q = Gk
+            var r = modN(q.x); // r = q.x mod n
+            if (r === _0n) return;
+            // Can use scalar blinding b^-1(bm + bdr) where b ∈ [1,q−1] according to
+            // https://tches.iacr.org/index.php/TCHES/article/view/7337/6509. We've decided against it:
+            // a) dependency on CSPRNG b) 15% slowdown c) doesn't really help since bigints are not CT
+            var s = modN(ik * modN(m + r * d)); // Not using blinding here
+            if (s === _0n) return;
+            var recovery = (q.x === r ? 0 : 2) | Number(q.y & _1n); // recovery bit (2 or 3, when q.x > n)
+            var normS = s;
+            if (lowS && isBiggerThanHalfOrder(s)) {
+                normS = normalizeS(s); // if lowS was passed, ensure s is always
+                recovery ^= 1; // // in the bottom half of N
+            }
+            return new Signature(r, normS, recovery); // use normS, not s
+        }
+        return {
+            seed: seed,
+            k2sig: k2sig
+        };
+    }
+    var defaultSigOpts = {
+        lowS: CURVE.lowS,
+        prehash: false
+    };
+    var defaultVerOpts = {
+        lowS: CURVE.lowS,
+        prehash: false
+    };
+    /**
+     * Signs message hash with a private key.
+     * ```
+     * sign(m, d, k) where
+     *   (x, y) = G × k
+     *   r = x mod n
+     *   s = (m + dr)/k mod n
+     * ```
+     * @param msgHash NOT message. msg needs to be hashed to `msgHash`, or use `prehash`.
+     * @param privKey private key
+     * @param opts lowS for non-malleable sigs. extraEntropy for mixing randomness into k. prehash will hash first arg.
+     * @returns signature with recovery param
+     */ function sign(msgHash, privKey, opts) {
+        if (opts === void 0) {
+            opts = defaultSigOpts;
+        }
+        var _a = prepSig(msgHash, privKey, opts), seed = _a.seed, k2sig = _a.k2sig; // Steps A, D of RFC6979 3.2.
+        var C = CURVE;
+        var drbg = ut.createHmacDrbg(C.hash.outputLen, C.nByteLength, C.hmac);
+        return drbg(seed, k2sig); // Steps B, C, D, E, F, G
+    }
+    // Enable precomputes. Slows down first publicKey computation by 20ms.
+    Point.BASE._setWindowSize(8);
+    // utils.precompute(8, ProjectivePoint.BASE)
+    /**
+     * Verifies a signature against message hash and public key.
+     * Rejects lowS signatures by default: to override,
+     * specify option `{lowS: false}`. Implements section 4.1.4 from https://www.secg.org/sec1-v2.pdf:
+     *
+     * ```
+     * verify(r, s, h, P) where
+     *   U1 = hs^-1 mod n
+     *   U2 = rs^-1 mod n
+     *   R = U1⋅G - U2⋅P
+     *   mod(R.x, n) == r
+     * ```
+     */ function verify(signature, msgHash, publicKey, opts) {
+        var _a;
+        if (opts === void 0) {
+            opts = defaultVerOpts;
+        }
+        var sg = signature;
+        msgHash = (0, utils_1.ensureBytes)('msgHash', msgHash);
+        publicKey = (0, utils_1.ensureBytes)('publicKey', publicKey);
+        if ('strict' in opts) throw new Error('options.strict was renamed to lowS');
+        var lowS = opts.lowS, prehash = opts.prehash;
+        var _sig = undefined;
+        var P;
+        try {
+            if (typeof sg === 'string' || ut.isBytes(sg)) {
+                // Signature can be represented in 2 ways: compact (2*nByteLength) & DER (variable-length).
+                // Since DER can also be 2*nByteLength bytes, we check for it first.
+                try {
+                    _sig = Signature.fromDER(sg);
+                } catch (derError) {
+                    if (!(derError instanceof exports.DER.Err)) throw derError;
+                    _sig = Signature.fromCompact(sg);
+                }
+            } else if (typeof sg === 'object' && typeof sg.r === 'bigint' && typeof sg.s === 'bigint') {
+                var r_1 = sg.r, s_1 = sg.s;
+                _sig = new Signature(r_1, s_1);
+            } else {
+                throw new Error('PARSE');
+            }
+            P = Point.fromHex(publicKey);
+        } catch (error) {
+            if (error.message === 'PARSE') throw new Error("signature must be Signature instance, Uint8Array or hex string");
+            return false;
+        }
+        if (lowS && _sig.hasHighS()) return false;
+        if (prehash) msgHash = CURVE.hash(msgHash);
+        var r = _sig.r, s = _sig.s;
+        var h = bits2int_modN(msgHash); // Cannot use fields methods, since it is group element
+        var is = invN(s); // s^-1
+        var u1 = modN(h * is); // u1 = hs^-1 mod n
+        var u2 = modN(r * is); // u2 = rs^-1 mod n
+        var R = (_a = Point.BASE.multiplyAndAddUnsafe(P, u1, u2)) === null || _a === void 0 ? void 0 : _a.toAffine(); // R = u1⋅G + u2⋅P
+        if (!R) return false;
+        var v = modN(R.x);
+        return v === r;
+    }
+    return {
+        CURVE: CURVE,
+        getPublicKey: getPublicKey,
+        getSharedSecret: getSharedSecret,
+        sign: sign,
+        verify: verify,
+        ProjectivePoint: Point,
+        Signature: Signature,
+        utils: utils
+    };
+}
+exports.weierstrass = weierstrass;
+/**
+ * Implementation of the Shallue and van de Woestijne method for any weierstrass curve.
+ * TODO: check if there is a way to merge this with uvRatio in Edwards; move to modular.
+ * b = True and y = sqrt(u / v) if (u / v) is square in F, and
+ * b = False and y = sqrt(Z * (u / v)) otherwise.
+ * @param Fp
+ * @param Z
+ * @returns
+ */ function SWUFpSqrtRatio(Fp, Z) {
+    // Generic implementation
+    var q = Fp.ORDER;
+    var l = _0n;
+    for(var o = q - _1n; o % _2n === _0n; o /= _2n)l += _1n;
+    var c1 = l; // 1. c1, the largest integer such that 2^c1 divides q - 1.
+    // We need 2n ** c1 and 2n ** (c1-1). We can't use **; but we can use <<.
+    // 2n ** c1 == 2n << (c1-1)
+    var _2n_pow_c1_1 = _2n << c1 - _1n - _1n;
+    var _2n_pow_c1 = _2n_pow_c1_1 * _2n;
+    var c2 = (q - _1n) / _2n_pow_c1; // 2. c2 = (q - 1) / (2^c1)  # Integer arithmetic
+    var c3 = (c2 - _1n) / _2n; // 3. c3 = (c2 - 1) / 2            # Integer arithmetic
+    var c4 = _2n_pow_c1 - _1n; // 4. c4 = 2^c1 - 1                # Integer arithmetic
+    var c5 = _2n_pow_c1_1; // 5. c5 = 2^(c1 - 1)                  # Integer arithmetic
+    var c6 = Fp.pow(Z, c2); // 6. c6 = Z^c2
+    var c7 = Fp.pow(Z, (c2 + _1n) / _2n); // 7. c7 = Z^((c2 + 1) / 2)
+    var sqrtRatio = function(u, v) {
+        var tv1 = c6; // 1. tv1 = c6
+        var tv2 = Fp.pow(v, c4); // 2. tv2 = v^c4
+        var tv3 = Fp.sqr(tv2); // 3. tv3 = tv2^2
+        tv3 = Fp.mul(tv3, v); // 4. tv3 = tv3 * v
+        var tv5 = Fp.mul(u, tv3); // 5. tv5 = u * tv3
+        tv5 = Fp.pow(tv5, c3); // 6. tv5 = tv5^c3
+        tv5 = Fp.mul(tv5, tv2); // 7. tv5 = tv5 * tv2
+        tv2 = Fp.mul(tv5, v); // 8. tv2 = tv5 * v
+        tv3 = Fp.mul(tv5, u); // 9. tv3 = tv5 * u
+        var tv4 = Fp.mul(tv3, tv2); // 10. tv4 = tv3 * tv2
+        tv5 = Fp.pow(tv4, c5); // 11. tv5 = tv4^c5
+        var isQR = Fp.eql(tv5, Fp.ONE); // 12. isQR = tv5 == 1
+        tv2 = Fp.mul(tv3, c7); // 13. tv2 = tv3 * c7
+        tv5 = Fp.mul(tv4, tv1); // 14. tv5 = tv4 * tv1
+        tv3 = Fp.cmov(tv2, tv3, isQR); // 15. tv3 = CMOV(tv2, tv3, isQR)
+        tv4 = Fp.cmov(tv5, tv4, isQR); // 16. tv4 = CMOV(tv5, tv4, isQR)
+        // 17. for i in (c1, c1 - 1, ..., 2):
+        for(var i = c1; i > _1n; i--){
+            var tv5_1 = i - _2n; // 18.    tv5 = i - 2
+            tv5_1 = _2n << tv5_1 - _1n; // 19.    tv5 = 2^tv5
+            var tvv5 = Fp.pow(tv4, tv5_1); // 20.    tv5 = tv4^tv5
+            var e1 = Fp.eql(tvv5, Fp.ONE); // 21.    e1 = tv5 == 1
+            tv2 = Fp.mul(tv3, tv1); // 22.    tv2 = tv3 * tv1
+            tv1 = Fp.mul(tv1, tv1); // 23.    tv1 = tv1 * tv1
+            tvv5 = Fp.mul(tv4, tv1); // 24.    tv5 = tv4 * tv1
+            tv3 = Fp.cmov(tv2, tv3, e1); // 25.    tv3 = CMOV(tv2, tv3, e1)
+            tv4 = Fp.cmov(tvv5, tv4, e1); // 26.    tv4 = CMOV(tv5, tv4, e1)
+        }
+        return {
+            isValid: isQR,
+            value: tv3
+        };
+    };
+    if (Fp.ORDER % _4n === _3n) {
+        // sqrt_ratio_3mod4(u, v)
+        var c1_1 = (Fp.ORDER - _3n) / _4n; // 1. c1 = (q - 3) / 4     # Integer arithmetic
+        var c2_1 = Fp.sqrt(Fp.neg(Z)); // 2. c2 = sqrt(-Z)
+        sqrtRatio = function(u, v) {
+            var tv1 = Fp.sqr(v); // 1. tv1 = v^2
+            var tv2 = Fp.mul(u, v); // 2. tv2 = u * v
+            tv1 = Fp.mul(tv1, tv2); // 3. tv1 = tv1 * tv2
+            var y1 = Fp.pow(tv1, c1_1); // 4. y1 = tv1^c1
+            y1 = Fp.mul(y1, tv2); // 5. y1 = y1 * tv2
+            var y2 = Fp.mul(y1, c2_1); // 6. y2 = y1 * c2
+            var tv3 = Fp.mul(Fp.sqr(y1), v); // 7. tv3 = y1^2; 8. tv3 = tv3 * v
+            var isQR = Fp.eql(tv3, u); // 9. isQR = tv3 == u
+            var y = Fp.cmov(y2, y1, isQR); // 10. y = CMOV(y2, y1, isQR)
+            return {
+                isValid: isQR,
+                value: y
+            }; // 11. return (isQR, y) isQR ? y : y*c2
+        };
+    }
+    // No curves uses that
+    // if (Fp.ORDER % _8n === _5n) // sqrt_ratio_5mod8
+    return sqrtRatio;
+}
+exports.SWUFpSqrtRatio = SWUFpSqrtRatio;
+/**
+ * Simplified Shallue-van de Woestijne-Ulas Method
+ * https://www.rfc-editor.org/rfc/rfc9380#section-6.6.2
+ */ function mapToCurveSimpleSWU(Fp, opts) {
+    mod.validateField(Fp);
+    if (!Fp.isValid(opts.A) || !Fp.isValid(opts.B) || !Fp.isValid(opts.Z)) throw new Error('mapToCurveSimpleSWU: invalid opts');
+    var sqrtRatio = SWUFpSqrtRatio(Fp, opts.Z);
+    if (!Fp.isOdd) throw new Error('Fp.isOdd is not implemented!');
+    // Input: u, an element of F.
+    // Output: (x, y), a point on E.
+    return function(u) {
+        // prettier-ignore
+        var tv1, tv2, tv3, tv4, tv5, tv6, x, y;
+        tv1 = Fp.sqr(u); // 1.  tv1 = u^2
+        tv1 = Fp.mul(tv1, opts.Z); // 2.  tv1 = Z * tv1
+        tv2 = Fp.sqr(tv1); // 3.  tv2 = tv1^2
+        tv2 = Fp.add(tv2, tv1); // 4.  tv2 = tv2 + tv1
+        tv3 = Fp.add(tv2, Fp.ONE); // 5.  tv3 = tv2 + 1
+        tv3 = Fp.mul(tv3, opts.B); // 6.  tv3 = B * tv3
+        tv4 = Fp.cmov(opts.Z, Fp.neg(tv2), !Fp.eql(tv2, Fp.ZERO)); // 7.  tv4 = CMOV(Z, -tv2, tv2 != 0)
+        tv4 = Fp.mul(tv4, opts.A); // 8.  tv4 = A * tv4
+        tv2 = Fp.sqr(tv3); // 9.  tv2 = tv3^2
+        tv6 = Fp.sqr(tv4); // 10. tv6 = tv4^2
+        tv5 = Fp.mul(tv6, opts.A); // 11. tv5 = A * tv6
+        tv2 = Fp.add(tv2, tv5); // 12. tv2 = tv2 + tv5
+        tv2 = Fp.mul(tv2, tv3); // 13. tv2 = tv2 * tv3
+        tv6 = Fp.mul(tv6, tv4); // 14. tv6 = tv6 * tv4
+        tv5 = Fp.mul(tv6, opts.B); // 15. tv5 = B * tv6
+        tv2 = Fp.add(tv2, tv5); // 16. tv2 = tv2 + tv5
+        x = Fp.mul(tv1, tv3); // 17.   x = tv1 * tv3
+        var _a = sqrtRatio(tv2, tv6), isValid = _a.isValid, value = _a.value; // 18. (is_gx1_square, y1) = sqrt_ratio(tv2, tv6)
+        y = Fp.mul(tv1, u); // 19.   y = tv1 * u  -> Z * u^3 * y1
+        y = Fp.mul(y, value); // 20.   y = y * y1
+        x = Fp.cmov(x, tv3, isValid); // 21.   x = CMOV(x, tv3, is_gx1_square)
+        y = Fp.cmov(y, value, isValid); // 22.   y = CMOV(y, y1, is_gx1_square)
+        var e1 = Fp.isOdd(u) === Fp.isOdd(y); // 23.  e1 = sgn0(u) == sgn0(y)
+        y = Fp.cmov(Fp.neg(y), y, e1); // 24.   y = CMOV(-y, y, e1)
+        x = Fp.div(x, tv4); // 25.   x = x / tv4
+        return {
+            x: x,
+            y: y
+        };
+    };
+}
+exports.mapToCurveSimpleSWU = mapToCurveSimpleSWU;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/bls.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+/*
+THIS IMPLEMENTATION WAS TAKEN FROM `@noble/hashes`
+
+original source: https://github.com/paulmillr/noble-curves/blob/38a4ca1e6b0a80c60b11bbb6b3d71e3bfabd5bbb/src/abstract/bls.ts#
+
+it was modified and adapted to this repository
+
+the main reason for copying over and not using as dependency is because of different target in the `tsconfig.json`
+
+`@noble/hashes` targets es2020, which tends to cause problems with some other (older) packages sometimes
+
+this repo targets ES5+
+*/ var __assign = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__assign || function() {
+    __assign = Object.assign || function(t) {
+        for(var s, i = 1, n = arguments.length; i < n; i++){
+            s = arguments[i];
+            for(var p in s)if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __values = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__values || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function() {
+            if (o && i >= o.length) o = void 0;
+            return {
+                value: o && o[i++],
+                done: !o
+            };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.bls = void 0;
+var modular_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/modular.js [app-ssr] (ecmascript)");
+var utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/utils.js [app-ssr] (ecmascript)");
+// prettier-ignore
+var hash_to_curve_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/hash-to-curve.js [app-ssr] (ecmascript)");
+var weierstrass_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/weierstrass.js [app-ssr] (ecmascript)");
+// prettier-ignore
+var _2n = BigInt(2), _3n = BigInt(3);
+function bls(CURVE) {
+    // Fields are specific for curve, so for now we'll need to pass them with opts
+    var _a = CURVE.fields, Fp = _a.Fp, Fr = _a.Fr, Fp2 = _a.Fp2, Fp6 = _a.Fp6, Fp12 = _a.Fp12;
+    var BLS_X_LEN = (0, utils_1.bitLen)(CURVE.params.x);
+    // Pre-compute coefficients for sparse multiplication
+    // Point addition and point double calculations is reused for coefficients
+    function calcPairingPrecomputes(p) {
+        var x = p.x, y = p.y;
+        // prettier-ignore
+        var Qx = x, Qy = y, Qz = Fp2.ONE;
+        // prettier-ignore
+        var Rx = Qx, Ry = Qy, Rz = Qz;
+        var ell_coeff = [];
+        for(var i = BLS_X_LEN - 2; i >= 0; i--){
+            // Double
+            var t0 = Fp2.sqr(Ry); // Ry²
+            var t1 = Fp2.sqr(Rz); // Rz²
+            var t2 = Fp2.multiplyByB(Fp2.mul(t1, _3n)); // 3 * T1 * B
+            var t3 = Fp2.mul(t2, _3n); // 3 * T2
+            var t4 = Fp2.sub(Fp2.sub(Fp2.sqr(Fp2.add(Ry, Rz)), t1), t0); // (Ry + Rz)² - T1 - T0
+            ell_coeff.push([
+                Fp2.sub(t2, t0),
+                Fp2.mul(Fp2.sqr(Rx), _3n),
+                Fp2.neg(t4)
+            ]);
+            Rx = Fp2.div(Fp2.mul(Fp2.mul(Fp2.sub(t0, t3), Rx), Ry), _2n); // ((T0 - T3) * Rx * Ry) / 2
+            Ry = Fp2.sub(Fp2.sqr(Fp2.div(Fp2.add(t0, t3), _2n)), Fp2.mul(Fp2.sqr(t2), _3n)); // ((T0 + T3) / 2)² - 3 * T2²
+            Rz = Fp2.mul(t0, t4); // T0 * T4
+            if ((0, utils_1.bitGet)(CURVE.params.x, i)) {
+                // Addition
+                var t0_1 = Fp2.sub(Ry, Fp2.mul(Qy, Rz)); // Ry - Qy * Rz
+                var t1_1 = Fp2.sub(Rx, Fp2.mul(Qx, Rz)); // Rx - Qx * Rz
+                ell_coeff.push([
+                    Fp2.sub(Fp2.mul(t0_1, Qx), Fp2.mul(t1_1, Qy)),
+                    Fp2.neg(t0_1),
+                    t1_1
+                ]);
+                var t2_1 = Fp2.sqr(t1_1); // T1²
+                var t3_1 = Fp2.mul(t2_1, t1_1); // T2 * T1
+                var t4_1 = Fp2.mul(t2_1, Rx); // T2 * Rx
+                var t5 = Fp2.add(Fp2.sub(t3_1, Fp2.mul(t4_1, _2n)), Fp2.mul(Fp2.sqr(t0_1), Rz)); // T3 - 2 * T4 + T0² * Rz
+                Rx = Fp2.mul(t1_1, t5); // T1 * T5
+                Ry = Fp2.sub(Fp2.mul(Fp2.sub(t4_1, t5), t0_1), Fp2.mul(t3_1, Ry)); // (T4 - T5) * T0 - T3 * Ry
+                Rz = Fp2.mul(Rz, t3_1); // Rz * T3
+            }
+        }
+        return ell_coeff;
+    }
+    function millerLoop(ell, g1) {
+        var x = CURVE.params.x;
+        var Px = g1[0];
+        var Py = g1[1];
+        var f12 = Fp12.ONE;
+        for(var j = 0, i = BLS_X_LEN - 2; i >= 0; i--, j++){
+            var E = ell[j];
+            f12 = Fp12.multiplyBy014(f12, E[0], Fp2.mul(E[1], Px), Fp2.mul(E[2], Py));
+            if ((0, utils_1.bitGet)(x, i)) {
+                j += 1;
+                var F = ell[j];
+                f12 = Fp12.multiplyBy014(f12, F[0], Fp2.mul(F[1], Px), Fp2.mul(F[2], Py));
+            }
+            if (i !== 0) f12 = Fp12.sqr(f12);
+        }
+        return Fp12.conjugate(f12);
+    }
+    var utils = {
+        randomPrivateKey: function() {
+            var length = (0, modular_1.getMinHashLength)(Fr.ORDER);
+            return (0, modular_1.mapHashToField)(CURVE.randomBytes(length), Fr.ORDER);
+        },
+        calcPairingPrecomputes: calcPairingPrecomputes
+    };
+    // Point on G1 curve: (x, y)
+    var G1_ = (0, weierstrass_1.weierstrassPoints)(__assign({
+        n: Fr.ORDER
+    }, CURVE.G1));
+    var G1 = Object.assign(G1_, (0, hash_to_curve_1.createHasher)(G1_.ProjectivePoint, CURVE.G1.mapToCurve, __assign(__assign({}, CURVE.htfDefaults), CURVE.G1.htfDefaults)));
+    function pairingPrecomputes(point) {
+        var p = point;
+        if (p._PPRECOMPUTES) return p._PPRECOMPUTES;
+        p._PPRECOMPUTES = calcPairingPrecomputes(point.toAffine());
+        return p._PPRECOMPUTES;
+    }
+    // TODO: export
+    // function clearPairingPrecomputes(point: G2) {
+    //   const p = point as G2 & withPairingPrecomputes;
+    //   p._PPRECOMPUTES = undefined;
+    // }
+    // Point on G2 curve (complex numbers): (x₁, x₂+i), (y₁, y₂+i)
+    var G2_ = (0, weierstrass_1.weierstrassPoints)(__assign({
+        n: Fr.ORDER
+    }, CURVE.G2));
+    var G2 = Object.assign(G2_, (0, hash_to_curve_1.createHasher)(G2_.ProjectivePoint, CURVE.G2.mapToCurve, __assign(__assign({}, CURVE.htfDefaults), CURVE.G2.htfDefaults)));
+    var ShortSignature = CURVE.G1.ShortSignature;
+    var Signature = CURVE.G2.Signature;
+    // Calculates bilinear pairing
+    function pairing(Q, P, withFinalExponent) {
+        if (withFinalExponent === void 0) {
+            withFinalExponent = true;
+        }
+        if (Q.equals(G1.ProjectivePoint.ZERO) || P.equals(G2.ProjectivePoint.ZERO)) throw new Error('pairing is not available for ZERO point');
+        Q.assertValidity();
+        P.assertValidity();
+        // Performance: 9ms for millerLoop and ~14ms for exp.
+        var Qa = Q.toAffine();
+        var looped = millerLoop(pairingPrecomputes(P), [
+            Qa.x,
+            Qa.y
+        ]);
+        return withFinalExponent ? Fp12.finalExponentiate(looped) : looped;
+    }
+    function normP1(point) {
+        return point instanceof G1.ProjectivePoint ? point : G1.ProjectivePoint.fromHex(point);
+    }
+    function normP1Hash(point, htfOpts) {
+        return point instanceof G1.ProjectivePoint ? point : G1.hashToCurve((0, utils_1.ensureBytes)('point', point), htfOpts);
+    }
+    function normP2(point) {
+        return point instanceof G2.ProjectivePoint ? point : Signature.fromHex(point);
+    }
+    function normP2Hash(point, htfOpts) {
+        return point instanceof G2.ProjectivePoint ? point : G2.hashToCurve((0, utils_1.ensureBytes)('point', point), htfOpts);
+    }
+    // Multiplies generator (G1) by private key.
+    // P = pk x G
+    function getPublicKey(privateKey) {
+        return G1.ProjectivePoint.fromPrivateKey(privateKey).toRawBytes(true);
+    }
+    // Multiplies generator (G2) by private key.
+    // P = pk x G
+    function getPublicKeyForShortSignatures(privateKey) {
+        return G2.ProjectivePoint.fromPrivateKey(privateKey).toRawBytes(true);
+    }
+    function sign(message, privateKey, htfOpts) {
+        var msgPoint = normP2Hash(message, htfOpts);
+        msgPoint.assertValidity();
+        var sigPoint = msgPoint.multiply(G1.normPrivateKeyToScalar(privateKey));
+        if (message instanceof G2.ProjectivePoint) return sigPoint;
+        return Signature.toRawBytes(sigPoint);
+    }
+    function signShortSignature(message, privateKey, htfOpts) {
+        var msgPoint = normP1Hash(message, htfOpts);
+        msgPoint.assertValidity();
+        var sigPoint = msgPoint.multiply(G1.normPrivateKeyToScalar(privateKey));
+        if (message instanceof G1.ProjectivePoint) return sigPoint;
+        return ShortSignature.toRawBytes(sigPoint);
+    }
+    // Checks if pairing of public key & hash is equal to pairing of generator & signature.
+    // e(P, H(m)) == e(G, S)
+    function verify(signature, message, publicKey, htfOpts) {
+        var P = normP1(publicKey);
+        var Hm = normP2Hash(message, htfOpts);
+        var G = G1.ProjectivePoint.BASE;
+        var S = normP2(signature);
+        // Instead of doing 2 exponentiations, we use property of billinear maps
+        // and do one exp after multiplying 2 points.
+        var ePHm = pairing(P.negate(), Hm, false);
+        var eGS = pairing(G, S, false);
+        var exp = Fp12.finalExponentiate(Fp12.mul(eGS, ePHm));
+        return Fp12.eql(exp, Fp12.ONE);
+    }
+    // Checks if pairing of public key & hash is equal to pairing of generator & signature.
+    // e(S, G) == e(H(m), P)
+    function verifyShortSignature(signature, message, publicKey, htfOpts) {
+        var P = normP2(publicKey);
+        var Hm = normP1Hash(message, htfOpts);
+        var G = G2.ProjectivePoint.BASE;
+        var S = normP1(signature);
+        // Instead of doing 2 exponentiations, we use property of billinear maps
+        // and do one exp after multiplying 2 points.
+        var eHmP = pairing(Hm, P, false);
+        var eSG = pairing(S, G.negate(), false);
+        var exp = Fp12.finalExponentiate(Fp12.mul(eSG, eHmP));
+        return Fp12.eql(exp, Fp12.ONE);
+    }
+    function aggregatePublicKeys(publicKeys) {
+        if (!publicKeys.length) throw new Error('Expected non-empty array');
+        var agg = publicKeys.map(normP1).reduce(function(sum, p) {
+            return sum.add(p);
+        }, G1.ProjectivePoint.ZERO);
+        var aggAffine = agg; //.toAffine();
+        if (publicKeys[0] instanceof G1.ProjectivePoint) {
+            aggAffine.assertValidity();
+            return aggAffine;
+        }
+        // toRawBytes ensures point validity
+        return aggAffine.toRawBytes(true);
+    }
+    function aggregateSignatures(signatures) {
+        if (!signatures.length) throw new Error('Expected non-empty array');
+        var agg = signatures.map(normP2).reduce(function(sum, s) {
+            return sum.add(s);
+        }, G2.ProjectivePoint.ZERO);
+        var aggAffine = agg; //.toAffine();
+        if (signatures[0] instanceof G2.ProjectivePoint) {
+            aggAffine.assertValidity();
+            return aggAffine;
+        }
+        return Signature.toRawBytes(aggAffine);
+    }
+    function aggregateShortSignatures(signatures) {
+        if (!signatures.length) throw new Error('Expected non-empty array');
+        var agg = signatures.map(normP1).reduce(function(sum, s) {
+            return sum.add(s);
+        }, G1.ProjectivePoint.ZERO);
+        var aggAffine = agg; //.toAffine();
+        if (signatures[0] instanceof G1.ProjectivePoint) {
+            aggAffine.assertValidity();
+            return aggAffine;
+        }
+        return ShortSignature.toRawBytes(aggAffine);
+    }
+    // https://ethresear.ch/t/fast-verification-of-multiple-bls-signatures/5407
+    // e(G, S) = e(G, SUM(n)(Si)) = MUL(n)(e(G, Si))
+    function verifyBatch(signature, messages, publicKeys, htfOpts) {
+        // @ts-ignore
+        // console.log('verifyBatch', bytesToHex(signature as any), messages, publicKeys.map(bytesToHex));
+        var e_1, _a;
+        if (!messages.length) throw new Error('Expected non-empty messages array');
+        if (publicKeys.length !== messages.length) throw new Error('Pubkey count should equal msg count');
+        var sig = normP2(signature);
+        var nMessages = messages.map(function(i) {
+            return normP2Hash(i, htfOpts);
+        });
+        var nPublicKeys = publicKeys.map(normP1);
+        try {
+            var paired = [];
+            var _loop_1 = function(message) {
+                var groupPublicKey = nMessages.reduce(function(groupPublicKey, subMessage, i) {
+                    return subMessage === message ? groupPublicKey.add(nPublicKeys[i]) : groupPublicKey;
+                }, G1.ProjectivePoint.ZERO);
+                // const msg = message instanceof PointG2 ? message : await PointG2.hashToCurve(message);
+                // Possible to batch pairing for same msg with different groupPublicKey here
+                paired.push(pairing(groupPublicKey, message, false));
+            };
+            try {
+                for(var _b = __values(new Set(nMessages)), _c = _b.next(); !_c.done; _c = _b.next()){
+                    var message = _c.value;
+                    _loop_1(message);
+                }
+            } catch (e_1_1) {
+                e_1 = {
+                    error: e_1_1
+                };
+            } finally{
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                } finally{
+                    if (e_1) throw e_1.error;
+                }
+            }
+            paired.push(pairing(G1.ProjectivePoint.BASE.negate(), sig, false));
+            var product = paired.reduce(function(a, b) {
+                return Fp12.mul(a, b);
+            }, Fp12.ONE);
+            var exp = Fp12.finalExponentiate(product);
+            return Fp12.eql(exp, Fp12.ONE);
+        } catch (_d) {
+            return false;
+        }
+    }
+    G1.ProjectivePoint.BASE._setWindowSize(4);
+    return {
+        getPublicKey: getPublicKey,
+        getPublicKeyForShortSignatures: getPublicKeyForShortSignatures,
+        sign: sign,
+        signShortSignature: signShortSignature,
+        verify: verify,
+        verifyBatch: verifyBatch,
+        verifyShortSignature: verifyShortSignature,
+        aggregatePublicKeys: aggregatePublicKeys,
+        aggregateSignatures: aggregateSignatures,
+        aggregateShortSignatures: aggregateShortSignatures,
+        millerLoop: millerLoop,
+        pairing: pairing,
+        G1: G1,
+        G2: G2,
+        Signature: Signature,
+        ShortSignature: ShortSignature,
+        fields: {
+            Fr: Fr,
+            Fp: Fp,
+            Fp2: Fp2,
+            Fp6: Fp6,
+            Fp12: Fp12
+        },
+        params: {
+            x: CURVE.params.x,
+            r: CURVE.params.r,
+            G1b: CURVE.G1.b,
+            G2b: CURVE.G2.b
+        },
+        utils: utils
+    };
+}
+exports.bls = bls;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/_assert.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.output = exports.exists = exports.hash = exports.bytes = exports.bool = exports.number = exports.isBytes = void 0;
+function number(n) {
+    if (!Number.isSafeInteger(n) || n < 0) throw new Error("positive integer expected, not ".concat(n));
+}
+exports.number = number;
+function bool(b) {
+    if (typeof b !== 'boolean') throw new Error("boolean expected, not ".concat(b));
+}
+exports.bool = bool;
+// copied from utils
+function isBytes(a) {
+    return a instanceof Uint8Array || a != null && typeof a === 'object' && a.constructor.name === 'Uint8Array';
+}
+exports.isBytes = isBytes;
+function bytes(b) {
+    var lengths = [];
+    for(var _i = 1; _i < arguments.length; _i++){
+        lengths[_i - 1] = arguments[_i];
+    }
+    if (!isBytes(b)) throw new Error('Uint8Array expected');
+    if (lengths.length > 0 && !lengths.includes(b.length)) throw new Error("Uint8Array expected of length ".concat(lengths, ", not of length=").concat(b.length));
+}
+exports.bytes = bytes;
+function hash(hash) {
+    if (typeof hash !== 'function' || typeof hash.create !== 'function') throw new Error('Hash should be wrapped by utils.wrapConstructor');
+    number(hash.outputLen);
+    number(hash.blockLen);
+}
+exports.hash = hash;
+function exists(instance, checkFinished) {
+    if (checkFinished === void 0) {
+        checkFinished = true;
+    }
+    if (instance.destroyed) throw new Error('Hash instance has been destroyed');
+    if (checkFinished && instance.finished) throw new Error('Hash#digest() has already been called');
+}
+exports.exists = exists;
+function output(out, instance) {
+    bytes(out);
+    var min = instance.outputLen;
+    if (out.length < min) {
+        throw new Error("digestInto() expects output buffer of length at least ".concat(min));
+    }
+}
+exports.output = output;
+var assert = {
+    number: number,
+    bool: bool,
+    bytes: bytes,
+    hash: hash,
+    exists: exists,
+    output: output
+};
+exports.default = assert;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/_md.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var __extends = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__extends || function() {
+    var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf || ({
+            __proto__: []
+        }) instanceof Array && function(d, b) {
+            d.__proto__ = b;
+        } || function(d, b) {
+            for(var p in b)if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+        };
+        return extendStatics(d, b);
+    };
+    return function(d, b) {
+        if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() {
+            this.constructor = d;
+        }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+}();
+var __read = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__read || function(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while((n === void 0 || n-- > 0) && !(r = i.next()).done)ar.push(r.value);
+    } catch (error) {
+        e = {
+            error: error
+        };
+    } finally{
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        } finally{
+            if (e) throw e.error;
+        }
+    }
+    return ar;
+};
+var __spreadArray = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__spreadArray || function(to, from, pack) {
+    if (pack || arguments.length === 2) for(var i = 0, l = from.length, ar; i < l; i++){
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.HashMD = exports.Maj = exports.Chi = void 0;
+var _assert_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/_assert.js [app-ssr] (ecmascript)");
+var utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/utils.js [app-ssr] (ecmascript)");
+// Polyfill for Safari 14
+function setBigUint64(view, byteOffset, value, isLE) {
+    if (typeof view.setBigUint64 === 'function') return view.setBigUint64(byteOffset, value, isLE);
+    var _32n = BigInt(32);
+    var _u32_max = BigInt(0xffffffff);
+    var wh = Number(value >> _32n & _u32_max);
+    var wl = Number(value & _u32_max);
+    var h = isLE ? 4 : 0;
+    var l = isLE ? 0 : 4;
+    view.setUint32(byteOffset + h, wh, isLE);
+    view.setUint32(byteOffset + l, wl, isLE);
+}
+// Choice: a ? b : c
+var Chi = function(a, b, c) {
+    return a & b ^ ~a & c;
+};
+exports.Chi = Chi;
+// Majority function, true if any two inpust is true
+var Maj = function(a, b, c) {
+    return a & b ^ a & c ^ b & c;
+};
+exports.Maj = Maj;
+/**
+ * Merkle-Damgard hash construction base class.
+ * Could be used to create MD5, RIPEMD, SHA1, SHA2.
+ */ var HashMD = function(_super) {
+    __extends(HashMD, _super);
+    function HashMD(blockLen, outputLen, padOffset, isLE) {
+        var _this = _super.call(this) || this;
+        _this.blockLen = blockLen;
+        _this.outputLen = outputLen;
+        _this.padOffset = padOffset;
+        _this.isLE = isLE;
+        _this.finished = false;
+        _this.length = 0;
+        _this.pos = 0;
+        _this.destroyed = false;
+        _this.buffer = new Uint8Array(blockLen);
+        _this.view = (0, utils_1.createView)(_this.buffer);
+        return _this;
+    }
+    HashMD.prototype.update = function(data) {
+        (0, _assert_1.exists)(this);
+        var _a = this, view = _a.view, buffer = _a.buffer, blockLen = _a.blockLen;
+        data = (0, utils_1.toBytes)(data);
+        var len = data.length;
+        for(var pos = 0; pos < len;){
+            var take = Math.min(blockLen - this.pos, len - pos);
+            // Fast path: we have at least one block in input, cast it to view and process
+            if (take === blockLen) {
+                var dataView = (0, utils_1.createView)(data);
+                for(; blockLen <= len - pos; pos += blockLen)this.process(dataView, pos);
+                continue;
+            }
+            buffer.set(data.subarray(pos, pos + take), this.pos);
+            this.pos += take;
+            pos += take;
+            if (this.pos === blockLen) {
+                this.process(view, 0);
+                this.pos = 0;
+            }
+        }
+        this.length += data.length;
+        this.roundClean();
+        return this;
+    };
+    HashMD.prototype.digestInto = function(out) {
+        (0, _assert_1.exists)(this);
+        (0, _assert_1.output)(out, this);
+        this.finished = true;
+        // Padding
+        // We can avoid allocation of buffer for padding completely if it
+        // was previously not allocated here. But it won't change performance.
+        var _a = this, buffer = _a.buffer, view = _a.view, blockLen = _a.blockLen, isLE = _a.isLE;
+        var pos = this.pos;
+        // append the bit '1' to the message
+        buffer[pos++] = 128;
+        this.buffer.subarray(pos).fill(0);
+        // we have less than padOffset left in buffer, so we cannot put length in
+        // current block, need process it and pad again
+        if (this.padOffset > blockLen - pos) {
+            this.process(view, 0);
+            pos = 0;
+        }
+        // Pad until full block byte with zeros
+        for(var i = pos; i < blockLen; i++)buffer[i] = 0;
+        // Note: sha512 requires length to be 128bit integer, but length in JS will overflow before that
+        // You need to write around 2 exabytes (u64_max / 8 / (1024**6)) for this to happen.
+        // So we just write lowest 64 bits of that value.
+        setBigUint64(view, blockLen - 8, BigInt(this.length * 8), isLE);
+        this.process(view, 0);
+        var oview = (0, utils_1.createView)(out);
+        var len = this.outputLen;
+        // NOTE: we do division by 4 later, which should be fused in single op with modulo by JIT
+        if (len % 4) throw new Error('_sha2: outputLen should be aligned to 32bit');
+        var outLen = len / 4;
+        var state = this.get();
+        if (outLen > state.length) throw new Error('_sha2: outputLen bigger than state');
+        for(var i = 0; i < outLen; i++)oview.setUint32(4 * i, state[i], isLE);
+    };
+    HashMD.prototype.digest = function() {
+        var _a = this, buffer = _a.buffer, outputLen = _a.outputLen;
+        this.digestInto(buffer);
+        var res = Uint8Array.prototype.slice.call(buffer, 0, outputLen);
+        this.destroy();
+        return res;
+    };
+    HashMD.prototype._cloneInto = function(to) {
+        to || (to = new this.constructor());
+        to.set.apply(to, __spreadArray([], __read(this.get()), false));
+        var _a = this, blockLen = _a.blockLen, buffer = _a.buffer, length = _a.length, finished = _a.finished, destroyed = _a.destroyed, pos = _a.pos;
+        to.length = length;
+        to.pos = pos;
+        to.finished = finished;
+        to.destroyed = destroyed;
+        if (length % blockLen) to.buffer.set(buffer);
+        return to;
+    };
+    return HashMD;
+}(utils_1.Hash);
+exports.HashMD = HashMD;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/sha256.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var __extends = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__extends || function() {
+    var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf || ({
+            __proto__: []
+        }) instanceof Array && function(d, b) {
+            d.__proto__ = b;
+        } || function(d, b) {
+            for(var p in b)if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+        };
+        return extendStatics(d, b);
+    };
+    return function(d, b) {
+        if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() {
+            this.constructor = d;
+        }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+}();
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.sha224 = exports.sha256 = void 0;
+var _md_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/_md.js [app-ssr] (ecmascript)");
+var utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/utils.js [app-ssr] (ecmascript)");
+// SHA2-256 need to try 2^128 hashes to execute birthday attack.
+// BTC network is doing 2^67 hashes/sec as per early 2023.
+// Round constants:
+// first 32 bits of the fractional parts of the cube roots of the first 64 primes 2..311)
+// prettier-ignore
+var SHA256_K = /* @__PURE__ */ new Uint32Array([
+    0x428a2f98,
+    0x71374491,
+    0xb5c0fbcf,
+    0xe9b5dba5,
+    0x3956c25b,
+    0x59f111f1,
+    0x923f82a4,
+    0xab1c5ed5,
+    0xd807aa98,
+    0x12835b01,
+    0x243185be,
+    0x550c7dc3,
+    0x72be5d74,
+    0x80deb1fe,
+    0x9bdc06a7,
+    0xc19bf174,
+    0xe49b69c1,
+    0xefbe4786,
+    0x0fc19dc6,
+    0x240ca1cc,
+    0x2de92c6f,
+    0x4a7484aa,
+    0x5cb0a9dc,
+    0x76f988da,
+    0x983e5152,
+    0xa831c66d,
+    0xb00327c8,
+    0xbf597fc7,
+    0xc6e00bf3,
+    0xd5a79147,
+    0x06ca6351,
+    0x14292967,
+    0x27b70a85,
+    0x2e1b2138,
+    0x4d2c6dfc,
+    0x53380d13,
+    0x650a7354,
+    0x766a0abb,
+    0x81c2c92e,
+    0x92722c85,
+    0xa2bfe8a1,
+    0xa81a664b,
+    0xc24b8b70,
+    0xc76c51a3,
+    0xd192e819,
+    0xd6990624,
+    0xf40e3585,
+    0x106aa070,
+    0x19a4c116,
+    0x1e376c08,
+    0x2748774c,
+    0x34b0bcb5,
+    0x391c0cb3,
+    0x4ed8aa4a,
+    0x5b9cca4f,
+    0x682e6ff3,
+    0x748f82ee,
+    0x78a5636f,
+    0x84c87814,
+    0x8cc70208,
+    0x90befffa,
+    0xa4506ceb,
+    0xbef9a3f7,
+    0xc67178f2
+]);
+// Initial state:
+// first 32 bits of the fractional parts of the square roots of the first 8 primes 2..19
+// prettier-ignore
+var SHA256_IV = /* @__PURE__ */ new Uint32Array([
+    0x6a09e667,
+    0xbb67ae85,
+    0x3c6ef372,
+    0xa54ff53a,
+    0x510e527f,
+    0x9b05688c,
+    0x1f83d9ab,
+    0x5be0cd19
+]);
+// Temporary buffer, not used to store anything between runs
+// Named this way because it matches specification.
+var SHA256_W = /* @__PURE__ */ new Uint32Array(64);
+var SHA256 = function(_super) {
+    __extends(SHA256, _super);
+    function SHA256() {
+        var _this = _super.call(this, 64, 32, 8, false) || this;
+        // We cannot use array here since array allows indexing by variable
+        // which means optimizer/compiler cannot use registers.
+        _this.A = SHA256_IV[0] | 0;
+        _this.B = SHA256_IV[1] | 0;
+        _this.C = SHA256_IV[2] | 0;
+        _this.D = SHA256_IV[3] | 0;
+        _this.E = SHA256_IV[4] | 0;
+        _this.F = SHA256_IV[5] | 0;
+        _this.G = SHA256_IV[6] | 0;
+        _this.H = SHA256_IV[7] | 0;
+        return _this;
+    }
+    SHA256.prototype.get = function() {
+        var _a = this, A = _a.A, B = _a.B, C = _a.C, D = _a.D, E = _a.E, F = _a.F, G = _a.G, H = _a.H;
+        return [
+            A,
+            B,
+            C,
+            D,
+            E,
+            F,
+            G,
+            H
+        ];
+    };
+    // prettier-ignore
+    SHA256.prototype.set = function(A, B, C, D, E, F, G, H) {
+        this.A = A | 0;
+        this.B = B | 0;
+        this.C = C | 0;
+        this.D = D | 0;
+        this.E = E | 0;
+        this.F = F | 0;
+        this.G = G | 0;
+        this.H = H | 0;
+    };
+    SHA256.prototype.process = function(view, offset) {
+        // Extend the first 16 words into the remaining 48 words w[16..63] of the message schedule array
+        for(var i = 0; i < 16; i++, offset += 4)SHA256_W[i] = view.getUint32(offset, false);
+        for(var i = 16; i < 64; i++){
+            var W15 = SHA256_W[i - 15];
+            var W2 = SHA256_W[i - 2];
+            var s0 = (0, utils_1.rotr)(W15, 7) ^ (0, utils_1.rotr)(W15, 18) ^ W15 >>> 3;
+            var s1 = (0, utils_1.rotr)(W2, 17) ^ (0, utils_1.rotr)(W2, 19) ^ W2 >>> 10;
+            SHA256_W[i] = s1 + SHA256_W[i - 7] + s0 + SHA256_W[i - 16] | 0;
+        }
+        // Compression function main loop, 64 rounds
+        var _a = this, A = _a.A, B = _a.B, C = _a.C, D = _a.D, E = _a.E, F = _a.F, G = _a.G, H = _a.H;
+        for(var i = 0; i < 64; i++){
+            var sigma1 = (0, utils_1.rotr)(E, 6) ^ (0, utils_1.rotr)(E, 11) ^ (0, utils_1.rotr)(E, 25);
+            var T1 = H + sigma1 + (0, _md_1.Chi)(E, F, G) + SHA256_K[i] + SHA256_W[i] | 0;
+            var sigma0 = (0, utils_1.rotr)(A, 2) ^ (0, utils_1.rotr)(A, 13) ^ (0, utils_1.rotr)(A, 22);
+            var T2 = sigma0 + (0, _md_1.Maj)(A, B, C) | 0;
+            H = G;
+            G = F;
+            F = E;
+            E = D + T1 | 0;
+            D = C;
+            C = B;
+            B = A;
+            A = T1 + T2 | 0;
+        }
+        // Add the compressed chunk to the current hash value
+        A = A + this.A | 0;
+        B = B + this.B | 0;
+        C = C + this.C | 0;
+        D = D + this.D | 0;
+        E = E + this.E | 0;
+        F = F + this.F | 0;
+        G = G + this.G | 0;
+        H = H + this.H | 0;
+        this.set(A, B, C, D, E, F, G, H);
+    };
+    SHA256.prototype.roundClean = function() {
+        SHA256_W.fill(0);
+    };
+    SHA256.prototype.destroy = function() {
+        this.set(0, 0, 0, 0, 0, 0, 0, 0);
+        this.buffer.fill(0);
+    };
+    return SHA256;
+}(_md_1.HashMD);
+// Constants from https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf
+var SHA224 = function(_super) {
+    __extends(SHA224, _super);
+    function SHA224() {
+        var _this = _super.call(this) || this;
+        _this.A = 0xc1059ed8 | 0;
+        _this.B = 0x367cd507 | 0;
+        _this.C = 0x3070dd17 | 0;
+        _this.D = 0xf70e5939 | 0;
+        _this.E = 0xffc00b31 | 0;
+        _this.F = 0x68581511 | 0;
+        _this.G = 0x64f98fa7 | 0;
+        _this.H = 0xbefa4fa4 | 0;
+        _this.outputLen = 28;
+        return _this;
+    }
+    return SHA224;
+}(SHA256);
+/**
+ * SHA2-256 hash function
+ * @param message - data that would be hashed
+ */ exports.sha256 = (0, utils_1.wrapConstructor)(function() {
+    return new SHA256();
+});
+exports.sha224 = (0, utils_1.wrapConstructor)(function() {
+    return new SHA224();
+});
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/bls12_381.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+/*
+THIS IMPLEMENTATION WAS TAKEN FROM `@noble/hashes`
+
+original source: https://github.com/paulmillr/noble-curves/blob/38a4ca1e6b0a80c60b11bbb6b3d71e3bfabd5bbb/src/bls12-381.ts#L1
+
+it was modified and adapted to this repository
+
+the main reason for copying over and not using as dependency is because of different target in the `tsconfig.json`
+
+`@noble/hashes` targets es2020, which tends to cause problems with some other (older) packages sometimes
+
+this repo targets ES5+
+*/ var __assign = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__assign || function() {
+    __assign = Object.assign || function(t) {
+        for(var s, i = 1, n = arguments.length; i < n; i++){
+            s = arguments[i];
+            for(var p in s)if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __createBinding = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__createBinding || (Object.create ? function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = {
+            enumerable: true,
+            get: function() {
+                return m[k];
+            }
+        };
+    }
+    Object.defineProperty(o, k2, desc);
+} : function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+});
+var __setModuleDefault = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__setModuleDefault || (Object.create ? function(o, v) {
+    Object.defineProperty(o, "default", {
+        enumerable: true,
+        value: v
+    });
+} : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__importStar || function(mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) {
+        for(var k in mod)if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    }
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __read = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__read || function(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while((n === void 0 || n-- > 0) && !(r = i.next()).done)ar.push(r.value);
+    } catch (error) {
+        e = {
+            error: error
+        };
+    } finally{
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        } finally{
+            if (e) throw e.error;
+        }
+    }
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.bls12_381 = exports.G2_mapToCurve = exports.G1_mapToCurve = exports.G1_formBytes = exports.parseMask = exports.Fp12 = exports.Fp12_ONE = exports.Fp12_eql = exports.Fp12_conjugate = exports.Fp12_finalExponentiate = exports.Fp12Multiply = exports.Fp2 = exports.Fp = void 0;
+/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */ // bls12-381 is pairing-friendly Barreto-Lynn-Scott elliptic curve construction allowing to:
+// - Construct zk-SNARKs at the 120-bit security
+// - Efficiently verify N aggregate signatures with 1 pairing and N ec additions:
+//   the Boneh-Lynn-Shacham signature scheme is orders of magnitude more efficient than Schnorr
+//
+// ### Summary
+// 1. BLS Relies on Bilinear Pairing (expensive)
+// 2. Private Keys: 32 bytes
+// 3. Public Keys: 48 bytes: 381 bit affine x coordinate, encoded into 48 big-endian bytes.
+// 4. Signatures: 96 bytes: two 381 bit integers (affine x coordinate), encoded into two 48 big-endian byte arrays.
+//     - The signature is a point on the G2 subgroup, which is defined over a finite field
+//     with elements twice as big as the G1 curve (G2 is over Fp2 rather than Fp. Fp2 is analogous to the complex numbers).
+// 5. The 12 stands for the Embedding degree.
+//
+// ### Formulas
+// - `P = pk x G` - public keys
+// - `S = pk x H(m)` - signing
+// - `e(P, H(m)) == e(G, S)` - verification using pairings
+// - `e(G, S) = e(G, SUM(n)(Si)) = MUL(n)(e(G, Si))` - signature aggregation
+//
+// ### Compatibility and notes
+// 1. It is compatible with Algorand, Chia, Dfinity, Ethereum, Filecoin, ZEC
+//    Filecoin uses little endian byte arrays for private keys - make sure to reverse byte order.
+// 2. Some projects use G2 for public keys and G1 for signatures. It's called "short signature"
+// 3. Curve security level is about 120 bits as per Barbulescu-Duquesne 2017
+//    https://hal.science/hal-01534101/file/main.pdf
+// 4. Compatible with specs:
+// [cfrg-pairing-friendly-curves-11](https://tools.ietf.org/html/draft-irtf-cfrg-pairing-friendly-curves-11),
+// [cfrg-bls-signature-05](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-05),
+// [RFC 9380](https://www.rfc-editor.org/rfc/rfc9380).
+var bls_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/bls.js [app-ssr] (ecmascript)");
+var mod = __importStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/modular.js [app-ssr] (ecmascript)"));
+var utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/utils.js [app-ssr] (ecmascript)");
+// Types
+var weierstrass_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/weierstrass.js [app-ssr] (ecmascript)");
+var hash_to_curve_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/hash-to-curve.js [app-ssr] (ecmascript)");
+var sha256_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/sha256.js [app-ssr] (ecmascript)");
+var utils_2 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/utils.js [app-ssr] (ecmascript)");
+// Be friendly to bad ECMAScript parsers by not using bigint literals
+// prettier-ignore
+var _0n = BigInt(0), _1n = BigInt(1), _2n = BigInt(2), _3n = BigInt(3), _4n = BigInt(4);
+// prettier-ignore
+var _8n = BigInt(8), _16n = BigInt(16);
+// CURVE FIELDS
+// Finite field over p.
+var Fp_raw = BigInt('0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab');
+exports.Fp = mod.Field(Fp_raw);
+// Finite field over r.
+// This particular field is not used anywhere in bls12-381, but it is still useful.
+var Fr = mod.Field(BigInt('0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001'));
+var Fp2Add = function(_a, _b) {
+    var c0 = _a.c0, c1 = _a.c1;
+    var r0 = _b.c0, r1 = _b.c1;
+    return {
+        c0: exports.Fp.add(c0, r0),
+        c1: exports.Fp.add(c1, r1)
+    };
+};
+var Fp2Subtract = function(_a, _b) {
+    var c0 = _a.c0, c1 = _a.c1;
+    var r0 = _b.c0, r1 = _b.c1;
+    return {
+        c0: exports.Fp.sub(c0, r0),
+        c1: exports.Fp.sub(c1, r1)
+    };
+};
+var Fp2Multiply = function(_a, rhs) {
+    var c0 = _a.c0, c1 = _a.c1;
+    if (typeof rhs === 'bigint') return {
+        c0: exports.Fp.mul(c0, rhs),
+        c1: exports.Fp.mul(c1, rhs)
+    };
+    // (a+bi)(c+di) = (ac−bd) + (ad+bc)i
+    var r0 = rhs.c0, r1 = rhs.c1;
+    var t1 = exports.Fp.mul(c0, r0); // c0 * o0
+    var t2 = exports.Fp.mul(c1, r1); // c1 * o1
+    // (T1 - T2) + ((c0 + c1) * (r0 + r1) - (T1 + T2))*i
+    var o0 = exports.Fp.sub(t1, t2);
+    var o1 = exports.Fp.sub(exports.Fp.mul(exports.Fp.add(c0, c1), exports.Fp.add(r0, r1)), exports.Fp.add(t1, t2));
+    return {
+        c0: o0,
+        c1: o1
+    };
+};
+var Fp2Square = function(_a) {
+    var c0 = _a.c0, c1 = _a.c1;
+    var a = exports.Fp.add(c0, c1);
+    var b = exports.Fp.sub(c0, c1);
+    var c = exports.Fp.add(c0, c0);
+    return {
+        c0: exports.Fp.mul(a, b),
+        c1: exports.Fp.mul(c, c1)
+    };
+};
+// G2 is the order-q subgroup of E2(Fp²) : y² = x³+4(1+√−1),
+// where Fp2 is Fp[√−1]/(x2+1). #E2(Fp2 ) = h2q, where
+// G² - 1
+// h2q
+// NOTE: ORDER was wrong!
+var FP2_ORDER = Fp_raw * Fp_raw;
+exports.Fp2 = {
+    ORDER: FP2_ORDER,
+    BITS: (0, utils_1.bitLen)(FP2_ORDER),
+    BYTES: Math.ceil((0, utils_1.bitLen)(FP2_ORDER) / 8),
+    MASK: (0, utils_1.bitMask)((0, utils_1.bitLen)(FP2_ORDER)),
+    ZERO: {
+        c0: exports.Fp.ZERO,
+        c1: exports.Fp.ZERO
+    },
+    ONE: {
+        c0: exports.Fp.ONE,
+        c1: exports.Fp.ZERO
+    },
+    create: function(num) {
+        return num;
+    },
+    isValid: function(_a) {
+        var c0 = _a.c0, c1 = _a.c1;
+        return typeof c0 === 'bigint' && typeof c1 === 'bigint';
+    },
+    is0: function(_a) {
+        var c0 = _a.c0, c1 = _a.c1;
+        return exports.Fp.is0(c0) && exports.Fp.is0(c1);
+    },
+    eql: function(_a, _b) {
+        var c0 = _a.c0, c1 = _a.c1;
+        var r0 = _b.c0, r1 = _b.c1;
+        return exports.Fp.eql(c0, r0) && exports.Fp.eql(c1, r1);
+    },
+    neg: function(_a) {
+        var c0 = _a.c0, c1 = _a.c1;
+        return {
+            c0: exports.Fp.neg(c0),
+            c1: exports.Fp.neg(c1)
+        };
+    },
+    pow: function(num, power) {
+        return mod.FpPow(exports.Fp2, num, power);
+    },
+    invertBatch: function(nums) {
+        return mod.FpInvertBatch(exports.Fp2, nums);
+    },
+    // Normalized
+    add: Fp2Add,
+    sub: Fp2Subtract,
+    mul: Fp2Multiply,
+    sqr: Fp2Square,
+    // NonNormalized stuff
+    addN: Fp2Add,
+    subN: Fp2Subtract,
+    mulN: Fp2Multiply,
+    sqrN: Fp2Square,
+    // Why inversion for bigint inside Fp instead of Fp2? it is even used in that context?
+    div: function(lhs, rhs) {
+        return exports.Fp2.mul(lhs, typeof rhs === 'bigint' ? exports.Fp.inv(exports.Fp.create(rhs)) : exports.Fp2.inv(rhs));
+    },
+    inv: function(_a) {
+        var a = _a.c0, b = _a.c1;
+        // We wish to find the multiplicative inverse of a nonzero
+        // element a + bu in Fp2. We leverage an identity
+        //
+        // (a + bu)(a - bu) = a² + b²
+        //
+        // which holds because u² = -1. This can be rewritten as
+        //
+        // (a + bu)(a - bu)/(a² + b²) = 1
+        //
+        // because a² + b² = 0 has no nonzero solutions for (a, b).
+        // This gives that (a - bu)/(a² + b²) is the inverse
+        // of (a + bu). Importantly, this can be computing using
+        // only a single inversion in Fp.
+        var factor = exports.Fp.inv(exports.Fp.create(a * a + b * b));
+        return {
+            c0: exports.Fp.mul(factor, exports.Fp.create(a)),
+            c1: exports.Fp.mul(factor, exports.Fp.create(-b))
+        };
+    },
+    sqrt: function(num) {
+        if (exports.Fp2.eql(num, exports.Fp2.ZERO)) return exports.Fp2.ZERO; // Algo doesn't handles this case
+        // TODO: Optimize this line. It's extremely slow.
+        // Speeding this up would boost aggregateSignatures.
+        // https://eprint.iacr.org/2012/685.pdf applicable?
+        // https://github.com/zkcrypto/bls12_381/blob/080eaa74ec0e394377caa1ba302c8c121df08b07/src/fp2.rs#L250
+        // https://github.com/supranational/blst/blob/aae0c7d70b799ac269ff5edf29d8191dbd357876/src/exp2.c#L1
+        // Inspired by https://github.com/dalek-cryptography/curve25519-dalek/blob/17698df9d4c834204f83a3574143abacb4fc81a5/src/field.rs#L99
+        var candidateSqrt = exports.Fp2.pow(num, (exports.Fp2.ORDER + _8n) / _16n);
+        var check = exports.Fp2.div(exports.Fp2.sqr(candidateSqrt), num); // candidateSqrt.square().div(this);
+        var R = FP2_ROOTS_OF_UNITY;
+        var divisor = [
+            R[0],
+            R[2],
+            R[4],
+            R[6]
+        ].find(function(r) {
+            return exports.Fp2.eql(r, check);
+        });
+        if (!divisor) throw new Error('No root');
+        var index = R.indexOf(divisor);
+        var root = R[index / 2];
+        if (!root) throw new Error('Invalid root');
+        var x1 = exports.Fp2.div(candidateSqrt, root);
+        var x2 = exports.Fp2.neg(x1);
+        var _a = exports.Fp2.reim(x1), re1 = _a.re, im1 = _a.im;
+        var _b = exports.Fp2.reim(x2), re2 = _b.re, im2 = _b.im;
+        if (im1 > im2 || im1 === im2 && re1 > re2) return x1;
+        return x2;
+    },
+    // Same as sgn0_m_eq_2 in RFC 9380
+    isOdd: function(x) {
+        var _a = exports.Fp2.reim(x), x0 = _a.re, x1 = _a.im;
+        var sign_0 = x0 % _2n;
+        var zero_0 = x0 === _0n;
+        var sign_1 = x1 % _2n;
+        return BigInt(sign_0 || zero_0 && sign_1) == _1n;
+    },
+    // Bytes util
+    fromBytes: function(b) {
+        if (b.length !== exports.Fp2.BYTES) throw new Error("fromBytes wrong length=".concat(b.length));
+        return {
+            c0: exports.Fp.fromBytes(b.subarray(0, exports.Fp.BYTES)),
+            c1: exports.Fp.fromBytes(b.subarray(exports.Fp.BYTES))
+        };
+    },
+    toBytes: function(_a) {
+        var c0 = _a.c0, c1 = _a.c1;
+        return (0, utils_1.concatBytes)(exports.Fp.toBytes(c0), exports.Fp.toBytes(c1));
+    },
+    cmov: function(_a, _b, c) {
+        var c0 = _a.c0, c1 = _a.c1;
+        var r0 = _b.c0, r1 = _b.c1;
+        return {
+            c0: exports.Fp.cmov(c0, r0, c),
+            c1: exports.Fp.cmov(c1, r1, c)
+        };
+    },
+    // Specific utils
+    // toString() {
+    //   return `Fp2(${this.c0} + ${this.c1}×i)`;
+    // }
+    reim: function(_a) {
+        var c0 = _a.c0, c1 = _a.c1;
+        return {
+            re: c0,
+            im: c1
+        };
+    },
+    // multiply by u + 1
+    mulByNonresidue: function(_a) {
+        var c0 = _a.c0, c1 = _a.c1;
+        return {
+            c0: exports.Fp.sub(c0, c1),
+            c1: exports.Fp.add(c0, c1)
+        };
+    },
+    multiplyByB: function(_a) {
+        var c0 = _a.c0, c1 = _a.c1;
+        var t0 = exports.Fp.mul(c0, _4n); // 4 * c0
+        var t1 = exports.Fp.mul(c1, _4n); // 4 * c1
+        // (T0-T1) + (T0+T1)*i
+        return {
+            c0: exports.Fp.sub(t0, t1),
+            c1: exports.Fp.add(t0, t1)
+        };
+    },
+    fromBigTuple: function(tuple) {
+        if (tuple.length !== 2) throw new Error('Invalid tuple');
+        var fps = tuple.map(function(n) {
+            return exports.Fp.create(n);
+        });
+        return {
+            c0: fps[0],
+            c1: fps[1]
+        };
+    },
+    frobeniusMap: function(_a, power) {
+        var c0 = _a.c0, c1 = _a.c1;
+        return {
+            c0: c0,
+            c1: exports.Fp.mul(c1, FP2_FROBENIUS_COEFFICIENTS[power % 2])
+        };
+    }
+};
+// Finite extension field over irreducible polynominal.
+// Fp(u) / (u² - β) where β = -1
+var FP2_FROBENIUS_COEFFICIENTS = [
+    BigInt('0x1'),
+    BigInt('0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaaa')
+].map(function(item) {
+    return exports.Fp.create(item);
+});
+// For Fp2 roots of unity.
+var rv1 = BigInt('0x6af0e0437ff400b6831e36d6bd17ffe48395dabc2d3435e77f76e17009241c5ee67992f72ec05f4c81084fbede3cc09');
+// const ev1 =
+//   BigInt('0x699be3b8c6870965e5bf892ad5d2cc7b0e85a117402dfd83b7f4a947e02d978498255a2aaec0ac627b5afbdf1bf1c90');
+// const ev2 =
+//   BigInt('0x8157cd83046453f5dd0972b6e3949e4288020b5b8a9cc99ca07e27089a2ce2436d965026adad3ef7baba37f2183e9b5');
+// const ev3 =
+//   BigInt('0xab1c2ffdd6c253ca155231eb3e71ba044fd562f6f72bc5bad5ec46a0b7a3b0247cf08ce6c6317f40edbc653a72dee17');
+// const ev4 =
+//   BigInt('0xaa404866706722864480885d68ad0ccac1967c7544b447873cc37e0181271e006df72162a3d3e0287bf597fbf7f8fc1');
+// Eighth roots of unity, used for computing square roots in Fp2.
+// To verify or re-calculate:
+// Array(8).fill(new Fp2([1n, 1n])).map((fp2, k) => fp2.pow(Fp2.ORDER * BigInt(k) / 8n))
+var FP2_ROOTS_OF_UNITY = [
+    [
+        _1n,
+        _0n
+    ],
+    [
+        rv1,
+        -rv1
+    ],
+    [
+        _0n,
+        _1n
+    ],
+    [
+        rv1,
+        rv1
+    ],
+    [
+        -_1n,
+        _0n
+    ],
+    [
+        -rv1,
+        rv1
+    ],
+    [
+        _0n,
+        -_1n
+    ],
+    [
+        -rv1,
+        -rv1
+    ]
+].map(function(pair) {
+    return exports.Fp2.fromBigTuple(pair);
+});
+var Fp6Add = function(_a, _b) {
+    var c0 = _a.c0, c1 = _a.c1, c2 = _a.c2;
+    var r0 = _b.c0, r1 = _b.c1, r2 = _b.c2;
+    return {
+        c0: exports.Fp2.add(c0, r0),
+        c1: exports.Fp2.add(c1, r1),
+        c2: exports.Fp2.add(c2, r2)
+    };
+};
+var Fp6Subtract = function(_a, _b) {
+    var c0 = _a.c0, c1 = _a.c1, c2 = _a.c2;
+    var r0 = _b.c0, r1 = _b.c1, r2 = _b.c2;
+    return {
+        c0: exports.Fp2.sub(c0, r0),
+        c1: exports.Fp2.sub(c1, r1),
+        c2: exports.Fp2.sub(c2, r2)
+    };
+};
+var Fp6Multiply = function(_a, rhs) {
+    var c0 = _a.c0, c1 = _a.c1, c2 = _a.c2;
+    if (typeof rhs === 'bigint') {
+        return {
+            c0: exports.Fp2.mul(c0, rhs),
+            c1: exports.Fp2.mul(c1, rhs),
+            c2: exports.Fp2.mul(c2, rhs)
+        };
+    }
+    var r0 = rhs.c0, r1 = rhs.c1, r2 = rhs.c2;
+    var t0 = exports.Fp2.mul(c0, r0); // c0 * o0
+    var t1 = exports.Fp2.mul(c1, r1); // c1 * o1
+    var t2 = exports.Fp2.mul(c2, r2); // c2 * o2
+    return {
+        // t0 + (c1 + c2) * (r1 * r2) - (T1 + T2) * (u + 1)
+        c0: exports.Fp2.add(t0, exports.Fp2.mulByNonresidue(exports.Fp2.sub(exports.Fp2.mul(exports.Fp2.add(c1, c2), exports.Fp2.add(r1, r2)), exports.Fp2.add(t1, t2)))),
+        // (c0 + c1) * (r0 + r1) - (T0 + T1) + T2 * (u + 1)
+        c1: exports.Fp2.add(exports.Fp2.sub(exports.Fp2.mul(exports.Fp2.add(c0, c1), exports.Fp2.add(r0, r1)), exports.Fp2.add(t0, t1)), exports.Fp2.mulByNonresidue(t2)),
+        // T1 + (c0 + c2) * (r0 + r2) - T0 + T2
+        c2: exports.Fp2.sub(exports.Fp2.add(t1, exports.Fp2.mul(exports.Fp2.add(c0, c2), exports.Fp2.add(r0, r2))), exports.Fp2.add(t0, t2))
+    };
+};
+var Fp6Square = function(_a) {
+    var c0 = _a.c0, c1 = _a.c1, c2 = _a.c2;
+    var t0 = exports.Fp2.sqr(c0); // c0²
+    var t1 = exports.Fp2.mul(exports.Fp2.mul(c0, c1), _2n); // 2 * c0 * c1
+    var t3 = exports.Fp2.mul(exports.Fp2.mul(c1, c2), _2n); // 2 * c1 * c2
+    var t4 = exports.Fp2.sqr(c2); // c2²
+    return {
+        c0: exports.Fp2.add(exports.Fp2.mulByNonresidue(t3), t0),
+        c1: exports.Fp2.add(exports.Fp2.mulByNonresidue(t4), t1),
+        // T1 + (c0 - c1 + c2)² + T3 - T0 - T4
+        c2: exports.Fp2.sub(exports.Fp2.sub(exports.Fp2.add(exports.Fp2.add(t1, exports.Fp2.sqr(exports.Fp2.add(exports.Fp2.sub(c0, c1), c2))), t3), t0), t4)
+    };
+};
+var Fp6 = {
+    ORDER: exports.Fp2.ORDER,
+    BITS: 3 * exports.Fp2.BITS,
+    BYTES: 3 * exports.Fp2.BYTES,
+    MASK: (0, utils_1.bitMask)(3 * exports.Fp2.BITS),
+    ZERO: {
+        c0: exports.Fp2.ZERO,
+        c1: exports.Fp2.ZERO,
+        c2: exports.Fp2.ZERO
+    },
+    ONE: {
+        c0: exports.Fp2.ONE,
+        c1: exports.Fp2.ZERO,
+        c2: exports.Fp2.ZERO
+    },
+    create: function(num) {
+        return num;
+    },
+    isValid: function(_a) {
+        var c0 = _a.c0, c1 = _a.c1, c2 = _a.c2;
+        return exports.Fp2.isValid(c0) && exports.Fp2.isValid(c1) && exports.Fp2.isValid(c2);
+    },
+    is0: function(_a) {
+        var c0 = _a.c0, c1 = _a.c1, c2 = _a.c2;
+        return exports.Fp2.is0(c0) && exports.Fp2.is0(c1) && exports.Fp2.is0(c2);
+    },
+    neg: function(_a) {
+        var c0 = _a.c0, c1 = _a.c1, c2 = _a.c2;
+        return {
+            c0: exports.Fp2.neg(c0),
+            c1: exports.Fp2.neg(c1),
+            c2: exports.Fp2.neg(c2)
+        };
+    },
+    eql: function(_a, _b) {
+        var c0 = _a.c0, c1 = _a.c1, c2 = _a.c2;
+        var r0 = _b.c0, r1 = _b.c1, r2 = _b.c2;
+        return exports.Fp2.eql(c0, r0) && exports.Fp2.eql(c1, r1) && exports.Fp2.eql(c2, r2);
+    },
+    sqrt: function() {
+        throw new Error('Not implemented');
+    },
+    // Do we need division by bigint at all? Should be done via order:
+    div: function(lhs, rhs) {
+        return Fp6.mul(lhs, typeof rhs === 'bigint' ? exports.Fp.inv(exports.Fp.create(rhs)) : Fp6.inv(rhs));
+    },
+    pow: function(num, power) {
+        return mod.FpPow(Fp6, num, power);
+    },
+    invertBatch: function(nums) {
+        return mod.FpInvertBatch(Fp6, nums);
+    },
+    // Normalized
+    add: Fp6Add,
+    sub: Fp6Subtract,
+    mul: Fp6Multiply,
+    sqr: Fp6Square,
+    // NonNormalized stuff
+    addN: Fp6Add,
+    subN: Fp6Subtract,
+    mulN: Fp6Multiply,
+    sqrN: Fp6Square,
+    inv: function(_a) {
+        var c0 = _a.c0, c1 = _a.c1, c2 = _a.c2;
+        var t0 = exports.Fp2.sub(exports.Fp2.sqr(c0), exports.Fp2.mulByNonresidue(exports.Fp2.mul(c2, c1))); // c0² - c2 * c1 * (u + 1)
+        var t1 = exports.Fp2.sub(exports.Fp2.mulByNonresidue(exports.Fp2.sqr(c2)), exports.Fp2.mul(c0, c1)); // c2² * (u + 1) - c0 * c1
+        var t2 = exports.Fp2.sub(exports.Fp2.sqr(c1), exports.Fp2.mul(c0, c2)); // c1² - c0 * c2
+        // 1/(((c2 * T1 + c1 * T2) * v) + c0 * T0)
+        var t4 = exports.Fp2.inv(exports.Fp2.add(exports.Fp2.mulByNonresidue(exports.Fp2.add(exports.Fp2.mul(c2, t1), exports.Fp2.mul(c1, t2))), exports.Fp2.mul(c0, t0)));
+        return {
+            c0: exports.Fp2.mul(t4, t0),
+            c1: exports.Fp2.mul(t4, t1),
+            c2: exports.Fp2.mul(t4, t2)
+        };
+    },
+    // Bytes utils
+    fromBytes: function(b) {
+        if (b.length !== Fp6.BYTES) throw new Error("fromBytes wrong length=".concat(b.length));
+        return {
+            c0: exports.Fp2.fromBytes(b.subarray(0, exports.Fp2.BYTES)),
+            c1: exports.Fp2.fromBytes(b.subarray(exports.Fp2.BYTES, 2 * exports.Fp2.BYTES)),
+            c2: exports.Fp2.fromBytes(b.subarray(2 * exports.Fp2.BYTES))
+        };
+    },
+    toBytes: function(_a) {
+        var c0 = _a.c0, c1 = _a.c1, c2 = _a.c2;
+        return (0, utils_1.concatBytes)(exports.Fp2.toBytes(c0), exports.Fp2.toBytes(c1), exports.Fp2.toBytes(c2));
+    },
+    cmov: function(_a, _b, c) {
+        var c0 = _a.c0, c1 = _a.c1, c2 = _a.c2;
+        var r0 = _b.c0, r1 = _b.c1, r2 = _b.c2;
+        return {
+            c0: exports.Fp2.cmov(c0, r0, c),
+            c1: exports.Fp2.cmov(c1, r1, c),
+            c2: exports.Fp2.cmov(c2, r2, c)
+        };
+    },
+    // Utils
+    //   fromTriple(triple: [Fp2, Fp2, Fp2]) {
+    //     return new Fp6(...triple);
+    //   }
+    //   toString() {
+    //     return `Fp6(${this.c0} + ${this.c1} * v, ${this.c2} * v^2)`;
+    //   }
+    fromBigSix: function(t) {
+        if (!Array.isArray(t) || t.length !== 6) throw new Error('Invalid Fp6 usage');
+        return {
+            c0: exports.Fp2.fromBigTuple(t.slice(0, 2)),
+            c1: exports.Fp2.fromBigTuple(t.slice(2, 4)),
+            c2: exports.Fp2.fromBigTuple(t.slice(4, 6))
+        };
+    },
+    frobeniusMap: function(_a, power) {
+        var c0 = _a.c0, c1 = _a.c1, c2 = _a.c2;
+        return {
+            c0: exports.Fp2.frobeniusMap(c0, power),
+            c1: exports.Fp2.mul(exports.Fp2.frobeniusMap(c1, power), FP6_FROBENIUS_COEFFICIENTS_1[power % 6]),
+            c2: exports.Fp2.mul(exports.Fp2.frobeniusMap(c2, power), FP6_FROBENIUS_COEFFICIENTS_2[power % 6])
+        };
+    },
+    mulByNonresidue: function(_a) {
+        var c0 = _a.c0, c1 = _a.c1, c2 = _a.c2;
+        return {
+            c0: exports.Fp2.mulByNonresidue(c2),
+            c1: c0,
+            c2: c1
+        };
+    },
+    // Sparse multiplication
+    multiplyBy1: function(_a, b1) {
+        var c0 = _a.c0, c1 = _a.c1, c2 = _a.c2;
+        return {
+            c0: exports.Fp2.mulByNonresidue(exports.Fp2.mul(c2, b1)),
+            c1: exports.Fp2.mul(c0, b1),
+            c2: exports.Fp2.mul(c1, b1)
+        };
+    },
+    // Sparse multiplication
+    multiplyBy01: function(_a, b0, b1) {
+        var c0 = _a.c0, c1 = _a.c1, c2 = _a.c2;
+        var t0 = exports.Fp2.mul(c0, b0); // c0 * b0
+        var t1 = exports.Fp2.mul(c1, b1); // c1 * b1
+        return {
+            // ((c1 + c2) * b1 - T1) * (u + 1) + T0
+            c0: exports.Fp2.add(exports.Fp2.mulByNonresidue(exports.Fp2.sub(exports.Fp2.mul(exports.Fp2.add(c1, c2), b1), t1)), t0),
+            // (b0 + b1) * (c0 + c1) - T0 - T1
+            c1: exports.Fp2.sub(exports.Fp2.sub(exports.Fp2.mul(exports.Fp2.add(b0, b1), exports.Fp2.add(c0, c1)), t0), t1),
+            // (c0 + c2) * b0 - T0 + T1
+            c2: exports.Fp2.add(exports.Fp2.sub(exports.Fp2.mul(exports.Fp2.add(c0, c2), b0), t0), t1)
+        };
+    },
+    multiplyByFp2: function(_a, rhs) {
+        var c0 = _a.c0, c1 = _a.c1, c2 = _a.c2;
+        return {
+            c0: exports.Fp2.mul(c0, rhs),
+            c1: exports.Fp2.mul(c1, rhs),
+            c2: exports.Fp2.mul(c2, rhs)
+        };
+    }
+};
+var FP6_FROBENIUS_COEFFICIENTS_1 = [
+    [
+        BigInt('0x1'),
+        BigInt('0x0')
+    ],
+    [
+        BigInt('0x0'),
+        BigInt('0x1a0111ea397fe699ec02408663d4de85aa0d857d89759ad4897d29650fb85f9b409427eb4f49fffd8bfd00000000aaac')
+    ],
+    [
+        BigInt('0x00000000000000005f19672fdf76ce51ba69c6076a0f77eaddb3a93be6f89688de17d813620a00022e01fffffffefffe'),
+        BigInt('0x0')
+    ],
+    [
+        BigInt('0x0'),
+        BigInt('0x1')
+    ],
+    [
+        BigInt('0x1a0111ea397fe699ec02408663d4de85aa0d857d89759ad4897d29650fb85f9b409427eb4f49fffd8bfd00000000aaac'),
+        BigInt('0x0')
+    ],
+    [
+        BigInt('0x0'),
+        BigInt('0x00000000000000005f19672fdf76ce51ba69c6076a0f77eaddb3a93be6f89688de17d813620a00022e01fffffffefffe')
+    ]
+].map(function(pair) {
+    return exports.Fp2.fromBigTuple(pair);
+});
+var FP6_FROBENIUS_COEFFICIENTS_2 = [
+    [
+        BigInt('0x1'),
+        BigInt('0x0')
+    ],
+    [
+        BigInt('0x1a0111ea397fe699ec02408663d4de85aa0d857d89759ad4897d29650fb85f9b409427eb4f49fffd8bfd00000000aaad'),
+        BigInt('0x0')
+    ],
+    [
+        BigInt('0x1a0111ea397fe699ec02408663d4de85aa0d857d89759ad4897d29650fb85f9b409427eb4f49fffd8bfd00000000aaac'),
+        BigInt('0x0')
+    ],
+    [
+        BigInt('0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaaa'),
+        BigInt('0x0')
+    ],
+    [
+        BigInt('0x00000000000000005f19672fdf76ce51ba69c6076a0f77eaddb3a93be6f89688de17d813620a00022e01fffffffefffe'),
+        BigInt('0x0')
+    ],
+    [
+        BigInt('0x00000000000000005f19672fdf76ce51ba69c6076a0f77eaddb3a93be6f89688de17d813620a00022e01fffffffeffff'),
+        BigInt('0x0')
+    ]
+].map(function(pair) {
+    return exports.Fp2.fromBigTuple(pair);
+});
+// The BLS parameter x for BLS12-381
+var BLS_X = BigInt('0xd201000000010000');
+var BLS_X_LEN = (0, utils_1.bitLen)(BLS_X);
+var Fp12Add = function(_a, _b) {
+    var c0 = _a.c0, c1 = _a.c1;
+    var r0 = _b.c0, r1 = _b.c1;
+    return {
+        c0: Fp6.add(c0, r0),
+        c1: Fp6.add(c1, r1)
+    };
+};
+var Fp12Subtract = function(_a, _b) {
+    var c0 = _a.c0, c1 = _a.c1;
+    var r0 = _b.c0, r1 = _b.c1;
+    return {
+        c0: Fp6.sub(c0, r0),
+        c1: Fp6.sub(c1, r1)
+    };
+};
+var Fp12Multiply = function(_a, rhs) {
+    var c0 = _a.c0, c1 = _a.c1;
+    if (typeof rhs === 'bigint') return {
+        c0: Fp6.mul(c0, rhs),
+        c1: Fp6.mul(c1, rhs)
+    };
+    var r0 = rhs.c0, r1 = rhs.c1;
+    var t1 = Fp6.mul(c0, r0); // c0 * r0
+    var t2 = Fp6.mul(c1, r1); // c1 * r1
+    return {
+        c0: Fp6.add(t1, Fp6.mulByNonresidue(t2)),
+        // (c0 + c1) * (r0 + r1) - (T1 + T2)
+        c1: Fp6.sub(Fp6.mul(Fp6.add(c0, c1), Fp6.add(r0, r1)), Fp6.add(t1, t2))
+    };
+};
+exports.Fp12Multiply = Fp12Multiply;
+var Fp12Square = function(_a) {
+    var c0 = _a.c0, c1 = _a.c1;
+    var ab = Fp6.mul(c0, c1); // c0 * c1
+    return {
+        // (c1 * v + c0) * (c0 + c1) - AB - AB * v
+        c0: Fp6.sub(Fp6.sub(Fp6.mul(Fp6.add(Fp6.mulByNonresidue(c1), c0), Fp6.add(c0, c1)), ab), Fp6.mulByNonresidue(ab)),
+        c1: Fp6.add(ab, ab)
+    }; // AB + AB
+};
+function Fp4Square(a, b) {
+    var a2 = exports.Fp2.sqr(a);
+    var b2 = exports.Fp2.sqr(b);
+    return {
+        first: exports.Fp2.add(exports.Fp2.mulByNonresidue(b2), a2),
+        second: exports.Fp2.sub(exports.Fp2.sub(exports.Fp2.sqr(exports.Fp2.add(a, b)), a2), b2)
+    };
+}
+var Fp12_finalExponentiate = function(num) {
+    var x = BLS_X;
+    // this^(q⁶) / this
+    var t0 = exports.Fp12.div(exports.Fp12.frobeniusMap(num, 6), num);
+    // t0^(q²) * t0
+    var t1 = exports.Fp12.mul(exports.Fp12.frobeniusMap(t0, 2), t0);
+    var t2 = exports.Fp12.conjugate(exports.Fp12._cyclotomicExp(t1, x));
+    var t3 = exports.Fp12.mul(exports.Fp12.conjugate(exports.Fp12._cyclotomicSquare(t1)), t2);
+    var t4 = exports.Fp12.conjugate(exports.Fp12._cyclotomicExp(t3, x));
+    var t5 = exports.Fp12.conjugate(exports.Fp12._cyclotomicExp(t4, x));
+    var t6 = exports.Fp12.mul(exports.Fp12.conjugate(exports.Fp12._cyclotomicExp(t5, x)), exports.Fp12._cyclotomicSquare(t2));
+    var t7 = exports.Fp12.conjugate(exports.Fp12._cyclotomicExp(t6, x));
+    var t2_t5_pow_q2 = exports.Fp12.frobeniusMap(exports.Fp12.mul(t2, t5), 2);
+    var t4_t1_pow_q3 = exports.Fp12.frobeniusMap(exports.Fp12.mul(t4, t1), 3);
+    var t6_t1c_pow_q1 = exports.Fp12.frobeniusMap(exports.Fp12.mul(t6, exports.Fp12.conjugate(t1)), 1);
+    var t7_t3c_t1 = exports.Fp12.mul(exports.Fp12.mul(t7, exports.Fp12.conjugate(t3)), t1);
+    // (t2 * t5)^(q²) * (t4 * t1)^(q³) * (t6 * t1.conj)^(q^1) * t7 * t3.conj * t1
+    return exports.Fp12.mul(exports.Fp12.mul(exports.Fp12.mul(t2_t5_pow_q2, t4_t1_pow_q3), t6_t1c_pow_q1), t7_t3c_t1);
+};
+exports.Fp12_finalExponentiate = Fp12_finalExponentiate;
+var Fp12_conjugate = function(_a) {
+    var c0 = _a.c0, c1 = _a.c1;
+    return {
+        c0: c0,
+        c1: Fp6.neg(c1)
+    };
+};
+exports.Fp12_conjugate = Fp12_conjugate;
+var Fp12_eql = function(_a, _b) {
+    var c0 = _a.c0, c1 = _a.c1;
+    var r0 = _b.c0, r1 = _b.c1;
+    return Fp6.eql(c0, r0) && Fp6.eql(c1, r1);
+};
+exports.Fp12_eql = Fp12_eql;
+exports.Fp12_ONE = {
+    c0: Fp6.ONE,
+    c1: Fp6.ZERO
+};
+exports.Fp12 = {
+    ORDER: exports.Fp2.ORDER,
+    BITS: 2 * exports.Fp2.BITS,
+    BYTES: 2 * exports.Fp2.BYTES,
+    MASK: (0, utils_1.bitMask)(2 * exports.Fp2.BITS),
+    ZERO: {
+        c0: Fp6.ZERO,
+        c1: Fp6.ZERO
+    },
+    ONE: {
+        c0: Fp6.ONE,
+        c1: Fp6.ZERO
+    },
+    create: function(num) {
+        return num;
+    },
+    isValid: function(_a) {
+        var c0 = _a.c0, c1 = _a.c1;
+        return Fp6.isValid(c0) && Fp6.isValid(c1);
+    },
+    is0: function(_a) {
+        var c0 = _a.c0, c1 = _a.c1;
+        return Fp6.is0(c0) && Fp6.is0(c1);
+    },
+    neg: function(_a) {
+        var c0 = _a.c0, c1 = _a.c1;
+        return {
+            c0: Fp6.neg(c0),
+            c1: Fp6.neg(c1)
+        };
+    },
+    eql: exports.Fp12_eql,
+    sqrt: function() {
+        throw new Error('Not implemented');
+    },
+    inv: function(_a) {
+        var c0 = _a.c0, c1 = _a.c1;
+        var t = Fp6.inv(Fp6.sub(Fp6.sqr(c0), Fp6.mulByNonresidue(Fp6.sqr(c1)))); // 1 / (c0² - c1² * v)
+        return {
+            c0: Fp6.mul(c0, t),
+            c1: Fp6.neg(Fp6.mul(c1, t))
+        }; // ((C0 * T) * T) + (-C1 * T) * w
+    },
+    div: function(lhs, rhs) {
+        return exports.Fp12.mul(lhs, typeof rhs === 'bigint' ? exports.Fp.inv(exports.Fp.create(rhs)) : exports.Fp12.inv(rhs));
+    },
+    pow: function(num, power) {
+        return mod.FpPow(exports.Fp12, num, power);
+    },
+    invertBatch: function(nums) {
+        return mod.FpInvertBatch(exports.Fp12, nums);
+    },
+    // Normalized
+    add: Fp12Add,
+    sub: Fp12Subtract,
+    mul: exports.Fp12Multiply,
+    sqr: Fp12Square,
+    // NonNormalized stuff
+    addN: Fp12Add,
+    subN: Fp12Subtract,
+    mulN: exports.Fp12Multiply,
+    sqrN: Fp12Square,
+    // Bytes utils
+    fromBytes: function(b) {
+        if (b.length !== exports.Fp12.BYTES) throw new Error("fromBytes wrong length=".concat(b.length));
+        return {
+            c0: Fp6.fromBytes(b.subarray(0, Fp6.BYTES)),
+            c1: Fp6.fromBytes(b.subarray(Fp6.BYTES))
+        };
+    },
+    toBytes: function(_a) {
+        var c0 = _a.c0, c1 = _a.c1;
+        return (0, utils_1.concatBytes)(Fp6.toBytes(c0), Fp6.toBytes(c1));
+    },
+    cmov: function(_a, _b, c) {
+        var c0 = _a.c0, c1 = _a.c1;
+        var r0 = _b.c0, r1 = _b.c1;
+        return {
+            c0: Fp6.cmov(c0, r0, c),
+            c1: Fp6.cmov(c1, r1, c)
+        };
+    },
+    // Utils
+    // toString() {
+    //   return `Fp12(${this.c0} + ${this.c1} * w)`;
+    // },
+    // fromTuple(c: [Fp6, Fp6]) {
+    //   return new Fp12(...c);
+    // }
+    fromBigTwelve: function(t) {
+        return {
+            c0: Fp6.fromBigSix(t.slice(0, 6)),
+            c1: Fp6.fromBigSix(t.slice(6, 12))
+        };
+    },
+    // Raises to q**i -th power
+    frobeniusMap: function(lhs, power) {
+        var r0 = Fp6.frobeniusMap(lhs.c0, power);
+        var _a = Fp6.frobeniusMap(lhs.c1, power), c0 = _a.c0, c1 = _a.c1, c2 = _a.c2;
+        var coeff = FP12_FROBENIUS_COEFFICIENTS[power % 12];
+        return {
+            c0: r0,
+            c1: Fp6.create({
+                c0: exports.Fp2.mul(c0, coeff),
+                c1: exports.Fp2.mul(c1, coeff),
+                c2: exports.Fp2.mul(c2, coeff)
+            })
+        };
+    },
+    // Sparse multiplication
+    multiplyBy014: function(_a, o0, o1, o4) {
+        var c0 = _a.c0, c1 = _a.c1;
+        var t0 = Fp6.multiplyBy01(c0, o0, o1);
+        var t1 = Fp6.multiplyBy1(c1, o4);
+        return {
+            c0: Fp6.add(Fp6.mulByNonresidue(t1), t0),
+            // (c1 + c0) * [o0, o1+o4] - T0 - T1
+            c1: Fp6.sub(Fp6.sub(Fp6.multiplyBy01(Fp6.add(c1, c0), o0, exports.Fp2.add(o1, o4)), t0), t1)
+        };
+    },
+    multiplyByFp2: function(_a, rhs) {
+        var c0 = _a.c0, c1 = _a.c1;
+        return {
+            c0: Fp6.multiplyByFp2(c0, rhs),
+            c1: Fp6.multiplyByFp2(c1, rhs)
+        };
+    },
+    conjugate: exports.Fp12_conjugate,
+    // A cyclotomic group is a subgroup of Fp^n defined by
+    //   GΦₙ(p) = {α ∈ Fpⁿ : α^Φₙ(p) = 1}
+    // The result of any pairing is in a cyclotomic subgroup
+    // https://eprint.iacr.org/2009/565.pdf
+    _cyclotomicSquare: function(_a) {
+        var c0 = _a.c0, c1 = _a.c1;
+        var c0c0 = c0.c0, c0c1 = c0.c1, c0c2 = c0.c2;
+        var c1c0 = c1.c0, c1c1 = c1.c1, c1c2 = c1.c2;
+        var _b = Fp4Square(c0c0, c1c1), t3 = _b.first, t4 = _b.second;
+        var _d = Fp4Square(c1c0, c0c2), t5 = _d.first, t6 = _d.second;
+        var _e = Fp4Square(c0c1, c1c2), t7 = _e.first, t8 = _e.second;
+        var t9 = exports.Fp2.mulByNonresidue(t8); // T8 * (u + 1)
+        return {
+            c0: Fp6.create({
+                c0: exports.Fp2.add(exports.Fp2.mul(exports.Fp2.sub(t3, c0c0), _2n), t3),
+                c1: exports.Fp2.add(exports.Fp2.mul(exports.Fp2.sub(t5, c0c1), _2n), t5),
+                c2: exports.Fp2.add(exports.Fp2.mul(exports.Fp2.sub(t7, c0c2), _2n), t7)
+            }),
+            c1: Fp6.create({
+                c0: exports.Fp2.add(exports.Fp2.mul(exports.Fp2.add(t9, c1c0), _2n), t9),
+                c1: exports.Fp2.add(exports.Fp2.mul(exports.Fp2.add(t4, c1c1), _2n), t4),
+                c2: exports.Fp2.add(exports.Fp2.mul(exports.Fp2.add(t6, c1c2), _2n), t6)
+            })
+        }; // 2 * (T6 + c1c2) + T6
+    },
+    _cyclotomicExp: function(num, n) {
+        var z = exports.Fp12.ONE;
+        for(var i = BLS_X_LEN - 1; i >= 0; i--){
+            z = exports.Fp12._cyclotomicSquare(z);
+            if ((0, utils_1.bitGet)(n, i)) z = exports.Fp12.mul(z, num);
+        }
+        return z;
+    },
+    // https://eprint.iacr.org/2010/354.pdf
+    // https://eprint.iacr.org/2009/565.pdf
+    finalExponentiate: exports.Fp12_finalExponentiate
+};
+var FP12_FROBENIUS_COEFFICIENTS = [
+    [
+        BigInt('0x1'),
+        BigInt('0x0')
+    ],
+    [
+        BigInt('0x1904d3bf02bb0667c231beb4202c0d1f0fd603fd3cbd5f4f7b2443d784bab9c4f67ea53d63e7813d8d0775ed92235fb8'),
+        BigInt('0x00fc3e2b36c4e03288e9e902231f9fb854a14787b6c7b36fec0c8ec971f63c5f282d5ac14d6c7ec22cf78a126ddc4af3')
+    ],
+    [
+        BigInt('0x00000000000000005f19672fdf76ce51ba69c6076a0f77eaddb3a93be6f89688de17d813620a00022e01fffffffeffff'),
+        BigInt('0x0')
+    ],
+    [
+        BigInt('0x135203e60180a68ee2e9c448d77a2cd91c3dedd930b1cf60ef396489f61eb45e304466cf3e67fa0af1ee7b04121bdea2'),
+        BigInt('0x06af0e0437ff400b6831e36d6bd17ffe48395dabc2d3435e77f76e17009241c5ee67992f72ec05f4c81084fbede3cc09')
+    ],
+    [
+        BigInt('0x00000000000000005f19672fdf76ce51ba69c6076a0f77eaddb3a93be6f89688de17d813620a00022e01fffffffefffe'),
+        BigInt('0x0')
+    ],
+    [
+        BigInt('0x144e4211384586c16bd3ad4afa99cc9170df3560e77982d0db45f3536814f0bd5871c1908bd478cd1ee605167ff82995'),
+        BigInt('0x05b2cfd9013a5fd8df47fa6b48b1e045f39816240c0b8fee8beadf4d8e9c0566c63a3e6e257f87329b18fae980078116')
+    ],
+    [
+        BigInt('0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaaa'),
+        BigInt('0x0')
+    ],
+    [
+        BigInt('0x00fc3e2b36c4e03288e9e902231f9fb854a14787b6c7b36fec0c8ec971f63c5f282d5ac14d6c7ec22cf78a126ddc4af3'),
+        BigInt('0x1904d3bf02bb0667c231beb4202c0d1f0fd603fd3cbd5f4f7b2443d784bab9c4f67ea53d63e7813d8d0775ed92235fb8')
+    ],
+    [
+        BigInt('0x1a0111ea397fe699ec02408663d4de85aa0d857d89759ad4897d29650fb85f9b409427eb4f49fffd8bfd00000000aaac'),
+        BigInt('0x0')
+    ],
+    [
+        BigInt('0x06af0e0437ff400b6831e36d6bd17ffe48395dabc2d3435e77f76e17009241c5ee67992f72ec05f4c81084fbede3cc09'),
+        BigInt('0x135203e60180a68ee2e9c448d77a2cd91c3dedd930b1cf60ef396489f61eb45e304466cf3e67fa0af1ee7b04121bdea2')
+    ],
+    [
+        BigInt('0x1a0111ea397fe699ec02408663d4de85aa0d857d89759ad4897d29650fb85f9b409427eb4f49fffd8bfd00000000aaad'),
+        BigInt('0x0')
+    ],
+    [
+        BigInt('0x05b2cfd9013a5fd8df47fa6b48b1e045f39816240c0b8fee8beadf4d8e9c0566c63a3e6e257f87329b18fae980078116'),
+        BigInt('0x144e4211384586c16bd3ad4afa99cc9170df3560e77982d0db45f3536814f0bd5871c1908bd478cd1ee605167ff82995')
+    ]
+].map(function(n) {
+    return exports.Fp2.fromBigTuple(n);
+});
+// END OF CURVE FIELDS
+// HashToCurve
+// 3-isogeny map from E' to E https://www.rfc-editor.org/rfc/rfc9380#appendix-E.3
+var isogenyMapG2 = (0, hash_to_curve_1.isogenyMap)(exports.Fp2, [
+    // xNum
+    [
+        [
+            '0x5c759507e8e333ebb5b7a9a47d7ed8532c52d39fd3a042a88b58423c50ae15d5c2638e343d9c71c6238aaaaaaaa97d6',
+            '0x5c759507e8e333ebb5b7a9a47d7ed8532c52d39fd3a042a88b58423c50ae15d5c2638e343d9c71c6238aaaaaaaa97d6'
+        ],
+        [
+            '0x0',
+            '0x11560bf17baa99bc32126fced787c88f984f87adf7ae0c7f9a208c6b4f20a4181472aaa9cb8d555526a9ffffffffc71a'
+        ],
+        [
+            '0x11560bf17baa99bc32126fced787c88f984f87adf7ae0c7f9a208c6b4f20a4181472aaa9cb8d555526a9ffffffffc71e',
+            '0x8ab05f8bdd54cde190937e76bc3e447cc27c3d6fbd7063fcd104635a790520c0a395554e5c6aaaa9354ffffffffe38d'
+        ],
+        [
+            '0x171d6541fa38ccfaed6dea691f5fb614cb14b4e7f4e810aa22d6108f142b85757098e38d0f671c7188e2aaaaaaaa5ed1',
+            '0x0'
+        ]
+    ],
+    // xDen
+    [
+        [
+            '0x0',
+            '0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaa63'
+        ],
+        [
+            '0xc',
+            '0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaa9f'
+        ],
+        [
+            '0x1',
+            '0x0'
+        ]
+    ],
+    // yNum
+    [
+        [
+            '0x1530477c7ab4113b59a4c18b076d11930f7da5d4a07f649bf54439d87d27e500fc8c25ebf8c92f6812cfc71c71c6d706',
+            '0x1530477c7ab4113b59a4c18b076d11930f7da5d4a07f649bf54439d87d27e500fc8c25ebf8c92f6812cfc71c71c6d706'
+        ],
+        [
+            '0x0',
+            '0x5c759507e8e333ebb5b7a9a47d7ed8532c52d39fd3a042a88b58423c50ae15d5c2638e343d9c71c6238aaaaaaaa97be'
+        ],
+        [
+            '0x11560bf17baa99bc32126fced787c88f984f87adf7ae0c7f9a208c6b4f20a4181472aaa9cb8d555526a9ffffffffc71c',
+            '0x8ab05f8bdd54cde190937e76bc3e447cc27c3d6fbd7063fcd104635a790520c0a395554e5c6aaaa9354ffffffffe38f'
+        ],
+        [
+            '0x124c9ad43b6cf79bfbf7043de3811ad0761b0f37a1e26286b0e977c69aa274524e79097a56dc4bd9e1b371c71c718b10',
+            '0x0'
+        ]
+    ],
+    // yDen
+    [
+        [
+            '0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffa8fb',
+            '0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffa8fb'
+        ],
+        [
+            '0x0',
+            '0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffa9d3'
+        ],
+        [
+            '0x12',
+            '0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaa99'
+        ],
+        [
+            '0x1',
+            '0x0'
+        ]
+    ]
+].map(function(i) {
+    return i.map(function(pair) {
+        return exports.Fp2.fromBigTuple(pair.map(BigInt));
+    });
+}));
+// 11-isogeny map from E' to E
+var isogenyMapG1 = (0, hash_to_curve_1.isogenyMap)(exports.Fp, [
+    // xNum
+    [
+        '0x11a05f2b1e833340b809101dd99815856b303e88a2d7005ff2627b56cdb4e2c85610c2d5f2e62d6eaeac1662734649b7',
+        '0x17294ed3e943ab2f0588bab22147a81c7c17e75b2f6a8417f565e33c70d1e86b4838f2a6f318c356e834eef1b3cb83bb',
+        '0xd54005db97678ec1d1048c5d10a9a1bce032473295983e56878e501ec68e25c958c3e3d2a09729fe0179f9dac9edcb0',
+        '0x1778e7166fcc6db74e0609d307e55412d7f5e4656a8dbf25f1b33289f1b330835336e25ce3107193c5b388641d9b6861',
+        '0xe99726a3199f4436642b4b3e4118e5499db995a1257fb3f086eeb65982fac18985a286f301e77c451154ce9ac8895d9',
+        '0x1630c3250d7313ff01d1201bf7a74ab5db3cb17dd952799b9ed3ab9097e68f90a0870d2dcae73d19cd13c1c66f652983',
+        '0xd6ed6553fe44d296a3726c38ae652bfb11586264f0f8ce19008e218f9c86b2a8da25128c1052ecaddd7f225a139ed84',
+        '0x17b81e7701abdbe2e8743884d1117e53356de5ab275b4db1a682c62ef0f2753339b7c8f8c8f475af9ccb5618e3f0c88e',
+        '0x80d3cf1f9a78fc47b90b33563be990dc43b756ce79f5574a2c596c928c5d1de4fa295f296b74e956d71986a8497e317',
+        '0x169b1f8e1bcfa7c42e0c37515d138f22dd2ecb803a0c5c99676314baf4bb1b7fa3190b2edc0327797f241067be390c9e',
+        '0x10321da079ce07e272d8ec09d2565b0dfa7dccdde6787f96d50af36003b14866f69b771f8c285decca67df3f1605fb7b',
+        '0x6e08c248e260e70bd1e962381edee3d31d79d7e22c837bc23c0bf1bc24c6b68c24b1b80b64d391fa9c8ba2e8ba2d229'
+    ],
+    // xDen
+    [
+        '0x8ca8d548cff19ae18b2e62f4bd3fa6f01d5ef4ba35b48ba9c9588617fc8ac62b558d681be343df8993cf9fa40d21b1c',
+        '0x12561a5deb559c4348b4711298e536367041e8ca0cf0800c0126c2588c48bf5713daa8846cb026e9e5c8276ec82b3bff',
+        '0xb2962fe57a3225e8137e629bff2991f6f89416f5a718cd1fca64e00b11aceacd6a3d0967c94fedcfcc239ba5cb83e19',
+        '0x3425581a58ae2fec83aafef7c40eb545b08243f16b1655154cca8abc28d6fd04976d5243eecf5c4130de8938dc62cd8',
+        '0x13a8e162022914a80a6f1d5f43e7a07dffdfc759a12062bb8d6b44e833b306da9bd29ba81f35781d539d395b3532a21e',
+        '0xe7355f8e4e667b955390f7f0506c6e9395735e9ce9cad4d0a43bcef24b8982f7400d24bc4228f11c02df9a29f6304a5',
+        '0x772caacf16936190f3e0c63e0596721570f5799af53a1894e2e073062aede9cea73b3538f0de06cec2574496ee84a3a',
+        '0x14a7ac2a9d64a8b230b3f5b074cf01996e7f63c21bca68a81996e1cdf9822c580fa5b9489d11e2d311f7d99bbdcc5a5e',
+        '0xa10ecf6ada54f825e920b3dafc7a3cce07f8d1d7161366b74100da67f39883503826692abba43704776ec3a79a1d641',
+        '0x95fc13ab9e92ad4476d6e3eb3a56680f682b4ee96f7d03776df533978f31c1593174e4b4b7865002d6384d168ecdd0a',
+        '0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001'
+    ],
+    // yNum
+    [
+        '0x90d97c81ba24ee0259d1f094980dcfa11ad138e48a869522b52af6c956543d3cd0c7aee9b3ba3c2be9845719707bb33',
+        '0x134996a104ee5811d51036d776fb46831223e96c254f383d0f906343eb67ad34d6c56711962fa8bfe097e75a2e41c696',
+        '0xcc786baa966e66f4a384c86a3b49942552e2d658a31ce2c344be4b91400da7d26d521628b00523b8dfe240c72de1f6',
+        '0x1f86376e8981c217898751ad8746757d42aa7b90eeb791c09e4a3ec03251cf9de405aba9ec61deca6355c77b0e5f4cb',
+        '0x8cc03fdefe0ff135caf4fe2a21529c4195536fbe3ce50b879833fd221351adc2ee7f8dc099040a841b6daecf2e8fedb',
+        '0x16603fca40634b6a2211e11db8f0a6a074a7d0d4afadb7bd76505c3d3ad5544e203f6326c95a807299b23ab13633a5f0',
+        '0x4ab0b9bcfac1bbcb2c977d027796b3ce75bb8ca2be184cb5231413c4d634f3747a87ac2460f415ec961f8855fe9d6f2',
+        '0x987c8d5333ab86fde9926bd2ca6c674170a05bfe3bdd81ffd038da6c26c842642f64550fedfe935a15e4ca31870fb29',
+        '0x9fc4018bd96684be88c9e221e4da1bb8f3abd16679dc26c1e8b6e6a1f20cabe69d65201c78607a360370e577bdba587',
+        '0xe1bba7a1186bdb5223abde7ada14a23c42a0ca7915af6fe06985e7ed1e4d43b9b3f7055dd4eba6f2bafaaebca731c30',
+        '0x19713e47937cd1be0dfd0b8f1d43fb93cd2fcbcb6caf493fd1183e416389e61031bf3a5cce3fbafce813711ad011c132',
+        '0x18b46a908f36f6deb918c143fed2edcc523559b8aaf0c2462e6bfe7f911f643249d9cdf41b44d606ce07c8a4d0074d8e',
+        '0xb182cac101b9399d155096004f53f447aa7b12a3426b08ec02710e807b4633f06c851c1919211f20d4c04f00b971ef8',
+        '0x245a394ad1eca9b72fc00ae7be315dc757b3b080d4c158013e6632d3c40659cc6cf90ad1c232a6442d9d3f5db980133',
+        '0x5c129645e44cf1102a159f748c4a3fc5e673d81d7e86568d9ab0f5d396a7ce46ba1049b6579afb7866b1e715475224b',
+        '0x15e6be4e990f03ce4ea50b3b42df2eb5cb181d8f84965a3957add4fa95af01b2b665027efec01c7704b456be69c8b604'
+    ],
+    // yDen
+    [
+        '0x16112c4c3a9c98b252181140fad0eae9601a6de578980be6eec3232b5be72e7a07f3688ef60c206d01479253b03663c1',
+        '0x1962d75c2381201e1a0cbd6c43c348b885c84ff731c4d59ca4a10356f453e01f78a4260763529e3532f6102c2e49a03d',
+        '0x58df3306640da276faaae7d6e8eb15778c4855551ae7f310c35a5dd279cd2eca6757cd636f96f891e2538b53dbf67f2',
+        '0x16b7d288798e5395f20d23bf89edb4d1d115c5dbddbcd30e123da489e726af41727364f2c28297ada8d26d98445f5416',
+        '0xbe0e079545f43e4b00cc912f8228ddcc6d19c9f0f69bbb0542eda0fc9dec916a20b15dc0fd2ededda39142311a5001d',
+        '0x8d9e5297186db2d9fb266eaac783182b70152c65550d881c5ecd87b6f0f5a6449f38db9dfa9cce202c6477faaf9b7ac',
+        '0x166007c08a99db2fc3ba8734ace9824b5eecfdfa8d0cf8ef5dd365bc400a0051d5fa9c01a58b1fb93d1a1399126a775c',
+        '0x16a3ef08be3ea7ea03bcddfabba6ff6ee5a4375efa1f4fd7feb34fd206357132b920f5b00801dee460ee415a15812ed9',
+        '0x1866c8ed336c61231a1be54fd1d74cc4f9fb0ce4c6af5920abc5750c4bf39b4852cfe2f7bb9248836b233d9d55535d4a',
+        '0x167a55cda70a6e1cea820597d94a84903216f763e13d87bb5308592e7ea7d4fbc7385ea3d529b35e346ef48bb8913f55',
+        '0x4d2f259eea405bd48f010a01ad2911d9c6dd039bb61a6290e591b36e636a5c871a5c29f4f83060400f8b49cba8f6aa8',
+        '0xaccbb67481d033ff5852c1e48c50c477f94ff8aefce42d28c0f9a88cea7913516f968986f7ebbea9684b529e2561092',
+        '0xad6b9514c767fe3c3613144b45f1496543346d98adf02267d5ceef9a00d9b8693000763e3b90ac11e99b138573345cc',
+        '0x2660400eb2e4f3b628bdd0d53cd76f2bf565b94e72927c1cb748df27942480e420517bd8714cc80d1fadc1326ed06f7',
+        '0xe0fa1d816ddc03e6b24255e0d7819c171c40f65e273b853324efcd6356caa205ca2f570f13497804415473a1d634b8f',
+        '0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001'
+    ]
+].map(function(i) {
+    return i.map(function(j) {
+        return BigInt(j);
+    });
+}));
+// SWU Map - Fp2 to G2': y² = x³ + 240i * x + 1012 + 1012i
+var G2_SWU = (0, weierstrass_1.mapToCurveSimpleSWU)(exports.Fp2, {
+    A: exports.Fp2.create({
+        c0: exports.Fp.create(_0n),
+        c1: exports.Fp.create(BigInt(240))
+    }),
+    B: exports.Fp2.create({
+        c0: exports.Fp.create(BigInt(1012)),
+        c1: exports.Fp.create(BigInt(1012))
+    }),
+    Z: exports.Fp2.create({
+        c0: exports.Fp.create(BigInt(-2)),
+        c1: exports.Fp.create(BigInt(-1))
+    })
+});
+// Optimized SWU Map - Fp to G1
+var G1_SWU = (0, weierstrass_1.mapToCurveSimpleSWU)(exports.Fp, {
+    A: exports.Fp.create(BigInt('0x144698a3b8e9433d693a02c96d4982b0ea985383ee66a8d8e8981aefd881ac98936f8da0e0f97f5cf428082d584c1d')),
+    B: exports.Fp.create(BigInt('0x12e2908d11688030018b12e8753eee3b2016c1f0f24f4070a0b9c14fcef35ef55a23215a316ceaa5d1cc48e98e172be0')),
+    Z: exports.Fp.create(BigInt(11))
+});
+// Endomorphisms (for fast cofactor clearing)
+// Ψ(P) endomorphism
+var ut_root = Fp6.create({
+    c0: exports.Fp2.ZERO,
+    c1: exports.Fp2.ONE,
+    c2: exports.Fp2.ZERO
+});
+var wsq = exports.Fp12.create({
+    c0: ut_root,
+    c1: Fp6.ZERO
+});
+var wcu = exports.Fp12.create({
+    c0: Fp6.ZERO,
+    c1: ut_root
+});
+var _a = __read(exports.Fp12.invertBatch([
+    wsq,
+    wcu
+]), 2), wsq_inv = _a[0], wcu_inv = _a[1];
+function psi(x, y) {
+    // Untwist Fp2->Fp12 && frobenius(1) && twist back
+    var x2 = exports.Fp12.mul(exports.Fp12.frobeniusMap(exports.Fp12.multiplyByFp2(wsq_inv, x), 1), wsq).c0.c0;
+    var y2 = exports.Fp12.mul(exports.Fp12.frobeniusMap(exports.Fp12.multiplyByFp2(wcu_inv, y), 1), wcu).c0.c0;
+    return [
+        x2,
+        y2
+    ];
+}
+// Ψ endomorphism
+function G2psi(c, P) {
+    var affine = P.toAffine();
+    var p = psi(affine.x, affine.y);
+    return new c(p[0], p[1], exports.Fp2.ONE);
+}
+// Ψ²(P) endomorphism
+// 1 / F2(2)^((p-1)/3) in GF(p²)
+var PSI2_C1 = BigInt('0x1a0111ea397fe699ec02408663d4de85aa0d857d89759ad4897d29650fb85f9b409427eb4f49fffd8bfd00000000aaac');
+function psi2(x, y) {
+    return [
+        exports.Fp2.mul(x, PSI2_C1),
+        exports.Fp2.neg(y)
+    ];
+}
+function G2psi2(c, P) {
+    var affine = P.toAffine();
+    var p = psi2(affine.x, affine.y);
+    return new c(p[0], p[1], exports.Fp2.ONE);
+}
+// Default hash_to_field options are for hash to G2.
+//
+// Parameter definitions are in section 5.3 of the spec unless otherwise noted.
+// Parameter values come from section 8.8.2 of the spec.
+// https://www.rfc-editor.org/rfc/rfc9380#section-8.8.2
+//
+// Base field F is GF(p^m)
+// p = 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab
+// m = 2 (or 1 for G1 see section 8.8.1)
+// k = 128
+var htfDefaults = Object.freeze({
+    // DST: a domain separation tag
+    // defined in section 2.2.5
+    // Use utils.getDSTLabel(), utils.setDSTLabel(value)
+    DST: "",
+    encodeDST: "",
+    // p: the characteristic of F
+    //    where F is a finite field of characteristic p and order q = p^m
+    p: exports.Fp.ORDER,
+    // m: the extension degree of F, m >= 1
+    //     where F is a finite field of characteristic p and order q = p^m
+    m: 2,
+    // k: the target security level for the suite in bits
+    // defined in section 5.1
+    k: 128,
+    // option to use a message that has already been processed by
+    // expand_message_xmd
+    expand: 'xmd',
+    // Hash functions for: expand_message_xmd is appropriate for use with a
+    // wide range of hash functions, including SHA-2, SHA-3, BLAKE2, and others.
+    // BBS+ uses blake2: https://github.com/hyperledger/aries-framework-go/issues/2247
+    hash: sha256_1.sha256
+});
+// Encoding utils
+// Point on G1 curve: (x, y)
+// Compressed point of infinity
+var COMPRESSED_ZERO = setMask(exports.Fp.toBytes(_0n), {
+    infinity: true,
+    compressed: true
+}); // set compressed & point-at-infinity bits
+function parseMask(bytes) {
+    // Copy, so we can remove mask data. It will be removed also later, when Fp.create will call modulo.
+    bytes = bytes.slice();
+    var mask = bytes[0] & 224;
+    var compressed = !!(mask >> 7 & 1); // compression bit (0b1000_0000)
+    var infinity = !!(mask >> 6 & 1); // point at infinity bit (0b0100_0000)
+    var sort = !!(mask >> 5 & 1); // sort bit (0b0010_0000)
+    bytes[0] &= 31; // clear mask (zero first 3 bits)
+    return {
+        compressed: compressed,
+        infinity: infinity,
+        sort: sort,
+        value: bytes
+    };
+}
+exports.parseMask = parseMask;
+function setMask(bytes, mask) {
+    if (bytes[0] & 224) throw new Error('setMask: non-empty mask');
+    if (mask.compressed) bytes[0] |= 128;
+    if (mask.infinity) bytes[0] |= 64;
+    if (mask.sort) bytes[0] |= 32;
+    return bytes;
+}
+function signatureG1ToRawBytes(point) {
+    point.assertValidity();
+    var isZero = point.equals(exports.bls12_381.G1.ProjectivePoint.ZERO);
+    var _a = point.toAffine(), x = _a.x, y = _a.y;
+    if (isZero) return COMPRESSED_ZERO.slice();
+    var P = exports.Fp.ORDER;
+    var sort = Boolean(y * _2n / P);
+    return setMask((0, utils_1.numberToBytesBE)(x, exports.Fp.BYTES), {
+        compressed: true,
+        sort: sort
+    });
+}
+function signatureG2ToRawBytes(point) {
+    // NOTE: by some reasons it was missed in bls12-381, looks like bug
+    point.assertValidity();
+    var len = exports.Fp.BYTES;
+    if (point.equals(exports.bls12_381.G2.ProjectivePoint.ZERO)) return (0, utils_1.concatBytes)(COMPRESSED_ZERO, (0, utils_1.numberToBytesBE)(_0n, len));
+    var _a = point.toAffine(), x = _a.x, y = _a.y;
+    var _b = exports.Fp2.reim(x), x0 = _b.re, x1 = _b.im;
+    var _d = exports.Fp2.reim(y), y0 = _d.re, y1 = _d.im;
+    var tmp = y1 > _0n ? y1 * _2n : y0 * _2n;
+    var sort = Boolean(tmp / exports.Fp.ORDER & _1n);
+    var z2 = x0;
+    return (0, utils_1.concatBytes)(setMask((0, utils_1.numberToBytesBE)(x1, len), {
+        sort: sort,
+        compressed: true
+    }), (0, utils_1.numberToBytesBE)(z2, len));
+}
+var G1_formBytes = function(bytes) {
+    var _a = parseMask(bytes), compressed = _a.compressed, infinity = _a.infinity, sort = _a.sort, value = _a.value;
+    if (value.length === 48 && compressed) {
+        // TODO: Fp.bytes
+        var P = exports.Fp.ORDER;
+        var compressedValue = (0, utils_1.bytesToNumberBE)(value);
+        // Zero
+        var x = exports.Fp.create(compressedValue & exports.Fp.MASK);
+        if (infinity) {
+            if (x !== _0n) throw new Error('G1: non-empty compressed point at infinity');
+            return {
+                x: _0n,
+                y: _0n
+            };
+        }
+        var right = exports.Fp.add(exports.Fp.pow(x, _3n), exports.Fp.create(exports.bls12_381.params.G1b)); // y² = x³ + b
+        var y = exports.Fp.sqrt(right);
+        if (!y) throw new Error('Invalid compressed G1 point');
+        if (y * _2n / P !== BigInt(sort)) y = exports.Fp.neg(y);
+        return {
+            x: exports.Fp.create(x),
+            y: exports.Fp.create(y)
+        };
+    } else if (value.length === 96 && !compressed) {
+        // Check if the infinity flag is set
+        var x = (0, utils_1.bytesToNumberBE)(value.subarray(0, exports.Fp.BYTES));
+        var y = (0, utils_1.bytesToNumberBE)(value.subarray(exports.Fp.BYTES));
+        if (infinity) {
+            if (x !== _0n || y !== _0n) throw new Error('G1: non-empty point at infinity');
+            return exports.bls12_381.G1.ProjectivePoint.ZERO.toAffine();
+        }
+        return {
+            x: exports.Fp.create(x),
+            y: exports.Fp.create(y)
+        };
+    } else {
+        throw new Error('Invalid point G1, expected 48/96 bytes');
+    }
+};
+exports.G1_formBytes = G1_formBytes;
+var G1_mapToCurve = function(scalars) {
+    var _a = G1_SWU(exports.Fp.create(scalars[0])), x = _a.x, y = _a.y;
+    return isogenyMapG1(x, y);
+};
+exports.G1_mapToCurve = G1_mapToCurve;
+var G2_mapToCurve = function(scalars) {
+    var _a = G2_SWU(exports.Fp2.fromBigTuple(scalars)), x = _a.x, y = _a.y;
+    return isogenyMapG2(x, y);
+};
+exports.G2_mapToCurve = G2_mapToCurve;
+// To verify curve parameters, see pairing-friendly-curves spec:
+// https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-11
+// Basic math is done over finite fields over p.
+// More complicated math is done over polynominal extension fields.
+// To simplify calculations in Fp12, we construct extension tower:
+// Fp₁₂ = Fp₆² => Fp₂³
+// Fp(u) / (u² - β) where β = -1
+// Fp₂(v) / (v³ - ξ) where ξ = u + 1
+// Fp₆(w) / (w² - γ) where γ = v
+// Here goes constants && point encoding format
+exports.bls12_381 = (0, bls_1.bls)({
+    // Fields
+    fields: {
+        Fp: exports.Fp,
+        Fp2: exports.Fp2,
+        Fp6: Fp6,
+        Fp12: exports.Fp12,
+        Fr: Fr
+    },
+    // G1 is the order-q subgroup of E1(Fp) : y² = x³ + 4, #E1(Fp) = h1q, where
+    // characteristic; z + (z⁴ - z² + 1)(z - 1)²/3
+    G1: {
+        Fp: exports.Fp,
+        // cofactor; (z - 1)²/3
+        h: BigInt('0x396c8c005555e1568c00aaab0000aaab'),
+        // generator's coordinates
+        // x = 3685416753713387016781088315183077757961620795782546409894578378688607592378376318836054947676345821548104185464507
+        // y = 1339506544944476473020471379941921221584933875938349620426543736416511423956333506472724655353366534992391756441569
+        Gx: BigInt('0x17f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb'),
+        Gy: BigInt('0x08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1'),
+        a: exports.Fp.ZERO,
+        b: _4n,
+        htfDefaults: __assign(__assign({}, htfDefaults), {
+            m: 1,
+            DST: 'BLS_SIG_BLS12381G1_XMD:SHA-256_SSWU_RO_NUL_'
+        }),
+        wrapPrivateKey: true,
+        allowInfinityPoint: true,
+        // Checks is the point resides in prime-order subgroup.
+        // point.isTorsionFree() should return true for valid points
+        // It returns false for shitty points.
+        // https://eprint.iacr.org/2021/1130.pdf
+        isTorsionFree: function(c, point) {
+            // φ endomorphism
+            var cubicRootOfUnityModP = BigInt('0x5f19672fdf76ce51ba69c6076a0f77eaddb3a93be6f89688de17d813620a00022e01fffffffefffe');
+            var phi = new c(exports.Fp.mul(point.px, cubicRootOfUnityModP), point.py, point.pz);
+            // todo: unroll
+            var xP = point.multiplyUnsafe(exports.bls12_381.params.x).negate(); // [x]P
+            var u2P = xP.multiplyUnsafe(exports.bls12_381.params.x); // [u2]P
+            return u2P.equals(phi);
+        // https://eprint.iacr.org/2019/814.pdf
+        // (z² − 1)/3
+        // const c1 = BigInt('0x396c8c005555e1560000000055555555');
+        // const P = this;
+        // const S = P.sigma();
+        // const Q = S.double();
+        // const S2 = S.sigma();
+        // // [(z² − 1)/3](2σ(P) − P − σ²(P)) − σ²(P) = O
+        // const left = Q.subtract(P).subtract(S2).multiplyUnsafe(c1);
+        // const C = left.subtract(S2);
+        // return C.isZero();
+        },
+        // Clear cofactor of G1
+        // https://eprint.iacr.org/2019/403
+        clearCofactor: function(_c, point) {
+            // return this.multiplyUnsafe(CURVE.h);
+            return point.multiplyUnsafe(exports.bls12_381.params.x).add(point); // x*P + P
+        },
+        mapToCurve: exports.G1_mapToCurve,
+        fromBytes: exports.G1_formBytes,
+        toBytes: function(c, point, isCompressed) {
+            var isZero = point.equals(c.ZERO);
+            var _a = point.toAffine(), x = _a.x, y = _a.y;
+            if (isCompressed) {
+                if (isZero) return COMPRESSED_ZERO.slice();
+                var P = exports.Fp.ORDER;
+                var sort = Boolean(y * _2n / P);
+                return setMask((0, utils_1.numberToBytesBE)(x, exports.Fp.BYTES), {
+                    compressed: true,
+                    sort: sort
+                });
+            } else {
+                if (isZero) {
+                    // 2x PUBLIC_KEY_LENGTH
+                    var x_2 = (0, utils_1.concatBytes)(new Uint8Array([
+                        0x40
+                    ]), new Uint8Array(2 * exports.Fp.BYTES - 1));
+                    return x_2;
+                } else {
+                    return (0, utils_1.concatBytes)((0, utils_1.numberToBytesBE)(x, exports.Fp.BYTES), (0, utils_1.numberToBytesBE)(y, exports.Fp.BYTES));
+                }
+            }
+        },
+        ShortSignature: {
+            fromHex: function(hex) {
+                var _a = parseMask((0, utils_1.ensureBytes)('signatureHex', hex, 48)), infinity = _a.infinity, sort = _a.sort, value = _a.value;
+                var P = exports.Fp.ORDER;
+                var compressedValue = (0, utils_1.bytesToNumberBE)(value);
+                // Zero
+                if (infinity) return exports.bls12_381.G1.ProjectivePoint.ZERO;
+                var x = exports.Fp.create(compressedValue & exports.Fp.MASK);
+                var right = exports.Fp.add(exports.Fp.pow(x, _3n), exports.Fp.create(exports.bls12_381.params.G1b)); // y² = x³ + b
+                var y = exports.Fp.sqrt(right);
+                if (!y) throw new Error('Invalid compressed G1 point');
+                var aflag = BigInt(sort);
+                if (y * _2n / P !== aflag) y = exports.Fp.neg(y);
+                var point = exports.bls12_381.G1.ProjectivePoint.fromAffine({
+                    x: x,
+                    y: y
+                });
+                point.assertValidity();
+                return point;
+            },
+            toRawBytes: function(point) {
+                return signatureG1ToRawBytes(point);
+            },
+            toHex: function(point) {
+                return (0, utils_1.bytesToHex)(signatureG1ToRawBytes(point));
+            }
+        }
+    },
+    // G2 is the order-q subgroup of E2(Fp²) : y² = x³+4(1+√−1),
+    // where Fp2 is Fp[√−1]/(x2+1). #E2(Fp2 ) = h2q, where
+    // G² - 1
+    // h2q
+    G2: {
+        Fp: exports.Fp2,
+        // cofactor
+        h: BigInt('0x5d543a95414e7f1091d50792876a202cd91de4547085abaa68a205b2e5a7ddfa628f1cb4d9e82ef21537e293a6691ae1616ec6e786f0c70cf1c38e31c7238e5'),
+        Gx: exports.Fp2.fromBigTuple([
+            BigInt('0x024aa2b2f08f0a91260805272dc51051c6e47ad4fa403b02b4510b647ae3d1770bac0326a805bbefd48056c8c121bdb8'),
+            BigInt('0x13e02b6052719f607dacd3a088274f65596bd0d09920b61ab5da61bbdc7f5049334cf11213945d57e5ac7d055d042b7e')
+        ]),
+        // y =
+        // 927553665492332455747201965776037880757740193453592970025027978793976877002675564980949289727957565575433344219582,
+        // 1985150602287291935568054521177171638300868978215655730859378665066344726373823718423869104263333984641494340347905
+        Gy: exports.Fp2.fromBigTuple([
+            BigInt('0x0ce5d527727d6e118cc9cdc6da2e351aadfd9baa8cbdd3a76d429a695160d12c923ac9cc3baca289e193548608b82801'),
+            BigInt('0x0606c4a02ea734cc32acd2b02bc28b99cb3e287e85a763af267492ab572e99ab3f370d275cec1da1aaa9075ff05f79be')
+        ]),
+        a: exports.Fp2.ZERO,
+        b: exports.Fp2.fromBigTuple([
+            _4n,
+            _4n
+        ]),
+        hEff: BigInt('0xbc69f08f2ee75b3584c6a0ea91b352888e2a8e9145ad7689986ff031508ffe1329c2f178731db956d82bf015d1212b02ec0ec69d7477c1ae954cbc06689f6a359894c0adebbf6b4e8020005aaa95551'),
+        htfDefaults: __assign({}, htfDefaults),
+        wrapPrivateKey: true,
+        allowInfinityPoint: true,
+        mapToCurve: exports.G2_mapToCurve,
+        // Checks is the point resides in prime-order subgroup.
+        // point.isTorsionFree() should return true for valid points
+        // It returns false for shitty points.
+        // https://eprint.iacr.org/2021/1130.pdf
+        isTorsionFree: function(c, P) {
+            return P.multiplyUnsafe(exports.bls12_381.params.x).negate().equals(G2psi(c, P)); // ψ(P) == [u](P)
+        // Older version: https://eprint.iacr.org/2019/814.pdf
+        // Ψ²(P) => Ψ³(P) => [z]Ψ³(P) where z = -x => [z]Ψ³(P) - Ψ²(P) + P == O
+        // return P.psi2().psi().mulNegX().subtract(psi2).add(P).isZero();
+        },
+        // Maps the point into the prime-order subgroup G2.
+        // clear_cofactor_bls12381_g2 from cfrg-hash-to-curve-11
+        // https://eprint.iacr.org/2017/419.pdf
+        // prettier-ignore
+        clearCofactor: function(c, P) {
+            var x = exports.bls12_381.params.x;
+            var t1 = P.multiplyUnsafe(x).negate(); // [-x]P
+            var t2 = G2psi(c, P); // Ψ(P)
+            var t3 = P.double(); // 2P
+            t3 = G2psi2(c, t3); // Ψ²(2P)
+            t3 = t3.subtract(t2); // Ψ²(2P) - Ψ(P)
+            t2 = t1.add(t2); // [-x]P + Ψ(P)
+            t2 = t2.multiplyUnsafe(x).negate(); // [x²]P - [x]Ψ(P)
+            t3 = t3.add(t2); // Ψ²(2P) - Ψ(P) + [x²]P - [x]Ψ(P)
+            t3 = t3.subtract(t1); // Ψ²(2P) - Ψ(P) + [x²]P - [x]Ψ(P) + [x]P
+            var Q = t3.subtract(P); // Ψ²(2P) - Ψ(P) + [x²]P - [x]Ψ(P) + [x]P - 1P
+            return Q; // [x²-x-1]P + [x-1]Ψ(P) + Ψ²(2P)
+        },
+        fromBytes: function(bytes) {
+            var _a = parseMask(bytes), compressed = _a.compressed, infinity = _a.infinity, sort = _a.sort, value = _a.value;
+            if (!compressed && !infinity && sort || !compressed && infinity && sort || sort && infinity && compressed // 11100000
+            ) {
+                throw new Error('Invalid encoding flag: ' + (bytes[0] & 224));
+            }
+            var L = exports.Fp.BYTES;
+            var slc = function(b, from, to) {
+                return (0, utils_1.bytesToNumberBE)(b.slice(from, to));
+            };
+            if (value.length === 96 && compressed) {
+                var b = exports.bls12_381.params.G2b;
+                var P = exports.Fp.ORDER;
+                if (infinity) {
+                    // check that all bytes are 0
+                    if (value.reduce(function(p, c) {
+                        return p !== 0 ? c + 1 : c;
+                    }, 0) > 0) {
+                        throw new Error('Invalid compressed G2 point');
+                    }
+                    return {
+                        x: exports.Fp2.ZERO,
+                        y: exports.Fp2.ZERO
+                    };
+                }
+                var x_1 = slc(value, 0, L);
+                var x_0 = slc(value, L, 2 * L);
+                var x = exports.Fp2.create({
+                    c0: exports.Fp.create(x_0),
+                    c1: exports.Fp.create(x_1)
+                });
+                var right = exports.Fp2.add(exports.Fp2.pow(x, _3n), b); // y² = x³ + 4 * (u+1) = x³ + b
+                var y = exports.Fp2.sqrt(right);
+                var Y_bit = y.c1 === _0n ? y.c0 * _2n / P : y.c1 * _2n / P ? _1n : _0n;
+                y = sort && Y_bit > 0 ? y : exports.Fp2.neg(y);
+                return {
+                    x: x,
+                    y: y
+                };
+            } else if (value.length === 192 && !compressed) {
+                if (infinity) {
+                    if (value.reduce(function(p, c) {
+                        return p !== 0 ? c + 1 : c;
+                    }, 0) > 0) {
+                        throw new Error('Invalid uncompressed G2 point');
+                    }
+                    return {
+                        x: exports.Fp2.ZERO,
+                        y: exports.Fp2.ZERO
+                    };
+                }
+                var x1 = slc(value, 0, L);
+                var x0 = slc(value, L, 2 * L);
+                var y1 = slc(value, 2 * L, 3 * L);
+                var y0 = slc(value, 3 * L, 4 * L);
+                return {
+                    x: exports.Fp2.fromBigTuple([
+                        x0,
+                        x1
+                    ]),
+                    y: exports.Fp2.fromBigTuple([
+                        y0,
+                        y1
+                    ])
+                };
+            } else {
+                throw new Error('Invalid point G2, expected 96/192 bytes');
+            }
+        },
+        toBytes: function(c, point, isCompressed) {
+            var len = exports.Fp.BYTES, P = exports.Fp.ORDER;
+            var isZero = point.equals(c.ZERO);
+            var _a = point.toAffine(), x = _a.x, y = _a.y;
+            if (isCompressed) {
+                if (isZero) return (0, utils_1.concatBytes)(COMPRESSED_ZERO, (0, utils_1.numberToBytesBE)(_0n, len));
+                var flag = Boolean(y.c1 === _0n ? y.c0 * _2n / P : y.c1 * _2n / P);
+                return (0, utils_1.concatBytes)(setMask((0, utils_1.numberToBytesBE)(x.c1, len), {
+                    compressed: true,
+                    sort: flag
+                }), (0, utils_1.numberToBytesBE)(x.c0, len));
+            } else {
+                if (isZero) return (0, utils_1.concatBytes)(new Uint8Array([
+                    0x40
+                ]), new Uint8Array(4 * len - 1)); // bytes[0] |= 1 << 6;
+                var _b = exports.Fp2.reim(x), x0 = _b.re, x1 = _b.im;
+                var _d = exports.Fp2.reim(y), y0 = _d.re, y1 = _d.im;
+                return (0, utils_1.concatBytes)((0, utils_1.numberToBytesBE)(x1, len), (0, utils_1.numberToBytesBE)(x0, len), (0, utils_1.numberToBytesBE)(y1, len), (0, utils_1.numberToBytesBE)(y0, len));
+            }
+        },
+        Signature: {
+            // TODO: Optimize, it's very slow because of sqrt.
+            fromHex: function(hex) {
+                var _a = parseMask((0, utils_1.ensureBytes)('signatureHex', hex)), infinity = _a.infinity, sort = _a.sort, value = _a.value;
+                var P = exports.Fp.ORDER;
+                var half = hex.length / 2;
+                if (half !== 48 && half !== 96) throw new Error('Invalid compressed signature length, must be 96 or 192');
+                var z1 = (0, utils_1.bytesToNumberBE)(value.slice(0, half));
+                var z2 = (0, utils_1.bytesToNumberBE)(value.slice(half));
+                // Indicates the infinity point
+                if (infinity) return exports.bls12_381.G2.ProjectivePoint.ZERO;
+                var x1 = exports.Fp.create(z1 & exports.Fp.MASK);
+                var x2 = exports.Fp.create(z2);
+                var x = exports.Fp2.create({
+                    c0: x2,
+                    c1: x1
+                });
+                var y2 = exports.Fp2.add(exports.Fp2.pow(x, _3n), exports.bls12_381.params.G2b); // y² = x³ + 4
+                // The slow part
+                var y = exports.Fp2.sqrt(y2);
+                if (!y) throw new Error('Failed to find a square root');
+                // Choose the y whose leftmost bit of the imaginary part is equal to the a_flag1
+                // If y1 happens to be zero, then use the bit of y0
+                var _b = exports.Fp2.reim(y), y0 = _b.re, y1 = _b.im;
+                var aflag1 = BigInt(sort);
+                var isGreater = y1 > _0n && y1 * _2n / P !== aflag1;
+                var isZero = y1 === _0n && y0 * _2n / P !== aflag1;
+                if (isGreater || isZero) y = exports.Fp2.neg(y);
+                var point = exports.bls12_381.G2.ProjectivePoint.fromAffine({
+                    x: x,
+                    y: y
+                });
+                point.assertValidity();
+                return point;
+            },
+            toRawBytes: function(point) {
+                return signatureG2ToRawBytes(point);
+            },
+            toHex: function(point) {
+                return (0, utils_1.bytesToHex)(signatureG2ToRawBytes(point));
+            }
+        }
+    },
+    params: {
+        x: BLS_X,
+        r: Fr.ORDER
+    },
+    htfDefaults: htfDefaults,
+    hash: sha256_1.sha256,
+    randomBytes: utils_2.randomBytes
+});
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/index.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var __createBinding = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__createBinding || (Object.create ? function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = {
+            enumerable: true,
+            get: function() {
+                return m[k];
+            }
+        };
+    }
+    Object.defineProperty(o, k2, desc);
+} : function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+});
+var __exportStar = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__exportStar || function(m, exports1) {
+    for(var p in m)if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports1, p)) __createBinding(exports1, m, p);
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+__exportStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/keccak.js [app-ssr] (ecmascript)"), exports);
+__exportStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/bls12_381.js [app-ssr] (ecmascript)"), exports); // DO NOT export "./_u64";
+ // DO NOT export "./utils";
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/bls12_318.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var __assign = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__assign || function() {
+    __assign = Object.assign || function(t) {
+        for(var s, i = 1, n = arguments.length; i < n; i++){
+            s = arguments[i];
+            for(var p in s)if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.isFp6 = exports.isBlsResult = exports.bls12_381_finalVerify = exports.bls12_381_eqMlResult = exports.bls12_381_mulMlResult = exports.bls12_381_millerLoop = exports.bls12_381_G2_uncompress = exports.bls12_381_G2_compress = exports.bls12_381_G2_hashToGroup = exports.bls12_381_G2_equal = exports.bls12_381_G2_scalarMul = exports.bls12_381_G2_neg = exports.bls12_381_G2_add = exports.bls12_381_G1_uncompress = exports.bls12_381_G1_compress = exports.bls12_381_G1_hashToGroup = exports.bls12_381_G1_equal = exports.bls12_381_G1_scalarMul = exports.bls12_381_G1_neg = exports.bls12_381_G1_add = exports.isFp2 = exports.isBlsG2 = exports.isBlsG1 = exports.BlsG2 = exports.BlsG1 = void 0;
+var noble_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/index.js [app-ssr] (ecmascript)");
+var hash_to_curve_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/hash-to-curve.js [app-ssr] (ecmascript)");
+var utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/utils.js [app-ssr] (ecmascript)");
+var sha256_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/sha256.js [app-ssr] (ecmascript)");
+exports.BlsG1 = noble_1.bls12_381.G1.ProjectivePoint;
+exports.BlsG2 = noble_1.bls12_381.G2.ProjectivePoint;
+function isBlsG1(stuff) {
+    return stuff instanceof exports.BlsG1 && typeof stuff.px === "bigint" && typeof stuff.py === "bigint" && typeof stuff.pz === "bigint";
+}
+exports.isBlsG1 = isBlsG1;
+function isBlsG2(stuff) {
+    return stuff instanceof exports.BlsG2 && isFp2(stuff.px) && isFp2(stuff.py) && isFp2(stuff.pz);
+}
+exports.isBlsG2 = isBlsG2;
+function isFp2(stuff) {
+    return typeof stuff === "object" && stuff !== null && !Array.isArray(stuff) && typeof stuff.c0 === "bigint" && typeof stuff.c1 === "bigint";
+}
+exports.isFp2 = isFp2;
+var curveOrder = BigInt("52435875175126190479447740508185965837690552500527637822603658699938581184513");
+var htfDefaults = Object.freeze({
+    // DST: a domain separation tag
+    // defined in section 2.2.5
+    // Use utils.getDSTLabel(), utils.setDSTLabel(value)
+    DST: "",
+    encodeDST: "",
+    // p: the characteristic of F
+    //    where F is a finite field of characteristic p and order q = p^m
+    p: noble_1.Fp.ORDER,
+    // m: the extension degree of F, m >= 1
+    //     where F is a finite field of characteristic p and order q = p^m
+    m: 2,
+    // k: the target security level for the suite in bits
+    // defined in section 5.1
+    k: 128,
+    // option to use a message that has already been processed by
+    // expand_message_xmd
+    expand: 'xmd',
+    // Hash functions for: expand_message_xmd is appropriate for use with a
+    // wide range of hash functions, including SHA-2, SHA-3, BLAKE2, and others.
+    // BBS+ uses blake2: https://github.com/hyperledger/aries-framework-go/issues/2247
+    hash: sha256_1.sha256
+});
+var G2_Hasher = (0, hash_to_curve_1.createHasher)(exports.BlsG2, noble_1.G2_mapToCurve, __assign({}, htfDefaults));
+var G1_Hasher = (0, hash_to_curve_1.createHasher)(exports.BlsG1, noble_1.G1_mapToCurve, __assign(__assign({}, htfDefaults), {
+    m: 1,
+    DST: 'BLS_SIG_BLS12381G1_XMD:SHA-256_SSWU_RO_NUL_'
+}));
+function bls12_381_G1_add(a, b) {
+    // if( bls12_381_G1_equal( a, BlsG1.ZERO ) ) return b;
+    // if( bls12_381_G1_equal( b, BlsG1.ZERO ) ) return a;
+    return a.add(b);
+}
+exports.bls12_381_G1_add = bls12_381_G1_add;
+function bls12_381_G1_neg(elem) {
+    return elem.negate();
+}
+exports.bls12_381_G1_neg = bls12_381_G1_neg;
+function bls12_381_G1_scalarMul(n, g1) {
+    if (n < 0) return bls12_381_G1_scalarMul(-n, bls12_381_G1_neg(g1));
+    n = BigInt(n);
+    if (n >= curveOrder) n = n % curveOrder;
+    if (n === BigInt(0)) return exports.BlsG1.ZERO;
+    return g1.multiply(n);
+}
+exports.bls12_381_G1_scalarMul = bls12_381_G1_scalarMul;
+function bls12_381_G1_equal(a, b) {
+    return a.equals(b);
+}
+exports.bls12_381_G1_equal = bls12_381_G1_equal;
+function bls12_381_G1_hashToGroup(a, b) {
+    // noble-curves can handle that but the plutus-machine doesn't
+    // so we artificially throw an error here
+    if (b.length > 255) throw new Error("DST length can not be greater than 255");
+    return exports.BlsG1.fromAffine(G1_Hasher.hashToCurve(a, {
+        DST: b
+    }).toAffine());
+}
+exports.bls12_381_G1_hashToGroup = bls12_381_G1_hashToGroup;
+function bls12_381_G1_compress(elem) {
+    return elem.toRawBytes();
+}
+exports.bls12_381_G1_compress = bls12_381_G1_compress;
+function bls12_381_G1_uncompress(compressed) {
+    var _a = (0, noble_1.parseMask)(compressed), compressed_bit = _a.compressed, infinity = _a.infinity, sort = _a.sort, value = _a.value;
+    // point zero edge case
+    if (compressed_bit && infinity && sort && value.every(function(n) {
+        return n === 0;
+    })) throw new Error("sign bit set on pont ZERO, we don't like it");
+    // not compressed bytes would be totally fine for the library but we artificially fail here
+    // https://github.com/IntersectMBO/plutus/blob/master/plutus-conformance/test-cases/uplc/evaluation/builtin/semantics/bls12_381_G1_uncompress/on-curve-serialised-not-compressed/on-curve-serialised-not-compressed.uplc
+    if (!compressed_bit) throw new Error("uncompress only works with compressed byets");
+    return exports.BlsG1.fromHex(compressed);
+}
+exports.bls12_381_G1_uncompress = bls12_381_G1_uncompress;
+function bls12_381_G2_add(a, b) {
+    // if( bls12_381_G2_equal( a, BlsG2.ZERO ) ) return b;
+    // if( bls12_381_G2_equal( b, BlsG2.ZERO ) ) return a;
+    return a.add(b);
+}
+exports.bls12_381_G2_add = bls12_381_G2_add;
+function bls12_381_G2_neg(elem) {
+    return elem.negate();
+}
+exports.bls12_381_G2_neg = bls12_381_G2_neg;
+function bls12_381_G2_scalarMul(n, g2) {
+    if (n < 0) return bls12_381_G2_scalarMul(-n, bls12_381_G2_neg(g2));
+    n = BigInt(n);
+    if (n >= curveOrder) n = n % curveOrder;
+    if (n === BigInt(0)) return exports.BlsG2.ZERO;
+    return g2.multiply(BigInt(n));
+}
+exports.bls12_381_G2_scalarMul = bls12_381_G2_scalarMul;
+function bls12_381_G2_equal(a, b) {
+    return a.equals(b);
+}
+exports.bls12_381_G2_equal = bls12_381_G2_equal;
+function bls12_381_G2_hashToGroup(a, b) {
+    // noble-curves can handle that but the plutus-machine doesn't
+    // so we artificially throw an error here
+    if (b.length > 255) throw new Error("DST length can not be greater than 255");
+    return exports.BlsG2.fromAffine(G2_Hasher.hashToCurve(a, {
+        DST: b
+    }).toAffine());
+}
+exports.bls12_381_G2_hashToGroup = bls12_381_G2_hashToGroup;
+function bls12_381_G2_compress(elem) {
+    return elem.toRawBytes();
+}
+exports.bls12_381_G2_compress = bls12_381_G2_compress;
+function bls12_381_G2_uncompress(compressed) {
+    var compressed_bit = (0, noble_1.parseMask)(compressed).compressed;
+    // not compressed bytes would be totally fine for the library but we artificially fail here
+    // https://github.com/IntersectMBO/plutus/blob/master/plutus-conformance/test-cases/uplc/evaluation/builtin/semantics/bls12_381_G2_uncompress/on-curve-serialised-not-compressed/on-curve-serialised-not-compressed.uplc
+    if (!compressed_bit) throw new Error("uncompress only works with compressed byets");
+    return exports.BlsG2.fromHex(compressed);
+}
+exports.bls12_381_G2_uncompress = bls12_381_G2_uncompress;
+function bls12_381_millerLoop(g1, g2) {
+    var _a = g1.toAffine(), x = _a.x, y = _a.y;
+    return millerLoop(pairingPrecomputes(g2), [
+        x,
+        y
+    ]);
+}
+exports.bls12_381_millerLoop = bls12_381_millerLoop;
+function bls12_381_mulMlResult(a, b) {
+    return (0, noble_1.Fp12Multiply)(a, b);
+}
+exports.bls12_381_mulMlResult = bls12_381_mulMlResult;
+exports.bls12_381_eqMlResult = noble_1.Fp12_eql;
+function bls12_381_finalVerify(a, b) {
+    // blst implementation https://github.com/supranational/blst/blob/0d46eefa45fc1e57aceb42bba0e84eab3a7a9725/src/aggregate.c#L506
+    var GT = (0, noble_1.Fp12_conjugate)(a);
+    GT = (0, noble_1.Fp12Multiply)(GT, b);
+    GT = (0, noble_1.Fp12_finalExponentiate)(GT);
+    return (0, noble_1.Fp12_eql)(GT, noble_1.Fp12_ONE);
+}
+exports.bls12_381_finalVerify = bls12_381_finalVerify;
+// The BLS parameter x for BLS12-381
+var BLS_X = BigInt('0xd201000000010000');
+var BLS_X_LEN = (0, utils_1.bitLen)(BLS_X);
+var _2n = BigInt(2), _3n = BigInt(3);
+// Pre-compute coefficients for sparse multiplication
+// Point addition and point double calculations is reused for coefficients
+function calcPairingPrecomputes(p) {
+    var x = p.x, y = p.y;
+    // prettier-ignore
+    var Qx = x, Qy = y, Qz = noble_1.Fp2.ONE;
+    // prettier-ignore
+    var Rx = Qx, Ry = Qy, Rz = Qz;
+    var ell_coeff = [];
+    for(var i = BLS_X_LEN - 2; i >= 0; i--){
+        // Double
+        var t0 = noble_1.Fp2.sqr(Ry); // Ry²
+        var t1 = noble_1.Fp2.sqr(Rz); // Rz²
+        var t2 = noble_1.Fp2.multiplyByB(noble_1.Fp2.mul(t1, _3n)); // 3 * T1 * B
+        var t3 = noble_1.Fp2.mul(t2, _3n); // 3 * T2
+        var t4 = noble_1.Fp2.sub(noble_1.Fp2.sub(noble_1.Fp2.sqr(noble_1.Fp2.add(Ry, Rz)), t1), t0); // (Ry + Rz)² - T1 - T0
+        ell_coeff.push([
+            noble_1.Fp2.sub(t2, t0),
+            noble_1.Fp2.mul(noble_1.Fp2.sqr(Rx), _3n),
+            noble_1.Fp2.neg(t4)
+        ]);
+        Rx = noble_1.Fp2.div(noble_1.Fp2.mul(noble_1.Fp2.mul(noble_1.Fp2.sub(t0, t3), Rx), Ry), _2n); // ((T0 - T3) * Rx * Ry) / 2
+        Ry = noble_1.Fp2.sub(noble_1.Fp2.sqr(noble_1.Fp2.div(noble_1.Fp2.add(t0, t3), _2n)), noble_1.Fp2.mul(noble_1.Fp2.sqr(t2), _3n)); // ((T0 + T3) / 2)² - 3 * T2²
+        Rz = noble_1.Fp2.mul(t0, t4); // T0 * T4
+        if ((0, utils_1.bitGet)(BLS_X /*CURVE.params.x*/ , i)) {
+            // Addition
+            var t0_1 = noble_1.Fp2.sub(Ry, noble_1.Fp2.mul(Qy, Rz)); // Ry - Qy * Rz
+            var t1_1 = noble_1.Fp2.sub(Rx, noble_1.Fp2.mul(Qx, Rz)); // Rx - Qx * Rz
+            ell_coeff.push([
+                noble_1.Fp2.sub(noble_1.Fp2.mul(t0_1, Qx), noble_1.Fp2.mul(t1_1, Qy)),
+                noble_1.Fp2.neg(t0_1),
+                t1_1
+            ]);
+            var t2_1 = noble_1.Fp2.sqr(t1_1); // T1²
+            var t3_1 = noble_1.Fp2.mul(t2_1, t1_1); // T2 * T1
+            var t4_1 = noble_1.Fp2.mul(t2_1, Rx); // T2 * Rx
+            var t5 = noble_1.Fp2.add(noble_1.Fp2.sub(t3_1, noble_1.Fp2.mul(t4_1, _2n)), noble_1.Fp2.mul(noble_1.Fp2.sqr(t0_1), Rz)); // T3 - 2 * T4 + T0² * Rz
+            Rx = noble_1.Fp2.mul(t1_1, t5); // T1 * T5
+            Ry = noble_1.Fp2.sub(noble_1.Fp2.mul(noble_1.Fp2.sub(t4_1, t5), t0_1), noble_1.Fp2.mul(t3_1, Ry)); // (T4 - T5) * T0 - T3 * Ry
+            Rz = noble_1.Fp2.mul(Rz, t3_1); // Rz * T3
+        }
+    }
+    return ell_coeff;
+}
+function pairingPrecomputes(point) {
+    var p = point;
+    if (p._PPRECOMPUTES) return p._PPRECOMPUTES;
+    p._PPRECOMPUTES = calcPairingPrecomputes(point.toAffine());
+    return p._PPRECOMPUTES;
+}
+function millerLoop(ell, g1) {
+    var x = BLS_X;
+    var Px = g1[0];
+    var Py = g1[1];
+    var f12 = noble_1.Fp12.ONE;
+    for(var j = 0, i = BLS_X_LEN - 2; i >= 0; i--, j++){
+        var E = ell[j];
+        f12 = noble_1.Fp12.multiplyBy014(f12, E[0], noble_1.Fp2.mul(E[1], Px), noble_1.Fp2.mul(E[2], Py));
+        if ((0, utils_1.bitGet)(x, i)) {
+            j += 1;
+            var F = ell[j];
+            f12 = noble_1.Fp12.multiplyBy014(f12, F[0], noble_1.Fp2.mul(F[1], Px), noble_1.Fp2.mul(F[2], Py));
+        }
+        if (i !== 0) f12 = noble_1.Fp12.sqr(f12);
+    }
+    return noble_1.Fp12.conjugate(f12);
+}
+function isBlsResult(stuff) {
+    return typeof stuff === "object" && stuff !== null && !Array.isArray(stuff) && isFp6(stuff.c0) && isFp6(stuff.c1);
+}
+exports.isBlsResult = isBlsResult;
+function isFp6(stuff) {
+    return typeof stuff === "object" && stuff !== null && !Array.isArray(stuff) && isFp2(stuff.c0) && isFp2(stuff.c1) && isFp2(stuff.c2);
+}
+exports.isFp6 = isFp6;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/sha2_512.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var __read = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__read || function(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while((n === void 0 || n-- > 0) && !(r = i.next()).done)ar.push(r.value);
+    } catch (error) {
+        e = {
+            error: error
+        };
+    } finally{
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        } finally{
+            if (e) throw e.error;
+        }
+    }
+    return ar;
+};
+var __spreadArray = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__spreadArray || function(to, from, pack) {
+    if (pack || arguments.length === 2) for(var i = 0, l = from.length, ar; i < l; i++){
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.sha2_512 = exports._sha2_512_pad = void 0;
+var types_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/types.js [app-ssr] (ecmascript)");
+/**
+ * Pad a bytearray so its size is a multiple of 128 (1024 bits).
+ * Internal method.
+ */ function _sha2_512_pad(src) {
+    var nBits = src.length * 8;
+    // clone
+    var dst = src.slice();
+    dst.push(0x80);
+    var nZeroes = 128 - dst.length % 128 - 8;
+    if (nZeroes < 0) {
+        nZeroes += 128;
+    }
+    for(var i = 0; i < nZeroes; i++){
+        dst.push(0);
+    }
+    // assume nBits fits in 32 bits
+    dst.push(0);
+    dst.push(0);
+    dst.push(0);
+    dst.push(0);
+    dst.push(nBits >> 24 & 0xff);
+    dst.push(nBits >> 16 & 0xff);
+    dst.push(nBits >> 8 & 0xff);
+    dst.push(nBits >> 0 & 0xff);
+    return dst;
+}
+exports._sha2_512_pad = _sha2_512_pad;
+var _sha2_512_k = Object.freeze([
+    (0, types_1.uint64)("0x428a2f98d728ae22"),
+    (0, types_1.uint64)("0x7137449123ef65cd"),
+    (0, types_1.uint64)("0xb5c0fbcfec4d3b2f"),
+    (0, types_1.uint64)("0xe9b5dba58189dbbc"),
+    (0, types_1.uint64)("0x3956c25bf348b538"),
+    (0, types_1.uint64)("0x59f111f1b605d019"),
+    (0, types_1.uint64)("0x923f82a4af194f9b"),
+    (0, types_1.uint64)("0xab1c5ed5da6d8118"),
+    (0, types_1.uint64)("0xd807aa98a3030242"),
+    (0, types_1.uint64)("0x12835b0145706fbe"),
+    (0, types_1.uint64)("0x243185be4ee4b28c"),
+    (0, types_1.uint64)("0x550c7dc3d5ffb4e2"),
+    (0, types_1.uint64)("0x72be5d74f27b896f"),
+    (0, types_1.uint64)("0x80deb1fe3b1696b1"),
+    (0, types_1.uint64)("0x9bdc06a725c71235"),
+    (0, types_1.uint64)("0xc19bf174cf692694"),
+    (0, types_1.uint64)("0xe49b69c19ef14ad2"),
+    (0, types_1.uint64)("0xefbe4786384f25e3"),
+    (0, types_1.uint64)("0x0fc19dc68b8cd5b5"),
+    (0, types_1.uint64)("0x240ca1cc77ac9c65"),
+    (0, types_1.uint64)("0x2de92c6f592b0275"),
+    (0, types_1.uint64)("0x4a7484aa6ea6e483"),
+    (0, types_1.uint64)("0x5cb0a9dcbd41fbd4"),
+    (0, types_1.uint64)("0x76f988da831153b5"),
+    (0, types_1.uint64)("0x983e5152ee66dfab"),
+    (0, types_1.uint64)("0xa831c66d2db43210"),
+    (0, types_1.uint64)("0xb00327c898fb213f"),
+    (0, types_1.uint64)("0xbf597fc7beef0ee4"),
+    (0, types_1.uint64)("0xc6e00bf33da88fc2"),
+    (0, types_1.uint64)("0xd5a79147930aa725"),
+    (0, types_1.uint64)("0x06ca6351e003826f"),
+    (0, types_1.uint64)("0x142929670a0e6e70"),
+    (0, types_1.uint64)("0x27b70a8546d22ffc"),
+    (0, types_1.uint64)("0x2e1b21385c26c926"),
+    (0, types_1.uint64)("0x4d2c6dfc5ac42aed"),
+    (0, types_1.uint64)("0x53380d139d95b3df"),
+    (0, types_1.uint64)("0x650a73548baf63de"),
+    (0, types_1.uint64)("0x766a0abb3c77b2a8"),
+    (0, types_1.uint64)("0x81c2c92e47edaee6"),
+    (0, types_1.uint64)("0x92722c851482353b"),
+    (0, types_1.uint64)("0xa2bfe8a14cf10364"),
+    (0, types_1.uint64)("0xa81a664bbc423001"),
+    (0, types_1.uint64)("0xc24b8b70d0f89791"),
+    (0, types_1.uint64)("0xc76c51a30654be30"),
+    (0, types_1.uint64)("0xd192e819d6ef5218"),
+    (0, types_1.uint64)("0xd69906245565a910"),
+    (0, types_1.uint64)("0xf40e35855771202a"),
+    (0, types_1.uint64)("0x106aa07032bbd1b8"),
+    (0, types_1.uint64)("0x19a4c116b8d2d0c8"),
+    (0, types_1.uint64)("0x1e376c085141ab53"),
+    (0, types_1.uint64)("0x2748774cdf8eeb99"),
+    (0, types_1.uint64)("0x34b0bcb5e19b48a8"),
+    (0, types_1.uint64)("0x391c0cb3c5c95a63"),
+    (0, types_1.uint64)("0x4ed8aa4ae3418acb"),
+    (0, types_1.uint64)("0x5b9cca4f7763e373"),
+    (0, types_1.uint64)("0x682e6ff3d6b2b8a3"),
+    (0, types_1.uint64)("0x748f82ee5defb2fc"),
+    (0, types_1.uint64)("0x78a5636f43172f60"),
+    (0, types_1.uint64)("0x84c87814a1f0ab72"),
+    (0, types_1.uint64)("0x8cc702081a6439ec"),
+    (0, types_1.uint64)("0x90befffa23631e28"),
+    (0, types_1.uint64)("0xa4506cebde82bde9"),
+    (0, types_1.uint64)("0xbef9a3f7b2c67915"),
+    (0, types_1.uint64)("0xc67178f2e372532b"),
+    (0, types_1.uint64)("0xca273eceea26619c"),
+    (0, types_1.uint64)("0xd186b8c721c0c207"),
+    (0, types_1.uint64)("0xeada7dd6cde0eb1e"),
+    (0, types_1.uint64)("0xf57d4f7fee6ed178"),
+    (0, types_1.uint64)("0x06f067aa72176fba"),
+    (0, types_1.uint64)("0x0a637dc5a2c898a6"),
+    (0, types_1.uint64)("0x113f9804bef90dae"),
+    (0, types_1.uint64)("0x1b710b35131c471b"),
+    (0, types_1.uint64)("0x28db77f523047d84"),
+    (0, types_1.uint64)("0x32caab7b40c72493"),
+    (0, types_1.uint64)("0x3c9ebe0a15c9bebc"),
+    (0, types_1.uint64)("0x431d67c49c100d4c"),
+    (0, types_1.uint64)("0x4cc5d4becb3e42b6"),
+    (0, types_1.uint64)("0x597f299cfc657e2a"),
+    (0, types_1.uint64)("0x5fcb6fab3ad6faec"),
+    (0, types_1.uint64)("0x6c44198c4a475817")
+]);
+/**
+ * getulates sha2-512 (64bytes) hash of a list of uint8 numbers.
+ * Result is also a list of uint8 number.
+ * @example
+ * bytesToHex(sha2_512([0x61, 0x62, 0x63])) => "ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f"
+ * @example
+ * bytesToHex(sha2_512([])) => "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"
+ * @param {number[]} bytes - list of uint8 numbers
+ * @returns {number[]} - list of uint8 numbers
+ */ function sha2_512(bytes) {
+    if (bytes instanceof Uint8Array) bytes = Array.from(bytes);
+    // initial has; updated later
+    var hash = [
+        (0, types_1.uint64)("0x6a09e667f3bcc908"),
+        (0, types_1.uint64)("0xbb67ae8584caa73b"),
+        (0, types_1.uint64)("0x3c6ef372fe94f82b"),
+        (0, types_1.uint64)("0xa54ff53a5f1d36f1"),
+        (0, types_1.uint64)("0x510e527fade682d1"),
+        (0, types_1.uint64)("0x9b05688c2b3e6c1f"),
+        (0, types_1.uint64)("0x1f83d9abfb41bd6b"),
+        (0, types_1.uint64)("0x5be0cd19137e2179")
+    ];
+    function sigma0(x) {
+        return (0, types_1.forceUint64)((0, types_1.uint64Rotr)(x, 1) ^ (0, types_1.uint64Rotr)(x, 8) ^ x >> BigInt(7));
+    }
+    function sigma1(x) {
+        return (0, types_1.forceUint64)((0, types_1.uint64Rotr)(x, 19) ^ (0, types_1.uint64Rotr)(x, 61) ^ x >> BigInt(6));
+    }
+    bytes = _sha2_512_pad(bytes);
+    // break message in successive 64 byte chunks
+    for(var chunkStart = 0; chunkStart < bytes.length; chunkStart += 128){
+        var chunk = bytes.slice(chunkStart, chunkStart + 128);
+        var w = new Array(80).fill(BigInt(0)); // array of 32 bit numbers!
+        // copy chunk into first 16 hi/lo positions of w (i.e. into first 32 uint32 positions)
+        for(var i = 0; i < 16; i++){
+            w[i] = (0, types_1.uint64)("0x" + (0, types_1.byteArrToHex)(chunk.slice(i * 8, i * 8 + 8)));
+        }
+        // extends the first 16 positions into the remaining 80 positions
+        for(var i = 16; i < 80; i++){
+            w[i] = (0, types_1.forceUint64)(sigma1(w[i - 2]) + w[i - 7] + sigma0(w[i - 15]) + w[i - 16]);
+        }
+        // intialize working variables to current hash value
+        var a = hash[0];
+        var b = hash[1];
+        var c = hash[2];
+        var d = hash[3];
+        var e = hash[4];
+        var f = hash[5];
+        var g = hash[6];
+        var h = hash[7];
+        // compression function main loop
+        for(var i = 0; i < 80; i++){
+            var S1 = (0, types_1.uint64Rotr)(e, 14) ^ (0, types_1.uint64Rotr)(e, 18) ^ (0, types_1.uint64Rotr)(e, 41);
+            var ch = e & f ^ ~e & g;
+            var temp1 = (0, types_1.forceUint64)(h + S1 + ch + _sha2_512_k[i] + w[i]);
+            var S0 = (0, types_1.uint64Rotr)(a, 28) ^ (0, types_1.uint64Rotr)(a, 34) ^ (0, types_1.uint64Rotr)(a, 39);
+            var maj = a & b ^ a & c ^ b & c;
+            var temp2 = (0, types_1.forceUint64)(S0 + maj);
+            h = g;
+            g = f;
+            f = e;
+            e = (0, types_1.forceUint64)(d + temp1);
+            d = c;
+            c = b;
+            b = a;
+            a = (0, types_1.forceUint64)(temp1 + temp2);
+        }
+        // update the hash
+        hash[0] = (0, types_1.forceUint64)(hash[0] + a);
+        hash[1] = (0, types_1.forceUint64)(hash[1] + b);
+        hash[2] = (0, types_1.forceUint64)(hash[2] + c);
+        hash[3] = (0, types_1.forceUint64)(hash[3] + d);
+        hash[4] = (0, types_1.forceUint64)(hash[4] + e);
+        hash[5] = (0, types_1.forceUint64)(hash[5] + f);
+        hash[6] = (0, types_1.forceUint64)(hash[6] + g);
+        hash[7] = (0, types_1.forceUint64)(hash[7] + h);
+    }
+    // produce the final digest of uint8 numbers
+    var result = [];
+    for(var i = 0; i < 8; i++){
+        result.push.apply(result, __spreadArray([], __read((0, types_1.uint64ToBytesBE)(hash[i])), false));
+    }
+    return new Uint8Array(result);
+}
+exports.sha2_512 = sha2_512;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/positiveMod.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.positiveMod = void 0;
+function positiveMod(x, n) {
+    var _n = BigInt(n);
+    var res = BigInt(x) % _n;
+    return res < BigInt(0) ? res + _n : res;
+}
+exports.positiveMod = positiveMod;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/bigintToBuffer.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.bigintToBuffer = void 0;
+var assert_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/assert.js [app-ssr] (ecmascript)");
+var uint8array_utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+uint8array-utils@1.0.4/node_modules/@harmoniclabs/uint8array-utils/dist/index.js [app-ssr] (ecmascript)");
+function bigintToBuffer(bigint, nBytes) {
+    if (nBytes === void 0) {
+        nBytes = undefined;
+    }
+    (0, assert_1.assert)(bigint >= BigInt(0), "cannot convert negative bigint to buffer");
+    if (bigint == BigInt(0)) {
+        if (nBytes === undefined) {
+            return Uint8Array.from([]);
+        }
+        return new Uint8Array(nBytes);
+    }
+    var buffHexString = bigint.toString(16);
+    buffHexString = buffHexString.length % 2 === 0 ? buffHexString : '0' + buffHexString;
+    if (nBytes !== undefined) {
+        (0, assert_1.assert)(Math.round(Math.abs(nBytes)) === nBytes, "cannot construct a buffer of length " + nBytes + ", while using BigIntUtils.toBufferOfNBytesBE");
+        // pads with zeroes so that the final length is of nBytes*2 (2 hex digits per byte)
+        // String.prototype.padStart docs: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
+        buffHexString = buffHexString.padStart(nBytes * 2, "00");
+        if (buffHexString.length > nBytes * 2) {
+            console.warn("required buffer size is smaller than the one used effectively by the given bigint, truncating the initial bytes as overflow");
+            buffHexString = buffHexString.slice(buffHexString.length - nBytes * 2);
+        }
+    }
+    return (0, uint8array_utils_1.fromHex)(buffHexString);
+}
+exports.bigintToBuffer = bigintToBuffer;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/ed25519.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var __generator = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__generator || function(thisArg, body) {
+    var _ = {
+        label: 0,
+        sent: function() {
+            if (t[0] & 1) throw t[1];
+            return t[1];
+        },
+        trys: [],
+        ops: []
+    }, f, y, t, g;
+    return g = {
+        next: verb(0),
+        "throw": verb(1),
+        "return": verb(2)
+    }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+        return this;
+    }), g;
+    //TURBOPACK unreachable
+    ;
+    function verb(n) {
+        return function(v) {
+            return step([
+                n,
+                v
+            ]);
+        };
+    }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while(g && (g = 0, op[0] && (_ = 0)), _)try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [
+                op[0] & 2,
+                t.value
+            ];
+            switch(op[0]){
+                case 0:
+                case 1:
+                    t = op;
+                    break;
+                case 4:
+                    _.label++;
+                    return {
+                        value: op[1],
+                        done: false
+                    };
+                case 5:
+                    _.label++;
+                    y = op[1];
+                    op = [
+                        0
+                    ];
+                    continue;
+                case 7:
+                    op = _.ops.pop();
+                    _.trys.pop();
+                    continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+                        _ = 0;
+                        continue;
+                    }
+                    if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+                        _.label = op[1];
+                        break;
+                    }
+                    if (op[0] === 6 && _.label < t[1]) {
+                        _.label = t[1];
+                        t = op;
+                        break;
+                    }
+                    if (t && _.label < t[2]) {
+                        _.label = t[2];
+                        _.ops.push(op);
+                        break;
+                    }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop();
+                    continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) {
+            op = [
+                6,
+                e
+            ];
+            y = 0;
+        } finally{
+            f = t = 0;
+        }
+        if (op[0] & 5) throw op[1];
+        return {
+            value: op[0] ? op[1] : void 0,
+            done: true
+        };
+    }
+};
+var __read = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__read || function(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while((n === void 0 || n-- > 0) && !(r = i.next()).done)ar.push(r.value);
+    } catch (error) {
+        e = {
+            error: error
+        };
+    } finally{
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        } finally{
+            if (e) throw e.error;
+        }
+    }
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.ed25519bigint = exports.verifyEd25519Signature = exports.getEd25519Signature = exports.signExtendedEd25519 = exports.signEd25519 = exports.extendedToPublic = exports.deriveEd25519PublicKey = exports.extendEd25519PrivateKey = exports.scalarMultBase = exports.scalarFromBytes = exports.pointFromBytes = exports.bigpointToUint8Array = exports.encodeInt = exports.scalarMul = exports.addPointsEdwards = void 0;
+var uint8array_utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+uint8array-utils@1.0.4/node_modules/@harmoniclabs/uint8array-utils/dist/index.js [app-ssr] (ecmascript)");
+var sha2_512_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/sha2_512.js [app-ssr] (ecmascript)");
+var types_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/types.js [app-ssr] (ecmascript)");
+var positiveMod_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/positiveMod.js [app-ssr] (ecmascript)");
+var assert_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/assert.js [app-ssr] (ecmascript)");
+var bigintToBuffer_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/bigintToBuffer.js [app-ssr] (ecmascript)");
+var Q = BigInt("57896044618658097711785492504343953926634992332820282019728792003956564819949"); // ipowi(255) - 19
+var Q38 = BigInt("7237005577332262213973186563042994240829374041602535252466099000494570602494"); // (Q + 3)/8
+var CURVE_ORDER = BigInt("7237005577332262213973186563042994240857116359379907606001950938285454250989"); // ipow2(252) + 27742317777372353535851937790883648493;
+var D = -BigInt("4513249062541557337682894930092624173785641285191125241628941591882900924598840740"); // -121665 * invert(121666);
+var I = BigInt("19681161376707505956807079304988542015446066515923890162744021073123829784752"); // expMod(BigInt( 2 ), (Q - BigInt( 1 ))/4, Q);
+var BASE = Object.freeze([
+    BigInt("15112221349535400772501151409588531511454012693041857206046113283949847762202"),
+    BigInt("46316835694926478169428394003475163141307993866256225615783033603165251855960") // (4*invert(5)) % Q
+]);
+/**
+ *
+ * @param {bigint} b
+ * @param {bigint} e
+ * @param {bigint} m
+ * @returns {bigint}
+ */ function expMod(b, e, m) {
+    if (e == BigInt(0)) {
+        return BigInt(1);
+    } else {
+        var t = expMod(b, e / BigInt(2), m);
+        t = t * t % m;
+        if (e % BigInt(2) != BigInt(0)) {
+            t = (0, positiveMod_1.positiveMod)(t * b, m);
+        }
+        return t;
+    }
+}
+function invert(n) {
+    var a = (0, positiveMod_1.positiveMod)(n, Q);
+    var b = Q;
+    var x = BigInt(0);
+    var y = BigInt(1);
+    var u = BigInt(1);
+    var v = BigInt(0);
+    while(a !== BigInt(0)){
+        var q = b / a;
+        var r = b % a;
+        var m = x - u * q;
+        var n_1 = y - v * q;
+        b = a;
+        a = r;
+        x = u;
+        y = v;
+        u = m;
+        v = n_1;
+    }
+    return (0, positiveMod_1.positiveMod)(x, Q);
+}
+/**
+ * @param {bigint} y
+ * @returns {bigint}
+ */ function recoverX(y) {
+    var yy = y * y;
+    var xx = (yy - BigInt(1)) * invert(D * yy + BigInt(1));
+    var x = expMod(xx, Q38, Q);
+    if ((x * x - xx) % Q !== BigInt(0)) {
+        x = x * I % Q;
+    }
+    if (x % BigInt(2) !== BigInt(0)) {
+        x = Q - x;
+    }
+    return x;
+}
+/**
+ * Curve point 'addition'
+ * Note: this is probably the bottleneck of this Ed25519 implementation
+ */ function addPointsEdwards(a, b) {
+    var x1 = a[0];
+    var y1 = a[1];
+    var x2 = b[0];
+    var y2 = b[1];
+    var dxxyy = D * x1 * x2 * y1 * y2;
+    var x3 = (x1 * y2 + x2 * y1) * invert(BigInt(1) + dxxyy);
+    var y3 = (y1 * y2 + x1 * x2) * invert(BigInt(1) - dxxyy);
+    return [
+        (0, positiveMod_1.positiveMod)(x3, Q),
+        (0, positiveMod_1.positiveMod)(y3, Q)
+    ];
+}
+exports.addPointsEdwards = addPointsEdwards;
+function scalarMul(point, n) {
+    if (n === BigInt(0)) {
+        return [
+            BigInt(0),
+            BigInt(1)
+        ];
+    } else {
+        var sum = scalarMul(point, n / BigInt(2));
+        sum = addPointsEdwards(sum, sum);
+        if (n % BigInt(2) !== BigInt(0)) {
+            sum = addPointsEdwards(sum, point);
+        }
+        return sum;
+    }
+}
+exports.scalarMul = scalarMul;
+/**
+ * Curve point 'multiplication'
+ */ function encodeInt(y) {
+    var bytes = Array.from((0, bigintToBuffer_1.bigintToBuffer)(y)).reverse();
+    while(bytes.length < 32){
+        bytes.push(0);
+    }
+    return bytes;
+}
+exports.encodeInt = encodeInt;
+function decodeInt(s) {
+    return BigInt("0x" + (0, types_1.byteArrToHex)(s.reverse()));
+}
+function bigpointToByteArray(point) {
+    var _a = __read(point, 2), x = _a[0], y = _a[1];
+    var bytes = encodeInt(y);
+    // last bit is determined by x
+    bytes[31] = bytes[31] & 255 | Number(x & BigInt(1)) * 128;
+    return bytes;
+}
+function bigpointToUint8Array(point) {
+    return new Uint8Array(bigpointToByteArray(point));
+}
+exports.bigpointToUint8Array = bigpointToUint8Array;
+function getBit(bytes, i) {
+    return bytes[Math.floor(i / 8)] >> i % 8 & 1;
+}
+function isOnCurve(point) {
+    var x = point[0];
+    var y = point[1];
+    var xx = x * x;
+    var yy = y * y;
+    return (-xx + yy - BigInt(1) - D * xx * yy) % Q == BigInt(0);
+}
+function pointFromBytes(s) {
+    if (s instanceof Uint8Array) s = asBytes(s);
+    (0, assert_1.assert)(s.length == 32, "point must have length of 32");
+    var bytes = s.slice();
+    bytes[31] = bytes[31] & 127;
+    var y = decodeInt(bytes);
+    var x = recoverX(y);
+    if (Number(x & BigInt(1)) != getBit(s, 255)) {
+        x = Q - x;
+    }
+    var point = [
+        x,
+        y
+    ];
+    if (!isOnCurve(point)) {
+        throw new Error("point isn't on curve");
+    }
+    return point;
+}
+exports.pointFromBytes = pointFromBytes;
+var ipow2_253 = BigInt("28948022309329048855892746252171976963317496166410141009864396001978282409984"); // ipow2(253)
+function scalarFromBytes(h) {
+    var bytes = h.slice(0, 32);
+    bytes[0] = bytes[0] & 248;
+    bytes[31] = bytes[31] & 63;
+    return ipow2_253 + BigInt("0x" + (0, types_1.byteArrToHex)(bytes.reverse()));
+}
+exports.scalarFromBytes = scalarFromBytes;
+function ihash(m) {
+    return decodeInt((0, sha2_512_1.sha2_512)(m));
+}
+function forceUint8Array(stuff) {
+    if (typeof stuff === "string") return (0, uint8array_utils_1.fromHex)(stuff);
+    return (0, uint8array_utils_1.isUint8Array)(stuff) ? stuff : new Uint8Array(stuff);
+}
+function scalarMultBase(scalar) {
+    return scalarMul(BASE, scalar);
+}
+exports.scalarMultBase = scalarMultBase;
+function extendEd25519PrivateKey(privateKey) {
+    var extended = (0, sha2_512_1.sha2_512)(privateKey);
+    var extension = extended.slice(32, 64);
+    var a = scalarFromBytes(extended.slice(0, 32));
+    return [
+        a,
+        extension
+    ];
+}
+exports.extendEd25519PrivateKey = extendEd25519PrivateKey;
+function deriveEd25519PublicKey(privateKey) {
+    var extended = (0, sha2_512_1.sha2_512)(privateKey);
+    var a = scalarFromBytes(extended);
+    var A = scalarMul(BASE, a);
+    return bigpointToByteArray(A);
+}
+exports.deriveEd25519PublicKey = deriveEd25519PublicKey;
+function extendedToPublic(extended) {
+    if (extended instanceof Uint8Array) extended = Array.from(extended);
+    var a = scalarFromBytes(extended);
+    var A = scalarMul(BASE, a);
+    return new Uint8Array(bigpointToByteArray(A));
+}
+exports.extendedToPublic = extendedToPublic;
+function asBytes(stuff) {
+    if (typeof stuff === "string") return asBytes((0, uint8array_utils_1.fromHex)(stuff));
+    return Array.from(stuff);
+}
+function signEd25519(message, privateKey) {
+    message = forceUint8Array(message);
+    privateKey = forceUint8Array(privateKey);
+    return signExtendedEd25519(message, (0, sha2_512_1.sha2_512)(asBytes(privateKey)));
+}
+exports.signEd25519 = signEd25519;
+function signExtendedEd25519(message, extendedKey) {
+    var _a;
+    message = forceUint8Array(message);
+    extendedKey = forceUint8Array(extendedKey);
+    if (extendedKey.length !== 64) throw new Error('signExtendedEd25519:: extended key must have length 64');
+    var privateKeyHash = asBytes(extendedKey);
+    var a = scalarFromBytes(privateKeyHash);
+    // for convenience getulate publicKey here:
+    var publicKey = bigpointToByteArray(scalarMul(BASE, a));
+    var r = ihash(privateKeyHash.slice(32, 64).concat(asBytes(message)));
+    var R = scalarMul(BASE, r);
+    var S = (0, positiveMod_1.positiveMod)(r + ihash(bigpointToByteArray(R).concat(publicKey).concat(asBytes(message))) * a, CURVE_ORDER);
+    var pubKey = new Uint8Array(publicKey);
+    var signature = new Uint8Array(bigpointToByteArray(R).concat(encodeInt(S)));
+    return _a = {
+        0: pubKey,
+        1: signature,
+        length: 2
+    }, _a[Symbol.iterator] = function() {
+        return __generator(this, function(_a) {
+            switch(_a.label){
+                case 0:
+                    return [
+                        4 /*yield*/ ,
+                        pubKey
+                    ];
+                case 1:
+                    _a.sent();
+                    return [
+                        4 /*yield*/ ,
+                        signature
+                    ];
+                case 2:
+                    _a.sent();
+                    return [
+                        2 /*return*/ 
+                    ];
+            }
+        });
+    }, _a.pubKey = pubKey, _a.signature = signature, _a;
+}
+exports.signExtendedEd25519 = signExtendedEd25519;
+function getEd25519Signature(message, privateKey) {
+    return signEd25519(message, privateKey).signature;
+}
+exports.getEd25519Signature = getEd25519Signature;
+function verifyEd25519Signature(signature, message, publicKey) {
+    if (signature.length !== 64 || publicKey.length != 32) {
+        throw new Error("unexpected signature length ".concat(signature.length));
+    }
+    if ((0, uint8array_utils_1.isUint8Array)(signature)) {
+        signature = (0, types_1.buffToByteArr)(signature);
+    }
+    if ((0, uint8array_utils_1.isUint8Array)(message)) {
+        message = (0, types_1.buffToByteArr)(message);
+    }
+    if ((0, uint8array_utils_1.isUint8Array)(publicKey)) {
+        publicKey = (0, types_1.buffToByteArr)(publicKey);
+    }
+    var R = pointFromBytes(asBytes(signature).slice(0, 32));
+    var A = pointFromBytes(asBytes(publicKey));
+    var S = decodeInt(asBytes(signature).slice(32, 64));
+    var h = ihash(asBytes(signature).slice(0, 32).concat(asBytes(publicKey)).concat(asBytes(message)));
+    var left = scalarMul(BASE, S);
+    var right = addPointsEdwards(R, scalarMul(A, h));
+    return left[0] == right[0] && left[1] == right[1];
+}
+exports.verifyEd25519Signature = verifyEd25519Signature;
+var _0n = BigInt(0);
+var ED25519_ORDER = BigInt('57896044618658097711785492504343953926634992332820282019728792003956564819949');
+function mod(a, b) {
+    var result = a % b;
+    return result >= _0n ? result : b + result;
+}
+function ed25519bigint(n) {
+    return mod(n, ED25519_ORDER);
+}
+exports.ed25519bigint = ed25519bigint;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/hmac.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var __extends = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__extends || function() {
+    var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf || ({
+            __proto__: []
+        }) instanceof Array && function(d, b) {
+            d.__proto__ = b;
+        } || function(d, b) {
+            for(var p in b)if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+        };
+        return extendStatics(d, b);
+    };
+    return function(d, b) {
+        if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() {
+            this.constructor = d;
+        }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+}();
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.hmac = exports.HMAC = void 0;
+var _assert_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/_assert.js [app-ssr] (ecmascript)");
+var utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/utils.js [app-ssr] (ecmascript)");
+// HMAC (RFC 2104)
+var HMAC = function(_super) {
+    __extends(HMAC, _super);
+    function HMAC(hash, _key) {
+        var _this = _super.call(this) || this;
+        _this.finished = false;
+        _this.destroyed = false;
+        (0, _assert_1.hash)(hash);
+        var key = (0, utils_1.toBytes)(_key);
+        _this.iHash = hash.create();
+        if (typeof _this.iHash.update !== 'function') throw new Error('Expected instance of class which extends utils.Hash');
+        _this.blockLen = _this.iHash.blockLen;
+        _this.outputLen = _this.iHash.outputLen;
+        var blockLen = _this.blockLen;
+        var pad = new Uint8Array(blockLen);
+        // blockLen can be bigger than outputLen
+        pad.set(key.length > blockLen ? hash.create().update(key).digest() : key);
+        for(var i = 0; i < pad.length; i++)pad[i] ^= 0x36;
+        _this.iHash.update(pad);
+        // By doing update (processing of first block) of outer hash here we can re-use it between multiple calls via clone
+        _this.oHash = hash.create();
+        // Undo internal XOR && apply outer XOR
+        for(var i = 0; i < pad.length; i++)pad[i] ^= 0x36 ^ 0x5c;
+        _this.oHash.update(pad);
+        pad.fill(0);
+        return _this;
+    }
+    HMAC.prototype.update = function(buf) {
+        (0, _assert_1.exists)(this);
+        this.iHash.update(buf);
+        return this;
+    };
+    HMAC.prototype.digestInto = function(out) {
+        (0, _assert_1.exists)(this);
+        (0, _assert_1.bytes)(out, this.outputLen);
+        this.finished = true;
+        this.iHash.digestInto(out);
+        this.oHash.update(out);
+        this.oHash.digestInto(out);
+        this.destroy();
+    };
+    HMAC.prototype.digest = function() {
+        var out = new Uint8Array(this.oHash.outputLen);
+        this.digestInto(out);
+        return out;
+    };
+    HMAC.prototype._cloneInto = function(to) {
+        // Create new instance without calling constructor since key already in state and we don't know it.
+        to || (to = Object.create(Object.getPrototypeOf(this), {}));
+        var _a = this, oHash = _a.oHash, iHash = _a.iHash, finished = _a.finished, destroyed = _a.destroyed, blockLen = _a.blockLen, outputLen = _a.outputLen;
+        to = to;
+        to.finished = finished;
+        to.destroyed = destroyed;
+        to.blockLen = blockLen;
+        to.outputLen = outputLen;
+        to.oHash = oHash._cloneInto(to.oHash);
+        to.iHash = iHash._cloneInto(to.iHash);
+        return to;
+    };
+    HMAC.prototype.destroy = function() {
+        this.destroyed = true;
+        this.oHash.destroy();
+        this.iHash.destroy();
+    };
+    return HMAC;
+}(utils_1.Hash);
+exports.HMAC = HMAC;
+/**
+ * HMAC: RFC2104 message authentication code.
+ * @param hash - function that would be used e.g. sha256
+ * @param key - message key
+ * @param message - message data
+ */ var hmac = function(hash, key, message) {
+    return new HMAC(hash, key).update(message).digest();
+};
+exports.hmac = hmac;
+exports.hmac.create = function(hash, key) {
+    return new HMAC(hash, key);
+};
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/sha512.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var __extends = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__extends || function() {
+    var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf || ({
+            __proto__: []
+        }) instanceof Array && function(d, b) {
+            d.__proto__ = b;
+        } || function(d, b) {
+            for(var p in b)if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+        };
+        return extendStatics(d, b);
+    };
+    return function(d, b) {
+        if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() {
+            this.constructor = d;
+        }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+}();
+var __createBinding = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__createBinding || (Object.create ? function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = {
+            enumerable: true,
+            get: function() {
+                return m[k];
+            }
+        };
+    }
+    Object.defineProperty(o, k2, desc);
+} : function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+});
+var __setModuleDefault = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__setModuleDefault || (Object.create ? function(o, v) {
+    Object.defineProperty(o, "default", {
+        enumerable: true,
+        value: v
+    });
+} : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__importStar || function(mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) {
+        for(var k in mod)if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    }
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __read = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__read || function(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while((n === void 0 || n-- > 0) && !(r = i.next()).done)ar.push(r.value);
+    } catch (error) {
+        e = {
+            error: error
+        };
+    } finally{
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        } finally{
+            if (e) throw e.error;
+        }
+    }
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.sha384 = exports.sha512_256 = exports.sha512_224 = exports.sha512 = exports.SHA512 = void 0;
+var _md_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/_md.js [app-ssr] (ecmascript)");
+var u64 = __importStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/_u64.js [app-ssr] (ecmascript)"));
+var utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/utils.js [app-ssr] (ecmascript)");
+// Round contants (first 32 bits of the fractional parts of the cube roots of the first 80 primes 2..409):
+// prettier-ignore
+var _a = __read(/* @__PURE__ */ function() {
+    return u64.split([
+        '0x428a2f98d728ae22',
+        '0x7137449123ef65cd',
+        '0xb5c0fbcfec4d3b2f',
+        '0xe9b5dba58189dbbc',
+        '0x3956c25bf348b538',
+        '0x59f111f1b605d019',
+        '0x923f82a4af194f9b',
+        '0xab1c5ed5da6d8118',
+        '0xd807aa98a3030242',
+        '0x12835b0145706fbe',
+        '0x243185be4ee4b28c',
+        '0x550c7dc3d5ffb4e2',
+        '0x72be5d74f27b896f',
+        '0x80deb1fe3b1696b1',
+        '0x9bdc06a725c71235',
+        '0xc19bf174cf692694',
+        '0xe49b69c19ef14ad2',
+        '0xefbe4786384f25e3',
+        '0x0fc19dc68b8cd5b5',
+        '0x240ca1cc77ac9c65',
+        '0x2de92c6f592b0275',
+        '0x4a7484aa6ea6e483',
+        '0x5cb0a9dcbd41fbd4',
+        '0x76f988da831153b5',
+        '0x983e5152ee66dfab',
+        '0xa831c66d2db43210',
+        '0xb00327c898fb213f',
+        '0xbf597fc7beef0ee4',
+        '0xc6e00bf33da88fc2',
+        '0xd5a79147930aa725',
+        '0x06ca6351e003826f',
+        '0x142929670a0e6e70',
+        '0x27b70a8546d22ffc',
+        '0x2e1b21385c26c926',
+        '0x4d2c6dfc5ac42aed',
+        '0x53380d139d95b3df',
+        '0x650a73548baf63de',
+        '0x766a0abb3c77b2a8',
+        '0x81c2c92e47edaee6',
+        '0x92722c851482353b',
+        '0xa2bfe8a14cf10364',
+        '0xa81a664bbc423001',
+        '0xc24b8b70d0f89791',
+        '0xc76c51a30654be30',
+        '0xd192e819d6ef5218',
+        '0xd69906245565a910',
+        '0xf40e35855771202a',
+        '0x106aa07032bbd1b8',
+        '0x19a4c116b8d2d0c8',
+        '0x1e376c085141ab53',
+        '0x2748774cdf8eeb99',
+        '0x34b0bcb5e19b48a8',
+        '0x391c0cb3c5c95a63',
+        '0x4ed8aa4ae3418acb',
+        '0x5b9cca4f7763e373',
+        '0x682e6ff3d6b2b8a3',
+        '0x748f82ee5defb2fc',
+        '0x78a5636f43172f60',
+        '0x84c87814a1f0ab72',
+        '0x8cc702081a6439ec',
+        '0x90befffa23631e28',
+        '0xa4506cebde82bde9',
+        '0xbef9a3f7b2c67915',
+        '0xc67178f2e372532b',
+        '0xca273eceea26619c',
+        '0xd186b8c721c0c207',
+        '0xeada7dd6cde0eb1e',
+        '0xf57d4f7fee6ed178',
+        '0x06f067aa72176fba',
+        '0x0a637dc5a2c898a6',
+        '0x113f9804bef90dae',
+        '0x1b710b35131c471b',
+        '0x28db77f523047d84',
+        '0x32caab7b40c72493',
+        '0x3c9ebe0a15c9bebc',
+        '0x431d67c49c100d4c',
+        '0x4cc5d4becb3e42b6',
+        '0x597f299cfc657e2a',
+        '0x5fcb6fab3ad6faec',
+        '0x6c44198c4a475817'
+    ].map(function(n) {
+        return BigInt(n);
+    }));
+}(), 2), SHA512_Kh = _a[0], SHA512_Kl = _a[1];
+// Temporary buffer, not used to store anything between runs
+var SHA512_W_H = /* @__PURE__ */ new Uint32Array(80);
+var SHA512_W_L = /* @__PURE__ */ new Uint32Array(80);
+var SHA512 = function(_super) {
+    __extends(SHA512, _super);
+    function SHA512() {
+        var _this = _super.call(this, 128, 64, 16, false) || this;
+        // We cannot use array here since array allows indexing by variable which means optimizer/compiler cannot use registers.
+        // Also looks cleaner and easier to verify with spec.
+        // Initial state (first 32 bits of the fractional parts of the square roots of the first 8 primes 2..19):
+        // h -- high 32 bits, l -- low 32 bits
+        _this.Ah = 0x6a09e667 | 0;
+        _this.Al = 0xf3bcc908 | 0;
+        _this.Bh = 0xbb67ae85 | 0;
+        _this.Bl = 0x84caa73b | 0;
+        _this.Ch = 0x3c6ef372 | 0;
+        _this.Cl = 0xfe94f82b | 0;
+        _this.Dh = 0xa54ff53a | 0;
+        _this.Dl = 0x5f1d36f1 | 0;
+        _this.Eh = 0x510e527f | 0;
+        _this.El = 0xade682d1 | 0;
+        _this.Fh = 0x9b05688c | 0;
+        _this.Fl = 0x2b3e6c1f | 0;
+        _this.Gh = 0x1f83d9ab | 0;
+        _this.Gl = 0xfb41bd6b | 0;
+        _this.Hh = 0x5be0cd19 | 0;
+        _this.Hl = 0x137e2179 | 0;
+        return _this;
+    }
+    // prettier-ignore
+    SHA512.prototype.get = function() {
+        var _a = this, Ah = _a.Ah, Al = _a.Al, Bh = _a.Bh, Bl = _a.Bl, Ch = _a.Ch, Cl = _a.Cl, Dh = _a.Dh, Dl = _a.Dl, Eh = _a.Eh, El = _a.El, Fh = _a.Fh, Fl = _a.Fl, Gh = _a.Gh, Gl = _a.Gl, Hh = _a.Hh, Hl = _a.Hl;
+        return [
+            Ah,
+            Al,
+            Bh,
+            Bl,
+            Ch,
+            Cl,
+            Dh,
+            Dl,
+            Eh,
+            El,
+            Fh,
+            Fl,
+            Gh,
+            Gl,
+            Hh,
+            Hl
+        ];
+    };
+    // prettier-ignore
+    SHA512.prototype.set = function(Ah, Al, Bh, Bl, Ch, Cl, Dh, Dl, Eh, El, Fh, Fl, Gh, Gl, Hh, Hl) {
+        this.Ah = Ah | 0;
+        this.Al = Al | 0;
+        this.Bh = Bh | 0;
+        this.Bl = Bl | 0;
+        this.Ch = Ch | 0;
+        this.Cl = Cl | 0;
+        this.Dh = Dh | 0;
+        this.Dl = Dl | 0;
+        this.Eh = Eh | 0;
+        this.El = El | 0;
+        this.Fh = Fh | 0;
+        this.Fl = Fl | 0;
+        this.Gh = Gh | 0;
+        this.Gl = Gl | 0;
+        this.Hh = Hh | 0;
+        this.Hl = Hl | 0;
+    };
+    SHA512.prototype.process = function(view, offset) {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+        // Extend the first 16 words into the remaining 64 words w[16..79] of the message schedule array
+        for(var i = 0; i < 16; i++, offset += 4){
+            SHA512_W_H[i] = view.getUint32(offset);
+            SHA512_W_L[i] = view.getUint32(offset += 4);
+        }
+        for(var i = 16; i < 80; i++){
+            // s0 := (w[i-15] rightrotate 1) xor (w[i-15] rightrotate 8) xor (w[i-15] rightshift 7)
+            var W15h = SHA512_W_H[i - 15] | 0;
+            var W15l = SHA512_W_L[i - 15] | 0;
+            var s0h = u64.rotrSH(W15h, W15l, 1) ^ u64.rotrSH(W15h, W15l, 8) ^ u64.shrSH(W15h, W15l, 7);
+            var s0l = u64.rotrSL(W15h, W15l, 1) ^ u64.rotrSL(W15h, W15l, 8) ^ u64.shrSL(W15h, W15l, 7);
+            // s1 := (w[i-2] rightrotate 19) xor (w[i-2] rightrotate 61) xor (w[i-2] rightshift 6)
+            var W2h = SHA512_W_H[i - 2] | 0;
+            var W2l = SHA512_W_L[i - 2] | 0;
+            var s1h = u64.rotrSH(W2h, W2l, 19) ^ u64.rotrBH(W2h, W2l, 61) ^ u64.shrSH(W2h, W2l, 6);
+            var s1l = u64.rotrSL(W2h, W2l, 19) ^ u64.rotrBL(W2h, W2l, 61) ^ u64.shrSL(W2h, W2l, 6);
+            // SHA256_W[i] = s0 + s1 + SHA256_W[i - 7] + SHA256_W[i - 16];
+            var SUMl = u64.add4L(s0l, s1l, SHA512_W_L[i - 7], SHA512_W_L[i - 16]);
+            var SUMh = u64.add4H(SUMl, s0h, s1h, SHA512_W_H[i - 7], SHA512_W_H[i - 16]);
+            SHA512_W_H[i] = SUMh | 0;
+            SHA512_W_L[i] = SUMl | 0;
+        }
+        var _k = this, Ah = _k.Ah, Al = _k.Al, Bh = _k.Bh, Bl = _k.Bl, Ch = _k.Ch, Cl = _k.Cl, Dh = _k.Dh, Dl = _k.Dl, Eh = _k.Eh, El = _k.El, Fh = _k.Fh, Fl = _k.Fl, Gh = _k.Gh, Gl = _k.Gl, Hh = _k.Hh, Hl = _k.Hl;
+        // Compression function main loop, 80 rounds
+        for(var i = 0; i < 80; i++){
+            // S1 := (e rightrotate 14) xor (e rightrotate 18) xor (e rightrotate 41)
+            var sigma1h = u64.rotrSH(Eh, El, 14) ^ u64.rotrSH(Eh, El, 18) ^ u64.rotrBH(Eh, El, 41);
+            var sigma1l = u64.rotrSL(Eh, El, 14) ^ u64.rotrSL(Eh, El, 18) ^ u64.rotrBL(Eh, El, 41);
+            //const T1 = (H + sigma1 + Chi(E, F, G) + SHA256_K[i] + SHA256_W[i]) | 0;
+            var CHIh = Eh & Fh ^ ~Eh & Gh;
+            var CHIl = El & Fl ^ ~El & Gl;
+            // T1 = H + sigma1 + Chi(E, F, G) + SHA512_K[i] + SHA512_W[i]
+            // prettier-ignore
+            var T1ll = u64.add5L(Hl, sigma1l, CHIl, SHA512_Kl[i], SHA512_W_L[i]);
+            var T1h = u64.add5H(T1ll, Hh, sigma1h, CHIh, SHA512_Kh[i], SHA512_W_H[i]);
+            var T1l = T1ll | 0;
+            // S0 := (a rightrotate 28) xor (a rightrotate 34) xor (a rightrotate 39)
+            var sigma0h = u64.rotrSH(Ah, Al, 28) ^ u64.rotrBH(Ah, Al, 34) ^ u64.rotrBH(Ah, Al, 39);
+            var sigma0l = u64.rotrSL(Ah, Al, 28) ^ u64.rotrBL(Ah, Al, 34) ^ u64.rotrBL(Ah, Al, 39);
+            var MAJh = Ah & Bh ^ Ah & Ch ^ Bh & Ch;
+            var MAJl = Al & Bl ^ Al & Cl ^ Bl & Cl;
+            Hh = Gh | 0;
+            Hl = Gl | 0;
+            Gh = Fh | 0;
+            Gl = Fl | 0;
+            Fh = Eh | 0;
+            Fl = El | 0;
+            _a = u64.add(Dh | 0, Dl | 0, T1h | 0, T1l | 0), Eh = _a.h, El = _a.l;
+            Dh = Ch | 0;
+            Dl = Cl | 0;
+            Ch = Bh | 0;
+            Cl = Bl | 0;
+            Bh = Ah | 0;
+            Bl = Al | 0;
+            var All = u64.add3L(T1l, sigma0l, MAJl);
+            Ah = u64.add3H(All, T1h, sigma0h, MAJh);
+            Al = All | 0;
+        }
+        // Add the compressed chunk to the current hash value
+        _b = u64.add(this.Ah | 0, this.Al | 0, Ah | 0, Al | 0), Ah = _b.h, Al = _b.l;
+        _c = u64.add(this.Bh | 0, this.Bl | 0, Bh | 0, Bl | 0), Bh = _c.h, Bl = _c.l;
+        _d = u64.add(this.Ch | 0, this.Cl | 0, Ch | 0, Cl | 0), Ch = _d.h, Cl = _d.l;
+        _e = u64.add(this.Dh | 0, this.Dl | 0, Dh | 0, Dl | 0), Dh = _e.h, Dl = _e.l;
+        _f = u64.add(this.Eh | 0, this.El | 0, Eh | 0, El | 0), Eh = _f.h, El = _f.l;
+        _g = u64.add(this.Fh | 0, this.Fl | 0, Fh | 0, Fl | 0), Fh = _g.h, Fl = _g.l;
+        _h = u64.add(this.Gh | 0, this.Gl | 0, Gh | 0, Gl | 0), Gh = _h.h, Gl = _h.l;
+        _j = u64.add(this.Hh | 0, this.Hl | 0, Hh | 0, Hl | 0), Hh = _j.h, Hl = _j.l;
+        this.set(Ah, Al, Bh, Bl, Ch, Cl, Dh, Dl, Eh, El, Fh, Fl, Gh, Gl, Hh, Hl);
+    };
+    SHA512.prototype.roundClean = function() {
+        SHA512_W_H.fill(0);
+        SHA512_W_L.fill(0);
+    };
+    SHA512.prototype.destroy = function() {
+        this.buffer.fill(0);
+        this.set(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    };
+    return SHA512;
+}(_md_1.HashMD);
+exports.SHA512 = SHA512;
+var SHA512_224 = function(_super) {
+    __extends(SHA512_224, _super);
+    function SHA512_224() {
+        var _this = _super.call(this) || this;
+        // h -- high 32 bits, l -- low 32 bits
+        _this.Ah = 0x8c3d37c8 | 0;
+        _this.Al = 0x19544da2 | 0;
+        _this.Bh = 0x73e19966 | 0;
+        _this.Bl = 0x89dcd4d6 | 0;
+        _this.Ch = 0x1dfab7ae | 0;
+        _this.Cl = 0x32ff9c82 | 0;
+        _this.Dh = 0x679dd514 | 0;
+        _this.Dl = 0x582f9fcf | 0;
+        _this.Eh = 0x0f6d2b69 | 0;
+        _this.El = 0x7bd44da8 | 0;
+        _this.Fh = 0x77e36f73 | 0;
+        _this.Fl = 0x04c48942 | 0;
+        _this.Gh = 0x3f9d85a8 | 0;
+        _this.Gl = 0x6a1d36c8 | 0;
+        _this.Hh = 0x1112e6ad | 0;
+        _this.Hl = 0x91d692a1 | 0;
+        _this.outputLen = 28;
+        return _this;
+    }
+    return SHA512_224;
+}(SHA512);
+var SHA512_256 = function(_super) {
+    __extends(SHA512_256, _super);
+    function SHA512_256() {
+        var _this = _super.call(this) || this;
+        // h -- high 32 bits, l -- low 32 bits
+        _this.Ah = 0x22312194 | 0;
+        _this.Al = 0xfc2bf72c | 0;
+        _this.Bh = 0x9f555fa3 | 0;
+        _this.Bl = 0xc84c64c2 | 0;
+        _this.Ch = 0x2393b86b | 0;
+        _this.Cl = 0x6f53b151 | 0;
+        _this.Dh = 0x96387719 | 0;
+        _this.Dl = 0x5940eabd | 0;
+        _this.Eh = 0x96283ee2 | 0;
+        _this.El = 0xa88effe3 | 0;
+        _this.Fh = 0xbe5e1e25 | 0;
+        _this.Fl = 0x53863992 | 0;
+        _this.Gh = 0x2b0199fc | 0;
+        _this.Gl = 0x2c85b8aa | 0;
+        _this.Hh = 0x0eb72ddc | 0;
+        _this.Hl = 0x81c52ca2 | 0;
+        _this.outputLen = 32;
+        return _this;
+    }
+    return SHA512_256;
+}(SHA512);
+var SHA384 = function(_super) {
+    __extends(SHA384, _super);
+    function SHA384() {
+        var _this = _super.call(this) || this;
+        // h -- high 32 bits, l -- low 32 bits
+        _this.Ah = 0xcbbb9d5d | 0;
+        _this.Al = 0xc1059ed8 | 0;
+        _this.Bh = 0x629a292a | 0;
+        _this.Bl = 0x367cd507 | 0;
+        _this.Ch = 0x9159015a | 0;
+        _this.Cl = 0x3070dd17 | 0;
+        _this.Dh = 0x152fecd8 | 0;
+        _this.Dl = 0xf70e5939 | 0;
+        _this.Eh = 0x67332667 | 0;
+        _this.El = 0xffc00b31 | 0;
+        _this.Fh = 0x8eb44a87 | 0;
+        _this.Fl = 0x68581511 | 0;
+        _this.Gh = 0xdb0c2e0d | 0;
+        _this.Gl = 0x64f98fa7 | 0;
+        _this.Hh = 0x47b5481d | 0;
+        _this.Hl = 0xbefa4fa4 | 0;
+        _this.outputLen = 48;
+        return _this;
+    }
+    return SHA384;
+}(SHA512);
+exports.sha512 = (0, utils_1.wrapConstructor)(function() {
+    return new SHA512();
+});
+exports.sha512_224 = (0, utils_1.wrapConstructor)(function() {
+    return new SHA512_224();
+});
+exports.sha512_256 = (0, utils_1.wrapConstructor)(function() {
+    return new SHA512_256();
+});
+exports.sha384 = (0, utils_1.wrapConstructor)(function() {
+    return new SHA384();
+});
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/hmacSHA512.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.hmacSHA512 = void 0;
+var hmac_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/hmac.js [app-ssr] (ecmascript)");
+var sha512_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/sha512.js [app-ssr] (ecmascript)");
+function hmacSHA512(key, data) {
+    return new Uint8Array((0, hmac_1.hmac)(sha512_1.sha512, key, data));
+}
+exports.hmacSHA512 = hmacSHA512;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/keccak.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var __createBinding = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__createBinding || (Object.create ? function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = {
+            enumerable: true,
+            get: function() {
+                return m[k];
+            }
+        };
+    }
+    Object.defineProperty(o, k2, desc);
+} : function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+});
+var __setModuleDefault = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__setModuleDefault || (Object.create ? function(o, v) {
+    Object.defineProperty(o, "default", {
+        enumerable: true,
+        value: v
+    });
+} : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__importStar || function(mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) {
+        for(var k in mod)if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    }
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.keccak_512 = exports.keccak_384 = exports.keccak_224 = exports.keccak_256 = void 0;
+var noble = __importStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/keccak.js [app-ssr] (ecmascript)"));
+function keccak_256(msg) {
+    return noble.keccak_256(msg);
+}
+exports.keccak_256 = keccak_256;
+function keccak_224(msg) {
+    return noble.keccak_224(msg);
+}
+exports.keccak_224 = keccak_224;
+function keccak_384(msg) {
+    return noble.keccak_384(msg);
+}
+exports.keccak_384 = keccak_384;
+function keccak_512(msg) {
+    return noble.keccak_512(msg);
+}
+exports.keccak_512 = keccak_512;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/_shortw_utils.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var __assign = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__assign || function() {
+    __assign = Object.assign || function(t) {
+        for(var s, i = 1, n = arguments.length; i < n; i++){
+            s = arguments[i];
+            for(var p in s)if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __read = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__read || function(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while((n === void 0 || n-- > 0) && !(r = i.next()).done)ar.push(r.value);
+    } catch (error) {
+        e = {
+            error: error
+        };
+    } finally{
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        } finally{
+            if (e) throw e.error;
+        }
+    }
+    return ar;
+};
+var __spreadArray = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__spreadArray || function(to, from, pack) {
+    if (pack || arguments.length === 2) for(var i = 0, l = from.length, ar; i < l; i++){
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.createCurve = exports.getHash = void 0;
+/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */ var hmac_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/hmac.js [app-ssr] (ecmascript)");
+var utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/utils.js [app-ssr] (ecmascript)");
+var weierstrass_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/weierstrass.js [app-ssr] (ecmascript)");
+// connects noble-curves to noble-hashes
+function getHash(hash) {
+    return {
+        hash: hash,
+        hmac: function(key) {
+            var msgs = [];
+            for(var _i = 1; _i < arguments.length; _i++){
+                msgs[_i - 1] = arguments[_i];
+            }
+            return (0, hmac_1.hmac)(hash, key, utils_1.concatBytes.apply(void 0, __spreadArray([], __read(msgs), false)));
+        },
+        randomBytes: utils_1.randomBytes
+    };
+}
+exports.getHash = getHash;
+function createCurve(curveDef, defHash) {
+    var create = function(hash) {
+        return (0, weierstrass_1.weierstrass)(__assign(__assign({}, curveDef), getHash(hash)));
+    };
+    return Object.freeze(__assign(__assign({}, create(defHash)), {
+        create: create
+    }));
+}
+exports.createCurve = createCurve;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/secp256k1.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var __read = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__read || function(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while((n === void 0 || n-- > 0) && !(r = i.next()).done)ar.push(r.value);
+    } catch (error) {
+        e = {
+            error: error
+        };
+    } finally{
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        } finally{
+            if (e) throw e.error;
+        }
+    }
+    return ar;
+};
+var __spreadArray = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__spreadArray || function(to, from, pack) {
+    if (pack || arguments.length === 2) for(var i = 0, l = from.length, ar; i < l; i++){
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.verifySecp256k1 = exports.signSecp256k1 = exports.encodeToCurve = exports.hashToCurve = exports.schnorr = exports.verifySchnorr = exports.signSchnorr = exports.Secp256k1Point = exports.secp256k1PointToBytes = exports.secp256k1 = void 0;
+/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */ var sha256_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/sha256.js [app-ssr] (ecmascript)");
+var utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/utils.js [app-ssr] (ecmascript)");
+var modular_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/modular.js [app-ssr] (ecmascript)");
+var weierstrass_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/weierstrass.js [app-ssr] (ecmascript)");
+var utils_2 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/utils.js [app-ssr] (ecmascript)");
+var hash_to_curve_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/abstract/hash-to-curve.js [app-ssr] (ecmascript)");
+var _shortw_utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/_shortw_utils.js [app-ssr] (ecmascript)");
+var secp256k1P = BigInt('0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f');
+var secp256k1N = BigInt('0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141');
+var _1n = BigInt(1);
+var _2n = BigInt(2);
+var divNearest = function(a, b) {
+    return (a + b / _2n) / b;
+};
+/**
+ * √n = n^((p+1)/4) for fields p = 3 mod 4. We unwrap the loop and multiply bit-by-bit.
+ * (P+1n/4n).toString(2) would produce bits [223x 1, 0, 22x 1, 4x 0, 11, 00]
+ */ function sqrtMod(y) {
+    var P = secp256k1P;
+    var _3n = BigInt(3), _6n = BigInt(6), _11n = BigInt(11), _22n = BigInt(22);
+    var _23n = BigInt(23), _44n = BigInt(44), _88n = BigInt(88);
+    var b2 = y * y * y % P; // x^3, 11
+    var b3 = b2 * b2 * y % P; // x^7
+    var b6 = (0, modular_1.pow2)(b3, _3n, P) * b3 % P;
+    var b9 = (0, modular_1.pow2)(b6, _3n, P) * b3 % P;
+    var b11 = (0, modular_1.pow2)(b9, _2n, P) * b2 % P;
+    var b22 = (0, modular_1.pow2)(b11, _11n, P) * b11 % P;
+    var b44 = (0, modular_1.pow2)(b22, _22n, P) * b22 % P;
+    var b88 = (0, modular_1.pow2)(b44, _44n, P) * b44 % P;
+    var b176 = (0, modular_1.pow2)(b88, _88n, P) * b88 % P;
+    var b220 = (0, modular_1.pow2)(b176, _44n, P) * b44 % P;
+    var b223 = (0, modular_1.pow2)(b220, _3n, P) * b3 % P;
+    var t1 = (0, modular_1.pow2)(b223, _23n, P) * b22 % P;
+    var t2 = (0, modular_1.pow2)(t1, _6n, P) * b2 % P;
+    var root = (0, modular_1.pow2)(t2, _2n, P);
+    if (!Fp.eql(Fp.sqr(root), y)) throw new Error('Cannot find square root');
+    return root;
+}
+var Fp = (0, modular_1.Field)(secp256k1P, undefined, undefined, {
+    sqrt: sqrtMod
+});
+exports.secp256k1 = (0, _shortw_utils_1.createCurve)({
+    a: BigInt(0),
+    b: BigInt(7),
+    Fp: Fp,
+    n: secp256k1N,
+    // Base point (x, y) aka generator point
+    Gx: BigInt('55066263022277343669578718895168534326250603453777594175500187360389116729240'),
+    Gy: BigInt('32670510020758816978083085130507043184471273380659243275938904335757337482424'),
+    h: BigInt(1),
+    lowS: true,
+    /**
+     * secp256k1 belongs to Koblitz curves: it has efficiently computable endomorphism.
+     * Endomorphism uses 2x less RAM, speeds up precomputation by 2x and ECDH / key recovery by 20%.
+     * For precomputed wNAF it trades off 1/2 init time & 1/3 ram for 20% perf hit.
+     * Explanation: https://gist.github.com/paulmillr/eb670806793e84df628a7c434a873066
+     */ endo: {
+        beta: BigInt('0x7ae96a2b657c07106e64479eac3434e99cf0497512f58995c1396c28719501ee'),
+        splitScalar: function(k) {
+            var n = secp256k1N;
+            var a1 = BigInt('0x3086d221a7d46bcde86c90e49284eb15');
+            var b1 = -_1n * BigInt('0xe4437ed6010e88286f547fa90abfe4c3');
+            var a2 = BigInt('0x114ca50f7a8e2f3f657c1108d9d44cfd8');
+            var b2 = a1;
+            var POW_2_128 = BigInt('0x100000000000000000000000000000000'); // (2n**128n).toString(16)
+            var c1 = divNearest(b2 * k, n);
+            var c2 = divNearest(-b1 * k, n);
+            var k1 = (0, modular_1.mod)(k - c1 * a1 - c2 * a2, n);
+            var k2 = (0, modular_1.mod)(-c1 * b1 - c2 * b2, n);
+            var k1neg = k1 > POW_2_128;
+            var k2neg = k2 > POW_2_128;
+            if (k1neg) k1 = n - k1;
+            if (k2neg) k2 = n - k2;
+            if (k1 > POW_2_128 || k2 > POW_2_128) {
+                throw new Error('splitScalar: Endomorphism failed, k=' + k);
+            }
+            return {
+                k1neg: k1neg,
+                k1: k1,
+                k2neg: k2neg,
+                k2: k2
+            };
+        }
+    }
+}, sha256_1.sha256);
+// Schnorr signatures are superior to ECDSA from above. Below is Schnorr-specific BIP0340 code.
+// https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki
+var _0n = BigInt(0);
+var fe = function(x) {
+    return typeof x === 'bigint' && _0n < x && x < secp256k1P;
+};
+var ge = function(x) {
+    return typeof x === 'bigint' && _0n < x && x < secp256k1N;
+};
+/** An object mapping tags to their tagged hash prefix of [SHA256(tag) | SHA256(tag)] */ var TAGGED_HASH_PREFIXES = {};
+function taggedHash(tag) {
+    var messages = [];
+    for(var _i = 1; _i < arguments.length; _i++){
+        messages[_i - 1] = arguments[_i];
+    }
+    var tagP = TAGGED_HASH_PREFIXES[tag];
+    if (tagP === undefined) {
+        var tagH = (0, sha256_1.sha256)(Uint8Array.from(tag, function(c) {
+            return c.charCodeAt(0);
+        }));
+        tagP = (0, utils_2.concatBytes)(tagH, tagH);
+        TAGGED_HASH_PREFIXES[tag] = tagP;
+    }
+    return (0, sha256_1.sha256)(utils_2.concatBytes.apply(void 0, __spreadArray([
+        tagP
+    ], __read(messages), false)));
+}
+// ECDSA compact points are 33-byte. Schnorr is 32: we strip first byte 0x02 or 0x03
+var pointToBytes = function(point) {
+    return point.toRawBytes(true).slice(1);
+};
+exports.secp256k1PointToBytes = pointToBytes;
+var numTo32b = function(n) {
+    return (0, utils_2.numberToBytesBE)(n, 32);
+};
+var modP = function(x) {
+    return (0, modular_1.mod)(x, secp256k1P);
+};
+var modN = function(x) {
+    return (0, modular_1.mod)(x, secp256k1N);
+};
+var Point = exports.secp256k1.ProjectivePoint;
+exports.Secp256k1Point = exports.secp256k1.ProjectivePoint;
+var GmulAdd = function(Q, a, b) {
+    return Point.BASE.multiplyAndAddUnsafe(Q, a, b);
+};
+// Calculate point, scalar and bytes
+function schnorrGetExtPubKey(priv) {
+    var d_ = exports.secp256k1.utils.normPrivateKeyToScalar(priv); // same method executed in fromPrivateKey
+    var p = Point.fromPrivateKey(d_); // P = d'⋅G; 0 < d' < n check is done inside
+    var scalar = p.hasEvenY() ? d_ : modN(-d_);
+    return {
+        scalar: scalar,
+        bytes: pointToBytes(p)
+    };
+}
+/**
+ * lift_x from BIP340. Convert 32-byte x coordinate to elliptic curve point.
+ * @returns valid point checked for being on-curve
+ */ function lift_x(x) {
+    if (!fe(x)) throw new Error('bad x: need 0 < x < p'); // Fail if x ≥ p.
+    var xx = modP(x * x);
+    var c = modP(xx * x + BigInt(7)); // Let c = x³ + 7 mod p.
+    var y = sqrtMod(c); // Let y = c^(p+1)/4 mod p.
+    if (y % _2n !== _0n) y = modP(-y); // Return the unique point P such that x(P) = x and
+    var p = new Point(x, y, _1n); // y(P) = y if y mod 2 = 0 or y(P) = p-y otherwise.
+    p.assertValidity();
+    return p;
+}
+/**
+ * Create tagged hash, convert it to bigint, reduce modulo-n.
+ */ function challenge() {
+    var args = [];
+    for(var _i = 0; _i < arguments.length; _i++){
+        args[_i] = arguments[_i];
+    }
+    return modN((0, utils_2.bytesToNumberBE)(taggedHash.apply(void 0, __spreadArray([
+        'BIP0340/challenge'
+    ], __read(args), false))));
+}
+/**
+ * Schnorr public key is just `x` coordinate of Point as per BIP340.
+ */ function schnorrGetPublicKey(privateKey) {
+    return schnorrGetExtPubKey(privateKey).bytes; // d'=int(sk). Fail if d'=0 or d'≥n. Ret bytes(d'⋅G)
+}
+/**
+ * Creates Schnorr signature as per BIP340. Verifies itself before returning anything.
+ * auxRand is optional and is not the sole source of k generation: bad CSPRNG won't be dangerous.
+ */ function schnorrSign(message, privateKey, auxRand) {
+    if (auxRand === void 0) {
+        auxRand = (0, utils_1.randomBytes)(32);
+    }
+    var m = (0, utils_2.ensureBytes)('message', message);
+    var _a = schnorrGetExtPubKey(privateKey), px = _a.bytes, d = _a.scalar; // checks for isWithinCurveOrder
+    var a = (0, utils_2.ensureBytes)('auxRand', auxRand, 32); // Auxiliary random data a: a 32-byte array
+    var t = numTo32b(d ^ (0, utils_2.bytesToNumberBE)(taggedHash('BIP0340/aux', a))); // Let t be the byte-wise xor of bytes(d) and hash/aux(a)
+    var rand = taggedHash('BIP0340/nonce', t, px, m); // Let rand = hash/nonce(t || bytes(P) || m)
+    var k_ = modN((0, utils_2.bytesToNumberBE)(rand)); // Let k' = int(rand) mod n
+    if (k_ === _0n) throw new Error('sign failed: k is zero'); // Fail if k' = 0.
+    var _b = schnorrGetExtPubKey(k_), rx = _b.bytes, k = _b.scalar; // Let R = k'⋅G.
+    var e = challenge(rx, px, m); // Let e = int(hash/challenge(bytes(R) || bytes(P) || m)) mod n.
+    var sig = new Uint8Array(64); // Let sig = bytes(R) || bytes((k + ed) mod n).
+    sig.set(rx, 0);
+    sig.set(numTo32b(modN(k + e * d)), 32);
+    // If Verify(bytes(P), m, sig) (see below) returns failure, abort
+    if (!schnorrVerify(sig, m, px)) throw new Error('sign: Invalid signature produced');
+    return sig;
+}
+/**
+ * Verifies Schnorr signature.
+ * Will swallow errors & return false except for initial type validation of arguments.
+ */ function schnorrVerify(signature, message, publicKey) {
+    var sig = (0, utils_2.ensureBytes)('signature', signature, 64);
+    var m = (0, utils_2.ensureBytes)('message', message);
+    var pub = (0, utils_2.ensureBytes)('publicKey', publicKey, 32);
+    try {
+        var P = lift_x((0, utils_2.bytesToNumberBE)(pub)); // P = lift_x(int(pk)); fail if that fails
+        var r = (0, utils_2.bytesToNumberBE)(sig.subarray(0, 32)); // Let r = int(sig[0:32]); fail if r ≥ p.
+        if (!fe(r)) return false;
+        var s = (0, utils_2.bytesToNumberBE)(sig.subarray(32, 64)); // Let s = int(sig[32:64]); fail if s ≥ n.
+        if (!ge(s)) return false;
+        var e = challenge(numTo32b(r), pointToBytes(P), m); // int(challenge(bytes(r)||bytes(P)||m))%n
+        var R = GmulAdd(P, s, modN(-e)); // R = s⋅G - e⋅P
+        if (!R || !R.hasEvenY() || R.toAffine().x !== r) return false; // -eP == (n-e)P
+        return true; // Fail if is_infinite(R) / not has_even_y(R) / x(R) ≠ r.
+    } catch (error) {
+        return false;
+    }
+}
+exports.signSchnorr = schnorrSign;
+exports.verifySchnorr = schnorrVerify;
+exports.schnorr = function() {
+    return {
+        getPublicKey: schnorrGetPublicKey,
+        sign: schnorrSign,
+        verify: schnorrVerify,
+        utils: {
+            randomPrivateKey: exports.secp256k1.utils.randomPrivateKey,
+            lift_x: lift_x,
+            pointToBytes: pointToBytes,
+            numberToBytesBE: utils_2.numberToBytesBE,
+            bytesToNumberBE: utils_2.bytesToNumberBE,
+            taggedHash: taggedHash,
+            mod: modular_1.mod
+        }
+    };
+}();
+var isoMap = /* @__PURE__ */ function() {
+    return (0, hash_to_curve_1.isogenyMap)(Fp, [
+        // xNum
+        [
+            '0x8e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38daaaaa8c7',
+            '0x7d3d4c80bc321d5b9f315cea7fd44c5d595d2fc0bf63b92dfff1044f17c6581',
+            '0x534c328d23f234e6e2a413deca25caece4506144037c40314ecbd0b53d9dd262',
+            '0x8e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38e38daaaaa88c'
+        ],
+        // xDen
+        [
+            '0xd35771193d94918a9ca34ccbb7b640dd86cd409542f8487d9fe6b745781eb49b',
+            '0xedadc6f64383dc1df7c4b2d51b54225406d36b641f5e41bbc52a56612a8c6d14',
+            '0x0000000000000000000000000000000000000000000000000000000000000001'
+        ],
+        // yNum
+        [
+            '0x4bda12f684bda12f684bda12f684bda12f684bda12f684bda12f684b8e38e23c',
+            '0xc75e0c32d5cb7c0fa9d0a54b12a0a6d5647ab046d686da6fdffc90fc201d71a3',
+            '0x29a6194691f91a73715209ef6512e576722830a201be2018a765e85a9ecee931',
+            '0x2f684bda12f684bda12f684bda12f684bda12f684bda12f684bda12f38e38d84'
+        ],
+        // yDen
+        [
+            '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffff93b',
+            '0x7a06534bb8bdb49fd5e9e6632722c2989467c1bfc8e8d978dfb425d2685c2573',
+            '0x6484aa716545ca2cf3a70c3fa8fe337e0a3d21162f0d6299a7bf8192bfd2a76f',
+            '0x0000000000000000000000000000000000000000000000000000000000000001'
+        ]
+    ].map(function(i) {
+        return i.map(function(j) {
+            return BigInt(j);
+        });
+    }));
+}();
+var mapSWU = /* @__PURE__ */ function() {
+    return (0, weierstrass_1.mapToCurveSimpleSWU)(Fp, {
+        A: BigInt('0x3f8731abdd661adca08a5558f0f5d272e953d363cb6f0e5d405447c01a444533'),
+        B: BigInt('1771'),
+        Z: Fp.create(BigInt('-11'))
+    });
+}();
+var htf = /* @__PURE__ */ function() {
+    return (0, hash_to_curve_1.createHasher)(exports.secp256k1.ProjectivePoint, function(scalars) {
+        var _a = mapSWU(Fp.create(scalars[0])), x = _a.x, y = _a.y;
+        return isoMap(x, y);
+    }, {
+        DST: 'secp256k1_XMD:SHA-256_SSWU_RO_',
+        encodeDST: 'secp256k1_XMD:SHA-256_SSWU_NU_',
+        p: Fp.ORDER,
+        m: 1,
+        k: 128,
+        expand: 'xmd',
+        hash: sha256_1.sha256
+    });
+}();
+exports.hashToCurve = function() {
+    return htf.hashToCurve;
+}();
+exports.encodeToCurve = function() {
+    return htf.encodeToCurve;
+}();
+function signSecp256k1(data, privateKey, extraEntropy) {
+    return exports.secp256k1.sign(data, privateKey, {
+        extraEntropy: extraEntropy
+    }).toCompactRawBytes();
+}
+exports.signSecp256k1 = signSecp256k1;
+var myDefaultVerOpts = {
+    lowS: true,
+    prehash: false
+};
+function verifySecp256k1(sig, msgHash, pubKey) {
+    return exports.secp256k1.verify(sig, msgHash, pubKey, myDefaultVerOpts);
+}
+exports.verifySecp256k1 = verifySecp256k1;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/secp256k1.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.verifySchnorrSecp256k1Signature = exports.verifyEcdsaSecp256k1Signature = void 0;
+var secp256k1_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/secp256k1.js [app-ssr] (ecmascript)");
+function verifyEcdsaSecp256k1Signature(vk, messageHash, signature) {
+    if (!(vk instanceof Uint8Array && messageHash instanceof Uint8Array && signature instanceof Uint8Array && vk.length === 33 && messageHash.length === 32 && signature.length === 64)) throw new TypeError("invalid arguments passed to 'verifyEcdsaSecp256k1Signature'");
+    var vkHead = vk[0];
+    if (!(vkHead === 0x02 || vkHead === 0x03)) throw new Error("plutus-machine only supports compressed public keys for 'verifyEcdsaSecp256k1Signature'");
+    return (0, secp256k1_1.verifySecp256k1)(signature, messageHash, vk);
+}
+exports.verifyEcdsaSecp256k1Signature = verifyEcdsaSecp256k1Signature;
+function verifySchnorrSecp256k1Signature(pubKey, messageHash, signature) {
+    if (!(pubKey instanceof Uint8Array && messageHash instanceof Uint8Array && signature instanceof Uint8Array && pubKey.length === 32 && signature.length === 64)) throw new TypeError("invalid arguments passed to 'verifyEcdsaSecp256k1Signature'");
+    // signature 64
+    // pubKey 32
+    return (0, secp256k1_1.verifySchnorr)(signature, messageHash, pubKey);
+}
+exports.verifySchnorrSecp256k1Signature = verifySchnorrSecp256k1Signature;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/rotr32.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.rotr32 = void 0;
+function rotr32(x, by) {
+    return x >>> by | x << 32 - by | 0;
+}
+exports.rotr32 = rotr32;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/sha2_256.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.sha2_256 = void 0;
+var uint8array_utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+uint8array-utils@1.0.4/node_modules/@harmoniclabs/uint8array-utils/dist/index.js [app-ssr] (ecmascript)");
+var types_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/types.js [app-ssr] (ecmascript)");
+var rotr32_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/rotr32.js [app-ssr] (ecmascript)");
+/**
+     * Pad a bytearray so its size is a multiple of 64 (512 bits).
+     * Internal method.
+     */ function pad(src) {
+    var nBits = src.length * 8;
+    var dst = src.slice();
+    dst.push(0x80);
+    var nZeroes = 64 - dst.length % 64 - 8;
+    if (nZeroes < 0) {
+        nZeroes += 64;
+    }
+    for(var i = 0; i < nZeroes; i++){
+        dst.push(0);
+    }
+    // assume nBits fits in 32 bits
+    dst.push(0);
+    dst.push(0);
+    dst.push(0);
+    dst.push(0);
+    dst.push(nBits >> 24 & 0xff);
+    dst.push(nBits >> 16 & 0xff);
+    dst.push(nBits >> 8 & 0xff);
+    dst.push(nBits >> 0 & 0xff);
+    return dst;
+}
+var k = [
+    0x428a2f98,
+    0x71374491,
+    0xb5c0fbcf,
+    0xe9b5dba5,
+    0x3956c25b,
+    0x59f111f1,
+    0x923f82a4,
+    0xab1c5ed5,
+    0xd807aa98,
+    0x12835b01,
+    0x243185be,
+    0x550c7dc3,
+    0x72be5d74,
+    0x80deb1fe,
+    0x9bdc06a7,
+    0xc19bf174,
+    0xe49b69c1,
+    0xefbe4786,
+    0x0fc19dc6,
+    0x240ca1cc,
+    0x2de92c6f,
+    0x4a7484aa,
+    0x5cb0a9dc,
+    0x76f988da,
+    0x983e5152,
+    0xa831c66d,
+    0xb00327c8,
+    0xbf597fc7,
+    0xc6e00bf3,
+    0xd5a79147,
+    0x06ca6351,
+    0x14292967,
+    0x27b70a85,
+    0x2e1b2138,
+    0x4d2c6dfc,
+    0x53380d13,
+    0x650a7354,
+    0x766a0abb,
+    0x81c2c92e,
+    0x92722c85,
+    0xa2bfe8a1,
+    0xa81a664b,
+    0xc24b8b70,
+    0xc76c51a3,
+    0xd192e819,
+    0xd6990624,
+    0xf40e3585,
+    0x106aa070,
+    0x19a4c116,
+    0x1e376c08,
+    0x2748774c,
+    0x34b0bcb5,
+    0x391c0cb3,
+    0x4ed8aa4a,
+    0x5b9cca4f,
+    0x682e6ff3,
+    0x748f82ee,
+    0x78a5636f,
+    0x84c87814,
+    0x8cc70208,
+    0x90befffa,
+    0xa4506ceb,
+    0xbef9a3f7,
+    0xc67178f2
+];
+function sigma0(x) {
+    return (0, rotr32_1.rotr32)(x, 7) ^ (0, rotr32_1.rotr32)(x, 18) ^ x >>> 3;
+}
+function sigma1(x) {
+    return (0, rotr32_1.rotr32)(x, 17) ^ (0, rotr32_1.rotr32)(x, 19) ^ x >>> 10;
+}
+/**
+ * getulates sha2-256 (32bytes) hash of a list of uint8 numbers.
+ * Result is also a list of uint8 number.
+ * @example
+ * bytesToHex(sha2_256([0x61, 0x62, 0x63])) => "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+ * @example
+ * sha2_256(textToBytes("Hello, World!")) => [223, 253, 96, 33, 187, 43, 213, 176, 175, 103, 98, 144, 128, 158, 195, 165, 49, 145, 221, 129, 199, 247, 10, 75, 40, 104, 138, 54, 33, 130, 152, 111]
+ * @param {uint5[]} bytes - list of uint8 numbers
+ * @returns {number[]} - list of uint8 numbers
+ */ function sha2_256(bytes) {
+    if ((0, uint8array_utils_1.isUint8Array)(bytes)) {
+        bytes = (0, types_1.buffToByteArr)(bytes);
+    }
+    /**
+     * Initial hash (updated during compression phase)
+     */ var hash = [
+        0x6a09e667,
+        0xbb67ae85,
+        0x3c6ef372,
+        0xa54ff53a,
+        0x510e527f,
+        0x9b05688c,
+        0x1f83d9ab,
+        0x5be0cd19
+    ];
+    bytes = pad(bytes);
+    // break message in successive 64 byte chunks
+    for(var chunkStart = 0; chunkStart < bytes.length; chunkStart += 64){
+        var chunk = bytes.slice(chunkStart, chunkStart + 64);
+        var w = new Array(64).fill(0); // array of 32 bit numbers!
+        // copy chunk into first 16 positions of w
+        for(var i = 0; i < 16; i++){
+            w[i] = chunk[i * 4 + 0] << 24 | chunk[i * 4 + 1] << 16 | chunk[i * 4 + 2] << 8 | chunk[i * 4 + 3];
+        }
+        // extends the first 16 positions into the remaining 48 positions
+        for(var i = 16; i < 64; i++){
+            w[i] = w[i - 16] + sigma0(w[i - 15]) + w[i - 7] + sigma1(w[i - 2]) | 0;
+        }
+        // intialize working variables to current hash value
+        var a = hash[0];
+        var b = hash[1];
+        var c = hash[2];
+        var d = hash[3];
+        var e = hash[4];
+        var f = hash[5];
+        var g = hash[6];
+        var h = hash[7];
+        // compression function main loop
+        for(var i = 0; i < 64; i++){
+            var S1 = (0, rotr32_1.rotr32)(e, 6) ^ (0, rotr32_1.rotr32)(e, 11) ^ (0, rotr32_1.rotr32)(e, 25);
+            var ch = e & f ^ ~e & g;
+            var temp1 = h + S1 + ch + k[i] + w[i] | 0;
+            var S0 = (0, rotr32_1.rotr32)(a, 2) ^ (0, rotr32_1.rotr32)(a, 13) ^ (0, rotr32_1.rotr32)(a, 22);
+            var maj = a & b ^ a & c ^ b & c;
+            var temp2 = S0 + maj | 0;
+            h = g;
+            g = f;
+            f = e;
+            e = d + temp1 | 0;
+            d = c;
+            c = b;
+            b = a;
+            a = temp1 + temp2 | 0;
+        }
+        // update the hash
+        hash[0] = hash[0] + a | 0;
+        hash[1] = hash[1] + b | 0;
+        hash[2] = hash[2] + c | 0;
+        hash[3] = hash[3] + d | 0;
+        hash[4] = hash[4] + e | 0;
+        hash[5] = hash[5] + f | 0;
+        hash[6] = hash[6] + g | 0;
+        hash[7] = hash[7] + h | 0;
+    }
+    // produce the final digest of uint8 numbers
+    var result = [];
+    for(var i = 0; i < 8; i++){
+        var item = hash[i];
+        result.push(item >> 24 & 0xff);
+        result.push(item >> 16 & 0xff);
+        result.push(item >> 8 & 0xff);
+        result.push(item >> 0 & 0xff);
+    }
+    return new Uint8Array(result);
+}
+exports.sha2_256 = sha2_256;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/sha3.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var __read = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__read || function(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while((n === void 0 || n-- > 0) && !(r = i.next()).done)ar.push(r.value);
+    } catch (error) {
+        e = {
+            error: error
+        };
+    } finally{
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        } finally{
+            if (e) throw e.error;
+        }
+    }
+    return ar;
+};
+var __spreadArray = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__spreadArray || function(to, from, pack) {
+    if (pack || arguments.length === 2) for(var i = 0, l = from.length, ar; i < l; i++){
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.sha3 = void 0;
+var types_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/types.js [app-ssr] (ecmascript)");
+var types_2 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/types.js [app-ssr] (ecmascript)");
+var uint8array_utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+uint8array-utils@1.0.4/node_modules/@harmoniclabs/uint8array-utils/dist/index.js [app-ssr] (ecmascript)");
+var assert_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/assert.js [app-ssr] (ecmascript)");
+/**
+ * state width (1600 bits, )
+ */ var WIDTH = 200;
+/**
+ * rate (1088 bits, 136 bytes)
+ */ var RATE = 136;
+/**
+ * capacity
+ */ var CAP = WIDTH - RATE;
+/**
+ * Apply 1000...1 padding until size is multiple of r.
+ * If already multiple of r then add a whole block of padding.
+ * @param {number[]} src - list of uint8 numbers
+ * @returns {number[]} - list of uint8 numbers
+ */ function pad(src) {
+    var dst = src.slice();
+    var nZeroes = RATE - 2 - dst.length % RATE;
+    if (nZeroes < -1) {
+        nZeroes += RATE - 2;
+    }
+    if (nZeroes == -1) {
+        dst.push(0x86);
+    } else {
+        dst.push(0x06);
+        for(var i = 0; i < nZeroes; i++){
+            dst.push(0);
+        }
+        dst.push(0x80);
+    }
+    (0, assert_1.assert)(dst.length % RATE === 0, "wrong destination length");
+    return dst;
+}
+/**
+ * 24 numbers used in the sha3 permute function
+ */ var OFFSETS = Object.freeze([
+    6,
+    12,
+    18,
+    24,
+    3,
+    9,
+    10,
+    16,
+    22,
+    1,
+    7,
+    13,
+    19,
+    20,
+    4,
+    5,
+    11,
+    17,
+    23,
+    2,
+    8,
+    14,
+    15,
+    21
+]);
+/**
+ * 24 numbers used in the sha3 permute function
+ */ var SHIFTS = Object.freeze([
+    -12,
+    -11,
+    21,
+    14,
+    28,
+    20,
+    3,
+    -13,
+    -29,
+    1,
+    6,
+    25,
+    8,
+    18,
+    27,
+    -4,
+    10,
+    15,
+    -24,
+    -30,
+    -23,
+    -7,
+    -9,
+    2
+]);
+/**
+ * Round constants used in the sha3 permute function
+ */ var RC = Object.freeze([
+    (0, types_2.uint64)("0x0000000000000001"),
+    (0, types_2.uint64)("0x0000000000008082"),
+    (0, types_2.uint64)("0x800000000000808a"),
+    (0, types_2.uint64)("0x8000000080008000"),
+    (0, types_2.uint64)("0x000000000000808b"),
+    (0, types_2.uint64)("0x0000000080000001"),
+    (0, types_2.uint64)("0x8000000080008081"),
+    (0, types_2.uint64)("0x8000000000008009"),
+    (0, types_2.uint64)("0x000000000000008a"),
+    (0, types_2.uint64)("0x0000000000000088"),
+    (0, types_2.uint64)("0x0000000080008009"),
+    (0, types_2.uint64)("0x000000008000000a"),
+    (0, types_2.uint64)("0x000000008000808b"),
+    (0, types_2.uint64)("0x800000000000008b"),
+    (0, types_2.uint64)("0x8000000000008089"),
+    (0, types_2.uint64)("0x8000000000008003"),
+    (0, types_2.uint64)("0x8000000000008002"),
+    (0, types_2.uint64)("0x8000000000000080"),
+    (0, types_2.uint64)("0x000000000000800a"),
+    (0, types_2.uint64)("0x800000008000000a"),
+    (0, types_2.uint64)("0x8000000080008081"),
+    (0, types_2.uint64)("0x8000000000008080"),
+    (0, types_2.uint64)("0x0000000080000001"),
+    (0, types_2.uint64)("0x8000000080008008")
+]);
+function permute(s) {
+    var c = new Array(5);
+    var b = new Array(25);
+    for(var round = 0; round < 24; round++){
+        for(var i = 0; i < 5; i++){
+            c[i] = (0, types_2.uint64)(s[i] ^ s[i + 5] ^ s[i + 10] ^ s[i + 15] ^ s[i + 20]);
+        }
+        for(var i = 0; i < 5; i++){
+            var tmp = (0, types_2.uint64)(c[(i + 4) % 5] ^ (0, types_2.uint64Rotr)(c[(i + 1) % 5], 63));
+            for(var j = 0; j < 5; j++){
+                s[i + 5 * j] = (0, types_2.uint64)(s[i + 5 * j] ^ tmp);
+            }
+        }
+        b[0] = s[0];
+        for(var i = 1; i < 25; i++){
+            var offset = OFFSETS[i - 1];
+            var left = Math.abs(SHIFTS[i - 1]);
+            var right = 32 - left;
+            if (SHIFTS[i - 1] < 0) {
+                b[i] = (0, types_2.uint64Rotr)(s[offset], right);
+            } else {
+                b[i] = (0, types_2.uint64Rotr)(s[offset], right + 32);
+            }
+        }
+        for(var i = 0; i < 5; i++){
+            for(var j = 0; j < 5; j++){
+                s[i * 5 + j] = (0, types_2.uint64)(b[i * 5 + j] ^ ~b[i * 5 + (j + 1) % 5] & b[i * 5 + (j + 2) % 5]);
+            }
+        }
+        s[0] = s[0] ^ RC[round];
+    }
+}
+/**
+ * getulates sha3-256 (32bytes) hash of a list of uint8 numbers.
+ * Result is also a list of uint8 number.
+ * Sha3 only bit-wise operations, so 64-bit operations can easily be replicated using 2 32-bit operations instead
+ * @example
+ * bytesToHex(sha3(textToBytes("abc"))) => "3a985da74fe225b2045c172d6bd390bd855f086e3e9d525b46bfe24511431532"
+ * @example
+ * bytesToHex(sha3((new Array(136)).fill(1))) => "b36dc2167c4d9dda1a58b87046c8d76a6359afe3612c4de8a38857e09117b2db"
+ * @example
+ * bytesToHex(sha3((new Array(135)).fill(2))) => "5bdf5d815d29a9d7161c66520efc17c2edd7898f2b99a029e8d2e4ff153407f4"
+ * @example
+ * bytesToHex(sha3((new Array(134)).fill(3))) => "8e6575663dfb75a88f94a32c5b363c410278b65020734560d968aadd6896a621"
+ * @example
+ * bytesToHex(sha3((new Array(137)).fill(4))) => "f10b39c3e455006aa42120b9751faa0f35c821211c9d086beb28bf3c4134c6c6"
+ */ function sha3(bytes) {
+    if ((0, uint8array_utils_1.isUint8Array)(bytes)) {
+        bytes = (0, types_1.buffToByteArr)(bytes);
+    }
+    bytes = pad(bytes);
+    // initialize the state
+    var state = new Array(WIDTH / 8).fill((0, types_2.uint64)(0));
+    for(var chunkStart = 0; chunkStart < bytes.length; chunkStart += RATE){
+        // extend the chunk to become length WIDTH
+        var chunk = bytes.slice(chunkStart, chunkStart + RATE).concat(new Array(CAP).fill(0));
+        // element-wise xor with 'state'
+        for(var i = 0; i < WIDTH; i += 8){
+            state[i / 8] = (0, types_2.uint64)(state[i / 8] ^ (0, types_2.uint64)("0x" + (0, types_2.byteArrToHex)(chunk.slice(i, i + 8).reverse())));
+        // beware: a uint32 is stored as little endian, but a pair of uint32s that form a uin64 are stored in big endian format!
+        //state[i/4] ^= (chunk[i] << 0) | (chunk[i+1] << 8) | (chunk[i+2] << 16) | (chunk[i+3] << 24);
+        }
+        // apply block permutations
+        permute(state);
+    }
+    var hash = [];
+    for(var i = 0; i < 4; i++){
+        hash.push.apply(hash, __spreadArray([], __read((0, types_2.uint64ToBytesLE)(state[i])), false));
+    }
+    return hash;
+}
+exports.sha3 = sha3;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/index.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var __createBinding = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__createBinding || (Object.create ? function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = {
+            enumerable: true,
+            get: function() {
+                return m[k];
+            }
+        };
+    }
+    Object.defineProperty(o, k2, desc);
+} : function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+});
+var __exportStar = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__exportStar || function(m, exports1) {
+    for(var p in m)if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports1, p)) __createBinding(exports1, m, p);
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+__exportStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/base32.js [app-ssr] (ecmascript)"), exports);
+__exportStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/positiveMod.js [app-ssr] (ecmascript)"), exports);
+__exportStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/rotr32.js [app-ssr] (ecmascript)"), exports);
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/vrf.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var __read = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__read || function(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while((n === void 0 || n-- > 0) && !(r = i.next()).done)ar.push(r.value);
+    } catch (error) {
+        e = {
+            error: error
+        };
+    } finally{
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        } finally{
+            if (e) throw e.error;
+        }
+    }
+    return ar;
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.vrf_ed25519_sha512_ell2_challenge_generation = exports.vrf_ed25519_sha512_ell2_nonce_generation = exports.vrf_ed25519_sha512_ell2_hash_to_curve = exports.vrf_ed25519_sha512_ell2_prove = void 0;
+var ed25519_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/ed25519.js [app-ssr] (ecmascript)");
+var sha2_512_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/sha2_512.js [app-ssr] (ecmascript)");
+/**
+4.4. RSA-FDH-VRF Ciphersuites
+
+This document defines RSA-FDH-VRF-SHA256 as follows:
+
+suite_string = 0x01.
+The hash function Hash is SHA-256 as specified in [RFC6234], with hLen = 32.
+MGF_salt = I2OSP(k, 4) || I2OSP(n, k).
+
+This document defines RSA-FDH-VRF-SHA384 as follows:
+
+suite_string = 0x02.
+The hash function Hash is SHA-384 as specified in [RFC6234], with hLen = 48.
+MGF_salt = I2OSP(k, 4) || I2OSP(n, k).
+
+This document defines RSA-FDH-VRF-SHA512 as follows:
+
+suite_string = 0x03.
+The hash function Hash is SHA-512 as specified in [RFC6234], with hLen = 64.
+MGF_salt = I2OSP(k, 4) || I2OSP(n, k).
+
+ */ var SUITE = 0x03;
+var ONE = 0x01;
+var TWO = 0x02;
+/**
+ * https://datatracker.ietf.org/doc/html/rfc9381#section-5.1
+ */ function vrf_ed25519_sha512_ell2_prove(sk, alpha) {
+    var _a = __read((0, ed25519_1.extendEd25519PrivateKey)(sk), 2), scalar = _a[0], extension = _a[1];
+    // 1. Use SK to derive the VRF secret scalar x and the VRF public key Y = x*B
+    var pk = new Uint8Array((0, ed25519_1.deriveEd25519PublicKey)(Array.from(sk)));
+    var H = vrf_ed25519_sha512_ell2_hash_to_curve(pk, alpha);
+    var H_point = (0, ed25519_1.pointFromBytes)(H);
+    var gamma = (0, ed25519_1.scalarMul)(H_point, scalar);
+    var compressed_gamma = (0, ed25519_1.bigpointToUint8Array)(gamma);
+    var k = vrf_ed25519_sha512_ell2_nonce_generation(extension, H);
+    var announcement_1 = (0, ed25519_1.bigpointToUint8Array)((0, ed25519_1.scalarMultBase)(k));
+    var announcement_2 = (0, ed25519_1.bigpointToUint8Array)((0, ed25519_1.scalarMul)(H_point, k));
+    var challange = (0, ed25519_1.scalarFromBytes)(vrf_ed25519_sha512_ell2_challenge_generation(H, compressed_gamma, announcement_1, announcement_2));
+    var response = k + challange * scalar;
+    return {
+        gamma: gamma,
+        challange: challange,
+        response: response
+    };
+}
+exports.vrf_ed25519_sha512_ell2_prove = vrf_ed25519_sha512_ell2_prove;
+function vrf_ed25519_sha512_ell2_hash_to_curve(public_key, alpha_string) {
+    var input = new Uint8Array(2 + public_key.length + alpha_string.length);
+    input[0] = SUITE;
+    input[1] = ONE;
+    input.set(public_key, 2);
+    input.set(alpha_string, 2 + public_key.length);
+    //return pointFromBytes(sha2_512(input))
+    return (0, sha2_512_1.sha2_512)(input);
+}
+exports.vrf_ed25519_sha512_ell2_hash_to_curve = vrf_ed25519_sha512_ell2_hash_to_curve;
+function vrf_ed25519_sha512_ell2_nonce_generation(secret_extension, H) {
+    var input = new Uint8Array(64);
+    input.set(secret_extension, 0);
+    input.set(H, 32);
+    //return pointFromBytes(sha2_512(input))
+    return (0, ed25519_1.scalarFromBytes)((0, sha2_512_1.sha2_512)(input));
+}
+exports.vrf_ed25519_sha512_ell2_nonce_generation = vrf_ed25519_sha512_ell2_nonce_generation;
+function vrf_ed25519_sha512_ell2_challenge_generation(H, gamma, announcement_1, announcement_2) {
+    var input = new Uint8Array(2 + H.length + gamma.length + announcement_1.length + announcement_2.length);
+    input[0] = SUITE;
+    input[1] = TWO;
+    input.set(H, 2);
+    input.set(gamma, 2 + H.length);
+    input.set(announcement_1, 2 + H.length + gamma.length);
+    input.set(announcement_2, 2 + H.length + gamma.length + announcement_1.length);
+    return (0, sha2_512_1.sha2_512)(input).slice(0, 16);
+}
+exports.vrf_ed25519_sha512_ell2_challenge_generation = vrf_ed25519_sha512_ell2_challenge_generation;
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/ripemd_160.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var __extends = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__extends || function() {
+    var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf || ({
+            __proto__: []
+        }) instanceof Array && function(d, b) {
+            d.__proto__ = b;
+        } || function(d, b) {
+            for(var p in b)if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+        };
+        return extendStatics(d, b);
+    };
+    return function(d, b) {
+        if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() {
+            this.constructor = d;
+        }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+}();
+var __values = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__values || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function() {
+            if (o && i >= o.length) o = void 0;
+            return {
+                value: o && o[i++],
+                done: !o
+            };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+var e_1, _a;
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.RIPEMD160 = void 0;
+/**
+ * RIPEMD-160 legacy hash function.
+ * https://homes.esat.kuleuven.be/~bosselae/ripemd160.html
+ * https://homes.esat.kuleuven.be/~bosselae/ripemd160/pdf/AB-9601/AB-9601.pdf
+ * @module
+ */ var _md_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/_md.js [app-ssr] (ecmascript)");
+var utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/utils.js [app-ssr] (ecmascript)");
+var Rho = /* @__PURE__ */ new Uint8Array([
+    7,
+    4,
+    13,
+    1,
+    10,
+    6,
+    15,
+    3,
+    12,
+    0,
+    9,
+    5,
+    2,
+    14,
+    11,
+    8
+]);
+var Id = /* @__PURE__ */ new Uint8Array(new Array(16).fill(0).map(function(_, i) {
+    return i;
+}));
+var Pi = /* @__PURE__ */ Id.map(function(i) {
+    return (9 * i + 5) % 16;
+});
+var idxL = [
+    Id
+];
+var idxR = [
+    Pi
+];
+for(var i = 0; i < 4; i++)try {
+    for(var _b = (e_1 = void 0, __values([
+        idxL,
+        idxR
+    ])), _c = _b.next(); !_c.done; _c = _b.next()){
+        var j = _c.value;
+        j.push(j[i].map(function(k) {
+            return Rho[k];
+        }));
+    }
+} catch (e_1_1) {
+    e_1 = {
+        error: e_1_1
+    };
+} finally{
+    try {
+        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+    } finally{
+        if (e_1) throw e_1.error;
+    }
+}
+var shifts = /* @__PURE__ */ [
+    [
+        11,
+        14,
+        15,
+        12,
+        5,
+        8,
+        7,
+        9,
+        11,
+        13,
+        14,
+        15,
+        6,
+        7,
+        9,
+        8
+    ],
+    [
+        12,
+        13,
+        11,
+        15,
+        6,
+        9,
+        9,
+        7,
+        12,
+        15,
+        11,
+        13,
+        7,
+        8,
+        7,
+        7
+    ],
+    [
+        13,
+        15,
+        14,
+        11,
+        7,
+        7,
+        6,
+        8,
+        13,
+        14,
+        13,
+        12,
+        5,
+        5,
+        6,
+        9
+    ],
+    [
+        14,
+        11,
+        12,
+        14,
+        8,
+        6,
+        5,
+        5,
+        15,
+        12,
+        15,
+        14,
+        9,
+        9,
+        8,
+        6
+    ],
+    [
+        15,
+        12,
+        13,
+        13,
+        9,
+        5,
+        8,
+        6,
+        14,
+        11,
+        12,
+        11,
+        8,
+        6,
+        5,
+        5
+    ]
+].map(function(i) {
+    return new Uint8Array(i);
+});
+var shiftsL = /* @__PURE__ */ idxL.map(function(idx, i) {
+    return idx.map(function(j) {
+        return shifts[i][j];
+    });
+});
+var shiftsR = /* @__PURE__ */ idxR.map(function(idx, i) {
+    return idx.map(function(j) {
+        return shifts[i][j];
+    });
+});
+var Kl = /* @__PURE__ */ new Uint32Array([
+    0x00000000,
+    0x5a827999,
+    0x6ed9eba1,
+    0x8f1bbcdc,
+    0xa953fd4e
+]);
+var Kr = /* @__PURE__ */ new Uint32Array([
+    0x50a28be6,
+    0x5c4dd124,
+    0x6d703ef3,
+    0x7a6d76e9,
+    0x00000000
+]);
+// It's called f() in spec.
+function f(group, x, y, z) {
+    if (group === 0) return x ^ y ^ z;
+    else if (group === 1) return x & y | ~x & z;
+    else if (group === 2) return (x | ~y) ^ z;
+    else if (group === 3) return x & z | y & ~z;
+    else return x ^ (y | ~z);
+}
+// Temporary buffer, not used to store anything between runs
+var R_BUF = /* @__PURE__ */ new Uint32Array(16);
+var RIPEMD160 = function(_super) {
+    __extends(RIPEMD160, _super);
+    function RIPEMD160() {
+        var _this = _super.call(this, 64, 20, 8, true) || this;
+        _this.h0 = 0x67452301 | 0;
+        _this.h1 = 0xefcdab89 | 0;
+        _this.h2 = 0x98badcfe | 0;
+        _this.h3 = 0x10325476 | 0;
+        _this.h4 = 0xc3d2e1f0 | 0;
+        return _this;
+    }
+    RIPEMD160.prototype.get = function() {
+        var _a = this, h0 = _a.h0, h1 = _a.h1, h2 = _a.h2, h3 = _a.h3, h4 = _a.h4;
+        return [
+            h0,
+            h1,
+            h2,
+            h3,
+            h4
+        ];
+    };
+    RIPEMD160.prototype.set = function(h0, h1, h2, h3, h4) {
+        this.h0 = h0 | 0;
+        this.h1 = h1 | 0;
+        this.h2 = h2 | 0;
+        this.h3 = h3 | 0;
+        this.h4 = h4 | 0;
+    };
+    RIPEMD160.prototype.process = function(view, offset) {
+        for(var i = 0; i < 16; i++, offset += 4)R_BUF[i] = view.getUint32(offset, true);
+        // prettier-ignore
+        var al = this.h0 | 0, ar = al, bl = this.h1 | 0, br = bl, cl = this.h2 | 0, cr = cl, dl = this.h3 | 0, dr = dl, el = this.h4 | 0, er = el;
+        // Instead of iterating 0 to 80, we split it into 5 groups
+        // And use the groups in constants, functions, etc. Much simpler
+        for(var group = 0; group < 5; group++){
+            var rGroup = 4 - group;
+            var hbl = Kl[group], hbr = Kr[group]; // prettier-ignore
+            var rl = idxL[group], rr = idxR[group]; // prettier-ignore
+            var sl = shiftsL[group], sr = shiftsR[group]; // prettier-ignore
+            for(var i = 0; i < 16; i++){
+                var tl = (0, utils_1.rotl)(al + f(group, bl, cl, dl) + R_BUF[rl[i]] + hbl, sl[i]) + el | 0;
+                al = el, el = dl, dl = (0, utils_1.rotl)(cl, 10) | 0, cl = bl, bl = tl; // prettier-ignore
+            }
+            // 2 loops are 10% faster
+            for(var i = 0; i < 16; i++){
+                var tr = (0, utils_1.rotl)(ar + f(rGroup, br, cr, dr) + R_BUF[rr[i]] + hbr, sr[i]) + er | 0;
+                ar = er, er = dr, dr = (0, utils_1.rotl)(cr, 10) | 0, cr = br, br = tr; // prettier-ignore
+            }
+        }
+        // Add the compressed chunk to the current hash value
+        this.set(this.h1 + cl + dr | 0, this.h2 + dl + er | 0, this.h3 + el + ar | 0, this.h4 + al + br | 0, this.h0 + bl + cr | 0);
+    };
+    RIPEMD160.prototype.roundClean = function() {
+        R_BUF.fill(0);
+    };
+    RIPEMD160.prototype.destroy = function() {
+        this.destroyed = true;
+        this.buffer.fill(0);
+        this.set(0, 0, 0, 0, 0);
+    };
+    return RIPEMD160;
+}(_md_1.HashMD);
+exports.RIPEMD160 = RIPEMD160;
+/** RIPEMD-160 - a legacy hash function from 1990s. */ var _ripemd160 = /* @__PURE__ */ (0, utils_1.wrapConstructor)(function() {
+    return new RIPEMD160();
+});
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/ripemd_160.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.ripemd160 = void 0;
+var uint8array_utils_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+uint8array-utils@1.0.4/node_modules/@harmoniclabs/uint8array-utils/dist/index.js [app-ssr] (ecmascript)");
+var ripemd_160_1 = __turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/noble/ripemd_160.js [app-ssr] (ecmascript)");
+function ripemd160(input) {
+    if (typeof input === "string") {
+        if (input.startsWith("0x")) input = (0, uint8array_utils_1.fromHex)(input.toLowerCase().slice(2));
+        else if (isHex(input)) input = (0, uint8array_utils_1.fromHex)(input.toLowerCase());
+        else input = (0, uint8array_utils_1.fromUtf8)(input);
+    }
+    if (!(input instanceof Uint8Array)) throw new Error("ripemd160: input must be Uint8Array or string");
+    return new ripemd_160_1.RIPEMD160().update(input).digest();
+}
+exports.ripemd160 = ripemd160;
+function isHex(str) {
+    return /^[0-9A-Fa-f]*$/.test(str);
+}
+}),
+"[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/index.js [app-ssr] (ecmascript)", ((__turbopack_context__, module, exports) => {
+"use strict";
+
+var __createBinding = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__createBinding || (Object.create ? function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = {
+            enumerable: true,
+            get: function() {
+                return m[k];
+            }
+        };
+    }
+    Object.defineProperty(o, k2, desc);
+} : function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+});
+var __exportStar = /*TURBOPACK member replacement*/ __turbopack_context__.e && /*TURBOPACK member replacement*/ __turbopack_context__.e.__exportStar || function(m, exports1) {
+    for(var p in m)if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports1, p)) __createBinding(exports1, m, p);
+};
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+__exportStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/bech32.js [app-ssr] (ecmascript)"), exports);
+__exportStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/blake2b.js [app-ssr] (ecmascript)"), exports);
+__exportStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/bls12_318.js [app-ssr] (ecmascript)"), exports);
+__exportStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/ed25519.js [app-ssr] (ecmascript)"), exports);
+__exportStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/hmacSHA512.js [app-ssr] (ecmascript)"), exports);
+__exportStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/keccak.js [app-ssr] (ecmascript)"), exports);
+__exportStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/secp256k1.js [app-ssr] (ecmascript)"), exports);
+__exportStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/sha2_256.js [app-ssr] (ecmascript)"), exports);
+__exportStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/sha2_512.js [app-ssr] (ecmascript)"), exports);
+__exportStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/sha3.js [app-ssr] (ecmascript)"), exports);
+__exportStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/types.js [app-ssr] (ecmascript)"), exports);
+__exportStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/utils/index.js [app-ssr] (ecmascript)"), exports);
+__exportStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/vrf.js [app-ssr] (ecmascript)"), exports);
+__exportStar(__turbopack_context__.r("[project]/node_modules/.deno/@harmoniclabs+crypto@0.2.5/node_modules/@harmoniclabs/crypto/dist/ripemd_160.js [app-ssr] (ecmascript)"), exports);
+}),
+];
+
+//# sourceMappingURL=74d46_%40harmoniclabs_crypto_dist_51ce9378._.js.map

@@ -1,0 +1,2536 @@
+(globalThis.TURBOPACK || (globalThis.TURBOPACK = [])).push([typeof document === "object" ? document.currentScript : undefined,
+"[project]/node_modules/.deno/@lucid-evolution+provider@0.1.94/node_modules/@lucid-evolution/provider/dist/index.js [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+return __turbopack_context__.a(async (__turbopack_handle_async_dependencies__, __turbopack_async_result__) => { try {
+
+__turbopack_context__.s([
+    "Blockfrost",
+    ()=>Blockfrost,
+    "Emulator",
+    ()=>Emulator,
+    "Koios",
+    ()=>Koios,
+    "KoiosError",
+    ()=>KoiosError,
+    "Kupmios",
+    ()=>Kupmios,
+    "KupmiosError",
+    ()=>KupmiosError,
+    "Maestro",
+    ()=>Maestro,
+    "generateEmulatorAccount",
+    ()=>generateEmulatorAccount,
+    "generateEmulatorAccountFromPrivateKey",
+    ()=>generateEmulatorAccountFromPrivateKey
+]);
+// src/core.ts
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/.deno/@anastasia-labs+cardano-multiplatform-lib-browser@6.0.2-3/node_modules/@anastasia-labs/cardano-multiplatform-lib-browser/cardano_multiplatform_lib.js [app-client] (ecmascript) <locals>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/.deno/@anastasia-labs+cardano-multiplatform-lib-browser@6.0.2-3/node_modules/@anastasia-labs/cardano-multiplatform-lib-browser/cardano_multiplatform_lib_bg.js [app-client] (ecmascript)");
+// src/blockfrost.ts
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$core$2d$utils$40$0$2e$1$2e$16$2f$node_modules$2f40$lucid$2d$evolution$2f$core$2d$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/.deno/@lucid-evolution+core-utils@0.1.16/node_modules/@lucid-evolution/core-utils/dist/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/.deno/@lucid-evolution+utils@0.1.68/node_modules/@lucid-evolution/utils/dist/index.js [app-client] (ecmascript)");
+// src/internal/blockfrost.ts
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/.deno/effect@3.21.4/node_modules/effect/dist/esm/Function.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Record$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Record$3e$__ = __turbopack_context__.i("[project]/node_modules/.deno/effect@3.21.4/node_modules/effect/dist/esm/Record.js [app-client] (ecmascript) <export * as Record>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__ = __turbopack_context__.i("[project]/node_modules/.deno/effect@3.21.4/node_modules/effect/dist/esm/Schema.js [app-client] (ecmascript) <export * as Schema>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__ = __turbopack_context__.i("[project]/node_modules/.deno/effect@3.21.4/node_modules/effect/dist/esm/Effect.js [app-client] (ecmascript) <export * as Effect>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Array$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Array$3e$__ = __turbopack_context__.i("[project]/node_modules/.deno/effect@3.21.4/node_modules/effect/dist/esm/Array.js [app-client] (ecmascript) <export * as Array>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schedule$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schedule$3e$__ = __turbopack_context__.i("[project]/node_modules/.deno/effect@3.21.4/node_modules/effect/dist/esm/Schedule.js [app-client] (ecmascript) <export * as Schedule>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Data$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Data$3e$__ = __turbopack_context__.i("[project]/node_modules/.deno/effect@3.21.4/node_modules/effect/dist/esm/Data.js [app-client] (ecmascript) <export * as Data>");
+// src/internal/HttpUtils.ts
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$HttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__HttpClient$3e$__ = __turbopack_context__.i("[project]/node_modules/.deno/@effect+platform@0.71.7/node_modules/@effect/platform/dist/esm/HttpClient.js [app-client] (ecmascript) <export * as HttpClient>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$HttpClientError$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__HttpClientError$3e$__ = __turbopack_context__.i("[project]/node_modules/.deno/@effect+platform@0.71.7/node_modules/@effect/platform/dist/esm/HttpClientError.js [app-client] (ecmascript) <export * as HttpClientError>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$HttpClientRequest$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__HttpClientRequest$3e$__ = __turbopack_context__.i("[project]/node_modules/.deno/@effect+platform@0.71.7/node_modules/@effect/platform/dist/esm/HttpClientRequest.js [app-client] (ecmascript) <export * as HttpClientRequest>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$HttpClientResponse$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__HttpClientResponse$3e$__ = __turbopack_context__.i("[project]/node_modules/.deno/@effect+platform@0.71.7/node_modules/@effect/platform/dist/esm/HttpClientResponse.js [app-client] (ecmascript) <export * as HttpClientResponse>");
+// src/kupmios.ts
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$FetchHttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__FetchHttpClient$3e$__ = __turbopack_context__.i("[project]/node_modules/.deno/@effect+platform@0.71.7/node_modules/@effect/platform/dist/esm/FetchHttpClient.js [app-client] (ecmascript) <export * as FetchHttpClient>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$wallet$40$0$2e$1$2e$74$2f$node_modules$2f40$lucid$2d$evolution$2f$wallet$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/.deno/@lucid-evolution+wallet@0.1.74/node_modules/@lucid-evolution/wallet/dist/index.js [app-client] (ecmascript)");
+var __turbopack_async_dependencies__ = __turbopack_handle_async_dependencies__([
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__,
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__,
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$wallet$40$0$2e$1$2e$74$2f$node_modules$2f40$lucid$2d$evolution$2f$wallet$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__
+]);
+[__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$wallet$40$0$2e$1$2e$74$2f$node_modules$2f40$lucid$2d$evolution$2f$wallet$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__] = __turbopack_async_dependencies__.then ? (await __turbopack_async_dependencies__)() : __turbopack_async_dependencies__;
+;
+;
+;
+// package.json
+var package_default = {
+    name: "@lucid-evolution/provider",
+    version: "0.1.94",
+    description: "",
+    main: "./dist/index.js",
+    types: "./dist/index.d.ts",
+    type: "module",
+    exports: {
+        ".": {
+            require: "./dist/index.cjs",
+            import: "./dist/index.js",
+            types: "./dist/index.d.ts"
+        }
+    },
+    files: [
+        "dist"
+    ],
+    publishConfig: {
+        access: "public"
+    },
+    scripts: {
+        build: "tsup src/index.ts --format esm,cjs --dts --clean",
+        clean: "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+        test: "vitest run"
+    },
+    keywords: [],
+    author: "",
+    license: "MIT",
+    browser: {
+        "@anastasia-labs/cardano-multiplatform-lib-nodejs": "@anastasia-labs/cardano-multiplatform-lib-browser"
+    },
+    dependencies: {
+        "@anastasia-labs/cardano-multiplatform-lib-browser": "6.0.2-3",
+        "@anastasia-labs/cardano-multiplatform-lib-nodejs": "6.0.2-3",
+        "@effect/platform": "^0.71.3",
+        "@effect/schema": "^0.68.26",
+        "@lucid-evolution/core-types": "workspace:*",
+        "@lucid-evolution/core-utils": "workspace:*",
+        "@lucid-evolution/utils": "workspace:*",
+        "@lucid-evolution/wallet": "workspace:*",
+        effect: "^3.11.7"
+    },
+    devDependencies: {
+        "@types/node": "^20.12.8",
+        tsup: "^8.0.2",
+        typescript: "^5.4.5",
+        vitest: "^2.0.4"
+    }
+};
+;
+;
+var toAditionalUTXOs = (utxos)=>(utxos || []).map((utxo)=>[
+            {
+                txId: utxo.txHash,
+                index: utxo.outputIndex
+            },
+            {
+                address: utxo.address,
+                value: {
+                    coins: Number(utxo.assets["lovelace"]),
+                    assets: fromAssets(utxo.assets)
+                },
+                datumHash: utxo.datumHash,
+                datum: utxo.datum,
+                script: toTxOutScript(utxo.scriptRef)
+            }
+        ]);
+var toTxOutScript = (scriptRef)=>{
+    if (scriptRef) {
+        switch(scriptRef.type){
+            case "PlutusV1":
+                return {
+                    "plutus:v1": (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["applySingleCborEncoding"])(scriptRef.script)
+                };
+            case "PlutusV2":
+                return {
+                    "plutus:v2": (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["applySingleCborEncoding"])(scriptRef.script)
+                };
+            case "PlutusV3":
+                return {
+                    "plutus:v3": (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["applySingleCborEncoding"])(scriptRef.script)
+                };
+            default:
+                return void 0;
+        }
+    }
+};
+var fromAssets = (assets)=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Record$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Record$3e$__["Record"].remove(assets, "lovelace"), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Record$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Record$3e$__["Record"].mapEntries((amount, unit)=>[
+            unit.length === 56 ? unit.slice(0, 56) : unit.slice(0, 56) + "." + unit.slice(56),
+            Number(amount)
+        ]), (r)=>__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Record$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Record$3e$__["Record"].isEmptyRecord(r) ? void 0 : r);
+var fromLegacyRedeemerTag = (redeemerTag)=>{
+    switch(redeemerTag){
+        case "certificate":
+            return "publish";
+        case "withdrawal":
+            return "withdraw";
+        default:
+            return redeemerTag;
+    }
+};
+// src/blockfrost.ts
+var Blockfrost = class {
+    url;
+    projectId;
+    constructor(url, projectId){
+        this.url = url;
+        this.projectId = projectId || "";
+    }
+    async getProtocolParameters() {
+        const result = await fetch(`${this.url}/epochs/latest/parameters`, {
+            headers: {
+                project_id: this.projectId,
+                lucid
+            }
+        }).then((res)=>res.json());
+        return {
+            minFeeA: parseInt(result.min_fee_a),
+            minFeeB: parseInt(result.min_fee_b),
+            maxTxSize: parseInt(result.max_tx_size),
+            maxValSize: parseInt(result.max_val_size),
+            keyDeposit: BigInt(result.key_deposit),
+            poolDeposit: BigInt(result.pool_deposit),
+            drepDeposit: BigInt(result.drep_deposit),
+            govActionDeposit: BigInt(result.gov_action_deposit),
+            priceMem: parseFloat(result.price_mem),
+            priceStep: parseFloat(result.price_step),
+            maxTxExMem: BigInt(result.max_tx_ex_mem),
+            maxTxExSteps: BigInt(result.max_tx_ex_steps),
+            coinsPerUtxoByte: BigInt(result.coins_per_utxo_size),
+            collateralPercentage: parseInt(result.collateral_percent),
+            maxCollateralInputs: parseInt(result.max_collateral_inputs),
+            minFeeRefScriptCostPerByte: parseInt(result.min_fee_ref_script_cost_per_byte),
+            costModels: result.cost_models_raw
+        };
+    }
+    async getUtxos(addressOrCredential) {
+        const queryPredicate = (()=>{
+            if (typeof addressOrCredential === "string") return addressOrCredential;
+            const credentialBech32 = addressOrCredential.type === "Key" ? __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Ed25519KeyHash"].from_hex(addressOrCredential.hash).to_bech32("addr_vkh") : __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ScriptHash"].from_hex(addressOrCredential.hash).to_bech32("addr_vkh");
+            return credentialBech32;
+        })();
+        let result = [];
+        let page = 1;
+        while(true){
+            const pageResult = await fetch(`${this.url}/addresses/${queryPredicate}/utxos?page=${page}`, {
+                headers: {
+                    project_id: this.projectId,
+                    lucid
+                }
+            }).then((res)=>res.json());
+            if (pageResult.error) {
+                if (pageResult.status_code === 404) {
+                    return [];
+                } else {
+                    throw new Error("Could not fetch UTxOs from Blockfrost. Try again.");
+                }
+            }
+            result = result.concat(pageResult);
+            if (pageResult.length <= 0) break;
+            page++;
+        }
+        return this.blockfrostUtxosToUtxos(result);
+    }
+    async getUtxosWithUnit(addressOrCredential, unit) {
+        const queryPredicate = (()=>{
+            if (typeof addressOrCredential === "string") return addressOrCredential;
+            const credentialBech32 = addressOrCredential.type === "Key" ? __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Ed25519KeyHash"].from_hex(addressOrCredential.hash).to_bech32("addr_vkh") : __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ScriptHash"].from_hex(addressOrCredential.hash).to_bech32("addr_vkh");
+            return credentialBech32;
+        })();
+        let result = [];
+        let page = 1;
+        while(true){
+            const pageResult = await fetch(`${this.url}/addresses/${queryPredicate}/utxos/${unit}?page=${page}`, {
+                headers: {
+                    project_id: this.projectId,
+                    lucid
+                }
+            }).then((res)=>res.json());
+            if (pageResult.error) {
+                if (pageResult.status_code === 404) {
+                    return [];
+                } else {
+                    throw new Error("Could not fetch UTxOs from Blockfrost. Try again.");
+                }
+            }
+            result = result.concat(pageResult);
+            if (pageResult.length <= 0) break;
+            page++;
+        }
+        return this.blockfrostUtxosToUtxos(result);
+    }
+    async getUtxoByUnit(unit) {
+        const addresses = await fetch(`${this.url}/assets/${unit}/addresses?count=2`, {
+            headers: {
+                project_id: this.projectId,
+                lucid
+            }
+        }).then((res)=>res.json());
+        if (!addresses || addresses.error) {
+            throw new Error("Unit not found.");
+        }
+        if (addresses.length > 1) {
+            throw new Error("Unit needs to be an NFT or only held by one address.");
+        }
+        const address = addresses[0].address;
+        const utxos = await this.getUtxosWithUnit(address, unit);
+        if (utxos.length > 1) {
+            throw new Error("Unit needs to be an NFT or only held by one address.");
+        }
+        return utxos[0];
+    }
+    async getUtxosByOutRef(outRefs) {
+        const queryHashes = [
+            ...new Set(outRefs.map((outRef)=>outRef.txHash))
+        ];
+        const utxos = await Promise.all(queryHashes.map(async (txHash)=>{
+            const result = await fetch(`${this.url}/txs/${txHash}/utxos`, {
+                headers: {
+                    project_id: this.projectId,
+                    lucid
+                }
+            }).then((res)=>res.json());
+            if (!result || result.error) {
+                return [];
+            }
+            const utxosResult = result.outputs.filter((r)=>!r.consumed_by_tx).map((r)=>({
+                    ...r,
+                    tx_hash: txHash
+                }));
+            return this.blockfrostUtxosToUtxos(utxosResult);
+        }));
+        return utxos.reduce((acc, utxos2)=>acc.concat(utxos2), []).filter((utxo)=>outRefs.some((outRef)=>utxo.txHash === outRef.txHash && utxo.outputIndex === outRef.outputIndex));
+    }
+    async getDelegation(rewardAddress) {
+        const result = await fetch(`${this.url}/accounts/${rewardAddress}`, {
+            headers: {
+                project_id: this.projectId,
+                lucid
+            }
+        }).then((res)=>res.json());
+        if (!result || result.error) {
+            return {
+                poolId: null,
+                rewards: 0n
+            };
+        }
+        return {
+            poolId: result.pool_id || null,
+            rewards: BigInt(result.withdrawable_amount)
+        };
+    }
+    async getDatum(datumHash) {
+        const datum = await fetch(`${this.url}/scripts/datum/${datumHash}/cbor`, {
+            headers: {
+                project_id: this.projectId,
+                lucid
+            }
+        }).then((res)=>res.json()).then((res)=>res.cbor);
+        if (!datum || datum.error) {
+            throw new Error(`No datum found for datum hash: ${datumHash}`);
+        }
+        return datum;
+    }
+    awaitTx(txHash, checkInterval = 3e3) {
+        return new Promise((res)=>{
+            const confirmation = setInterval(async ()=>{
+                const isConfirmed = await fetch(`${this.url}/txs/${txHash}/cbor`, {
+                    headers: {
+                        project_id: this.projectId,
+                        lucid
+                    }
+                }).then((res2)=>res2.json());
+                if (isConfirmed && !isConfirmed.error) {
+                    clearInterval(confirmation);
+                    await new Promise((res2)=>setTimeout(()=>res2(1), 1e3));
+                    return res(true);
+                }
+            }, checkInterval);
+        });
+    }
+    async submitTx(tx) {
+        const result = await fetch(`${this.url}/tx/submit`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/cbor",
+                project_id: this.projectId,
+                lucid
+            },
+            body: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$core$2d$utils$40$0$2e$1$2e$16$2f$node_modules$2f40$lucid$2d$evolution$2f$core$2d$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fromHex"])(tx)
+        }).then((res)=>res.json());
+        if (!result || result.error) {
+            if (result?.status_code === 400) throw new Error(result.message);
+            else throw new Error("Could not submit transaction.");
+        }
+        return result;
+    }
+    async blockfrostUtxosToUtxos(result) {
+        const utxos = [];
+        const batchSize = 10;
+        let count = 0;
+        for(let i = 0; i < result.length; i += batchSize){
+            const batch = result.slice(i, i + batchSize);
+            count += batchSize;
+            await handleRateLimit(count);
+            const batchResults = await Promise.all(batch.map(async (r)=>{
+                return {
+                    txHash: r.tx_hash,
+                    outputIndex: r.output_index,
+                    assets: Object.fromEntries(r.amount.map(({ unit, quantity })=>[
+                            unit,
+                            BigInt(quantity)
+                        ])),
+                    address: r.address,
+                    datumHash: !r.inline_datum && r.data_hash || void 0,
+                    datum: r.inline_datum || void 0,
+                    scriptRef: r.reference_script_hash ? await (async ()=>{
+                        const { type } = await fetch(`${this.url}/scripts/${r.reference_script_hash}`, {
+                            headers: {
+                                project_id: this.projectId,
+                                lucid
+                            }
+                        }).then((res)=>res.json());
+                        const { cbor: script } = await fetch(`${this.url}/scripts/${r.reference_script_hash}/cbor`, {
+                            headers: {
+                                project_id: this.projectId,
+                                lucid
+                            }
+                        }).then((res)=>res.json());
+                        switch(type){
+                            case "timelock":
+                                const { json: native } = await fetch(`${this.url}/scripts/${r.reference_script_hash}/json`, {
+                                    headers: {
+                                        project_id: this.projectId,
+                                        lucid
+                                    }
+                                }).then((res)=>res.json());
+                                return (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["scriptFromNative"])(native);
+                            case "plutusV1":
+                                return {
+                                    type: "PlutusV1",
+                                    script: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["applyDoubleCborEncoding"])(script)
+                                };
+                            case "plutusV2":
+                                return {
+                                    type: "PlutusV2",
+                                    script: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["applyDoubleCborEncoding"])(script)
+                                };
+                            case "plutusV3":
+                                return {
+                                    type: "PlutusV3",
+                                    script: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["applyDoubleCborEncoding"])(script)
+                                };
+                        }
+                    })() : void 0
+                };
+            }));
+            utxos.push(...batchResults);
+        }
+        return utxos;
+    }
+    async evaluateTx(tx, additionalUTxOs) {
+        const payload = {
+            cbor: tx,
+            additionalUtxoSet: toAditionalUTXOs(additionalUTxOs)
+        };
+        const res = await fetch(`${this.url}/utils/txs/evaluate/utxos`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                project_id: this.projectId,
+                lucid
+            },
+            body: JSON.stringify(payload)
+        }).then((res2)=>res2.json());
+        if (!res || res.fault) {
+            const message = res?.status_code === 400 ? res.message : `Could not evaluate the transaction: ${JSON.stringify(res)}. Transaction: ${tx}`;
+            throw new Error(message);
+        }
+        const blockfrostRedeemer = res;
+        if (!("EvaluationResult" in blockfrostRedeemer.result)) {
+            throw new Error(`EvaluateTransaction fails: ${JSON.stringify(blockfrostRedeemer.result)}`);
+        }
+        const evalRedeemers = [];
+        Object.entries(blockfrostRedeemer.result.EvaluationResult).forEach(([redeemerPointer, data])=>{
+            const [pTag, pIndex] = redeemerPointer.split(":");
+            evalRedeemers.push({
+                redeemer_tag: fromLegacyRedeemerTag(pTag),
+                redeemer_index: Number(pIndex),
+                ex_units: {
+                    mem: Number(data.memory),
+                    steps: Number(data.steps)
+                }
+            });
+        });
+        return evalRedeemers;
+    }
+};
+var handleRateLimit = async (count)=>{
+    if (count % 100 === 0) {
+        await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$core$2d$utils$40$0$2e$1$2e$16$2f$node_modules$2f40$lucid$2d$evolution$2f$core$2d$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["sleep"])(5e3);
+    } else if (count % 10 === 0) {
+        await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$core$2d$utils$40$0$2e$1$2e$16$2f$node_modules$2f40$lucid$2d$evolution$2f$core$2d$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["sleep"])(500);
+    }
+};
+var lucid = package_default.version;
+;
+;
+;
+;
+;
+var JSONRPCSchema = (schema)=>__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        jsonrpc: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+        method: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].optional(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+        id: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number),
+        result: schema
+    }).annotations({
+        identifier: "JSONRPCSchema"
+    });
+var JSONRPCErrorSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    code: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    message: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    data: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].optional(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Unknown)
+});
+var JSONRPCErrorResponseSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    jsonrpc: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    method: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].optional(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+    id: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number),
+    error: JSONRPCErrorSchema
+});
+var JSONRPCResponseSchema = (schema)=>__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Union(JSONRPCSchema(schema), JSONRPCErrorResponseSchema).annotations({
+        identifier: "JSONRPCResponseSchema"
+    });
+var getJSONRPCResult = (response)=>{
+    if ("error" in response) {
+        const data = response.error.data === void 0 ? "" : `: ${JSON.stringify(response.error.data)}`;
+        throw new Error(`Ogmios JSON-RPC error ${response.error.code}: ${response.error.message}${data}`);
+    }
+    return response.result;
+};
+var LovelaceAsset = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    lovelace: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number
+});
+var TupleNumberFromString = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].compose(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].split("/"), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NumberFromString));
+var ProtocolParametersSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    minFeeCoefficient: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    minFeeReferenceScripts: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        base: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+        range: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+        multiplier: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number
+    }),
+    maxReferenceScriptsSize: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        bytes: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number
+    }),
+    stakePoolVotingThresholds: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        noConfidence: TupleNumberFromString,
+        constitutionalCommittee: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+            default: TupleNumberFromString,
+            stateOfNoConfidence: TupleNumberFromString
+        }),
+        hardForkInitiation: TupleNumberFromString,
+        protocolParametersUpdate: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+            security: TupleNumberFromString
+        })
+    }),
+    delegateRepresentativeVotingThresholds: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        noConfidence: TupleNumberFromString,
+        constitutionalCommittee: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+            default: TupleNumberFromString,
+            stateOfNoConfidence: TupleNumberFromString
+        }),
+        constitution: TupleNumberFromString,
+        hardForkInitiation: TupleNumberFromString,
+        protocolParametersUpdate: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+            network: TupleNumberFromString,
+            economic: TupleNumberFromString,
+            technical: TupleNumberFromString,
+            governance: TupleNumberFromString
+        }),
+        treasuryWithdrawals: TupleNumberFromString
+    }),
+    constitutionalCommitteeMinSize: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].optional(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number),
+    constitutionalCommitteeMaxTermLength: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    governanceActionLifetime: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    governanceActionDeposit: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        ada: LovelaceAsset
+    }),
+    delegateRepresentativeDeposit: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        ada: LovelaceAsset
+    }),
+    delegateRepresentativeMaxIdleTime: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    minFeeConstant: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        ada: LovelaceAsset
+    }),
+    maxBlockBodySize: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        bytes: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number
+    }),
+    maxBlockHeaderSize: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        bytes: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number
+    }),
+    maxTransactionSize: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        bytes: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number
+    }),
+    stakeCredentialDeposit: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        ada: LovelaceAsset
+    }),
+    stakePoolDeposit: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        ada: LovelaceAsset
+    }),
+    stakePoolRetirementEpochBound: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    desiredNumberOfStakePools: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    stakePoolPledgeInfluence: TupleNumberFromString,
+    monetaryExpansion: TupleNumberFromString,
+    treasuryExpansion: TupleNumberFromString,
+    minStakePoolCost: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        ada: LovelaceAsset
+    }),
+    minUtxoDepositConstant: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        ada: LovelaceAsset
+    }),
+    minUtxoDepositCoefficient: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    plutusCostModels: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        "plutus:v1": __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number),
+        "plutus:v2": __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number),
+        "plutus:v3": __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number)
+    }),
+    scriptExecutionPrices: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        memory: TupleNumberFromString,
+        cpu: TupleNumberFromString
+    }),
+    maxExecutionUnitsPerTransaction: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        memory: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+        cpu: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number
+    }),
+    maxExecutionUnitsPerBlock: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        memory: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+        cpu: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number
+    }),
+    maxValueSize: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        bytes: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number
+    }),
+    collateralPercentage: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    maxCollateralInputs: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    version: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        major: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+        minor: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number
+    })
+}).annotations({
+    identifier: "ProtocolParametersSchema"
+});
+var RewardAccountAdaSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    ada: LovelaceAsset
+});
+var LegacyDelegationSummarySchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    delegate: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].optional(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        id: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String
+    }))),
+    rewards: RewardAccountAdaSchema,
+    deposit: RewardAccountAdaSchema
+});
+var RewardAccountSummarySchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    from: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].optional(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Literal("key", "script")),
+    credential: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].optional(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+    stakePool: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].optional(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        id: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String
+    }))),
+    rewards: RewardAccountAdaSchema,
+    deposit: RewardAccountAdaSchema
+});
+var Delegation = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Union(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Null, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Record({
+    key: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    value: LegacyDelegationSummarySchema
+}), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(RewardAccountSummarySchema));
+var toOgmiosQuantity = (amount)=>{
+    const quantity = Number(amount);
+    if (amount < 0n || !Number.isSafeInteger(quantity)) {
+        throw new Error(`Cannot encode Ogmios quantity ${amount.toString()}. Ogmios expects JSON numbers, so quantities must be non-negative safe integers.`);
+    }
+    return quantity;
+};
+var RedeemerSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    validator: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        purpose: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Literal("spend", "mint", "publish", "withdraw", "vote", "propose"),
+        index: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Int
+    }),
+    budget: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        memory: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Int,
+        cpu: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Int
+    })
+}).annotations({
+    identifier: "RedeemerSchema"
+});
+var toOgmiosUTxOs = (utxos)=>{
+    const toOgmiosScript = (scriptRef)=>{
+        if (scriptRef) {
+            switch(scriptRef.type){
+                case "PlutusV1":
+                    return {
+                        language: "plutus:v1",
+                        cbor: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["applySingleCborEncoding"])(scriptRef.script)
+                    };
+                case "PlutusV2":
+                    return {
+                        language: "plutus:v2",
+                        cbor: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["applySingleCborEncoding"])(scriptRef.script)
+                    };
+                case "PlutusV3":
+                    return {
+                        language: "plutus:v3",
+                        cbor: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["applySingleCborEncoding"])(scriptRef.script)
+                    };
+                default:
+                    return null;
+            }
+        }
+    };
+    const toOgmiosAssets = (assets)=>{
+        const newAssets = {};
+        Object.entries(assets).forEach(([unit, amount])=>{
+            if (unit == "lovelace") return;
+            const { policyId, assetName } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fromUnit"])(unit);
+            if (!newAssets[policyId]) {
+                newAssets[policyId] = {};
+            }
+            return newAssets[policyId][assetName ? assetName : ""] = toOgmiosQuantity(amount);
+        });
+        return newAssets;
+    };
+    return (utxos || []).map((utxo)=>({
+            transaction: {
+                id: utxo.txHash
+            },
+            index: utxo.outputIndex,
+            address: utxo.address,
+            value: {
+                ada: {
+                    lovelace: toOgmiosQuantity(utxo.assets["lovelace"])
+                },
+                ...toOgmiosAssets(utxo.assets)
+            },
+            datumHash: utxo.datumHash,
+            datum: utxo.datum,
+            script: toOgmiosScript(utxo.scriptRef)
+        }));
+};
+;
+var QuantitySchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Union(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number.pipe(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].filter(Number.isSafeInteger)), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String.pipe(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].pattern(/^\d+$/)));
+var ValueSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    coins: QuantitySchema,
+    assets: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Record({
+        key: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+        value: QuantitySchema
+    })
+});
+var UTxOSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    transaction_index: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    transaction_id: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    output_index: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    address: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    value: ValueSchema,
+    datum_hash: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+    datum_type: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].optional(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Literal("hash", "inline")),
+    script_hash: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+    created_at: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        slot_no: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+        header_hash: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String
+    }),
+    spent_at: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        slot_no: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+        header_hash: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String
+    }))
+});
+var ScriptSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    language: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Literal("native", "plutus:v1", "plutus:v2", "plutus:v3"),
+    script: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String
+}));
+var DatumSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    datum: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String
+}));
+var DelegationSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Record({
+    key: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    value: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        delegate: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+            id: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String
+        }),
+        rewards: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+            ada: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+                lovelace: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number
+            })
+        }),
+        deposit: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+            ada: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+                lovelace: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number
+            })
+        })
+    })
+}));
+;
+;
+var filterStatusOk = (self)=>self.status >= 200 && self.status < 300 ? __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].succeed(self) : self.text.pipe(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap((text)=>__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].fail(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$HttpClientError$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__HttpClientError$3e$__["HttpClientError"].ResponseError({
+            response: self,
+            request: self.request,
+            reason: "StatusCode",
+            description: `non 2xx status code : ${text}`
+        }))));
+var makeGet = (url, schema, headers)=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(// Initiate a GET request to the specified URL
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$HttpClientRequest$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__HttpClientRequest$3e$__["HttpClientRequest"].get(url), // Conditional bearer token authentication
+    headers ? __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$HttpClientRequest$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__HttpClientRequest$3e$__["HttpClientRequest"].setHeaders(headers) : __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["identity"], // Execute the HTTP request and retrieve the response
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$HttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__HttpClient$3e$__["HttpClient"].execute, // Ensure only 2xx responses are treated as successes.
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap(filterStatusOk), // Parse the response body using the provided JSON schema
+    // This validates and transforms the response to the expected type
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$HttpClientResponse$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__HttpClientResponse$3e$__["HttpClientResponse"].schemaBodyJson(schema)), // Ensure request is aborted if the program is interrupted
+    // Prevents resource leaks and ensures clean request termination
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].scoped);
+var makePostAsJson = (url, data, schema, headers)=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(// Initiate a POST request to the specified URL
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$HttpClientRequest$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__HttpClientRequest$3e$__["HttpClientRequest"].post(url), // Conditional headers
+    headers ? __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$HttpClientRequest$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__HttpClientRequest$3e$__["HttpClientRequest"].setHeaders(headers) : __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["identity"], // Set the request body as Json
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$HttpClientRequest$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__HttpClientRequest$3e$__["HttpClientRequest"].bodyJson(data), // Execute the HTTP request and retrieve the response
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$HttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__HttpClient$3e$__["HttpClient"].execute), // Ensure only 2xx responses are treated as successes.
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap(filterStatusOk), // Parse the response body using the provided JSON schema
+    // This validates and transforms the response to the expected type
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$HttpClientResponse$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__HttpClientResponse$3e$__["HttpClientResponse"].schemaBodyJson(schema)), // Ensure request is aborted if the program is interrupted
+    // Prevents resource leaks and ensures clean request termination
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].scoped);
+var makePostAsUint8Array = (url, data, schema, headers)=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(// Initiate a POST request to the specified URL
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$HttpClientRequest$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__HttpClientRequest$3e$__["HttpClientRequest"].post(url), // Conditional bearer token authentication
+    headers ? __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$HttpClientRequest$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__HttpClientRequest$3e$__["HttpClientRequest"].setHeaders(headers) : __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["identity"], // Set the request body as a Uint8Array with CBOR content type
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$HttpClientRequest$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__HttpClientRequest$3e$__["HttpClientRequest"].bodyUint8Array(data, "application/cbor"), // Execute the HTTP request and retrieve the response
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$HttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__HttpClient$3e$__["HttpClient"].execute, // Ensure only 2xx responses are treated as successes.
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap(filterStatusOk), // Parse the response body using the provided JSON schema
+    // This validates and transforms the response to the expected type
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$HttpClientResponse$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__HttpClientResponse$3e$__["HttpClientResponse"].schemaBodyJson(schema)), // Ensure request is aborted if the program is interrupted
+    // Prevents resource leaks and ensures clean request termination
+    __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].scoped);
+;
+var KupmiosError = class extends __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Data$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Data$3e$__["Data"].TaggedError("KupmiosError") {
+    get message() {
+        return `${this.cause}`;
+    }
+};
+var Kupmios = class {
+    kupoUrl;
+    ogmiosUrl;
+    headers;
+    constructor(kupoUrl, ogmiosUrl, headers){
+        this.kupoUrl = kupoUrl;
+        this.ogmiosUrl = ogmiosUrl;
+        this.headers = headers;
+    }
+    async getProtocolParameters() {
+        const data = {
+            jsonrpc: "2.0",
+            method: "queryLedgerState/protocolParameters",
+            params: {},
+            id: null
+        };
+        const schema = JSONRPCResponseSchema(ProtocolParametersSchema);
+        const response = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(makePostAsJson(this.ogmiosUrl, data, schema, this.headers?.ogmiosHeader), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(1e4), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].catchAll((cause)=>new KupmiosError({
+                cause
+            })), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].provide(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$FetchHttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__FetchHttpClient$3e$__["FetchHttpClient"].layer), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].runPromise);
+        const result = getJSONRPCResult(response);
+        return toProtocolParameters(result);
+    }
+    async getUtxos(addressOrCredential) {
+        const isAddress = typeof addressOrCredential === "string";
+        const queryPredicate = isAddress ? addressOrCredential : addressOrCredential.hash;
+        const pattern = `${this.kupoUrl}/matches/${queryPredicate}${isAddress ? "" : "/*"}?unspent`;
+        const schema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(UTxOSchema);
+        const utxos = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(makeGet(pattern, schema, this.headers?.kupoHeader), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap((u)=>kupmiosUtxosToUtxos(this.kupoUrl, u, this.headers?.kupoHeader)), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(1e4), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].catchAll((cause)=>new KupmiosError({
+                cause
+            })), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].provide(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$FetchHttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__FetchHttpClient$3e$__["FetchHttpClient"].layer), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].runPromise);
+        return utxos;
+    }
+    async getUtxosWithUnit(addressOrCredential, unit) {
+        const isAddress = typeof addressOrCredential === "string";
+        const queryPredicate = isAddress ? addressOrCredential : addressOrCredential.hash;
+        const { policyId, assetName } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fromUnit"])(unit);
+        const pattern = `${this.kupoUrl}/matches/${queryPredicate}${isAddress ? "" : "/*"}?unspent&policy_id=${policyId}${assetName ? `&asset_name=${assetName}` : ""}`;
+        const schema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(UTxOSchema);
+        const utxos = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(makeGet(pattern, schema, this.headers?.kupoHeader), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap((u)=>kupmiosUtxosToUtxos(this.kupoUrl, u, this.headers?.kupoHeader)), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(1e4), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].catchAll((cause)=>new KupmiosError({
+                cause
+            })), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].provide(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$FetchHttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__FetchHttpClient$3e$__["FetchHttpClient"].layer), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].runPromise);
+        return utxos;
+    }
+    async getUtxoByUnit(unit) {
+        const { policyId, assetName } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fromUnit"])(unit);
+        const pattern = `${this.kupoUrl}/matches/${policyId}.${assetName ? `${assetName}` : "*"}?unspent`;
+        const schema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(UTxOSchema);
+        const utxos = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(makeGet(pattern, schema, this.headers?.kupoHeader), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap((u)=>kupmiosUtxosToUtxos(this.kupoUrl, u, this.headers?.kupoHeader)), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(1e4), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].catchAll((cause)=>new KupmiosError({
+                cause
+            })), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].provide(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$FetchHttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__FetchHttpClient$3e$__["FetchHttpClient"].layer), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].runPromise);
+        if (utxos.length === 0) {
+            throw new Error("Unit not found.");
+        }
+        if (utxos.length > 1) {
+            throw new Error("Unit needs to be an NFT or only held by one address.");
+        }
+        return utxos[0];
+    }
+    async getUtxosByOutRef(outRefs) {
+        const queryHashes = [
+            ...new Set(outRefs.map((outRef)=>outRef.txHash))
+        ];
+        const mkPattern = (txHash)=>`${this.kupoUrl}/matches/*@${txHash}?unspent`;
+        const schema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(UTxOSchema);
+        const program = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].forEach(queryHashes, (txHash)=>(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(makeGet(mkPattern(txHash), schema, this.headers?.kupoHeader), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap((u)=>kupmiosUtxosToUtxos(this.kupoUrl, u, this.headers?.kupoHeader)), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(1e4), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].catchAll((cause)=>new KupmiosError({
+                    cause
+                }))));
+        const utxos = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].runPromise((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(program, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].provide(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$FetchHttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__FetchHttpClient$3e$__["FetchHttpClient"].layer)));
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Array$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Array$3e$__["Array"].flatten(utxos).filter((utxo)=>outRefs.some((outRef)=>utxo.txHash === outRef.txHash && utxo.outputIndex === outRef.outputIndex));
+    }
+    async getDelegation(rewardAddress) {
+        const data = {
+            jsonrpc: "2.0",
+            method: "queryLedgerState/rewardAccountSummaries",
+            params: {
+                keys: [
+                    rewardAddress
+                ]
+            },
+            id: null
+        };
+        const schema = JSONRPCResponseSchema(Delegation);
+        const response = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(makePostAsJson(this.ogmiosUrl, data, schema, this.headers?.ogmiosHeader), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].provide(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$FetchHttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__FetchHttpClient$3e$__["FetchHttpClient"].layer), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(1e4), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].catchAll((cause)=>new KupmiosError({
+                cause
+            })), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].runPromise);
+        const result = getJSONRPCResult(response);
+        return toDelegation(result);
+    }
+    async getDatum(datumHash) {
+        const pattern = `${this.kupoUrl}/datums/${datumHash}`;
+        const schema = DatumSchema;
+        const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(makeGet(pattern, schema, this.headers?.kupoHeader), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].provide(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$FetchHttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__FetchHttpClient$3e$__["FetchHttpClient"].layer), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(1e4), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].fromNullable), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].catchAll((cause)=>new KupmiosError({
+                cause
+            })), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].runPromise);
+        return result.datum;
+    }
+    async awaitTx(txHash, checkInterval = 2e4) {
+        const pattern = `${this.kupoUrl}/matches/*@${txHash}?unspent`;
+        const schema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(UTxOSchema).annotations({
+            identifier: "Array<KupmiosSchema.KupoUTxO>"
+        });
+        const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(makeGet(pattern, schema, this.headers?.kupoHeader), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].provide(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$FetchHttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__FetchHttpClient$3e$__["FetchHttpClient"].layer), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].repeat({
+            schedule: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schedule$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schedule$3e$__["Schedule"].exponential(checkInterval),
+            until: (result2)=>result2.length > 0
+        }), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(16e4), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].catchAll((cause)=>new KupmiosError({
+                cause
+            })), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].as(true), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].runPromise);
+        return result;
+    }
+    async submitTx(cbor) {
+        const data = {
+            jsonrpc: "2.0",
+            method: "submitTransaction",
+            params: {
+                transaction: {
+                    cbor
+                }
+            },
+            id: null
+        };
+        const schema = JSONRPCResponseSchema(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+            transaction: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+                id: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String
+            })
+        }));
+        const response = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(makePostAsJson(this.ogmiosUrl, data, schema, this.headers?.ogmiosHeader), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].provide(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$FetchHttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__FetchHttpClient$3e$__["FetchHttpClient"].layer), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(1e4), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].catchAll((cause)=>new KupmiosError({
+                cause
+            })), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].runPromise);
+        const result = getJSONRPCResult(response);
+        return result.transaction.id;
+    }
+    async evaluateTx(tx, additionalUTxOs) {
+        const data = {
+            jsonrpc: "2.0",
+            method: "evaluateTransaction",
+            params: {
+                transaction: {
+                    cbor: tx
+                },
+                additionalUtxo: toOgmiosUTxOs(additionalUTxOs)
+            },
+            id: null
+        };
+        const schema = JSONRPCResponseSchema(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(RedeemerSchema));
+        const response = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(makePostAsJson(this.ogmiosUrl, data, schema, this.headers?.ogmiosHeader), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].provide(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$FetchHttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__FetchHttpClient$3e$__["FetchHttpClient"].layer), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(1e4), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].catchAll((cause)=>new KupmiosError({
+                cause
+            })), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].runPromise);
+        const result = getJSONRPCResult(response);
+        const evalRedeemers = result.map((item)=>({
+                ex_units: {
+                    mem: item.budget.memory,
+                    steps: item.budget.cpu
+                },
+                redeemer_index: item.validator.index,
+                redeemer_tag: item.validator.purpose
+            }));
+        return evalRedeemers;
+    }
+};
+var getDatumEffect = (kupoUrl, datum_type, datum_hash, kupoHeader)=>__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].gen(function*() {
+        if (datum_type === "inline" && datum_hash) {
+            const pattern = `${kupoUrl}/datums/${datum_hash}`;
+            const schema = DatumSchema;
+            return yield* (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(makeGet(pattern, schema, kupoHeader), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].fromNullable), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].map((result)=>result.datum), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].retry(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schedule$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schedule$3e$__["Schedule"].compose(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schedule$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schedule$3e$__["Schedule"].exponential(50), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schedule$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schedule$3e$__["Schedule"].recurs(5))), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(5e3));
+        } else return void 0;
+    });
+var getScriptEffect = (kupoUrl, script_hash, kupoHeader)=>__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].gen(function*() {
+        if (script_hash) {
+            const pattern = `${kupoUrl}/scripts/${script_hash}`;
+            const schema = ScriptSchema;
+            return yield* (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(makeGet(pattern, schema, kupoHeader), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].fromNullable), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].retry(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schedule$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schedule$3e$__["Schedule"].compose(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schedule$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schedule$3e$__["Schedule"].exponential(50), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schedule$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schedule$3e$__["Schedule"].recurs(5))), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(5e3), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].map(({ language, script })=>{
+                switch(language){
+                    case "native":
+                        return {
+                            type: "Native",
+                            script
+                        };
+                    case "plutus:v1":
+                        return {
+                            type: "PlutusV1",
+                            script: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["applyDoubleCborEncoding"])(script)
+                        };
+                    case "plutus:v2":
+                        return {
+                            type: "PlutusV2",
+                            script: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["applyDoubleCborEncoding"])(script)
+                        };
+                    case "plutus:v3":
+                        return {
+                            type: "PlutusV3",
+                            script: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["applyDoubleCborEncoding"])(script)
+                        };
+                }
+            }));
+        } else return void 0;
+    });
+var toAssets = (value)=>{
+    const assets = {
+        lovelace: BigInt(value.coins)
+    };
+    for (const unit of Object.keys(value.assets)){
+        assets[unit.replace(".", "")] = BigInt(value.assets[unit]);
+    }
+    return assets;
+};
+var toProtocolParameters = (result)=>{
+    return {
+        minFeeA: result.minFeeCoefficient,
+        minFeeB: result.minFeeConstant.ada.lovelace,
+        maxTxSize: result.maxTransactionSize.bytes,
+        maxValSize: result.maxValueSize.bytes,
+        keyDeposit: BigInt(result.stakeCredentialDeposit.ada.lovelace),
+        poolDeposit: BigInt(result.stakePoolDeposit.ada.lovelace),
+        drepDeposit: BigInt(result.delegateRepresentativeDeposit.ada.lovelace),
+        govActionDeposit: BigInt(result.governanceActionDeposit.ada.lovelace),
+        priceMem: result.scriptExecutionPrices.memory[0] / result.scriptExecutionPrices.memory[1],
+        priceStep: result.scriptExecutionPrices.cpu[0] / result.scriptExecutionPrices.cpu[1],
+        maxTxExMem: BigInt(result.maxExecutionUnitsPerTransaction.memory),
+        maxTxExSteps: BigInt(result.maxExecutionUnitsPerTransaction.cpu),
+        // NOTE: coinsPerUtxoByte is now called utxoCostPerByte:
+        // https://github.com/IntersectMBO/cardano-node/pull/4141
+        // Ogmios v6.x calls it minUtxoDepositCoefficient according to the following
+        // documentation from its protocol parameters data model:
+        // https://github.com/CardanoSolutions/ogmios/blob/master/architectural-decisions/accepted/017-api-version-6-major-rewrite.md#protocol-parameters
+        coinsPerUtxoByte: BigInt(result.minUtxoDepositCoefficient),
+        collateralPercentage: result.collateralPercentage,
+        maxCollateralInputs: result.maxCollateralInputs,
+        minFeeRefScriptCostPerByte: result.minFeeReferenceScripts.base,
+        costModels: {
+            PlutusV1: [
+                ...result.plutusCostModels["plutus:v1"]
+            ],
+            PlutusV2: [
+                ...result.plutusCostModels["plutus:v2"]
+            ],
+            PlutusV3: [
+                ...result.plutusCostModels["plutus:v3"]
+            ]
+        }
+    };
+};
+var toDelegation = (result)=>{
+    if (!result) {
+        return {
+            poolId: null,
+            rewards: 0n
+        };
+    }
+    const delegation = Array.isArray(result) ? result[0] : Object.values(result)[0];
+    if (!delegation) {
+        return {
+            poolId: null,
+            rewards: 0n
+        };
+    }
+    return {
+        poolId: "stakePool" in delegation ? delegation.stakePool?.id || null : delegation.delegate?.id || null,
+        rewards: BigInt(delegation.rewards.ada.lovelace)
+    };
+};
+var kupmiosUtxosToUtxos = (kupoURL, utxos, kupoHeader)=>__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].forEach(utxos, (utxo)=>{
+        return (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].all([
+            getDatumEffect(kupoURL, utxo.datum_type, utxo.datum_hash, kupoHeader),
+            getScriptEffect(kupoURL, utxo.script_hash, kupoHeader)
+        ]), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].map(([datum, script])=>({
+                txHash: utxo.transaction_id,
+                outputIndex: utxo.output_index,
+                address: utxo.address,
+                assets: toAssets(utxo.value),
+                datumHash: utxo.datum_type === "hash" ? utxo.datum_hash : void 0,
+                datum,
+                scriptRef: script
+            })));
+    }, {
+        concurrency: "unbounded"
+    });
+;
+;
+;
+;
+function generateEmulatorAccountFromPrivateKey(assets) {
+    const privateKey = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PrivateKey"].generate_ed25519().to_bech32();
+    const priv = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PrivateKey"].from_bech32(privateKey);
+    const pubKeyHash = priv.to_public().hash();
+    const address = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["EnterpriseAddress"].new(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Credential"].new_pub_key(pubKeyHash)).to_address().to_bech32(void 0);
+    return {
+        seedPhrase: "",
+        address,
+        assets,
+        privateKey
+    };
+}
+function generateEmulatorAccount(assets) {
+    const seedPhrase = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["generateSeedPhrase"])();
+    return {
+        seedPhrase,
+        address: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$wallet$40$0$2e$1$2e$74$2f$node_modules$2f40$lucid$2d$evolution$2f$wallet$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["walletFromSeed"])(seedPhrase, {
+            addressType: "Base",
+            accountIndex: 0,
+            network: "Custom"
+        }).address,
+        assets,
+        privateKey: ""
+    };
+}
+var Emulator = class {
+    ledger;
+    mempool = {};
+    /**
+   * Only stake key registrations/delegations and rewards are tracked.
+   * Other certificates are not tracked.
+   */ chain = {};
+    blockHeight;
+    slot;
+    time;
+    protocolParameters;
+    datumTable = {};
+    constructor(accounts, protocolParameters = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PROTOCOL_PARAMETERS_DEFAULT"]){
+        const GENESIS_HASH = "00".repeat(32);
+        this.blockHeight = 0;
+        this.slot = 0;
+        this.time = Date.now();
+        this.ledger = {};
+        accounts.forEach(({ address, assets, outputData }, index)=>{
+            if ([
+                outputData?.hash,
+                outputData?.asHash,
+                outputData?.inline
+            ].filter((b)=>b).length > 1) {
+                throw new Error("Not allowed to set hash, asHash and inline at the same time.");
+            }
+            this.ledger[GENESIS_HASH + index] = {
+                utxo: {
+                    txHash: GENESIS_HASH,
+                    outputIndex: index,
+                    address,
+                    assets,
+                    datumHash: outputData?.asHash ? __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["hash_plutus_data"](__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PlutusData"].from_cbor_hex(outputData.asHash)).to_hex() : outputData?.hash,
+                    datum: outputData?.inline,
+                    scriptRef: outputData?.scriptRef
+                },
+                spent: false
+            };
+        });
+        this.protocolParameters = protocolParameters;
+    }
+    now() {
+        return this.time;
+    }
+    awaitSlot(length = 1) {
+        this.slot += length;
+        this.time += length * 1e3;
+        const currentHeight = this.blockHeight;
+        this.blockHeight = Math.floor(this.slot / 20);
+        if (this.blockHeight > currentHeight) {
+            for (const [outRef, { utxo, spent }] of Object.entries(this.mempool)){
+                this.ledger[outRef] = {
+                    utxo,
+                    spent
+                };
+            }
+            for (const [outRef, { spent }] of Object.entries(this.ledger)){
+                if (spent) delete this.ledger[outRef];
+            }
+            this.mempool = {};
+        }
+    }
+    awaitBlock(height = 1) {
+        this.blockHeight += height;
+        this.slot += height * 20;
+        this.time += height * 20 * 1e3;
+        for (const [outRef, { utxo, spent }] of Object.entries(this.mempool)){
+            this.ledger[outRef] = {
+                utxo,
+                spent
+            };
+        }
+        for (const [outRef, { spent }] of Object.entries(this.ledger)){
+            if (spent) delete this.ledger[outRef];
+        }
+        this.mempool = {};
+    }
+    getUtxos(addressOrCredential) {
+        const utxos = Object.values(this.ledger).flatMap(({ utxo })=>{
+            if (typeof addressOrCredential === "string") {
+                return addressOrCredential === utxo.address ? utxo : [];
+            } else {
+                const { paymentCredential } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getAddressDetails"])(utxo.address);
+                return paymentCredential?.hash === addressOrCredential.hash ? utxo : [];
+            }
+        });
+        return Promise.resolve(utxos);
+    }
+    getProtocolParameters() {
+        return Promise.resolve(this.protocolParameters);
+    }
+    getDatum(datumHash) {
+        return Promise.resolve(this.datumTable[datumHash]);
+    }
+    getUtxosWithUnit(addressOrCredential, unit) {
+        const utxos = Object.values(this.ledger).flatMap(({ utxo })=>{
+            if (typeof addressOrCredential === "string") {
+                return addressOrCredential === utxo.address && utxo.assets[unit] > 0n ? utxo : [];
+            } else {
+                const { paymentCredential } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getAddressDetails"])(utxo.address);
+                return paymentCredential?.hash === addressOrCredential.hash && utxo.assets[unit] > 0n ? utxo : [];
+            }
+        });
+        return Promise.resolve(utxos);
+    }
+    getUtxosByOutRef(outRefs) {
+        return Promise.resolve(outRefs.flatMap((outRef)=>this.ledger[outRef.txHash + outRef.outputIndex]?.utxo || []));
+    }
+    getUtxoByUnit(unit) {
+        const utxos = Object.values(this.ledger).flatMap(({ utxo })=>utxo.assets[unit] > 0n ? utxo : []);
+        if (utxos.length > 1) {
+            throw new Error("Unit needs to be an NFT or only held by one address.");
+        }
+        return Promise.resolve(utxos[0]);
+    }
+    getDelegation(rewardAddress) {
+        return Promise.resolve({
+            poolId: this.chain[rewardAddress]?.delegation?.poolId || null,
+            rewards: this.chain[rewardAddress]?.delegation?.rewards || 0n
+        });
+    }
+    awaitTx(txHash) {
+        if (this.mempool[txHash + 0]) {
+            this.awaitBlock();
+            return Promise.resolve(true);
+        }
+        return Promise.resolve(true);
+    }
+    /**
+   * Emulates the behaviour of the reward distribution at epoch boundaries.
+   * Stake keys need to be registered and delegated like on a real chain in order to receive rewards.
+   */ distributeRewards(rewards) {
+        for (const [rewardAddress, { registeredStake, delegation }] of Object.entries(this.chain)){
+            if (registeredStake && delegation.poolId) {
+                this.chain[rewardAddress] = {
+                    registeredStake,
+                    delegation: {
+                        poolId: delegation.poolId,
+                        rewards: delegation.rewards += rewards
+                    }
+                };
+            }
+        }
+        this.awaitBlock();
+    }
+    submitTx(tx) {
+        const desTx = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Transaction"].from_cbor_hex(tx);
+        const body = desTx.body();
+        const witnesses = desTx.witness_set();
+        const datums = witnesses.plutus_datums();
+        const txHash = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["hash_transaction"](body).to_hex();
+        const lowerBound = body.validity_interval_start() ? parseInt(body.validity_interval_start().toString()) : null;
+        const upperBound = body.ttl() ? parseInt(body.ttl().toString()) : null;
+        if (Number.isInteger(lowerBound) && this.slot < lowerBound) {
+            throw new Error(`Lower bound (${lowerBound}) not in slot range (${this.slot}).`);
+        }
+        if (Number.isInteger(upperBound) && this.slot > upperBound) {
+            throw new Error(`Upper bound (${upperBound}) not in slot range (${this.slot}).`);
+        }
+        const datumTable = (()=>{
+            const table = {};
+            for(let i = 0; i < (datums?.len() || 0); i++){
+                const datum = datums.get(i);
+                const datumHash = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["hash_plutus_data"](datum).to_hex();
+                table[datumHash] = datum.to_cbor_hex();
+            }
+            return table;
+        })();
+        const consumedHashes = /* @__PURE__ */ new Set();
+        const keyHashes = (()=>{
+            const keyHashes2 = [];
+            for(let i = 0; i < (witnesses.vkeywitnesses()?.len() || 0); i++){
+                const witness = witnesses.vkeywitnesses().get(i);
+                const publicKey = witness.vkey();
+                const keyHash = publicKey.hash().to_hex();
+                if (!publicKey.verify((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$core$2d$utils$40$0$2e$1$2e$16$2f$node_modules$2f40$lucid$2d$evolution$2f$core$2d$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fromHex"])(txHash), witness.ed25519_signature())) {
+                    throw new Error(`Invalid vkey witness. Key hash: ${keyHash}`);
+                }
+                keyHashes2.push(keyHash);
+            }
+            return keyHashes2;
+        })();
+        const edKeyHashes = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Ed25519KeyHashList"].new();
+        keyHashes.forEach((keyHash)=>edKeyHashes.add(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Ed25519KeyHash"].from_hex(keyHash)));
+        const nativeHashes = (()=>{
+            const scriptHashes = [];
+            for(let i = 0; i < (witnesses.native_scripts()?.len() || 0); i++){
+                const witness = witnesses.native_scripts().get(i);
+                const scriptHash = witness.hash().to_hex();
+                if (!witness.verify(Number.isInteger(lowerBound) ? __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["BigInteger"].from_str(lowerBound.toString()).to_js_value() : void 0, Number.isInteger(upperBound) ? __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["BigInteger"].from_str(upperBound.toString()).to_js_value() : void 0, edKeyHashes)) {
+                    throw new Error(`Invalid native script witness. Script hash: ${scriptHash}`);
+                }
+                for(let i2 = 0; i2 < witness.get_required_signers().len(); i2++){
+                    const keyHash = witness.get_required_signers().get(i2).to_hex();
+                    consumedHashes.add(keyHash);
+                }
+                scriptHashes.push(scriptHash);
+            }
+            return scriptHashes;
+        })();
+        const nativeHashesOptional = {};
+        const plutusHashesOptional = [];
+        const plutusHashes = (()=>{
+            const scriptHashes = [];
+            for(let i = 0; i < (witnesses.plutus_v1_scripts()?.len() || 0); i++){
+                const script = witnesses.plutus_v1_scripts().get(i);
+                const scriptHash = script.hash().to_hex();
+                scriptHashes.push(scriptHash);
+            }
+            for(let i = 0; i < (witnesses.plutus_v2_scripts()?.len() || 0); i++){
+                const script = witnesses.plutus_v2_scripts().get(i);
+                const scriptHash = script.hash().to_hex();
+                scriptHashes.push(scriptHash);
+            }
+            for(let i = 0; i < (witnesses.plutus_v3_scripts()?.len() || 0); i++){
+                const script = witnesses.plutus_v3_scripts().get(i);
+                const scriptHash = script.hash().to_hex();
+                scriptHashes.push(scriptHash);
+            }
+            return scriptHashes;
+        })();
+        const inputs = body.inputs();
+        const resolvedInputs = [];
+        for(let i = 0; i < inputs.len(); i++){
+            const input = inputs.get(i);
+            const outRef = input.transaction_id().to_hex() + input.index().toString();
+            const entryLedger = this.ledger[outRef];
+            const { entry, type } = !entryLedger ? {
+                entry: this.mempool[outRef],
+                type: "Mempool"
+            } : {
+                entry: entryLedger,
+                type: "Ledger"
+            };
+            if (!entry || entry.spent) {
+                throw new Error(`Could not spend UTxO: ${JSON.stringify({
+                    txHash: entry?.utxo.txHash,
+                    outputIndex: entry?.utxo.outputIndex
+                })}
+It does not exist or was already spent.`);
+            }
+            const scriptRef = entry.utxo.scriptRef;
+            if (scriptRef) {
+                switch(scriptRef.type){
+                    case "Native":
+                        {
+                            const script = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["NativeScript"].from_cbor_bytes((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$core$2d$utils$40$0$2e$1$2e$16$2f$node_modules$2f40$lucid$2d$evolution$2f$core$2d$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fromHex"])(scriptRef.script));
+                            nativeHashesOptional[script.hash().to_hex()] = script;
+                            break;
+                        }
+                    case "PlutusV1":
+                        {
+                            const script = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PlutusScript"].from_v1(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PlutusV1Script"].from_cbor_bytes((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$core$2d$utils$40$0$2e$1$2e$16$2f$node_modules$2f40$lucid$2d$evolution$2f$core$2d$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fromHex"])(scriptRef.script)));
+                            plutusHashesOptional.push(script.hash().to_hex());
+                            break;
+                        }
+                    case "PlutusV2":
+                        {
+                            const script = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PlutusScript"].from_v2(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PlutusV2Script"].from_cbor_bytes((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$core$2d$utils$40$0$2e$1$2e$16$2f$node_modules$2f40$lucid$2d$evolution$2f$core$2d$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fromHex"])(scriptRef.script)));
+                            plutusHashesOptional.push(script.hash().to_hex());
+                            break;
+                        }
+                    case "PlutusV3":
+                        {
+                            const script = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PlutusScript"].from_v3(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PlutusV3Script"].from_cbor_bytes((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$core$2d$utils$40$0$2e$1$2e$16$2f$node_modules$2f40$lucid$2d$evolution$2f$core$2d$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fromHex"])(scriptRef.script)));
+                            plutusHashesOptional.push(script.hash().to_hex());
+                            break;
+                        }
+                }
+            }
+            if (entry.utxo.datumHash) consumedHashes.add(entry.utxo.datumHash);
+            resolvedInputs.push({
+                entry,
+                type
+            });
+        }
+        for(let i = 0; i < (body.reference_inputs()?.len() || 0); i++){
+            const input = body.reference_inputs().get(i);
+            const outRef = input.transaction_id().to_hex() + input.index().toString();
+            const entry = this.ledger[outRef] || this.mempool[outRef];
+            if (!entry || entry.spent) {
+                throw new Error(`Could not read UTxO: ${JSON.stringify({
+                    txHash: entry?.utxo.txHash,
+                    outputIndex: entry?.utxo.outputIndex
+                })}
+It does not exist or was already spent.`);
+            }
+            const scriptRef = entry.utxo.scriptRef;
+            if (scriptRef) {
+                switch(scriptRef.type){
+                    case "Native":
+                        {
+                            const script = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["NativeScript"].from_cbor_bytes((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$core$2d$utils$40$0$2e$1$2e$16$2f$node_modules$2f40$lucid$2d$evolution$2f$core$2d$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fromHex"])(scriptRef.script));
+                            nativeHashesOptional[script.hash().to_hex()] = script;
+                            break;
+                        }
+                    case "PlutusV1":
+                        {
+                            const script = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PlutusScript"].from_v1(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PlutusV1Script"].from_cbor_bytes((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$core$2d$utils$40$0$2e$1$2e$16$2f$node_modules$2f40$lucid$2d$evolution$2f$core$2d$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fromHex"])(scriptRef.script)));
+                            plutusHashesOptional.push(script.hash().to_hex());
+                            break;
+                        }
+                    case "PlutusV2":
+                        {
+                            const script = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PlutusScript"].from_v2(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PlutusV2Script"].from_cbor_bytes((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$core$2d$utils$40$0$2e$1$2e$16$2f$node_modules$2f40$lucid$2d$evolution$2f$core$2d$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fromHex"])(scriptRef.script)));
+                            plutusHashesOptional.push(script.hash().to_hex());
+                            break;
+                        }
+                    case "PlutusV3":
+                        {
+                            const script = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PlutusScript"].from_v3(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PlutusV3Script"].from_cbor_bytes((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$core$2d$utils$40$0$2e$1$2e$16$2f$node_modules$2f40$lucid$2d$evolution$2f$core$2d$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fromHex"])(scriptRef.script)));
+                            plutusHashesOptional.push(script.hash().to_hex());
+                            break;
+                        }
+                }
+            }
+            if (entry.utxo.datumHash) consumedHashes.add(entry.utxo.datumHash);
+        }
+        const redeemers = (()=>{
+            const tagMap = {
+                0: "Spend",
+                1: "Mint",
+                2: "Cert",
+                3: "Reward",
+                4: "Proposing",
+                5: "Voting"
+            };
+            const collected = [];
+            const redeemers2 = witnesses.redeemers();
+            const arrLegacyRedeemer = redeemers2?.as_arr_legacy_redeemer();
+            if (arrLegacyRedeemer) {
+                for(let i = 0; i < (arrLegacyRedeemer.len() || 0); i++){
+                    const redeemer = arrLegacyRedeemer.get(i);
+                    collected.push({
+                        tag: tagMap[redeemer.tag()],
+                        index: Number(redeemer.index())
+                    });
+                }
+            }
+            const mapRedeemerKeyToRedeemerVal = redeemers2?.as_map_redeemer_key_to_redeemer_val();
+            if (mapRedeemerKeyToRedeemerVal) {
+                const keys = mapRedeemerKeyToRedeemerVal.keys();
+                for(let i = 0; i < (keys.len() || 0); i++){
+                    const key = keys.get(i);
+                    collected.push({
+                        tag: tagMap[key.tag()],
+                        index: Number(key.index())
+                    });
+                }
+            }
+            return collected;
+        })();
+        function checkAndConsumeHash(credential, tag, index) {
+            switch(credential.type){
+                case "Key":
+                    {
+                        if (!keyHashes.includes(credential.hash)) {
+                            throw new Error(`Missing vkey witness. Key hash: ${credential.hash}`);
+                        }
+                        consumedHashes.add(credential.hash);
+                        break;
+                    }
+                case "Script":
+                    {
+                        if (nativeHashes.includes(credential.hash)) {
+                            consumedHashes.add(credential.hash);
+                            break;
+                        } else if (nativeHashesOptional[credential.hash]) {
+                            if (!nativeHashesOptional[credential.hash].verify(Number.isInteger(lowerBound) ? __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["BigInteger"].from_str(lowerBound.toString()).to_js_value() : void 0, Number.isInteger(upperBound) ? __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["BigInteger"].from_str(upperBound.toString()).to_js_value() : void 0, edKeyHashes)) {
+                                throw new Error(`Invalid native script witness. Script hash: ${credential.hash}`);
+                            }
+                            break;
+                        } else if (plutusHashes.includes(credential.hash) || plutusHashesOptional.includes(credential.hash)) {
+                            if (redeemers.find((redeemer)=>redeemer.tag === tag && redeemer.index === index)) {
+                                consumedHashes.add(credential.hash);
+                                break;
+                            }
+                        }
+                        throw new Error(`Missing script witness. Script hash: ${credential.hash}`);
+                    }
+            }
+        }
+        for(let i = 0; i < (body.collateral_inputs()?.len() || 0); i++){
+            const input = body.collateral_inputs().get(i);
+            const outRef = input.transaction_id().to_hex() + input.index().toString();
+            const entry = this.ledger[outRef] || this.mempool[outRef];
+            if (!entry || entry.spent) {
+                throw new Error(`Could not read UTxO: ${JSON.stringify({
+                    txHash: entry?.utxo.txHash,
+                    outputIndex: entry?.utxo.outputIndex
+                })}
+It does not exist or was already spent.`);
+            }
+            const { paymentCredential } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getAddressDetails"])(entry.utxo.address);
+            if (paymentCredential?.type === "Script") {
+                throw new Error("Collateral inputs can only contain vkeys.");
+            }
+            checkAndConsumeHash(paymentCredential, null, null);
+        }
+        for(let i = 0; i < (body.required_signers()?.len() || 0); i++){
+            const signer = body.required_signers().get(i);
+            checkAndConsumeHash({
+                type: "Key",
+                hash: signer.to_hex()
+            }, null, null);
+        }
+        for(let index = 0; index < (body.mint()?.keys().len() || 0); index++){
+            const policyId = body.mint().keys().get(index).to_hex();
+            checkAndConsumeHash({
+                type: "Script",
+                hash: policyId
+            }, "Mint", index);
+        }
+        const withdrawalRequests = [];
+        for(let index = 0; index < (body.withdrawals()?.keys().len() || 0); index++){
+            const rawAddress = body.withdrawals().keys().get(index);
+            const withdrawal = BigInt(body.withdrawals().get(rawAddress).toString());
+            const rewardAddress = rawAddress.to_address().to_bech32(void 0);
+            const { stakeCredential } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getAddressDetails"])(rewardAddress);
+            checkAndConsumeHash(stakeCredential, "Reward", index);
+            if (this.chain[rewardAddress]?.delegation.rewards !== withdrawal) {
+                throw new Error("Withdrawal amount doesn't match actual reward balance.");
+            }
+            withdrawalRequests.push({
+                rewardAddress,
+                withdrawal
+            });
+        }
+        const certRequests = [];
+        for(let index = 0; index < (body.certs()?.len() || 0); index++){
+            const cert = body.certs().get(index);
+            switch(cert.kind()){
+                case 0:
+                    {
+                        const registration = cert.as_stake_registration();
+                        const rewardAddress = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RewardAddress"].new(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["NetworkInfo"].testnet().network_id(), registration.stake_credential()).to_address().to_bech32(void 0);
+                        if (this.chain[rewardAddress]?.registeredStake) {
+                            throw new Error(`Stake key is already registered. Reward address: ${rewardAddress}`);
+                        }
+                        certRequests.push({
+                            type: "Registration",
+                            rewardAddress
+                        });
+                        break;
+                    }
+                case __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CertificateKind"].RegCert:
+                    {
+                        const registration = cert.as_reg_cert();
+                        const rewardAddress = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RewardAddress"].new(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["NetworkInfo"].testnet().network_id(), registration.stake_credential()).to_address().to_bech32(void 0);
+                        const { stakeCredential } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getAddressDetails"])(rewardAddress);
+                        checkAndConsumeHash(stakeCredential, "Cert", index);
+                        if (this.chain[rewardAddress]?.registeredStake) {
+                            throw new Error(`Stake key is already registered. Reward address: ${rewardAddress}`);
+                        }
+                        certRequests.push({
+                            type: "Registration",
+                            rewardAddress
+                        });
+                        break;
+                    }
+                case 1:
+                    {
+                        const deregistration = cert.as_stake_deregistration();
+                        const rewardAddress = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RewardAddress"].new(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["NetworkInfo"].testnet().network_id(), deregistration.stake_credential()).to_address().to_bech32(void 0);
+                        const { stakeCredential } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getAddressDetails"])(rewardAddress);
+                        checkAndConsumeHash(stakeCredential, "Cert", index);
+                        if (!this.chain[rewardAddress]?.registeredStake) {
+                            throw new Error(`Stake key is already deregistered. Reward address: ${rewardAddress}`);
+                        }
+                        certRequests.push({
+                            type: "Deregistration",
+                            rewardAddress
+                        });
+                        break;
+                    }
+                case 2:
+                    {
+                        const delegation = cert.as_stake_delegation();
+                        const rewardAddress = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["RewardAddress"].new(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["NetworkInfo"].testnet().network_id(), delegation.stake_credential()).to_address().to_bech32(void 0);
+                        const poolId = delegation.pool().to_bech32("pool");
+                        const { stakeCredential } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getAddressDetails"])(rewardAddress);
+                        checkAndConsumeHash(stakeCredential, "Cert", index);
+                        if (!this.chain[rewardAddress]?.registeredStake && !certRequests.find((request)=>request.type === "Registration" && request.rewardAddress === rewardAddress)) {
+                            throw new Error(`Stake key is not registered. Reward address: ${rewardAddress}`);
+                        }
+                        certRequests.push({
+                            type: "Delegation",
+                            rewardAddress,
+                            poolId
+                        });
+                        break;
+                    }
+            }
+        }
+        resolvedInputs.forEach(({ entry: { utxo } }, index)=>{
+            const { paymentCredential } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getAddressDetails"])(utxo.address);
+            checkAndConsumeHash(paymentCredential, "Spend", index);
+        });
+        const outputs = (()=>{
+            const collected = [];
+            for(let i = 0; i < body.outputs().len(); i++){
+                const output = body.outputs().get(i);
+                const unspentOutput = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TransactionUnspentOutput"].new(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TransactionInput"].new(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TransactionHash"].from_hex(txHash), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["BigInteger"].from_str(i.toString()).to_js_value()), output);
+                const utxo = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["coreToUtxo"])(unspentOutput);
+                if (utxo.datumHash) consumedHashes.add(utxo.datumHash);
+                collected.push({
+                    utxo,
+                    spent: false
+                });
+            }
+            return collected;
+        })();
+        const [extraKeyHash] = keyHashes.filter((keyHash)=>!consumedHashes.has(keyHash));
+        if (extraKeyHash) {
+            throw new Error(`Extraneous vkey witness. Key hash: ${extraKeyHash}`);
+        }
+        const [extraNativeHash] = nativeHashes.filter((scriptHash)=>!consumedHashes.has(scriptHash));
+        if (extraNativeHash) {
+            throw new Error(`Extraneous native script. Script hash: ${extraNativeHash}`);
+        }
+        const [extraPlutusHash] = plutusHashes.filter((scriptHash)=>!consumedHashes.has(scriptHash));
+        if (extraPlutusHash) {
+            throw new Error(`Extraneous plutus script. Script hash: ${extraPlutusHash}`);
+        }
+        const [extraDatumHash] = Object.keys(datumTable).filter((datumHash)=>!consumedHashes.has(datumHash));
+        if (extraDatumHash) {
+            throw new Error(`Extraneous plutus data. Datum hash: ${extraDatumHash}`);
+        }
+        resolvedInputs.forEach(({ entry, type })=>{
+            const outRef = entry.utxo.txHash + entry.utxo.outputIndex;
+            entry.spent = true;
+            if (type === "Ledger") this.ledger[outRef] = entry;
+            else if (type === "Mempool") this.mempool[outRef] = entry;
+        });
+        withdrawalRequests.forEach(({ rewardAddress, withdrawal })=>{
+            this.chain[rewardAddress].delegation.rewards -= withdrawal;
+        });
+        certRequests.forEach(({ type, rewardAddress, poolId })=>{
+            switch(type){
+                case "Registration":
+                    {
+                        if (this.chain[rewardAddress]) {
+                            this.chain[rewardAddress].registeredStake = true;
+                        } else {
+                            this.chain[rewardAddress] = {
+                                registeredStake: true,
+                                delegation: {
+                                    poolId: null,
+                                    rewards: 0n
+                                }
+                            };
+                        }
+                        break;
+                    }
+                case "Deregistration":
+                    {
+                        this.chain[rewardAddress].registeredStake = false;
+                        this.chain[rewardAddress].delegation.poolId = null;
+                        break;
+                    }
+                case "Delegation":
+                    {
+                        this.chain[rewardAddress].delegation.poolId = poolId;
+                    }
+            }
+        });
+        outputs.forEach(({ utxo, spent })=>{
+            this.mempool[utxo.txHash + utxo.outputIndex] = {
+                utxo,
+                spent
+            };
+        });
+        for (const [datumHash, datum] of Object.entries(datumTable)){
+            this.datumTable[datumHash] = datum;
+        }
+        return Promise.resolve(txHash);
+    }
+    async evaluateTx(tx, additionalUTxOs) {
+        const desTx = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Transaction"].from_cbor_hex(tx);
+        const redeemers = desTx.witness_set().redeemers();
+        if (!redeemers) {
+            return [];
+        }
+        let evalRedeemers = [];
+        const arrLegacyRedeemer = redeemers.as_arr_legacy_redeemer();
+        if (arrLegacyRedeemer) {
+            for(let i = 0; i < arrLegacyRedeemer.len(); i++){
+                const legacyRedeemer = arrLegacyRedeemer.get(i);
+                evalRedeemers.push({
+                    ex_units: {
+                        mem: Number(legacyRedeemer.ex_units().mem()),
+                        steps: Number(legacyRedeemer.ex_units().steps())
+                    },
+                    redeemer_index: Number(legacyRedeemer.index()),
+                    redeemer_tag: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fromCMLRedeemerTag"])(legacyRedeemer.tag())
+                });
+            }
+            return evalRedeemers;
+        }
+        const mapRedeemerKeyToRedeemerVal = redeemers.as_map_redeemer_key_to_redeemer_val();
+        if (mapRedeemerKeyToRedeemerVal) {
+            const keys = mapRedeemerKeyToRedeemerVal.keys();
+            for(let i = 0; i < keys.len(); i++){
+                const key = keys.get(i);
+                const redeemerVal = mapRedeemerKeyToRedeemerVal.get(key);
+                if (redeemerVal) {
+                    evalRedeemers.push({
+                        ex_units: {
+                            mem: Number(redeemerVal.ex_units().mem()),
+                            steps: Number(redeemerVal.ex_units().steps())
+                        },
+                        redeemer_index: Number(key.index),
+                        redeemer_tag: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fromCMLRedeemerTag"])(key.tag())
+                    });
+                }
+            }
+            return evalRedeemers;
+        }
+        return evalRedeemers;
+    }
+    log() {
+        function getRandomColor(unit) {
+            const seed = unit === "lovelace" ? "1" : unit;
+            let num = 0;
+            for(let i = 0; i < seed.length; i++){
+                num += seed.charCodeAt(i);
+            }
+            const r = num * 123 % 256;
+            const g = num * 321 % 256;
+            const b = num * 213 % 256;
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+        const totalBalances = {};
+        const balances = {};
+        for (const { utxo } of Object.values(this.ledger)){
+            for (const [unit, quantity] of Object.entries(utxo.assets)){
+                if (!balances[utxo.address]) {
+                    balances[utxo.address] = {
+                        [unit]: quantity
+                    };
+                } else if (!balances[utxo.address]?.[unit]) {
+                    balances[utxo.address][unit] = quantity;
+                } else {
+                    balances[utxo.address][unit] += quantity;
+                }
+                if (!totalBalances[unit]) {
+                    totalBalances[unit] = quantity;
+                } else {
+                    totalBalances[unit] += quantity;
+                }
+            }
+        }
+        console.log("\n%cBlockchain state", "color:purple");
+        console.log(`
+    Block height:   %c${this.blockHeight}%c
+    Slot:           %c${this.slot}%c
+    Unix time:      %c${this.time}
+  `, "color:yellow", "color:white", "color:yellow", "color:white", "color:yellow");
+        console.log("\n");
+        for (const [address, assets] of Object.entries(balances)){
+            console.log(`Address: %c${address}`, "color:blue", "\n");
+            for (const [unit, quantity] of Object.entries(assets)){
+                const barLength = Math.max(Math.floor(60 * (Number(quantity) / Number(totalBalances[unit]))), 1);
+                console.log(`%c${"\u2586".repeat(barLength) + " ".repeat(60 - barLength)}`, `color: ${getRandomColor(unit)}`, "", `${unit}:`, quantity, "");
+            }
+            console.log(`
+${"\u2581".repeat(60)}
+`);
+        }
+    }
+};
+;
+;
+var Maestro = class {
+    url;
+    apiKey;
+    turboSubmit;
+    constructor({ network, apiKey, turboSubmit = false }){
+        this.url = `https://${network}.gomaestro-api.org/v1`;
+        this.apiKey = apiKey;
+        this.turboSubmit = turboSubmit;
+    }
+    async getProtocolParameters() {
+        const timestampedResult = await fetch(`${this.url}/protocol-parameters`, {
+            headers: this.commonHeaders()
+        }).then((res)=>res.json());
+        const result = timestampedResult.data;
+        const decimalFromRationalString = (str)=>{
+            const forwardSlashIndex = str.indexOf("/");
+            return parseInt(str.slice(0, forwardSlashIndex)) / parseInt(str.slice(forwardSlashIndex + 1));
+        };
+        return {
+            minFeeA: parseInt(result.min_fee_coefficient),
+            minFeeB: parseInt(result.min_fee_constant.ada.lovelace),
+            maxTxSize: parseInt(result.max_transaction_size.bytes),
+            maxValSize: parseInt(result.max_value_size.bytes),
+            keyDeposit: BigInt(result.stake_credential_deposit.ada.lovelace),
+            poolDeposit: BigInt(result.stake_pool_deposit.ada.lovelace),
+            drepDeposit: BigInt(result.delegate_representative_deposit.ada.lovelace),
+            govActionDeposit: BigInt(result.governance_action_deposit.ada.lovelace),
+            priceMem: decimalFromRationalString(result.script_execution_prices.memory),
+            priceStep: decimalFromRationalString(result.script_execution_prices.cpu),
+            maxTxExMem: BigInt(result.max_execution_units_per_transaction.memory),
+            maxTxExSteps: BigInt(result.max_execution_units_per_transaction.cpu),
+            coinsPerUtxoByte: BigInt(result.min_utxo_deposit_coefficient),
+            collateralPercentage: parseInt(result.collateral_percentage),
+            maxCollateralInputs: parseInt(result.max_collateral_inputs),
+            minFeeRefScriptCostPerByte: parseInt(result.min_fee_reference_scripts.base),
+            costModels: {
+                PlutusV1: result.plutus_cost_models.plutus_v1,
+                PlutusV2: result.plutus_cost_models.plutus_v2,
+                PlutusV3: result.plutus_cost_models.plutus_v3
+            }
+        };
+    }
+    async getUtxosInternal(addressOrCredential, unit) {
+        const queryPredicate = (()=>{
+            if (typeof addressOrCredential === "string") {
+                return "/addresses/" + addressOrCredential;
+            }
+            let credentialBech32Query = "/addresses/cred/";
+            credentialBech32Query += addressOrCredential.type === "Key" ? __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Ed25519KeyHash"].from_hex(addressOrCredential.hash).to_bech32("addr_vkh") : __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$anastasia$2d$labs$2b$cardano$2d$multiplatform$2d$lib$2d$browser$40$6$2e$0$2e$2$2d$3$2f$node_modules$2f40$anastasia$2d$labs$2f$cardano$2d$multiplatform$2d$lib$2d$browser$2f$cardano_multiplatform_lib_bg$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ScriptHash"].from_hex(addressOrCredential.hash).to_bech32("addr_shared_vkh");
+            return credentialBech32Query;
+        })();
+        const qparams = new URLSearchParams({
+            count: "100",
+            ...unit && {
+                asset: unit
+            }
+        });
+        const result = await this.getAllPagesData(async (qry)=>await fetch(qry, {
+                headers: this.requireAmountsAsStrings(this.commonHeaders())
+            }), `${this.url}${queryPredicate}/utxos`, qparams, "Location: getUtxosInternal. Error: Could not fetch UTxOs from Maestro");
+        return result.map(this.maestroUtxoToUtxo);
+    }
+    getUtxos(addressOrCredential) {
+        return this.getUtxosInternal(addressOrCredential);
+    }
+    getUtxosWithUnit(addressOrCredential, unit) {
+        return this.getUtxosInternal(addressOrCredential, unit);
+    }
+    async getUtxoByUnit(unit) {
+        const timestampedAddressesResponse = await fetch(`${this.url}/assets/${unit}/addresses?count=2`, {
+            headers: this.commonHeaders()
+        });
+        const timestampedAddresses = await timestampedAddressesResponse.json();
+        if (!timestampedAddressesResponse.ok) {
+            if (timestampedAddresses.message) {
+                throw new Error(timestampedAddresses.message);
+            }
+            throw new Error("Location: getUtxoByUnit. Error: Couldn't perform query. Received status code: " + timestampedAddressesResponse.status);
+        }
+        const addressesWithAmount = timestampedAddresses.data;
+        if (addressesWithAmount.length === 0) {
+            throw new Error("Location: getUtxoByUnit. Error: Unit not found.");
+        }
+        if (addressesWithAmount.length > 1) {
+            throw new Error("Location: getUtxoByUnit. Error: Unit needs to be an NFT or only held by one address.");
+        }
+        const address = addressesWithAmount[0].address;
+        const utxos = await this.getUtxosWithUnit(address, unit);
+        if (utxos.length > 1) {
+            throw new Error("Location: getUtxoByUnit. Error: Unit needs to be an NFT or only held by one address.");
+        }
+        return utxos[0];
+    }
+    async getUtxosByOutRef(outRefs) {
+        const qry = `${this.url}/transactions/outputs`;
+        const body = JSON.stringify(outRefs.map(({ txHash, outputIndex })=>`${txHash}#${outputIndex}`));
+        const utxos = await this.getAllPagesData(async (qry2)=>await fetch(qry2, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...this.requireAmountsAsStrings(this.commonHeaders())
+                },
+                body
+            }), qry, new URLSearchParams({}), "Location: getUtxosByOutRef. Error: Could not fetch UTxOs by references from Maestro");
+        return utxos.map(this.maestroUtxoToUtxo);
+    }
+    async getDelegation(rewardAddress) {
+        const timestampedResultResponse = await fetch(`${this.url}/accounts/${rewardAddress}`, {
+            headers: this.commonHeaders()
+        });
+        if (!timestampedResultResponse.ok) {
+            return {
+                poolId: null,
+                rewards: 0n
+            };
+        }
+        const timestampedResult = await timestampedResultResponse.json();
+        const result = timestampedResult.data;
+        return {
+            poolId: result.delegated_pool || null,
+            rewards: BigInt(result.rewards_available)
+        };
+    }
+    async getDatum(datumHash) {
+        const timestampedResultResponse = await fetch(`${this.url}/datums/${datumHash}`, {
+            headers: this.commonHeaders()
+        });
+        if (!timestampedResultResponse.ok) {
+            if (timestampedResultResponse.status === 404) {
+                throw new Error(`No datum found for datum hash: ${datumHash}`);
+            } else {
+                throw new Error("Location: getDatum. Error: Couldn't successfully perform query. Received status code: " + timestampedResultResponse.status);
+            }
+        }
+        const timestampedResult = await timestampedResultResponse.json();
+        return timestampedResult.data.bytes;
+    }
+    awaitTx(txHash, checkInterval = 3e3) {
+        return new Promise((res)=>{
+            const confirmation = setInterval(async ()=>{
+                const isConfirmedResponse = await fetch(`${this.url}/transactions/${txHash}/cbor`, {
+                    headers: this.commonHeaders()
+                });
+                if (isConfirmedResponse.ok) {
+                    await isConfirmedResponse.json();
+                    clearInterval(confirmation);
+                    await new Promise((res2)=>setTimeout(()=>res2(1), 1e3));
+                    return res(true);
+                }
+            }, checkInterval);
+        });
+    }
+    async submitTx(tx) {
+        let queryUrl = `${this.url}/txmanager`;
+        queryUrl += this.turboSubmit ? "/turbosubmit" : "";
+        const response = await fetch(queryUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/cbor",
+                Accept: "text/plain",
+                ...this.commonHeaders()
+            },
+            body: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$core$2d$utils$40$0$2e$1$2e$16$2f$node_modules$2f40$lucid$2d$evolution$2f$core$2d$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fromHex"])(tx)
+        });
+        const result = await response.text();
+        if (!response.ok) {
+            if (response.status === 400) throw new Error(result);
+            else {
+                throw new Error("Could not submit transaction. Received status code: " + response.status);
+            }
+        }
+        return result;
+    }
+    commonHeaders() {
+        return {
+            "api-key": this.apiKey,
+            lucid: lucid2
+        };
+    }
+    requireAmountsAsStrings(obj) {
+        return {
+            ...obj,
+            "amounts-as-strings": "true"
+        };
+    }
+    maestroUtxoToUtxo(result) {
+        return {
+            txHash: result.tx_hash,
+            outputIndex: result.index,
+            assets: (()=>{
+                const a = {};
+                result.assets.forEach((am)=>{
+                    a[am.unit] = BigInt(am.amount);
+                });
+                return a;
+            })(),
+            address: result.address,
+            datumHash: result.datum ? result.datum.type == "inline" ? void 0 : result.datum.hash : void 0,
+            datum: result.datum?.bytes,
+            scriptRef: toScriptRef(result.reference_script)
+        };
+    }
+    async getAllPagesData(getResponse, qry, paramsGiven, errorMsg) {
+        let nextCursor = null;
+        let result = [];
+        while(true){
+            if (nextCursor !== null) {
+                paramsGiven.set("cursor", nextCursor);
+            }
+            const response = await getResponse(`${qry}?` + paramsGiven);
+            const pageResult = await response.json();
+            if (!response.ok) {
+                throw new Error(`${errorMsg}. Received status code: ${response.status}`);
+            }
+            nextCursor = pageResult.next_cursor;
+            result = result.concat(pageResult.data);
+            if (nextCursor == null) break;
+        }
+        return result;
+    }
+    async evaluateTx(tx, additionalUTxOs) {
+        const additionalMaestroUTxOs = (additionalUTxOs || []).map((utxo)=>({
+                tx_hash: utxo.txHash,
+                index: utxo.outputIndex,
+                txout_cbor: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["utxoToCore"])(utxo).output().to_cbor_hex()
+            }));
+        const payload = {
+            cbor: tx,
+            additional_utxos: additionalMaestroUTxOs
+        };
+        const res = await fetch(`${this.url}/transactions/evaluate`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                "api-key": this.apiKey
+            },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+            const body = await res.text();
+            console.error("Response error:", JSON.stringify(res));
+            throw new Error(`Evaluate transaction failed: ${body}`);
+        }
+        const result = await res.json();
+        return result;
+    }
+};
+var toScriptRef = (reference_script)=>{
+    if (reference_script && reference_script.bytes) {
+        switch(reference_script.type){
+            case "native":
+                return (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["scriptFromNative"])(reference_script.json);
+            case "plutusv1":
+                return {
+                    type: "PlutusV1",
+                    script: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["applyDoubleCborEncoding"])(reference_script.bytes)
+                };
+            case "plutusv2":
+                return {
+                    type: "PlutusV2",
+                    script: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["applyDoubleCborEncoding"])(reference_script.bytes)
+                };
+            case "plutusv3":
+                return {
+                    type: "PlutusV3",
+                    script: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["applyDoubleCborEncoding"])(reference_script.bytes)
+                };
+            default:
+                return void 0;
+        }
+    }
+};
+var lucid2 = package_default.version;
+;
+;
+;
+;
+;
+var ProtocolParametersSchema2 = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    pvt_motion_no_confidence: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    pvt_committee_normal: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    pvt_committee_no_confidence: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    pvt_hard_fork_initiation: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    pvtpp_security_group: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    dvt_motion_no_confidence: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    dvt_committee_normal: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    dvt_committee_no_confidence: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    dvt_update_to_constitution: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    dvt_hard_fork_initiation: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    dvt_p_p_network_group: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    dvt_p_p_economic_group: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    dvt_p_p_technical_group: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    dvt_p_p_gov_group: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    dvt_treasury_withdrawal: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    committee_min_size: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    committee_max_term_length: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    gov_action_lifetime: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    gov_action_deposit: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NumberFromString,
+    drep_deposit: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NumberFromString,
+    drep_activity: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    min_fee_ref_script_cost_per_byte: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    epoch_no: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    min_fee_a: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    min_fee_b: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    max_block_size: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    max_tx_size: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    max_bh_size: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    key_deposit: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].BigInt,
+    pool_deposit: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].BigInt,
+    max_epoch: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    optimal_pool_count: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    influence: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    monetary_expand_rate: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    treasury_growth_rate: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    decentralisation: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    extra_entropy: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+    protocol_major: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    protocol_minor: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    min_utxo_value: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    min_pool_cost: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    nonce: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    block_hash: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+    cost_models: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        PlutusV1: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number),
+        PlutusV2: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number),
+        PlutusV3: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number)
+    }),
+    price_mem: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    price_step: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    max_tx_ex_mem: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].BigIntFromNumber,
+    max_tx_ex_steps: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].BigIntFromNumber,
+    max_block_ex_mem: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    max_block_ex_steps: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    max_val_size: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    collateral_percent: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    max_collateral_inputs: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    coins_per_utxo_size: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].BigInt
+});
+var AssetSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    policy_id: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    asset_name: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+    fingerprint: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    decimals: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    quantity: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String
+});
+var ReferenceScriptSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    hash: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+    size: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number),
+    type: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+    bytes: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+    value: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Object)
+});
+var UTxOSchema2 = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    tx_hash: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    tx_index: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    block_time: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    block_height: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number),
+    value: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    datum_hash: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+    inline_datum: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        bytes: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+        value: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Object
+    })),
+    reference_script: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(ReferenceScriptSchema),
+    asset_list: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(AssetSchema))
+});
+var AddressInfoSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullishOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    address: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    balance: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    stake_address: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+    script_address: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Boolean,
+    utxo_set: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(UTxOSchema2)
+})));
+var InputOutputSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    payment_addr: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        bech32: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+        cred: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String
+    }),
+    stake_addr: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+    tx_hash: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    tx_index: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    value: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    datum_hash: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+    inline_datum: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        bytes: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+        value: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Object
+    })),
+    reference_script: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(ReferenceScriptSchema),
+    asset_list: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(AssetSchema)
+});
+var TxInfoSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    tx_hash: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    block_hash: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    block_height: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    epoch_no: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    epoch_slot: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    absolute_slot: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    tx_timestamp: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    tx_block_index: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    tx_size: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+    total_output: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    fee: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    treasury_donation: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    deposit: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    invalid_before: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+    invalid_after: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+    collateral_inputs: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(InputOutputSchema)),
+    collateral_output: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(InputOutputSchema),
+    reference_inputs: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(InputOutputSchema)),
+    inputs: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(InputOutputSchema),
+    outputs: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(InputOutputSchema),
+    withdrawals: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        amount: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+        stake_addr: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String
+    }))),
+    assets_minted: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(AssetSchema)),
+    metadata: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Object),
+    certificates: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        index: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+        type: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+        info: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Object)
+    }))),
+    native_scripts: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        script_hash: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+        script_json: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Object
+    }))),
+    plutus_contracts: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+        address: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+        spends_input: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+            tx_hash: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+            tx_index: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number
+        })),
+        script_hash: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+        bytecode: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+        size: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Number,
+        valid_contract: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Boolean,
+        input: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+            redeemer: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+                purpose: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Literal("spend", "mint", "cert", "reward"),
+                fee: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+                unit: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+                    steps: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+                    mem: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String
+                }),
+                datum: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+                    hash: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+                    value: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Object)
+                })
+            }),
+            datum: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+                hash: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+                value: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Object)
+            })
+        })
+    }))),
+    //TODO: add S.Struct
+    // https://preprod.koios.rest/#post-/tx_info
+    voting_procedures: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Object),
+    //TODO: add S.Struct
+    // https://preprod.koios.rest/#post-/tx_info
+    proposal_procedures: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Object
+});
+var TxHashSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String;
+var AssetAddressSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    payment_address: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String,
+    stake_address: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+    quantity: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String
+});
+var AccountInfoSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    delegated_pool: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NullOr(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String),
+    rewards_available: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].NumberFromString
+});
+var DatumInfo = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Struct({
+    bytes: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].String
+});
+var toUTxO = (koiosUTxO, address)=>({
+        txHash: koiosUTxO.tx_hash,
+        outputIndex: koiosUTxO.tx_index,
+        assets: (()=>{
+            const a = {};
+            if (koiosUTxO.asset_list) {
+                koiosUTxO.asset_list.forEach((am)=>{
+                    a[am.policy_id + am.asset_name] = BigInt(am.quantity);
+                });
+            }
+            a["lovelace"] = BigInt(koiosUTxO.value);
+            return a;
+        })(),
+        address,
+        datumHash: koiosUTxO.inline_datum ? void 0 : koiosUTxO.datum_hash || void 0,
+        datum: koiosUTxO.inline_datum ? koiosUTxO.inline_datum.bytes : void 0,
+        scriptRef: toScriptRef2(koiosUTxO.reference_script)
+    });
+var toScriptRef2 = (reference_script)=>{
+    if (reference_script && reference_script.bytes && reference_script.type) {
+        switch(reference_script.type){
+            case "plutusV1":
+                return {
+                    type: "PlutusV1",
+                    script: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["applyDoubleCborEncoding"])(reference_script.bytes)
+                };
+            case "plutusV2":
+                return {
+                    type: "PlutusV2",
+                    script: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["applyDoubleCborEncoding"])(reference_script.bytes)
+                };
+            case "plutusV3":
+                return {
+                    type: "PlutusV3",
+                    script: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["applyDoubleCborEncoding"])(reference_script.bytes)
+                };
+            default:
+                return void 0;
+        }
+    }
+};
+var getUtxosEffect = (baseUrl, addressOrCredential, headers)=>{
+    const url = `${baseUrl}/address_info`;
+    const body = {
+        _addresses: [
+            addressOrCredential
+        ]
+    };
+    const schema = AddressInfoSchema;
+    const result = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].if(typeof addressOrCredential === "string", {
+        onFalse: ()=>__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].fail("Credential Type is not supported in Koios yet."),
+        onTrue: ()=>makePostAsJson(url, body, schema, headers)
+    }), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].map(([result2])=>result2 ? result2.utxo_set.map((koiosUtxo)=>toUTxO(koiosUtxo, result2.address)) : []), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].provide(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$FetchHttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__FetchHttpClient$3e$__["FetchHttpClient"].layer));
+    return result;
+};
+;
+;
+var KoiosError = class extends __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Data$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Data$3e$__["Data"].TaggedError("KoiosError") {
+    get message() {
+        return `${this.cause}`;
+    }
+};
+var Koios = class {
+    baseUrl;
+    token;
+    constructor(baseUrl, token){
+        this.baseUrl = baseUrl;
+        this.token = token;
+    }
+    async getProtocolParameters() {
+        const url = `${this.baseUrl}/epoch_params?limit=1`;
+        const schema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(ProtocolParametersSchema2);
+        const bearerToken = this.token ? {
+            Authorization: `Bearer ${this.token}`
+        } : void 0;
+        const [result] = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(makeGet(url, schema, bearerToken), // Allows for dependency injection and easier testing
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].provide(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$FetchHttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__FetchHttpClient$3e$__["FetchHttpClient"].layer), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(1e4), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].catchAllCause((cause)=>new KoiosError({
+                cause
+            })), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].runPromise);
+        return {
+            minFeeA: result.min_fee_a,
+            minFeeB: result.min_fee_b,
+            maxTxSize: result.max_tx_size,
+            maxValSize: result.max_val_size,
+            keyDeposit: result.key_deposit,
+            poolDeposit: result.pool_deposit,
+            drepDeposit: BigInt(result.drep_deposit),
+            govActionDeposit: BigInt(result.gov_action_deposit),
+            priceMem: result.price_mem,
+            priceStep: result.price_step,
+            maxTxExMem: result.max_tx_ex_mem,
+            maxTxExSteps: result.max_tx_ex_steps,
+            coinsPerUtxoByte: result.coins_per_utxo_size,
+            collateralPercentage: result.collateral_percent,
+            maxCollateralInputs: result.max_collateral_inputs,
+            minFeeRefScriptCostPerByte: result.min_fee_ref_script_cost_per_byte,
+            costModels: {
+                PlutusV1: [
+                    ...result.cost_models.PlutusV1
+                ],
+                PlutusV2: [
+                    ...result.cost_models.PlutusV2
+                ],
+                PlutusV3: [
+                    ...result.cost_models.PlutusV3
+                ]
+            }
+        };
+    }
+    async getUtxos(addressOrCredential) {
+        const bearerToken = this.token ? {
+            Authorization: `Bearer ${this.token}`
+        } : void 0;
+        const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(getUtxosEffect(this.baseUrl, addressOrCredential, bearerToken), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(1e4), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].catchAllCause((cause)=>new KoiosError({
+                cause
+            })), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].runPromise);
+        return result;
+    }
+    async getUtxosWithUnit(addressOrCredential, unit) {
+        const bearerToken = this.token ? {
+            Authorization: `Bearer ${this.token}`
+        } : void 0;
+        const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(getUtxosEffect(this.baseUrl, addressOrCredential, bearerToken), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].map((utxos)=>utxos.filter((utxo)=>{
+                const keys = Object.keys(utxo.assets);
+                return keys.length > 0 && keys.includes(unit);
+            })), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(1e4), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].catchAllCause((cause)=>new KoiosError({
+                cause
+            })), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].runPromise);
+        return result;
+    }
+    async getUtxoByUnit(unit) {
+        let { policyId, assetName } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$utils$40$0$2e$1$2e$68$2f$node_modules$2f40$lucid$2d$evolution$2f$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fromUnit"])(unit);
+        const url = `${this.baseUrl}/asset_addresses?_asset_policy=${policyId}&_asset_name=${assetName}`;
+        const bearerToken = this.token ? {
+            Authorization: `Bearer ${this.token}`
+        } : void 0;
+        const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(makeGet(url, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(AssetAddressSchema), bearerToken), // Allows for dependency injection and easier testing
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].provide(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$FetchHttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__FetchHttpClient$3e$__["FetchHttpClient"].layer), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap((adresses)=>adresses.length === 0 ? __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].fail("Unit not found") : __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].succeed(adresses)), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap((adresses)=>adresses.length > 1 ? __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].fail("Unit needs to be an NFT or only held by one address.") : __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].succeed(adresses[0])), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap((address)=>getUtxosEffect(this.baseUrl, address.payment_address, bearerToken)), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].map((utxos)=>utxos.filter((utxo)=>{
+                const keys = Object.keys(utxo.assets);
+                return keys.length > 0 && keys.includes(unit);
+            })), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap((utxos)=>utxos.length > 1 ? __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].fail("Unit needs to be an NFT or only held by one address.") : __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].succeed(utxos[0])), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(1e4), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].catchAllCause((cause)=>new KoiosError({
+                cause
+            })), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].runPromise);
+        return result;
+    }
+    async getUtxosByOutRef(outRefs) {
+        const url = `${this.baseUrl}/tx_info`;
+        const body = {
+            _tx_hashes: [
+                ...new Set(outRefs.map((outRef)=>outRef.txHash))
+            ],
+            _assets: true,
+            _scripts: true
+        };
+        const schema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(TxInfoSchema);
+        const bearerToken = this.token ? {
+            Authorization: `Bearer ${this.token}`
+        } : void 0;
+        const [result] = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(makePostAsJson(url, body, schema, bearerToken), // Allows for dependency injection and easier testing
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].provide(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$FetchHttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__FetchHttpClient$3e$__["FetchHttpClient"].layer), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(1e4), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].catchAllCause((cause)=>new KoiosError({
+                cause
+            })), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].runPromise);
+        if (result) {
+            const utxos = result.outputs.map((koiosInputOutput)=>toUTxO({
+                    tx_hash: koiosInputOutput.tx_hash,
+                    tx_index: koiosInputOutput.tx_index,
+                    block_time: 0,
+                    block_height: result.block_height,
+                    value: koiosInputOutput.value,
+                    datum_hash: koiosInputOutput.datum_hash,
+                    inline_datum: koiosInputOutput.inline_datum,
+                    reference_script: koiosInputOutput.reference_script,
+                    asset_list: koiosInputOutput.asset_list
+                }, koiosInputOutput.payment_addr.bech32));
+            return utxos.filter((utxo)=>outRefs.some((outRef)=>utxo.txHash === outRef.txHash && utxo.outputIndex === outRef.outputIndex));
+        } else {
+            return [];
+        }
+    }
+    async getDelegation(rewardAddress) {
+        const body = {
+            _stake_addresses: [
+                rewardAddress
+            ]
+        };
+        const url = `${this.baseUrl}/account_info`;
+        const bearerToken = this.token ? {
+            Authorization: `Bearer ${this.token}`
+        } : void 0;
+        const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(makePostAsJson(url, body, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(AccountInfoSchema), bearerToken), // Allows for dependency injection and easier testing
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].provide(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$FetchHttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__FetchHttpClient$3e$__["FetchHttpClient"].layer), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap((result2)=>result2.length === 0 ? __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].fail("No Delegation Found by Reward Address") : __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].succeed(result2[0])), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(1e4), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].catchAllCause((cause)=>new KoiosError({
+                cause
+            })), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].runPromise);
+        return {
+            poolId: result.delegated_pool || null,
+            rewards: BigInt(result.rewards_available)
+        };
+    }
+    async getDatum(datumHash) {
+        const url = `${this.baseUrl}/datum_info`;
+        const body = {
+            _datum_hashes: [
+                datumHash
+            ]
+        };
+        const bearerToken = this.token ? {
+            Authorization: `Bearer ${this.token}`
+        } : void 0;
+        const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(makePostAsJson(url, body, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(DatumInfo), bearerToken), // Allows for dependency injection and easier testing
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].provide(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$FetchHttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__FetchHttpClient$3e$__["FetchHttpClient"].layer), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].flatMap((result2)=>result2.length === 0 ? __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].fail("No Datum Found by Datum Hash") : __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].succeed(result2[0])), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(1e4), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].catchAllCause((cause)=>new KoiosError({
+                cause
+            })), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].runPromise);
+        return result.bytes;
+    }
+    async awaitTx(txHash, checkInterval = 2e4) {
+        const url = `${this.baseUrl}/tx_info`;
+        const body = {
+            _tx_hashes: [
+                txHash
+            ]
+        };
+        const schema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(TxInfoSchema);
+        const bearerToken = this.token ? {
+            Authorization: `Bearer ${this.token}`
+        } : void 0;
+        const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(makePostAsJson(url, body, schema, bearerToken), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].repeat({
+            schedule: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schedule$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schedule$3e$__["Schedule"].exponential(checkInterval),
+            until: (result2)=>result2.length > 0
+        }), // Allows for dependency injection and easier testing
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].provide(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$FetchHttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__FetchHttpClient$3e$__["FetchHttpClient"].layer), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(16e4), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].orDie, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].as(true), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].runPromise);
+        return result;
+    }
+    async submitTx(tx) {
+        const url = `${this.baseUrl}/submittx`;
+        const body = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$lucid$2d$evolution$2b$core$2d$utils$40$0$2e$1$2e$16$2f$node_modules$2f40$lucid$2d$evolution$2f$core$2d$utils$2f$dist$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fromHex"])(tx);
+        const schema = TxHashSchema;
+        const bearerToken = this.token ? {
+            Authorization: `Bearer ${this.token}`
+        } : void 0;
+        const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(makePostAsUint8Array(url, body, schema, bearerToken), // Allows for dependency injection and easier testing
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].provide(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$FetchHttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__FetchHttpClient$3e$__["FetchHttpClient"].layer), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(1e4), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].catchAllCause((cause)=>new KoiosError({
+                cause
+            })), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].runPromise);
+        return result;
+    }
+    async evaluateTx(tx, additionalUTxOs) {
+        const url = `${this.baseUrl}/ogmios`;
+        const body = {
+            jsonrpc: "2.0",
+            method: "evaluateTransaction",
+            params: {
+                transaction: {
+                    cbor: tx
+                },
+                additionalUtxo: toOgmiosUTxOs(additionalUTxOs)
+            },
+            id: null
+        };
+        const schema = JSONRPCSchema(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Schema$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Schema$3e$__["Schema"].Array(RedeemerSchema));
+        const bearerToken = this.token ? {
+            Authorization: `Bearer ${this.token}`
+        } : void 0;
+        const { result } = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Function$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["pipe"])(makePostAsJson(url, body, schema, bearerToken), // Allows for dependency injection and easier testing
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].provide(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f40$effect$2b$platform$40$0$2e$71$2e$7$2f$node_modules$2f40$effect$2f$platform$2f$dist$2f$esm$2f$FetchHttpClient$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__FetchHttpClient$3e$__["FetchHttpClient"].layer), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].timeout(1e4), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].catchAllCause((cause)=>new KoiosError({
+                cause
+            })), __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$deno$2f$effect$40$3$2e$21$2e$4$2f$node_modules$2f$effect$2f$dist$2f$esm$2f$Effect$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__Effect$3e$__["Effect"].runPromise);
+        const evalRedeemers = result.map((item)=>({
+                ex_units: {
+                    mem: item.budget.memory,
+                    steps: item.budget.cpu
+                },
+                redeemer_index: item.validator.index,
+                redeemer_tag: item.validator.purpose
+            }));
+        return evalRedeemers;
+    }
+};
+;
+__turbopack_async_result__();
+} catch(e) { __turbopack_async_result__(e); } }, false);}),
+]);
+
+//# sourceMappingURL=f2d13_%40lucid-evolution_provider_dist_index_9831644e.js.map

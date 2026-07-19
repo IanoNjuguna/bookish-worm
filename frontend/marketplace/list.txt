@@ -1,0 +1,88 @@
+# UI Modernization
+- tailwind.config.ts: Enforce global "angular" aesthetic by overriding core borderRadius utilities (sm, md, lg, xl, 2xl, 3xl, DEFAULT) to 0px.
+
+# Decouple Social Auth
+- package.json: Uninstall @utxos/sdk dependency.
+- components/Providers.tsx: Strip out @utxos/sdk pre-loading, connection overrides, and fallback termination logic to rely purely on native browser extension injection (window.cardano).
+- components/ConnectHeader.tsx: Remove hardcoded Google/UTXOS wallet entry from connection dropdown.
+
+# Prototyping: Dev-Only Memory Wallet
+- components/Providers.tsx: Implement `connectFromSeed` to initialize `lucid.selectWallet.fromSeed()`.
+- components/Providers.tsx: Mock `walletApi.signData` to route backend authentication signatures natively through `lucid.wallet().signMessage`.
+- components/Providers.tsx: Implement volatile memory session (`sessionSeedPhrase`) to persist seed phrase state during current browser tab lifecycle.
+- components/ConnectHeader.tsx: Implement dynamic fallback UI to reveal "Create Wallet (Dev Only)" and "Import Seed (Dev Only)" options when no browser extension is detected.
+- components/ConnectHeader.tsx: Build Shadcn Dialog modals for seed phrase generation and entry, strictly tagged with "⚠️ FOR PROTOTYPING ONLY" warnings.
+
+# Prototyping: Settings Integration
+- components/ConnectHeader.tsx: Wire "Settings" dropdown to open Wallet Settings Dialog.
+- components/ConnectHeader.tsx: Display `sessionSeedPhrase` securely with clipboard actions if active, gracefully degrading with an explanatory message if connected via a standard browser extension.
+
+# Cardano TX Builder Microservice (2026-07-11)
+- backend/tx-builder/main.py: Implement FastAPI POST /api/v1/tracks/{id}/build-mint-tx endpoint with PyCardano transaction construction.
+- backend/tx-builder/main.py: Add greedy UTXO input selection (descending by lovelace) with 2 ADA conservative fee buffer.
+- backend/tx-builder/main.py: Add exact integer split math for collaborator payment outputs; remainder goes to uploader.
+- backend/tx-builder/main.py: Add address and network validation (mainnet vs testnet/preprod) using pycardano Address.from_primitive.
+- backend/tx-builder/main.py: Add optional X-API-Key header authentication via API_SECRET_KEY env variable.
+- backend/tx-builder/main.py: Resolve SQLite database path from DB_PATH env variable with fallback to backend/core-api/doba.db.
+- backend/tx-builder/requirements.txt: Add fastapi, uvicorn, pycardano, pydantic, starlette dependencies.
+- backend/tx-builder/test_main.py: Implement unit tests for success, insufficient funds, and invalid address cases.
+- backend/tx-builder/README.md: Write developer guide with API spec and running instructions.
+- backend/tx-builder/docs.md: Write full walkthrough including directory structure, API flow, and testing steps.
+
+# Frontend Integration — Secure Mint Flow (2026-07-11)
+- lib/mintHelper.ts: Create buildAndSignMintTx helper — maps Lucid UTXOs to backend schema, POSTs to tx-builder, signs returned CBOR hex via wallet, and submits signed tx to the Cardano network.
+- next.config.mjs: Add /api/v1/:path* rewrite proxy to the Python FastAPI service (NEXT_PUBLIC_PYTHON_API_URL or http://localhost:8000 fallback).
+- components/AudioPlayer.tsx: Replace inline lucid.newTx() transaction composition with buildAndSignMintTx call.
+- app/[locale]/track/[id]/page.tsx: Replace inline lucid.newTx() with buildAndSignMintTx call.
+- components/SongCard.tsx: Replace inline lucid.newTx() multi-address splits with buildAndSignMintTx call.
+- components/NowPlayingSidebar.tsx: Replace inline lucid.newTx() in collection block with buildAndSignMintTx call.
+
+# Repo Reorganisation (2026-07-11)
+- Renamed backend/ → backend/core-api (Hono TypeScript API).
+- Renamed backend-python/ → backend/tx-builder (PyCardano microservice).
+- Grouped both services under a single backend/ parent directory.
+- package.json: Updated dev:all script to start Next.js, core-api (bun), and tx-builder (python) concurrently.
+- package.json: Added test:all script to run tx-builder Python unit tests from the project root.
+
+# Gitignore Cleanup (2026-07-11)
+- .gitignore: Added Python artifacts (__pycache__, *.py[cod], venv, .pytest_cache), TypeScript build info, sqlite extensions, backend/ scoped paths, vim swap files, and scratch file exclusions.
+- backend/core-api/.gitignore: Expanded with bun.lockb, .env*.local, *.sqlite, .vscode, vim swap files.
+- backend/tx-builder/.gitignore: Created new gitignore covering Python bytecode, virtual envs, .env, databases, and editor files.
+
+# Frontend Styling & UI (2026-07-11)
+- tailwind.config.ts: Removed Space Mono from the default `sans` font stack; promoted it to a dedicated `display` font family (font-display) for headings and brand elements.
+- tailwind.config.ts: Overrode all borderRadius utilities (DEFAULT, sm, md, lg, xl, 2xl, 3xl) to 0px to enforce a strict angular / sharp-cornered aesthetic across all Shadcn and Radix components.
+- app/globals.css: Added light-mode base styles — body background switched to #FAF9F6 (off-white) with `text-midnight`; applied a soft radial gradient overlay for depth.
+- app/globals.css: Scoped original dark background (#0D0D12) and dark gradient under `.dark body` to support theme toggling without breaking existing dark styles.
+- components/ThemeProvider.tsx: Created new ThemeProvider wrapping next-themes to enable system-aware light/dark mode switching.
+- components/ThemeToggle.tsx: Created ThemeToggle button component (sun/moon icon swap) wired to next-themes `setTheme`.
+- components/DynamicFavicon.tsx: Created component that dynamically swaps favicon between doba.ico (dark mode) and doba-light.ico (light mode) based on active theme.
+- components/AuthModal.tsx: Created dedicated modal component for wallet connection and authentication flow.
+- components/AssetsView.tsx: Created new AssetsView component displaying user's on-chain assets and collection.
+- components/DashboardLayoutClient.tsx: Created client-side dashboard layout wrapper managing sidebar state and responsive breakpoints.
+- public/doba.ico: Added dark-mode favicon.
+- public/doba-light.ico: Added light-mode favicon.
+- public/doba.png: Added updated app logo.
+- public/doba-banner.png: Added banner image for OG/social previews.
+- public/robots.txt: Added robots.txt for SEO crawl control.
+
+# Cardano Smart Contracts Refinement (2026-07-17)
+- contracts/validators/frac.ak: Added 1% platform fee output to the distribution validator (spend redeemer verifies a treasury output >= price * fee_bps / 10000).
+- contracts/validators/frac.ak: Added ADA price enforcement using price_lovelace stored in DisDatum (verifies payment and datum/ADA preservation in the continuing output).
+- contracts/validators/frac.ak: Added UpdatePrice redeemer (action = 2) enabling owner to update the sale price in DisDatum without unlocking or withdrawing the locked fraction tokens.
+- contracts/validators/frac.ak: Renamed obfuscated/abbreviated fields in type definitions (MintAction: a -> action, amount, tn -> token_name; LockAction: a -> action, b -> field_b; DisAction: a -> action, b -> field_b) for production readiness and code readability.
+
+# Song Provenance & Blockchain Details UI (2026-07-17)
+- app/[locale]/track/[id]/page.tsx: Added a detailed Blockchain Details section displaying truncated Policy ID, Creator Address, Provenance (Reference NFT link via CIP-68 label 100), and Token ID.
+- components/NowPlayingSidebar.tsx: Added a matching Blockchain Info section in the sidebar with truncated Policy ID, Creator Address, Provenance, and pink-styled Token ID.
+- app/[locale]/track/[id]/page.tsx: Removed the redundant Provenance and Token Policy action buttons under the play/collect buttons.
+- components/NowPlayingSidebar.tsx: Removed the redundant Provenance and Token Policy action buttons from the play sidebar.
+- app/[locale]/track/[id]/page.tsx: Updated the Collect More button styling to use the same outline design as the Provenance button.
+- components/NowPlayingSidebar.tsx: Updated the Collect More button styling in the sidebar to use the outline design.
+- tsconfig.json: Excluded scratch directory to prevent compiler errors from one-off/temporary scripts during Next.js build.
+- components/AudioPlayer.tsx: Changed the player's background to transparent (0 opacity) to allow page gradients and colors to show through seamlessly, and changed position style from fixed to relative to participate in the layout's flex flow.
+- components/DashboardLayoutClient.tsx: Refactored the Content Area Wrapper structure to place the scrollable main content viewport and the audio player in a vertical flex layout segment, preventing page content from scrolling behind or obstructing the player.
+- components/Footer.tsx: Redesigned the footer to use a beautiful, compact vertical layout that fits neatly into narrow sidebars and menus without crowding.
+- components/DashboardLayoutClient.tsx: Moved the footer from the bottom of the main content area to the bottom of the left navigation sidebar (desktop) and bottom of the slide-down menu (mobile).
+- components/DashboardLayoutClient.tsx: Dynamically applied the mobile menu's background color and blur to the top header navbar when the mobile menu is open, preventing page content from showing through.
+- components/DashboardLayoutClient.tsx: Fixed pre-existing TypeScript and JSX lint warnings (unused variables, async arrow functions, and missing attributes).

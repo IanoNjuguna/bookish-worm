@@ -1,0 +1,3 @@
+module.exports=[928210,a=>{"use strict";let b=(0,a.i(743665).default)("outline","external-link","ExternalLink",[["path",{d:"M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6",key:"svg-0"}],["path",{d:"M11 13l9 -9",key:"svg-1"}],["path",{d:"M15 4h5v5",key:"svg-2"}]]);a.s(["IconExternalLink",()=>b],928210)}];
+
+//# sourceMappingURL=028ac_%40tabler_icons-react_dist_esm_icons_IconExternalLink_mjs_9dc9a512._.js.map

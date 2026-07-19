@@ -1,0 +1,51 @@
+/* [project]/app/[locale]/chivo_a4b6fad9.module.css [app-client] (css) */
+@font-face {
+  font-family: chivo;
+  src: url("../media/Chivo_Regular-s.p.95dcd381.ttf") format("truetype");
+  font-display: swap;
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: chivo;
+  src: url("../media/Chivo_Medium-s.p.f00e717b.ttf") format("truetype");
+  font-display: swap;
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: chivo;
+  src: url("../media/Chivo_SemiBold-s.p.458bc1bd.ttf") format("truetype");
+  font-display: swap;
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: chivo;
+  src: url("../media/Chivo_Bold-s.p.de332f5b.ttf") format("truetype");
+  font-display: swap;
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: chivo Fallback;
+  src: local(Arial);
+  ascent-override: 87.44%;
+  descent-override: 23.25%;
+  line-gap-override: 0.0%;
+  size-adjust: 107.51%;
+}
+
+.chivo_a4b6fad9-module__fF-iTW__className {
+  font-family: chivo, chivo Fallback;
+}
+
+.chivo_a4b6fad9-module__fF-iTW__variable {
+  --font-chivo: "chivo", "chivo Fallback";
+}
+
+/*# sourceMappingURL=app_%5Blocale%5D_chivo_a4b6fad9_module_css_bad6b30c._.single.css.map*/
