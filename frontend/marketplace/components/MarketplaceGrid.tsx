@@ -98,7 +98,11 @@ export default function MarketplaceGrid({
         }
         setHasMore(data.length === limit)
       } else {
-        logger.error(`Failed to fetch tracks: ${res.status} ${res.statusText}`)
+        const errorBody = await res.text().catch(() => '')
+        logger.error(
+          `Failed to fetch tracks: ${res.status} ${res.statusText}`,
+          errorBody ? { responseBody: errorBody, fetchUrl } : { fetchUrl }
+        )
       }
     } catch (error: any) {
       logger.error('Failed to fetch tracks:', error?.message || error)

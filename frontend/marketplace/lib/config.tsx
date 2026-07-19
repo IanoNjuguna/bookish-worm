@@ -1,8 +1,8 @@
 import { QueryClient } from '@tanstack/react-query';
 
-export const CARDANO_NETWORK = 'Mainnet';
+export const CARDANO_NETWORK = 'Mainnet' as const;
 
-export const BLOCKFROST_PROJECT_ID = process.env.NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_MAINNET;
+export const BLOCKFROST_PROJECT_ID = (process.env.NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_MAINNET || '').trim();
 
 export const MINTING_POLICY_ID = process.env.NEXT_PUBLIC_MINTING_POLICY_ID || '';
 

@@ -16,13 +16,21 @@ import { Storage } from '@google-cloud/storage'
 const storage = new Storage()
 const app = new Hono()
 
-// CORS: explicit origin allowlist
-const ALLOWED_ORIGINS = [
+function parseCsvEnv(value: string | undefined, fallback: string[]) {
+  if (!value) return fallback
+  return value
+    .split(',')
+    .map(v => v.trim())
+    .filter(Boolean)
+}
+
+// CORS allowlist (comma-separated CORS_ORIGINS env var)
+const ALLOWED_ORIGINS = parseCsvEnv(process.env.CORS_ORIGINS, [
   'https://doba.world',
   'https://about.doba.world',
   'http://localhost:3000',
   'http://localhost:3001',
-]
+])
 
 app.use('/*', cors({
   origin: (origin) => {
@@ -56,7 +64,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'doba-default-secret-change-me'
 
 // Derive cookie settings from environment
 const IS_PRODUCTION = process.env.NODE_ENV === 'production'
-const COOKIE_DOMAIN = IS_PRODUCTION ? '.doba.world' : undefined
+const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || undefined
+const COOKIE_SAME_SITE = process.env.COOKIE_SAMESITE || 'Strict'
 
 function setRefreshCookie(c: any, token: string) {
   const maxAge = 30 * 24 * 60 * 60 // 30 days in seconds
@@ -64,7 +73,7 @@ function setRefreshCookie(c: any, token: string) {
     `doba_refresh_token=${token}`,
     `Path=/auth`,
     `HttpOnly`,
-    `SameSite=Strict`,
+    `SameSite=${COOKIE_SAME_SITE}`,
     `Max-Age=${maxAge}`,
   ]
   if (IS_PRODUCTION) parts.push('Secure')
@@ -77,7 +86,7 @@ function clearRefreshCookie(c: any) {
     `doba_refresh_token=`,
     `Path=/auth`,
     `HttpOnly`,
-    `SameSite=Strict`,
+    `SameSite=${COOKIE_SAME_SITE}`,
     `Max-Age=0`,
   ]
   if (IS_PRODUCTION) parts.push('Secure')
@@ -502,46 +511,63 @@ function resolveTrackAddress(track: any): any {
 }
 
 app.get('/songs', async (c) => {
-  const artist = c.req.query('artist')
-  const genre = c.req.query('genre')
-  const search = c.req.query('search')
-  const albumIdStr = c.req.query('album_id')
-  const album_id = albumIdStr && !isNaN(parseInt(albumIdStr)) ? parseInt(albumIdStr) : undefined
-  const limitStr = c.req.query('limit')
-  const limit = limitStr && !isNaN(parseInt(limitStr)) ? parseInt(limitStr) : undefined
-  const offsetStr = c.req.query('offset')
-  const offset = offsetStr && !isNaN(parseInt(offsetStr)) ? parseInt(offsetStr) : undefined
+  try {
+    const artist = c.req.query('artist')
+    const genre = c.req.query('genre')
+    const search = c.req.query('search')
+    const albumIdStr = c.req.query('album_id')
+    const album_id = albumIdStr && !isNaN(parseInt(albumIdStr)) ? parseInt(albumIdStr) : undefined
+    const limitStr = c.req.query('limit')
+    const limit = limitStr && !isNaN(parseInt(limitStr)) ? parseInt(limitStr) : undefined
+    const offsetStr = c.req.query('offset')
+    const offset = offsetStr && !isNaN(parseInt(offsetStr)) ? parseInt(offsetStr) : undefined
 
-  const tracks = await getAllTracks({
-    artist,
-    genre,
-    search,
-    album_id,
-    limit,
-    offset
-  })
+    const tracks = await getAllTracks({
+      artist,
+      genre,
+      search,
+      album_id,
+      limit,
+      offset
+    })
 
-  // Check ownership if user is authenticated
-  let userMints: number[] = []
-  const authHeader = c.req.header('Authorization')
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    const token = authHeader.split(' ')[1]
-    const payload = await verifyJWT(token, JWT_SECRET)
-    if (payload && payload.sub) {
-      userMints = await getUserMints(payload.sub as string)
+    // Ownership is best-effort for this public endpoint.
+    let userMints: number[] = []
+    const authHeader = c.req.header('Authorization')
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const token = authHeader.split(' ')[1]
+        const payload = await verifyJWT(token, JWT_SECRET)
+        if (payload && payload.sub) {
+          userMints = await getUserMints(payload.sub as string)
+        }
+      } catch (authErr: any) {
+        logger.warn('GET /songs ownership lookup skipped due to auth error', authErr?.message || authErr)
+      }
     }
+
+    const tracksWithOwnership = tracks.map(track => {
+      const parentId = track.album_id ? Number(track.album_id) : null
+      const isOwned = userMints.includes(track.token_id) || (parentId !== null && userMints.includes(parentId))
+      return {
+        ...resolveTrackAddress(track),
+        is_owned: isOwned
+      }
+    })
+
+    return c.json(tracksWithOwnership)
+  } catch (error: any) {
+    logger.error('Failed to fetch songs list', {
+      message: error?.message || 'unknown error',
+      artist: c.req.query('artist') || null,
+      genre: c.req.query('genre') || null,
+      search: c.req.query('search') || null,
+      album_id: c.req.query('album_id') || null,
+      limit: c.req.query('limit') || null,
+      offset: c.req.query('offset') || null,
+    })
+    return c.json({ error: 'Failed to fetch songs' }, 500)
   }
-
-  const tracksWithOwnership = tracks.map(track => {
-    const parentId = track.album_id ? Number(track.album_id) : null
-    const isOwned = userMints.includes(track.token_id) || (parentId !== null && userMints.includes(parentId))
-    return {
-      ...resolveTrackAddress(track),
-      is_owned: isOwned
-    }
-  })
-
-  return c.json(tracksWithOwnership)
 })
 
 // Health Check

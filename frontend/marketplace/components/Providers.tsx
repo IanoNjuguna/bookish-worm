@@ -64,6 +64,10 @@ export function CardanoProvider({ children }: { children: React.ReactNode }) {
 			// Dynamically import Lucid & Blockfrost to prevent SSR compilation errors
 			const { Lucid, Blockfrost } = await import("@lucid-evolution/lucid");
 
+			if (!BLOCKFROST_PROJECT_ID) {
+				throw new Error("Missing NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_MAINNET. Add it to your environment and restart Next.js.");
+			}
+
 			// Initialize provider
 			const blockfrostProvider = new Blockfrost(
 				`https://cardano-mainnet.blockfrost.io/api/v0`,
@@ -71,7 +75,18 @@ export function CardanoProvider({ children }: { children: React.ReactNode }) {
 			);
 
 			// Initialize Lucid
-			const lucidInstance = await Lucid(blockfrostProvider, "Mainnet");
+			let lucidInstance: any;
+			try {
+				lucidInstance = await Lucid(blockfrostProvider, CARDANO_NETWORK);
+			} catch (lucidInitError: any) {
+				const message = String(lucidInitError?.message || lucidInitError || "");
+				if (message.includes("Cannot convert undefined to a BigInt")) {
+					throw new Error(
+						"Failed to initialize Cardano provider. Check NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_MAINNET (missing/invalid) and ensure Mainnet Blockfrost access is enabled."
+					);
+				}
+				throw lucidInitError;
+			}
 
 			if (seedPhrase) {
 				try {
