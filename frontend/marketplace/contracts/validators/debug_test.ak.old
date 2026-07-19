@@ -1,0 +1,35 @@
+use aiken/crypto.{VerificationKeyHash}
+use aiken/primitive/bytearray
+use cardano/assets.{PolicyId}
+use cardano/transaction.{Transaction, Output, InlineDatum, ScriptPurpose, Mint}
+use frac.{MintAction, fraction_minting}
+use aiken/collection/dict
+
+test debug_minting() {
+  let owner: VerificationKeyHash = #"00000000000000000000000000000000000000000000000000000000"
+  let policy_id: PolicyId = #"00000000000000000000000000000000000000000000000000000000"
+  let r = MintAction { a: 1, b: 1000, tn: #"48454c4c4f3031" } // HELLO01
+  
+  // Dummy outputs with correct InlineDatum and Values
+  let ref_asset = bytearray.concat(#"000643b0", #"48454c4c4f3031")
+  let frac_asset = bytearray.concat(#"001bc280", #"48454c4c4f3031")
+  
+  let val = assets.from_asset(policy_id, ref_asset, 1) |> assets.merge(assets.from_asset(policy_id, frac_asset, 1000))
+  
+  let ph = transaction.placeholder
+  let tx = Transaction {
+    mint: val,
+    outputs: [
+      Output {
+        address: ph.outputs |> dict.values |> aiken/list.head |> fn(o) { o.address } ? ph.outputs,
+        value: val,
+        datum: InlineDatum(Void),
+        reference_script: None,
+      }
+    ],
+    extra_signatories: [owner],
+    ..ph
+  }
+
+  fraction_minting.mint(owner, r, policy_id, tx)
+}

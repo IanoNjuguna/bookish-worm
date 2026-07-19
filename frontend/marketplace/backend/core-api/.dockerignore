@@ -1,0 +1,13 @@
+# Cloud Run ignores (similar to .dockerignore)
+node_modules
+.env
+.env.local
+.env.example
+*.db
+*.db-journal
+.DS_Store
+.git
+.gitignore
+README.md
+GCP_DEPLOY.md
+*.md
