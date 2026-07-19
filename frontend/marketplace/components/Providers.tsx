@@ -72,6 +72,24 @@ export function CardanoProvider({ children }: { children: React.ReactNode }) {
 				throw new Error("Invalid Blockfrost key for Mainnet. Expected NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_MAINNET to start with 'mainnet'.");
 			}
 
+			// Preflight Blockfrost access so Lucid doesn't fail with opaque BigInt errors.
+			const blockfrostTestRes = await fetch("https://cardano-mainnet.blockfrost.io/api/v0/epochs/latest", {
+				headers: {
+					project_id: BLOCKFROST_PROJECT_ID,
+				},
+			});
+
+			if (!blockfrostTestRes.ok) {
+				throw new Error(
+					`Blockfrost preflight failed (${blockfrostTestRes.status}). Verify NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_MAINNET and Mainnet project access.`
+				);
+			}
+
+			const blockfrostTestData = await blockfrostTestRes.json().catch(() => null);
+			if (!blockfrostTestData || typeof blockfrostTestData.epoch !== "number") {
+				throw new Error("Blockfrost preflight returned an unexpected payload. Check Blockfrost key and network settings.");
+			}
+
 			// Initialize provider
 			const blockfrostProvider = new Blockfrost(
 				`https://cardano-mainnet.blockfrost.io/api/v0`,
