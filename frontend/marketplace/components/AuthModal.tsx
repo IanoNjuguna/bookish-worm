@@ -1,12 +1,11 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import { useAudio } from '@/components/AudioProvider'
 import { useCardano } from '@/components/Providers'
-import { IconShieldCheck } from '@tabler/icons-react'
+import { IconShieldCheck, IconWallet, IconKey, IconLoader2, IconCheck } from '@tabler/icons-react'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -17,19 +16,38 @@ interface AuthModalProps {
 export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const { login, isLoading, isAuthenticated } = useAudio()
   const { disconnect } = useCardano()
-  const [agreedToTos, setAgreedToTos] = useState(false)
+  const [hasAutoStarted, setHasAutoStarted] = useState(false)
+  const [hasFailedAttempt, setHasFailedAttempt] = useState(false)
 
   // Automatically close if authenticated
-  React.useEffect(() => {
+  useEffect(() => {
     if (isAuthenticated && isOpen) {
       onClose()
     }
   }, [isAuthenticated, isOpen, onClose])
 
+  // Trigger wallet signature automatically when modal opens.
+  useEffect(() => {
+    if (!isOpen) {
+      setHasAutoStarted(false)
+      setHasFailedAttempt(false)
+      return
+    }
+    if (isAuthenticated || isLoading || hasAutoStarted) return
+
+    setHasAutoStarted(true)
+    void handleLogin()
+  }, [isOpen, isAuthenticated, isLoading, hasAutoStarted])
+
   const handleLogin = async () => {
+    setHasFailedAttempt(false)
     const token = await login()
     if (token && onSuccess) {
       onSuccess(token)
+      return
+    }
+    if (!token && !isAuthenticated) {
+      setHasFailedAttempt(true)
     }
   }
 
@@ -37,6 +55,11 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     disconnect()
     onClose()
   }
+
+  const stepOneDone = hasAutoStarted || isLoading || isAuthenticated
+  const stepTwoDone = isLoading || isAuthenticated
+  const stepThreeDone = isAuthenticated
+  const progressWidth = isAuthenticated ? 'w-full' : isLoading ? 'w-2/3' : hasAutoStarted ? 'w-1/3' : 'w-1/4'
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -47,43 +70,60 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
       >
         <DialogHeader className="mb-4">
           <div className="mx-auto w-12 h-12 bg-lavender/10 rounded-full flex items-center justify-center mb-4">
-            <IconShieldCheck size={28} className="text-lavender" />
+            {isLoading ? (
+              <IconLoader2 size={28} className="text-lavender animate-spin" />
+            ) : (
+              <IconShieldCheck size={28} className="text-lavender" />
+            )}
           </div>
-          <DialogTitle className="text-xl text-center font-bold">Secure Your Account</DialogTitle>
+          <DialogTitle className="text-xl text-center font-bold">Loading...</DialogTitle>
           <DialogDescription className="text-midnight/80 dark:text-white/60 text-center pt-2">
-            You're almost there! Please complete your sign-in to securely link your wallet to Doba.
+            {isLoading
+              ? 'Preparing your secure wallet session. Please approve the signature in your wallet if prompted.'
+              : 'Connecting your wallet and preparing secure access.'}
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-6 py-2">
-          <div className="flex items-start space-x-3 bg-midnight/[0.04] dark:bg-white/[0.02] p-4 rounded-lg border border-midnight/10 dark:border-white/5">
-            <Checkbox 
-              id="tos" 
-              checked={agreedToTos} 
-              onCheckedChange={(c) => setAgreedToTos(c as boolean)} 
-              className="mt-1 border-midnight/30 dark:border-white/40 data-[state=checked]:bg-lavender data-[state=checked]:border-lavender data-[state=checked]:text-midnight"
-            />
-            <div className="grid gap-1.5 leading-none">
-              <label
-                htmlFor="tos"
-                className="text-sm font-medium leading-normal cursor-pointer text-midnight/90 dark:text-white/90"
-              >
-                Sign message to securely link your wallet
-              </label>
-              <p className="text-xs text-midnight/70 dark:text-white/50 leading-relaxed pr-2">
-                This signature is completely free and proves you own this wallet. It acts as an unbreakable cryptographic lock, ensuring that only you can upload music, access your profile, and withdraw your earnings safely.
-              </p>
+          <div className="bg-midnight/[0.04] dark:bg-white/[0.02] p-4 rounded-lg border border-midnight/10 dark:border-white/5">
+            <div className="h-2 w-full bg-midnight/10 dark:bg-white/10 rounded-full overflow-hidden mb-4">
+              <div className={`h-full ${progressWidth} bg-lavender transition-all duration-500`} />
             </div>
+
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center gap-2 text-midnight/90 dark:text-white/90">
+                {stepOneDone ? <IconCheck size={16} className="text-green-500" /> : <IconWallet size={16} className="text-lavender" />}
+                <span>Wallet connected</span>
+              </div>
+              <div className="flex items-center gap-2 text-midnight/90 dark:text-white/90">
+                {stepTwoDone ? (
+                  isAuthenticated ? <IconCheck size={16} className="text-green-500" /> : <IconLoader2 size={16} className="text-lavender animate-spin" />
+                ) : (
+                  <IconKey size={16} className="text-lavender" />
+                )}
+                <span>Signature verification in progress</span>
+              </div>
+              <div className="flex items-center gap-2 text-midnight/90 dark:text-white/90">
+                {stepThreeDone ? <IconCheck size={16} className="text-green-500" /> : <IconShieldCheck size={16} className="text-lavender" />}
+                <span>Secure session setup</span>
+              </div>
+            </div>
+
+            <p className="text-xs text-midnight/70 dark:text-white/50 leading-relaxed mt-4">
+              No transaction fees are charged. This signature only proves wallet ownership.
+            </p>
           </div>
 
           <div className="flex flex-col gap-3">
-            <Button
-              onClick={handleLogin}
-              disabled={isLoading || !agreedToTos}
-              className="w-full bg-[#FF1F8A] hover:bg-[#FF1F8A]/90 text-white font-bold h-12 text-base transition-all rounded-lg flex items-center justify-center gap-2"
-            >
-              {isLoading ? 'Verifying...' : 'Finish Setup'}
-            </Button>
+            {hasFailedAttempt && !isAuthenticated && (
+              <Button
+                onClick={handleLogin}
+                disabled={isLoading}
+                className="w-full bg-[#FF1F8A] hover:bg-[#FF1F8A]/90 text-white font-bold h-12 text-base transition-all rounded-lg flex items-center justify-center gap-2"
+              >
+                {isLoading ? 'Loading...' : 'Retry Signature'}
+              </Button>
+            )}
             
             <Button
               onClick={handleCancel}

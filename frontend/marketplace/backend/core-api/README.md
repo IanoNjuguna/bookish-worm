@@ -12,13 +12,13 @@ bun install
 bun run dev
 
 # Test the API
-curl http://localhost:3000/health
+curl http://localhost:3001/health
 ```
 
 ## Add Sample Data
 
 ```bash
-curl -X POST http://localhost:3000/admin/tracks \
+curl -X POST http://localhost:3001/admin/tracks \
   -H "Content-Type: application/json" \
   -H "X-API-Key: dev-secret-key" \
   -d '{
@@ -37,7 +37,7 @@ curl -X POST http://localhost:3000/admin/tracks \
 ## View Metadata
 
 ```bash
-curl http://localhost:3000/metadata/1
+curl http://localhost:3001/metadata/1
 ```
 
 ## Endpoints

@@ -286,8 +286,16 @@ export function useBackendAuth() {
 			return data.accessToken
 		} catch (error: any) {
 			const errMessage = typeof error === 'string' ? error : (error?.message || '')
-			if (errMessage.includes('UserDeclined') || errMessage.includes('User declined') || errMessage.includes('cancelled') || errMessage.includes('Refused')) {
-				console.log('User cancelled signature request.')
+			const normalized = errMessage.toLowerCase()
+			const isUserCancelled = normalized.includes('userdeclined')
+				|| normalized.includes('user declined')
+				|| normalized.includes('declined sign data')
+				|| normalized.includes('cancelled')
+				|| normalized.includes('canceled')
+				|| normalized.includes('refused')
+
+			if (isUserCancelled) {
+				console.info('User cancelled signature request.')
 				toast.info('Signature request cancelled')
 			} else {
 				console.error('Login error:', error)

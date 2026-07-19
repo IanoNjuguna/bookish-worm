@@ -21,6 +21,49 @@ interface Collaborator {
 
 const API_URL = (process.env.NEXT_PUBLIC_API_URL || '/api-backend').replace(/\/$/, '')
 
+async function readErrorBody(res: Response): Promise<string> {
+	const contentType = res.headers.get('content-type') || ''
+	if (contentType.includes('application/json')) {
+		const data = await res.json().catch(() => ({} as any))
+		return data?.message || data?.error || JSON.stringify(data)
+	}
+	return await res.text().catch(() => '')
+}
+
+async function assertOk(res: Response, context: string): Promise<void> {
+	if (res.ok) return
+	const body = (await readErrorBody(res)).trim()
+	const details = body || `${res.status} ${res.statusText}`
+	throw new Error(`${context}: ${details}`)
+}
+
+function mapUploadErrorMessage(error: any): string {
+	const raw = typeof error === 'string' ? error : (error?.message || '')
+	const msg = raw.toLowerCase()
+
+	if (msg.includes('pinata jwt not configured')) {
+		return 'Upload service is not configured. Set PINATA_JWT on core-api backend and retry.'
+	}
+	if (msg.includes('payload too large') || msg.includes('413')) {
+		return 'Uploaded file is too large. Please use a smaller audio/image file and try again.'
+	}
+	if (
+		msg.includes('missing or invalid authorization header')
+		|| msg.includes('invalid or expired access token')
+		|| msg.includes('401')
+	) {
+		return 'Your session expired. Please sign the authentication message again and retry.'
+	}
+	if (msg.includes('invalid or expired nonce') || msg.includes('missing nonce')) {
+		return 'Secure session expired during signing. Please authenticate again and retry.'
+	}
+	if (msg.includes('failed to fetch') || msg.includes('networkerror')) {
+		return 'Cannot reach backend upload service. Check that core-api is running and reachable.'
+	}
+
+	return formatTxError(error)
+}
+
 export default function UploadView() {
 	const t = useTranslations('upload')
 	const { address: cardanoAddress, lucid } = useCardano()
@@ -161,7 +204,6 @@ export default function UploadView() {
 				const response = await fetch(`${API_URL.replace(/\/$/, '')}/upload-assets`, {
 					method: 'POST',
 					headers: {
-						'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '',
 						'Authorization': `Bearer ${token}`
 					},
 					body: formData,
@@ -178,6 +220,7 @@ export default function UploadView() {
 				}
 			} catch (e) {
 				logger.error('Background upload failed', e)
+				toast.error(mapUploadErrorMessage(e))
 			} finally {
 				setIsAssetsUploading(false)
 			}
@@ -287,13 +330,11 @@ export default function UploadView() {
 				const imgRes = await fetch(`${API_URL.replace(/\/$/, '')}/upload-assets`, {
 					method: 'POST',
 					headers: {
-						'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '',
 						'Authorization': `Bearer ${token}`
 					},
 					body: imageFormData,
 				})
-
-				if (!imgRes.ok) throw new Error(`Cover image upload failed: ${await imgRes.text()}`)
+				await assertOk(imgRes, 'Cover image upload failed')
 				const imgData = await imgRes.json()
 				currentImageHash = imgData.imageHash
 				currentImageName = imgData.imageName
@@ -309,13 +350,11 @@ export default function UploadView() {
 					const trackRes = await fetch(`${API_URL.replace(/\/$/, '')}/upload-assets`, {
 						method: 'POST',
 						headers: {
-							'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '',
 							'Authorization': `Bearer ${token}`
 						},
 						body: trackFormData,
 					})
-
-					if (!trackRes.ok) throw new Error(`Track "${t.title}" audio upload failed: ${await trackRes.text()}`)
+					await assertOk(trackRes, `Track "${t.title}" audio upload failed`)
 					const trackData = await trackRes.json()
 					t.audioHash = trackData.audioHash
 					t.audioName = trackData.audioName
@@ -337,13 +376,11 @@ export default function UploadView() {
 					const assetRes = await fetch(`${API_URL.replace(/\/$/, '')}/upload-assets`, {
 						method: 'POST',
 						headers: {
-							'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '',
 							'Authorization': `Bearer ${token}`
 						},
 						body: formData,
 					})
-
-					if (!assetRes.ok) throw new Error(`Media upload failed: ${await assetRes.text()}`)
+					await assertOk(assetRes, 'Media upload failed')
 					const assetData = await assetRes.json()
 
 					currentAudioHash = assetData.audioHash
@@ -360,7 +397,6 @@ export default function UploadView() {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '',
 					'Authorization': `Bearer ${token}`
 				},
 				body: JSON.stringify({
@@ -386,8 +422,7 @@ export default function UploadView() {
 					royaltyAddress: royaltyAddress || cardanoAddress || ''
 				}),
 			})
-
-			if (!metaResponse.ok) throw new Error(`Metadata generation failed: ${await metaResponse.text()}`)
+			await assertOk(metaResponse, 'Metadata generation failed')
 			const { metadataUri } = await metaResponse.json()
 
 			// Generate a unique token_id (millisecond timestamp)
@@ -426,7 +461,6 @@ export default function UploadView() {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
-						'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '',
 						'Authorization': `Bearer ${token}`
 					},
 					body: JSON.stringify({
@@ -453,7 +487,7 @@ export default function UploadView() {
 						track_number: null
 					}),
 				})
-				if (!albumResponse.ok) throw new Error(`Backend album indexing failed: ${await albumResponse.text()}`)
+				await assertOk(albumResponse, 'Backend album indexing failed')
 
 				// Register each track inside the album
 				for (let idx = 0; idx < albumTracks.length; idx++) {
@@ -462,7 +496,6 @@ export default function UploadView() {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',
-							'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '',
 							'Authorization': `Bearer ${token}`
 						},
 						body: JSON.stringify({
@@ -489,7 +522,7 @@ export default function UploadView() {
 							track_number: idx + 1
 						}),
 					})
-					if (!trackResponse.ok) throw new Error(`Backend track "${t.title}" indexing failed: ${await trackResponse.text()}`)
+					await assertOk(trackResponse, `Backend track "${t.title}" indexing failed`)
 				}
 			} else {
 				// Register Single Track
@@ -497,7 +530,6 @@ export default function UploadView() {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
-						'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '',
 						'Authorization': `Bearer ${token}`
 					},
 					body: JSON.stringify({
@@ -522,7 +554,7 @@ export default function UploadView() {
 						release_date: new Date().toISOString().split('T')[0]
 					}),
 				})
-				if (!songResponse.ok) throw new Error(`Backend indexing failed: ${await songResponse.text()}`)
+				await assertOk(songResponse, 'Backend indexing failed')
 			}
 
 			// 4. Register Collaborators in Backend
@@ -533,7 +565,6 @@ export default function UploadView() {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',
-							'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '',
 							'Authorization': `Bearer ${token}`
 						},
 						body: JSON.stringify({
@@ -568,7 +599,7 @@ export default function UploadView() {
 
 		} catch (error: any) {
 			logger.error('Submit Error', error)
-			toast.error(formatTxError(error), { id: mainToast })
+			toast.error(mapUploadErrorMessage(error), { id: mainToast })
 		} finally {
 			setIsUploading(false)
 		}

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient, CARDANO_NETWORK, BLOCKFROST_PROJECT_ID } from "@/lib/config";
+import { queryClient, CARDANO_NETWORK, BLOCKFROST_PROJECT_ID, BLOCKFROST_URL } from "@/lib/config";
 import { toast } from "sonner";
 
 interface CardanoContextType {
@@ -25,32 +25,6 @@ const CardanoContext = createContext<CardanoContextType>({
 	address: null,
 	stakeAddress: null,
 	walletName: null,
-	walletApi: null,
-	lucid: null,
-	sessionSeedPhrase: null,
-	connect: async () => {},
-	connectFromSeed: async () => {},
-	disconnect: () => {},
-});
-
-export function CardanoProvider({ children }: { children: React.ReactNode }) {
-	const [isConnected, setIsConnected] = useState(false);
-	const [address, setAddress] = useState<string | null>(null);
-	const [stakeAddress, setStakeAddress] = useState<string | null>(null);
-	const [walletName, setWalletName] = useState<string | null>(null);
-	const [walletApi, setWalletApi] = useState<any | null>(null);
-	const [lucid, setLucid] = useState<any | null>(null);
-	const [isConnecting, setIsConnecting] = useState(false);
-	const [sessionSeedPhrase, setSessionSeedPhrase] = useState<string | null>(null);
-
-	useEffect(() => {
-		const checkConnection = async () => {
-			if (typeof window !== "undefined") {
-				const savedWallet = localStorage.getItem("doba_connected_wallet");
-				if (savedWallet && !isConnected && !isConnecting) {
-					connect(savedWallet).catch((err) => {
-						console.warn("Auto-reconnection failed:", err);
-					});
 				}
 			}
 		};
@@ -64,36 +38,27 @@ export function CardanoProvider({ children }: { children: React.ReactNode }) {
 			// Dynamically import Lucid & Blockfrost to prevent SSR compilation errors
 			const { Lucid, Blockfrost } = await import("@lucid-evolution/lucid");
 
-			if (!BLOCKFROST_PROJECT_ID) {
-				throw new Error("Missing NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_MAINNET. Add it to your environment and restart Next.js.");
-			}
-
-			if (CARDANO_NETWORK === "Mainnet" && !BLOCKFROST_PROJECT_ID.toLowerCase().startsWith("mainnet")) {
-				throw new Error("Invalid Blockfrost key for Mainnet. Expected NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_MAINNET to start with 'mainnet'.");
-			}
-
-			// Preflight Blockfrost access so Lucid doesn't fail with opaque BigInt errors.
-			const blockfrostTestRes = await fetch("https://cardano-mainnet.blockfrost.io/api/v0/epochs/latest", {
-				headers: {
-					project_id: BLOCKFROST_PROJECT_ID,
-				},
-			});
-
-			if (!blockfrostTestRes.ok) {
+			const projectId = (BLOCKFROST_PROJECT_ID || "").trim();
+			if (!projectId) {
 				throw new Error(
-					`Blockfrost preflight failed (${blockfrostTestRes.status}). Verify NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_MAINNET and Mainnet project access.`
+					`Missing Blockfrost key for ${CARDANO_NETWORK}. Set ${CARDANO_NETWORK === "Mainnet" ? "NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_MAINNET" : "NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_PREPROD"} in .env.local and restart Next.js.`
 				);
 			}
 
-			const blockfrostTestData = await blockfrostTestRes.json().catch(() => null);
-			if (!blockfrostTestData || typeof blockfrostTestData.epoch !== "number") {
-				throw new Error("Blockfrost preflight returned an unexpected payload. Check Blockfrost key and network settings.");
+			// Preflight Blockfrost credentials to avoid opaque Lucid init errors
+			const healthRes = await fetch(`${BLOCKFROST_URL}/health`, {
+				headers: { project_id: projectId }
+			});
+			if (!healthRes.ok) {
+				throw new Error(
+					`Blockfrost auth failed (${healthRes.status}). Verify your ${CARDANO_NETWORK} project ID and network setting.`
+				);
 			}
 
 			// Initialize provider
 			const blockfrostProvider = new Blockfrost(
-				`https://cardano-mainnet.blockfrost.io/api/v0`,
-				BLOCKFROST_PROJECT_ID
+				BLOCKFROST_URL,
+				projectId
 			);
 
 			// Initialize Lucid
@@ -104,7 +69,7 @@ export function CardanoProvider({ children }: { children: React.ReactNode }) {
 				const message = String(lucidInitError?.message || lucidInitError || "");
 				if (message.includes("Cannot convert undefined to a BigInt") || message.includes("BigInt")) {
 					throw new Error(
-						"Failed to initialize Cardano provider. Check NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_MAINNET (missing/invalid) and ensure Mainnet Blockfrost access is enabled."
+						`Failed to initialize Cardano provider for ${CARDANO_NETWORK}. Check your Blockfrost credentials and ensure network access is enabled.`
 					);
 				}
 				throw lucidInitError;
@@ -123,7 +88,7 @@ export function CardanoProvider({ children }: { children: React.ReactNode }) {
 
 							if (!selectedWallet || typeof selectedWallet.signMessage !== "function") {
 								throw new Error("Seed wallet signer is unavailable");
-							}
+
 
 							return await selectedWallet.signMessage(address, payload);
 						},

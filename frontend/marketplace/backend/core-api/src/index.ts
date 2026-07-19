@@ -120,6 +120,11 @@ app.use('*', async (c, next) => {
     if (c.req.path.startsWith('/auth/')) return await next()
     if (c.req.path.includes('/play')) return await next()
 
+    // JWT-authenticated routes (upload/songs/mints/collaborators/users/etc.)
+    // should not require a client-exposed API key.
+    const authHeader = c.req.header('Authorization')
+    if (authHeader && authHeader.startsWith('Bearer ')) return await next()
+
     const apiKey = c.req.header('X-API-Key')
     const validKey = process.env.API_SECRET_KEY || process.env.ADMIN_API_KEY
 
