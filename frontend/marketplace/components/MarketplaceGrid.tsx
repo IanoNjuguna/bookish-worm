@@ -30,6 +30,9 @@ interface Track {
 }
 
 const API_URL = '/api-backend'
+const TRANSIENT_HTTP_STATUSES = new Set([500, 502, 503, 504])
+
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 export default function MarketplaceGrid({
   onPlay,
@@ -58,12 +61,14 @@ export default function MarketplaceGrid({
   const [loadingMore, setLoadingMore] = useState(false)
   const [hasMore, setHasMore] = useState(true)
   const [offset, setOffset] = useState(0)
+  const [fetchError, setFetchError] = useState<string | null>(null)
 
   const fetchTracks = async (isLoadMore = false) => {
     if (isLoadMore) setLoadingMore(true)
     else setLoading(true)
 
     try {
+      setFetchError(null)
       const currentOffset = isLoadMore ? offset + limit : 0
       const params = new URLSearchParams()
       if (searchQuery) params.append('search', searchQuery)
@@ -86,9 +91,41 @@ export default function MarketplaceGrid({
         }
       }
 
-      const res = await fetch(fetchUrl, { headers })
-      if (res.ok) {
-        const data = await res.json()
+      const maxAttempts = 3
+      let lastStatus: number | null = null
+      let lastStatusText = ''
+      let lastErrorBody = ''
+      let responseData: Track[] | null = null
+
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        const attemptHeaders = { ...headers }
+
+        // If upstream keeps failing and we have auth attached, try a no-auth request once.
+        if (attempt === 2 && attemptHeaders['Authorization']) {
+          delete attemptHeaders['Authorization']
+        }
+
+        const res = await fetch(fetchUrl, { headers: attemptHeaders })
+
+        if (res.ok) {
+          responseData = await res.json()
+          break
+        }
+
+        lastStatus = res.status
+        lastStatusText = res.statusText
+        lastErrorBody = await res.text().catch(() => '')
+
+        const shouldRetry = TRANSIENT_HTTP_STATUSES.has(res.status) && attempt < maxAttempts
+        if (!shouldRetry) {
+          break
+        }
+
+        await delay(attempt * 400)
+      }
+
+      if (responseData) {
+        const data = responseData
         if (isLoadMore) {
           setTracks(prev => [...prev, ...data])
           setOffset(currentOffset)
@@ -98,14 +135,17 @@ export default function MarketplaceGrid({
         }
         setHasMore(data.length === limit)
       } else {
-        const errorBody = await res.text().catch(() => '')
+        const status = lastStatus ?? 0
+        const statusText = lastStatusText || 'Request failed'
         logger.error(
-          `Failed to fetch tracks: ${res.status} ${res.statusText}`,
-          errorBody ? { responseBody: errorBody, fetchUrl } : { fetchUrl }
+          `Failed to fetch tracks: ${status} ${statusText}`,
+          lastErrorBody ? { responseBody: lastErrorBody, fetchUrl } : { fetchUrl }
         )
+        setFetchError(status >= 500 ? 'Service temporarily unavailable. Please try again shortly.' : 'Unable to load tracks right now.')
       }
     } catch (error: any) {
       logger.error('Failed to fetch tracks:', error?.message || error)
+      setFetchError('Network error while loading tracks. Please retry.')
     } finally {
       setLoading(false)
       setLoadingMore(false)
@@ -134,7 +174,7 @@ export default function MarketplaceGrid({
   if (!tracks.length) {
     return (
       <div className="bg-midnight/[0.02] dark:bg-white/[0.02] border border-white/5 p-20 text-center">
-        <p className="text-midnight/70 dark:text-white/40 italic text-sm">{t('noSongs')}</p>
+        <p className="text-midnight/70 dark:text-white/40 italic text-sm">{fetchError || t('noSongs')}</p>
       </div>
     )
   }

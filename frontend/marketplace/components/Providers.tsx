@@ -68,6 +68,10 @@ export function CardanoProvider({ children }: { children: React.ReactNode }) {
 				throw new Error("Missing NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_MAINNET. Add it to your environment and restart Next.js.");
 			}
 
+			if (CARDANO_NETWORK === "Mainnet" && !BLOCKFROST_PROJECT_ID.toLowerCase().startsWith("mainnet")) {
+				throw new Error("Invalid Blockfrost key for Mainnet. Expected NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_MAINNET to start with 'mainnet'.");
+			}
+
 			// Initialize provider
 			const blockfrostProvider = new Blockfrost(
 				`https://cardano-mainnet.blockfrost.io/api/v0`,
@@ -80,7 +84,7 @@ export function CardanoProvider({ children }: { children: React.ReactNode }) {
 				lucidInstance = await Lucid(blockfrostProvider, CARDANO_NETWORK);
 			} catch (lucidInitError: any) {
 				const message = String(lucidInitError?.message || lucidInitError || "");
-				if (message.includes("Cannot convert undefined to a BigInt")) {
+				if (message.includes("Cannot convert undefined to a BigInt") || message.includes("BigInt")) {
 					throw new Error(
 						"Failed to initialize Cardano provider. Check NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_MAINNET (missing/invalid) and ensure Mainnet Blockfrost access is enabled."
 					);
@@ -148,11 +152,14 @@ export function CardanoProvider({ children }: { children: React.ReactNode }) {
 
 			toast.success(`Connected to ${wallet === "utxos" ? "Social Login" : wallet}`);
 		} catch (error: any) {
-			const errMessage = typeof error === 'string' ? error : (error?.message || '');
+			let errMessage = typeof error === 'string' ? error : (error?.message || '');
+			if (errMessage.includes('Cannot convert undefined to a BigInt') || errMessage.includes('BigInt')) {
+				errMessage = 'Wallet provider failed to initialize. Verify NEXT_PUBLIC_BLOCKFROST_PROJECT_ID_MAINNET and restart the app.';
+			}
 			if (errMessage.includes('Refused') || errMessage.includes('cancelled') || errMessage.includes('rejected')) {
 				console.log('Wallet connection cancelled by user.');
 			} else {
-				console.error("Wallet connection failed:", error);
+				console.error("Wallet connection failed:", errMessage);
 				toast.error(errMessage || "Failed to connect to wallet");
 			}
 			disconnect();
