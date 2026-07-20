@@ -52,6 +52,8 @@ Show the user-facing problem and the product in plain language.
 
 ## Live Demo
 
+[Doba World v1](https://youtu.be/54gs12UbgMI)
+
 ## How a User Buys the Product
 
 Doba bypasses traditional web checkouts (like entering a credit card number) and relies entirely on decentralized interactions.
