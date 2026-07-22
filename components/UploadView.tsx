@@ -14,6 +14,7 @@ import { toast } from 'sonner'
 import { useAudio } from '@/components/AudioProvider'
 import { mintTrackOnChain, formatTxError, isUserDeclinedTxError } from '@/lib/contractHelper'
 import { CARDANO_NETWORK } from '@/lib/config'
+import { notifyOnRampInitiated, notifyMintedTrack } from '@/lib/notifications'
 
 interface Collaborator {
 	address: string
@@ -596,6 +597,7 @@ export default function UploadView() {
 			}
 
 			setPublishedSongId(tokenId)
+			notifyMintedTrack(title, isAlbum, `/track/${tokenId}`)
 			toast.success(isAlbum ? "Album published successfully!" : "Track published successfully!", { id: mainToast })
 
 		} catch (error: any) {
@@ -1105,9 +1107,10 @@ export default function UploadView() {
 									href={`https://utxos.dev/onramp${cardanoAddress ? `?address=${encodeURIComponent(cardanoAddress)}` : ''}`}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1DB954] hover:bg-[#1ed760] text-white font-bold rounded-none transition-all text-xs shadow-lg uppercase tracking-wider cursor-pointer"
+									onClick={() => notifyOnRampInitiated()}
+									className="inline-flex items-center justify-center px-5 py-2.5 bg-[#1DB954] hover:bg-[#1ed760] text-black font-bold rounded-none transition-all text-xs shadow-lg uppercase tracking-wider cursor-pointer"
 								>
-									<span>💳</span> Fund your wallet with ADA
+									Fund your wallet with ADA
 								</a>
 							</div>
 						) : (

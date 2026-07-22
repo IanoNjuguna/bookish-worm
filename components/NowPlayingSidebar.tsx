@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { useAudio } from '@/components/AudioProvider'
 import { buyFractionOnChain, formatTxError, isUserDeclinedTxError } from '@/lib/contractHelper'
+import { notifyCollectedTrack } from '@/lib/notifications'
 import { IconPlayerPlay as Play, IconPlayerPause as Pause, IconPlayerSkipBack as SkipBack, IconPlayerSkipForward as SkipForward } from '@tabler/icons-react'
 
 const formatTokenId = (id: string | number) => {
@@ -221,6 +222,7 @@ export default function NowPlayingSidebar({ track, isVisible, onClose }: NowPlay
 
 			setHasOwned(true)
 			fetchMintData()
+			notifyCollectedTrack(track.name || track.title || 'Track', `/track/${tokenId}`)
 			if (mainToast) {
 				toast.success(`"${track.name || track.title}" collected!`, { id: mainToast })
 			}

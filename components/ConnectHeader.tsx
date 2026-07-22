@@ -11,6 +11,7 @@ import { toast } from 'sonner'
 import { EXPLORER_URL } from '@/lib/config'
 import { ThemeToggle } from './ThemeToggle'
 import NotificationsMenu from './NotificationsMenu'
+import { notifyWalletFunded } from '@/lib/notifications'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -89,6 +90,8 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
     setAvailableWallets(wallets)
   }, [])
 
+  const prevBalanceRef = React.useRef<number | null>(null)
+
   // Fetch ADA balance
   useEffect(() => {
     async function fetchBalance() {
@@ -116,6 +119,12 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
 
         const ada = Number(lovelace) / 1000000
         setAdaBalance(ada.toFixed(2))
+
+        if (prevBalanceRef.current !== null && ada > prevBalanceRef.current) {
+          const diff = (ada - prevBalanceRef.current).toFixed(2)
+          notifyWalletFunded(diff)
+        }
+        prevBalanceRef.current = ada
       } catch (e) {
         console.error('Failed to fetch ADA balance:', e)
       }

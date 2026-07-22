@@ -26,6 +26,7 @@ import { useAudio } from './AudioProvider'
 import { useCardano } from '@/components/Providers'
 import { EXPLORER_URL } from '@/lib/config'
 import { buyFractionOnChain, formatTxError, isUserDeclinedTxError } from '@/lib/contractHelper'
+import { notifyCollectedTrack } from '@/lib/notifications'
 
 
 interface AudioPlayerProps {
@@ -204,6 +205,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
       }
 
       setHasOwned(true)
+      notifyCollectedTrack(currentTrack.title, `/track/${currentTrack.tokenId || ''}`)
       toast.success(`"${currentTrack.title}" collected!`, { id: mainToast })
     } catch (error: any) {
       logger.error('AudioPlayer: Collection Error', error)

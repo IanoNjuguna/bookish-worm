@@ -77,6 +77,22 @@ export function addNotification(
   setNotifications([next, ...existing])
 }
 
+export function notifyCollectedTrack(trackTitle: string, href?: string) {
+  addNotification(`🎵 Collected "${trackTitle}"! Added to your collection.`, 'success', { href })
+}
+
+export function notifyMintedTrack(title: string, isAlbum: boolean = false, href?: string) {
+  addNotification(`🎨 Minted ${isAlbum ? 'Album' : 'Track'} "${title}" on-chain!`, 'success', { href })
+}
+
+export function notifyOnRampInitiated() {
+  addNotification('💳 Opened UTxO On-Ramp. Completing purchase will fund your wallet with ADA.', 'info')
+}
+
+export function notifyWalletFunded(adaAmount: string | number) {
+  addNotification(`💰 Wallet funded: +${adaAmount} ADA received!`, 'success')
+}
+
 export function markNotificationRead(id: string) {
   const existing = getNotifications()
   const next = existing.map((n) => (n.id === id ? { ...n, read: true } : n))

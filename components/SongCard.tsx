@@ -1,7 +1,8 @@
 'use client'
 
 import { logger } from '@/lib/logger'
-import { buyFractionOnChain, buyAlbumFractionsOnChain, formatTxError, isUserDeclinedTxError } from '@/lib/contractHelper'
+import { mintTrackOnChain, buyFractionOnChain, buyAlbumFractionsOnChain, formatTxError, isUserDeclinedTxError } from '@/lib/contractHelper'
+import { notifyCollectedTrack } from '@/lib/notifications'
 import React from 'react'
 import { IconPlayerPlay, IconPlayerPause, IconLoader2, IconDiamond, IconDiamondFilled, IconDisc } from '@tabler/icons-react'
 import { DobaVisualizer } from '@/components/icons/DobaVisualizer'
@@ -266,6 +267,7 @@ export default function SongCard({
 
       // Update local state immediately
       setHasOwned(true)
+      notifyCollectedTrack(name, `/track/${tokenId}`)
       toast.success(
         <div className="flex flex-col gap-1">
           <p className="font-bold">"{name}" collected!</p>
