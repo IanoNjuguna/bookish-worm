@@ -13,6 +13,7 @@ import { useCardano } from '@/components/Providers'
 import { toast } from 'sonner'
 import { useAudio } from '@/components/AudioProvider'
 import { mintTrackOnChain, formatTxError, isUserDeclinedTxError } from '@/lib/contractHelper'
+import { CARDANO_NETWORK } from '@/lib/config'
 
 interface Collaborator {
 	address: string
@@ -1085,10 +1086,50 @@ export default function UploadView() {
 
 				{/* Insufficient Balance Warning */}
 				{cardanoAddress && adaBalance !== null && adaBalance < 2000000n && (
-					<div className="bg-red-500/10 border border-red-500/30 p-4 text-red-400 text-xs space-y-2">
-						<p className="font-bold uppercase tracking-wider">⚠️ INSUFFICIENT WALLET BALANCE</p>
-						<p>Your wallet address has less than 2 ADA ({ (Number(adaBalance) / 1000000).toFixed(2) } ADA). You need at least 2 ADA to cover minting transaction fees and the minimum UTxO storage deposit on the Cardano Preprod network.</p>
-						<p>You can request free test ADA using the <a href="https://docs.cardano.org/cardano-testnet/tools/faucet/" target="_blank" rel="noopener noreferrer" className="underline font-bold text-white hover:text-cyber-pink">Cardano Preprod Faucet</a>.</p>
+					<div className="bg-red-500/10 border border-red-500/30 p-5 text-red-400 text-xs space-y-3 rounded-none backdrop-blur-sm">
+						<div className="flex items-center justify-between">
+							<p className="font-bold uppercase tracking-wider text-sm flex items-center gap-2">
+								<span>⚠️</span> INSUFFICIENT WALLET BALANCE
+							</p>
+							<span className="text-[10px] font-mono px-2 py-0.5 bg-red-500/20 text-red-300 border border-red-500/40">
+								{CARDANO_NETWORK.toUpperCase()}
+							</span>
+						</div>
+						<p className="leading-relaxed">
+							Your wallet address <code className="font-mono bg-red-950/40 px-1 py-0.5 border border-red-500/20 text-white">{cardanoAddress.slice(0, 10)}...{cardanoAddress.slice(-8)}</code> has less than 2 ADA ({(Number(adaBalance) / 1000000).toFixed(2)} ADA). You need at least 2 ADA to cover minting transaction fees and the minimum UTxO storage deposit on {CARDANO_NETWORK}.
+						</p>
+
+						{CARDANO_NETWORK === 'Mainnet' ? (
+							<div className="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+								<a
+									href={`https://utxos.dev/onramp${cardanoAddress ? `?address=${encodeURIComponent(cardanoAddress)}` : ''}`}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-cyber-pink text-white font-bold rounded-none hover:bg-cyber-pink/90 transition-all text-xs shadow-lg uppercase tracking-wider cursor-pointer"
+								>
+									<span>💳</span> Fund your wallet with ADA
+								</a>
+								<a
+									href="https://docs.utxos.dev/onramp"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-white/80 hover:text-white underline text-xs transition-colors"
+								>
+									Learn about UTxO On-Ramp →
+								</a>
+							</div>
+						) : (
+							<div className="pt-1 flex items-center gap-3">
+								<a
+									href="https://docs.cardano.org/cardano-testnet/tools/faucet/"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/40 text-white font-bold hover:bg-red-500/30 transition-all text-xs uppercase tracking-wider"
+								>
+									Request Free Test ADA (Cardano Preprod Faucet) →
+								</a>
+							</div>
+						)}
 					</div>
 				)}
 

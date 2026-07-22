@@ -115,17 +115,28 @@ export default function DocsPage() {
                   
                   <div className="space-y-3">
                     <div className="bg-black/30 rounded-lg p-4">
-                      <h4 className="font-semibold text-midnight dark:text-white mb-2">Option A: Buy on an Exchange</h4>
+                      <h4 className="font-semibold text-midnight dark:text-white mb-2 flex items-center justify-between">
+                        <span>Option A: Buy with Credit Card via UTxO On-Ramp</span>
+                        <span className="text-[10px] bg-[#FF1F8A]/20 text-[#FF1F8A] px-2 py-0.5 font-mono uppercase tracking-wider">Recommended</span>
+                      </h4>
+                      <p className="text-sm text-midnight/70 dark:text-white/70 mb-3">Buy ADA instantly using credit card, Apple Pay, Google Pay, or bank transfer.</p>
+                      <a href="https://utxos.dev/onramp" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[#FF1F8A] hover:underline text-sm font-semibold">
+                        Launch UTxO Cardano On-Ramp →
+                      </a>
+                    </div>
+
+                    <div className="bg-black/30 rounded-lg p-4">
+                      <h4 className="font-semibold text-midnight dark:text-white mb-2">Option B: Buy on a Centralized Exchange</h4>
                       <ol className="list-decimal list-inside space-y-1 text-sm text-midnight/70 dark:text-white/70 ml-4">
                         <li>Buy ADA on Coinbase, Binance, Kraken, or another exchange</li>
-                        <li>Send ADA to your wallet address</li>
+                        <li>Send ADA to your connected wallet address</li>
                       </ol>
                     </div>
 
                     <div className="bg-black/30 rounded-lg p-4">
-                      <h4 className="font-semibold text-midnight dark:text-white mb-2">Option B: Use a Faucet (For Testnet/Preprod)</h4>
+                      <h4 className="font-semibold text-midnight dark:text-white mb-2">Option C: Use a Testnet Faucet (Preprod Only)</h4>
                       <p className="text-sm text-midnight/70 dark:text-white/70 mb-2">If you are testing on Preprod, get free mock ADA:</p>
-                      <a href="https://docs.cardano.org/cardano-testnet/tools/faucet/" target="_blank" rel="noopener noreferrer" className="text-[#FF1F8A] hover:underline text-sm">
+                      <a href="https://docs.cardano.org/cardano-testnet/tools/faucet/" target="_blank" rel="noopener noreferrer" className="text-[#FF1F8A] hover:underline text-sm font-semibold">
                         Go to Cardano Faucet →
                       </a>
                     </div>
