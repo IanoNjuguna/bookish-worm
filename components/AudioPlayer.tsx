@@ -205,7 +205,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
       }
 
       setHasOwned(true)
-      notifyCollectedTrack(currentTrack.title, `/track/${currentTrack.tokenId || ''}`)
+      notifyCollectedTrack(currentTrack.title, `/track/${currentTrack.id || ''}`)
       toast.success(`"${currentTrack.title}" collected!`, { id: mainToast })
     } catch (error: any) {
       logger.error('AudioPlayer: Collection Error', error)
