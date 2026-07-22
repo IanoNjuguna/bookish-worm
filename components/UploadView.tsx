@@ -29,7 +29,15 @@ async function readErrorBody(res: Response): Promise<string> {
 		const data = await res.json().catch(() => ({} as any))
 		return data?.message || data?.error || JSON.stringify(data)
 	}
-	return await res.text().catch(() => '')
+	const text = (await res.text().catch(() => '')).trim()
+	if (text.includes('<html') || text.includes('<!DOCTYPE') || text.includes('<body')) {
+		const titleMatch = text.match(/<title>(.*?)<\/title>/i)
+		if (titleMatch && titleMatch[1]) {
+			return `${res.status} ${res.statusText} (${titleMatch[1].trim()})`
+		}
+		return `${res.status} ${res.statusText}`
+	}
+	return text || `${res.status} ${res.statusText}`
 }
 
 async function assertOk(res: Response, context: string): Promise<void> {
