@@ -1,0 +1,23 @@
+{
+  "/[locale]/(dashboard)/analytics/page": "/[locale]/analytics",
+  "/[locale]/(dashboard)/assets/page": "/[locale]/assets",
+  "/[locale]/(dashboard)/deposit/page": "/[locale]/deposit",
+  "/[locale]/(dashboard)/earnings/page": "/[locale]/earnings",
+  "/[locale]/(dashboard)/library/page": "/[locale]/library",
+  "/[locale]/(dashboard)/page": "/[locale]",
+  "/[locale]/(dashboard)/profile/page": "/[locale]/profile",
+  "/[locale]/(dashboard)/search/page": "/[locale]/search",
+  "/[locale]/(dashboard)/send-money/page": "/[locale]/send-money",
+  "/[locale]/(dashboard)/track/[id]/page": "/[locale]/track/[id]",
+  "/[locale]/(dashboard)/upload/page": "/[locale]/upload",
+  "/[locale]/about/page": "/[locale]/about",
+  "/[locale]/docs/page": "/[locale]/docs",
+  "/[locale]/faq/page": "/[locale]/faq",
+  "/[locale]/for-artists/page": "/[locale]/for-artists",
+  "/[locale]/how-it-works/page": "/[locale]/how-it-works",
+  "/[locale]/privacy/page": "/[locale]/privacy",
+  "/[locale]/support/page": "/[locale]/support",
+  "/[locale]/terms/page": "/[locale]/terms",
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found"
+}

@@ -1,0 +1,43 @@
+/* [project]/app/[locale]/notosanskr_bae66164.module.css [app-client] (css) */
+@font-face {
+  font-family: notoSansKr;
+  src: url("../media/NotoSansKR_Regular-s.41639840.ttf") format("truetype");
+  font-display: swap;
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: notoSansKr;
+  src: url("../media/NotoSansKR_Medium-s.31646539.ttf") format("truetype");
+  font-display: swap;
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: notoSansKr;
+  src: url("../media/NotoSansKR_Bold-s.983af132.ttf") format("truetype");
+  font-display: swap;
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: notoSansKr Fallback;
+  src: local(Arial);
+  ascent-override: 110.26%;
+  descent-override: 27.38%;
+  line-gap-override: 0.0%;
+  size-adjust: 105.2%;
+}
+
+.notosanskr_bae66164-module__op4mDG__className {
+  font-family: notoSansKr, notoSansKr Fallback;
+}
+
+.notosanskr_bae66164-module__op4mDG__variable {
+  --font-noto-sans-kr: "notoSansKr", "notoSansKr Fallback";
+}
+
+/*# sourceMappingURL=app_%5Blocale%5D_notosanskr_bae66164_module_css_bad6b30c._.single.css.map*/

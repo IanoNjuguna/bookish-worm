@@ -5,7 +5,7 @@ node_modules/
 /.pnpm-store/
 
 # Next.js build outputs
-.next/
+#.next/
 out/
 
 # Production build artifacts

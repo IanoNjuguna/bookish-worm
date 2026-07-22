@@ -1,0 +1,6 @@
+{
+  "/[locale]/(dashboard)/assets/page": "app/[locale]/(dashboard)/assets/page.js",
+  "/[locale]/(dashboard)/page": "app/[locale]/(dashboard)/page.js",
+  "/[locale]/(dashboard)/send-money/page": "app/[locale]/(dashboard)/send-money/page.js",
+  "/[locale]/(dashboard)/upload/page": "app/[locale]/(dashboard)/upload/page.js"
+}
