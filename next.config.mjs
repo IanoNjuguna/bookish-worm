@@ -25,14 +25,20 @@ const nextConfig = {
   experimental: {
   },
   async rewrites() {
-   // Fallback prevents the string from ever evaluating to "undefined/:path*"
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://bookish-worm-production.up.railway.app';
+    let rawUrl = (process.env.NEXT_PUBLIC_API_URL || '').trim();
+    if (!rawUrl) {
+      rawUrl = 'https://bookish-worm-production.up.railway.app';
+    }
+    if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://') && !rawUrl.startsWith('/')) {
+      rawUrl = `https://${rawUrl}`;
+    }
+    const backendUrl = rawUrl.replace(/\/+$/, '');
     return [
       {
         source: '/api-backend/:path*',
         destination: `${backendUrl}/:path*`,
       },
-    ]
+    ];
   },
   webpack: (config, { isServer }) => {
     // Enable WebAssembly support for Cardano libraries (e.g. Lucid)
