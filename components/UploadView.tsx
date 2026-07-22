@@ -14,7 +14,7 @@ import { toast } from 'sonner'
 import { useAudio } from '@/components/AudioProvider'
 import { mintTrackOnChain, formatTxError, isUserDeclinedTxError } from '@/lib/contractHelper'
 import { CARDANO_NETWORK } from '@/lib/config'
-import { notifyOnRampInitiated, notifyMintedTrack } from '@/lib/notifications'
+import { notifyMintedTrack } from '@/lib/notifications'
 
 interface Collaborator {
 	address: string
