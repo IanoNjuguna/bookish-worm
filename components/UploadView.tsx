@@ -1100,22 +1100,14 @@ export default function UploadView() {
 						</p>
 
 						{CARDANO_NETWORK === 'Mainnet' ? (
-							<div className="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+							<div className="pt-1 flex items-center">
 								<a
 									href={`https://utxos.dev/onramp${cardanoAddress ? `?address=${encodeURIComponent(cardanoAddress)}` : ''}`}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-cyber-pink text-white font-bold rounded-none hover:bg-cyber-pink/90 transition-all text-xs shadow-lg uppercase tracking-wider cursor-pointer"
+									className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1DB954] hover:bg-[#1ed760] text-white font-bold rounded-none transition-all text-xs shadow-lg uppercase tracking-wider cursor-pointer"
 								>
 									<span>💳</span> Fund your wallet with ADA
-								</a>
-								<a
-									href="https://docs.utxos.dev/onramp"
-									target="_blank"
-									rel="noopener noreferrer"
-									className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-white/80 hover:text-white underline text-xs transition-colors"
-								>
-									Learn about UTxO On-Ramp →
 								</a>
 							</div>
 						) : (
