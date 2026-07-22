@@ -52,7 +52,7 @@ Show the user-facing problem and the product in plain language.
 
 ## Live Demo
 
-[Doba World v1](https://youtu.be/54gs12UbgMI)
+[Doba World v1 Demo Videos](https://www.youtube.com/playlist?list=PLZ93aQ7cOj2I)
 
 ## How a User Buys the Product
 
