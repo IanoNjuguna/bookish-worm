@@ -29,7 +29,7 @@ const nextConfig = {
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://bookish-worm-production.up.railway.app';
     return [
       {
-        source: '/backend/:path*',
+        source: '/api-backend/:path*',
         destination: `${backendUrl}/:path*`,
       },
     ]
