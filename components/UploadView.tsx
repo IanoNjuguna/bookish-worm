@@ -68,7 +68,7 @@ function mapUploadErrorMessage(error: any): string {
 		return 'Secure session expired during signing. Please authenticate again and retry.'
 	}
 	if (msg.includes('failed to fetch') || msg.includes('networkerror')) {
-		return 'Cannot reach backend upload service. Check that core-api is running and reachable.'
+		return `Cannot reach backend upload service (${raw || 'Failed to fetch'}). Verify NEXT_PUBLIC_API_URL on Vercel and CORS_ORIGINS on Railway.`
 	}
 
 	return formatTxError(error)

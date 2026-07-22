@@ -35,7 +35,10 @@ const ALLOWED_ORIGINS = parseCsvEnv(process.env.CORS_ORIGINS, [
 app.use('/*', cors({
   origin: (origin) => {
     if (!origin) return '*' // Non-browser clients (curl, server-to-server)
-    return ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
+    if (ALLOWED_ORIGINS.includes('*')) return '*'
+    if (ALLOWED_ORIGINS.includes(origin)) return origin
+    if (origin.endsWith('.vercel.app') || origin.endsWith('.doba.world') || origin === 'https://doba.world') return origin
+    return ALLOWED_ORIGINS[0] || '*'
   },
   allowHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'Accept', 'Origin', 'X-Requested-With'],
   allowMethods: ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE', 'PATCH'],
