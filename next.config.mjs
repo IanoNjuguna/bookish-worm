@@ -25,10 +25,12 @@ const nextConfig = {
   experimental: {
   },
   async rewrites() {
+   // Fallback prevents the string from ever evaluating to "undefined/:path*"
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'bookish-worm-production.up.railway.app';
     return [
       {
-        source: '/api-backend/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`,
+        source: '/backend/:path*',
+        destination: `${backendUrl}/:path*`,
       },
     ]
   },
