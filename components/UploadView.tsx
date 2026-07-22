@@ -1088,38 +1088,26 @@ export default function UploadView() {
 
 				{/* Insufficient Balance Warning */}
 				{cardanoAddress && adaBalance !== null && adaBalance < 2000000n && (
-					<div className="bg-red-500/10 border border-red-500/30 p-5 text-red-400 text-xs space-y-3 rounded-none backdrop-blur-sm">
+					<div className="bg-red-500/10 border border-red-500/30 p-5 text-red-700 dark:text-red-300 text-xs space-y-3 rounded-none backdrop-blur-sm">
 						<div className="flex items-center justify-between">
-							<p className="font-bold uppercase tracking-wider text-sm flex items-center gap-2">
+							<p className="font-bold uppercase tracking-wider text-sm flex items-center gap-2 text-red-800 dark:text-red-200">
 								<span>⚠️</span> INSUFFICIENT WALLET BALANCE
 							</p>
-							<span className="text-[10px] font-mono px-2 py-0.5 bg-red-500/20 text-red-300 border border-red-500/40">
+							<span className="text-[10px] font-mono px-2 py-0.5 bg-red-500/20 text-red-800 dark:text-red-300 border border-red-500/40 font-bold">
 								{CARDANO_NETWORK.toUpperCase()}
 							</span>
 						</div>
-						<p className="leading-relaxed">
-							Your wallet address <code className="font-mono bg-red-950/40 px-1 py-0.5 border border-red-500/20 text-white">{cardanoAddress.slice(0, 10)}...{cardanoAddress.slice(-8)}</code> has less than 2 ADA ({(Number(adaBalance) / 1000000).toFixed(2)} ADA). You need at least 2 ADA to cover minting transaction fees and the minimum UTxO storage deposit on {CARDANO_NETWORK}.
+						<p className="leading-relaxed text-red-900/90 dark:text-red-300/90 font-medium">
+							Your wallet address <code className="font-mono bg-red-500/15 dark:bg-red-950/40 px-1 py-0.5 border border-red-500/30 text-red-950 dark:text-white font-semibold">{cardanoAddress.slice(0, 10)}...{cardanoAddress.slice(-8)}</code> has less than 2 ADA ({(Number(adaBalance) / 1000000).toFixed(2)} ADA). You need at least 2 ADA to cover minting transaction fees and the minimum UTxO storage deposit on {CARDANO_NETWORK}.
 						</p>
 
-						{CARDANO_NETWORK === 'Mainnet' ? (
-							<div className="pt-1 flex items-center">
-								<a
-									href={`https://utxos.dev/onramp${cardanoAddress ? `?address=${encodeURIComponent(cardanoAddress)}` : ''}`}
-									target="_blank"
-									rel="noopener noreferrer"
-									onClick={() => notifyOnRampInitiated()}
-									className="inline-flex items-center justify-center px-5 py-2.5 bg-[#1DB954] hover:bg-[#1ed760] text-black font-bold rounded-none transition-all text-xs shadow-lg uppercase tracking-wider cursor-pointer"
-								>
-									Fund your wallet with ADA
-								</a>
-							</div>
-						) : (
+						{CARDANO_NETWORK !== 'Mainnet' && (
 							<div className="pt-1 flex items-center gap-3">
 								<a
 									href="https://docs.cardano.org/cardano-testnet/tools/faucet/"
 									target="_blank"
 									rel="noopener noreferrer"
-									className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/40 text-white font-bold hover:bg-red-500/30 transition-all text-xs uppercase tracking-wider"
+									className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/40 text-red-900 dark:text-white font-bold hover:bg-red-500/30 transition-all text-xs uppercase tracking-wider"
 								>
 									Request Free Test ADA (Cardano Preprod Faucet) →
 								</a>
