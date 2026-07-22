@@ -2,7 +2,8 @@
 
 import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { IconBell, IconBellFilled, IconCheck, IconTrash, IconInfoCircle, IconCircleCheck, IconAlertTriangle, IconX } from '@tabler/icons-react'
+import { IconBell, IconBellFilled, IconCheck, IconTrash, IconInfoCircle, IconCircleCheck, IconAlertTriangle, IconX, IconCopy } from '@tabler/icons-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/hooks/use-mobile'
 import {
@@ -78,6 +79,18 @@ export default function NotificationsMenu() {
 
   const unreadCount = useMemo(() => items.filter((n) => !n.read).length, [items])
 
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+
+  const handleCopyNotification = (e: React.MouseEvent, item: AppNotification) => {
+    e.stopPropagation()
+    navigator.clipboard.writeText(item.message)
+    setCopiedId(item.id)
+    toast.success('Notification copied to clipboard')
+    setTimeout(() => {
+      setCopiedId((curr) => (curr === item.id ? null : curr))
+    }, 2000)
+  }
+
   const handleNotificationClick = (item: AppNotification) => {
     markNotificationRead(item.id)
     if (item.href && item.href.startsWith('/')) {
@@ -115,36 +128,51 @@ export default function NotificationsMenu() {
         </div>
       ) : (
         items.map((item) => (
-          <button
+          <div
             key={item.id}
-            type="button"
             onClick={() => handleNotificationClick(item)}
-            className={`w-full text-left px-3 py-3.5 sm:py-3 border-b border-midnight/5 dark:border-white/5 hover:bg-midnight/5 dark:hover:bg-white/5 transition-colors touch-manipulation ${item.read ? 'opacity-75' : ''}`}
+            className={`group relative w-full text-left px-3 py-3 sm:py-2.5 border-b border-midnight/5 dark:border-white/5 hover:bg-midnight/5 dark:hover:bg-white/5 transition-colors cursor-pointer touch-manipulation ${item.read ? 'opacity-75' : ''}`}
           >
-            <div className="flex items-start gap-2">
-              <div className="mt-0.5">
-                <NotificationIcon level={item.level} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm leading-snug break-words pr-1">{item.message}</p>
-                <p className="mt-1 text-[11px] font-medium text-midnight/75 dark:text-white/75">
-                  {formatAbsoluteDateTime(item.createdAt)}
-                </p>
-                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-midnight/60 dark:text-white/60">
-                  <span>{formatRelativeTime(item.createdAt)}</span>
-                  {item.href && item.href.startsWith('/') && (
-                    <span className="max-w-full truncate text-midnight/50 dark:text-white/50">{item.href}</span>
-                  )}
-                  {!item.read && (
-                    <span className="inline-flex items-center gap-1 text-[#FF1F8A]">
-                      <IconCheck size={12} />
-                      unread
-                    </span>
-                  )}
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-start gap-2 min-w-0 flex-1">
+                <div className="mt-0.5 flex-shrink-0">
+                  <NotificationIcon level={item.level} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm leading-snug break-words pr-1">{item.message}</p>
+                  <p className="mt-1 text-[11px] font-medium text-midnight/75 dark:text-white/75">
+                    {formatAbsoluteDateTime(item.createdAt)}
+                  </p>
+                  <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-midnight/60 dark:text-white/60">
+                    <span>{formatRelativeTime(item.createdAt)}</span>
+                    {item.href && item.href.startsWith('/') && (
+                      <span className="max-w-full truncate text-midnight/50 dark:text-white/50">{item.href}</span>
+                    )}
+                    {!item.read && (
+                      <span className="inline-flex items-center gap-1 text-[#FF1F8A]">
+                        <IconCheck size={12} />
+                        unread
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
+
+              <button
+                type="button"
+                onClick={(e) => handleCopyNotification(e, item)}
+                title="Copy notification"
+                aria-label="Copy notification text"
+                className="p-1.5 rounded hover:bg-midnight/10 dark:hover:bg-white/15 text-midnight/50 dark:text-white/50 hover:text-midnight dark:hover:text-white transition-all flex-shrink-0"
+              >
+                {copiedId === item.id ? (
+                  <IconCheck size={14} className="text-green-500" />
+                ) : (
+                  <IconCopy size={14} />
+                )}
+              </button>
             </div>
-          </button>
+          </div>
         ))
       )}
     </div>
