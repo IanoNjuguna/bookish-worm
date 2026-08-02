@@ -18,7 +18,7 @@ import { load } from "https://deno.land/std@0.224.0/dotenv/mod.ts";
 const env = await load({ envPath: "../.env" });
 const BLOCKFROST = env["NEXT_PUBLIC_BLOCKFROST_PROJECT_ID"];
 const TREASURY_ADDRESS = env["TREASURY_ADDRESS"] || Deno.env.get("TREASURY_ADDRESS") || "";
-const FEE_BPS = 500n; // 5%
+const FEE_BPS = 700n; // 7%
 
 if (!TREASURY_ADDRESS) {
 	console.warn("⚠️  TREASURY_ADDRESS is not set in .env — treasury fee output will be skipped.");
