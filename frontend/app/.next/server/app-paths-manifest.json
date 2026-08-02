@@ -1,0 +1,15 @@
+{
+  "/[locale]/(dashboard)/analytics/page": "app/[locale]/(dashboard)/analytics/page.js",
+  "/[locale]/(dashboard)/assets/page": "app/[locale]/(dashboard)/assets/page.js",
+  "/[locale]/(dashboard)/deposit/page": "app/[locale]/(dashboard)/deposit/page.js",
+  "/[locale]/(dashboard)/earnings/page": "app/[locale]/(dashboard)/earnings/page.js",
+  "/[locale]/(dashboard)/library/page": "app/[locale]/(dashboard)/library/page.js",
+  "/[locale]/(dashboard)/page": "app/[locale]/(dashboard)/page.js",
+  "/[locale]/(dashboard)/profile/page": "app/[locale]/(dashboard)/profile/page.js",
+  "/[locale]/(dashboard)/search/page": "app/[locale]/(dashboard)/search/page.js",
+  "/[locale]/(dashboard)/send-money/page": "app/[locale]/(dashboard)/send-money/page.js",
+  "/[locale]/(dashboard)/track/[id]/page": "app/[locale]/(dashboard)/track/[id]/page.js",
+  "/[locale]/(dashboard)/upload/page": "app/[locale]/(dashboard)/upload/page.js",
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js"
+}
