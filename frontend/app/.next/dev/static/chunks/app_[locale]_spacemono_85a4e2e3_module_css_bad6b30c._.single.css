@@ -1,0 +1,35 @@
+/* [project]/app/[locale]/spacemono_85a4e2e3.module.css [app-client] (css) */
+@font-face {
+  font-family: spaceMono;
+  src: url("../media/SpaceMono_Regular-s.p.48265a82.ttf") format("truetype");
+  font-display: swap;
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: spaceMono;
+  src: url("../media/SpaceMono_Bold-s.p.59831013.ttf") format("truetype");
+  font-display: swap;
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: spaceMono Fallback;
+  src: local(Arial);
+  ascent-override: 83.51%;
+  descent-override: 26.92%;
+  line-gap-override: 0.0%;
+  size-adjust: 134.12%;
+}
+
+.spacemono_85a4e2e3-module__vZ7pva__className {
+  font-family: spaceMono, spaceMono Fallback;
+}
+
+.spacemono_85a4e2e3-module__vZ7pva__variable {
+  --font-space-mono: "spaceMono", "spaceMono Fallback";
+}
+
+/*# sourceMappingURL=app_%5Blocale%5D_spacemono_85a4e2e3_module_css_bad6b30c._.single.css.map*/

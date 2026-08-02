@@ -14,135 +14,98 @@ interface AuthData {
 }
 
 export function useBackendAuth() {
-	const { address: cardanoAddress, stakeAddress, walletName, isConnected, walletApi } = useCardano()
+	const { address: cardanoAddress, stakeAddress, walletName, isConnected, walletApi, lucid } = useCardano()
 	const [accessToken, setAccessToken] = useState<string | null>(null)
 	const [isLoading, setIsLoading] = useState(false)
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
-	const [preloadedNonce, setPreloadedNonce] = useState<string | null>(null)
-	const [nonceTimestamp, setNonceTimestamp] = useState<number | null>(null)
 	const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-	const effectiveAddress = stakeAddress || cardanoAddress
-
-	// Preload nonce to bypass popup blockers for social auth (keeps user gesture intact)
-	useEffect(() => {
-		if (effectiveAddress && !isAuthenticated) {
-			fetch(`${API_URL}/auth/challenge?address=${encodeURIComponent(effectiveAddress)}`)
-				.then(res => {
-					if (!res.ok) throw new Error('Failed to fetch challenge')
-					return res.json()
-				})
-				.then(data => {
-					if (data && data.nonce) {
-						setPreloadedNonce(data.nonce)
-						setNonceTimestamp(Date.now())
-					}
-				})
-				.catch(() => {})
-		}
-	}, [effectiveAddress, isAuthenticated])
+	const effectiveAddress = cardanoAddress || stakeAddress
 
 	// Schedule a silent refresh before the access token expires
-	const scheduleRefresh = useCallback((expiresAt: number) => {
+	const scheduleRefresh = useCallback((data: AuthData) => {
 		if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current)
 
-		const msUntilRefresh = expiresAt - Date.now() - REFRESH_BUFFER_MS
-		if (msUntilRefresh <= 0) {
-			// Already expired or about to — refresh immediately
+		const timeUntilRefresh = data.expiresAt - Date.now() - REFRESH_BUFFER_MS
+
+		if (timeUntilRefresh <= 0) {
 			refreshSession()
 			return
 		}
 
 		refreshTimerRef.current = setTimeout(() => {
 			refreshSession()
-		}, msUntilRefresh)
+		}, timeUntilRefresh)
 	}, [])
 
-	const logout = useCallback(() => {
-		if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current)
-		setAccessToken(null)
-		setIsAuthenticated(false)
-		if (typeof window !== 'undefined') {
-			localStorage.removeItem('doba_auth_data')
-		}
-		// Tell the server to clear its HttpOnly cookie
-		fetch(`${API_URL}/auth/logout`, { method: 'POST', credentials: 'include' }).catch(() => {})
-	}, [])
-
+	// Silent session refresh using HTTP-only refresh token cookie
 	const refreshSession = useCallback(async (): Promise<string | null> => {
 		try {
 			const res = await fetch(`${API_URL}/auth/refresh`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				credentials: 'include', // Send HttpOnly cookie
+				credentials: 'include'
 			})
 
 			if (!res.ok) {
-				logout()
+				localStorage.removeItem('doba_auth_data')
+				setAccessToken(null)
+				setIsAuthenticated(false)
 				return null
 			}
 
 			const data = await res.json()
-			const expiresIn = data.expiresIn || 15 * 60 // Default 15 min
-			const expiresAt = Date.now() + expiresIn * 1000
+			if (data.accessToken) {
+				const expiresAt = data.expiresAt
+					? new Date(data.expiresAt).getTime()
+					: Date.now() + (data.expiresIn ? data.expiresIn * 1000 : 3600_000)
 
-			const newAuthData: AuthData = {
-				accessToken: data.accessToken,
-				address: data.address || effectiveAddress || '',
-				expiresAt
+				const authData: AuthData = {
+					accessToken: data.accessToken,
+					address: data.address || effectiveAddress || '',
+					expiresAt
+				}
+
+				localStorage.setItem('doba_auth_data', JSON.stringify(authData))
+				setAccessToken(data.accessToken)
+				setIsAuthenticated(true)
+				scheduleRefresh(authData)
+				return data.accessToken
 			}
-
-			localStorage.setItem('doba_auth_data', JSON.stringify(newAuthData))
-			setAccessToken(data.accessToken)
-			setIsAuthenticated(true)
-
-			// Schedule the next refresh
-			scheduleRefresh(expiresAt)
-
-			return data.accessToken
+			return null
 		} catch (err) {
-			console.error('Failed to refresh session:', err)
-			logout()
+			localStorage.removeItem('doba_auth_data')
+			setAccessToken(null)
+			setIsAuthenticated(false)
 			return null
 		}
-	}, [logout, effectiveAddress, scheduleRefresh])
+	}, [effectiveAddress, scheduleRefresh])
 
+	// Silent auth restoration from localStorage on mount & when wallet connects
 	const [isCheckingAuth, setIsCheckingAuth] = useState(true)
-
-	// Load stored auth on mount and schedule refresh
 	useEffect(() => {
-		if (typeof window === 'undefined') return
 		const stored = localStorage.getItem('doba_auth_data')
 		if (stored) {
 			try {
-				const data: AuthData = JSON.parse(stored)
-				// If a wallet is connected, verify it matches the stored address
-				if (effectiveAddress) {
-					if (data.address === effectiveAddress) {
-						if (Date.now() < data.expiresAt - REFRESH_BUFFER_MS) {
-							setAccessToken(data.accessToken)
-							setIsAuthenticated(true)
-							scheduleRefresh(data.expiresAt)
-							setIsCheckingAuth(false)
-						} else {
-							refreshSession().finally(() => setIsCheckingAuth(false))
-						}
-					} else {
-						// Address mismatch, clear auth
-						localStorage.removeItem('doba_auth_data')
-						setIsCheckingAuth(false)
-					}
+				const authData: AuthData = JSON.parse(stored)
+
+				if (effectiveAddress && authData.address && authData.address.toLowerCase() !== effectiveAddress.toLowerCase()) {
+					localStorage.removeItem('doba_auth_data')
+					setAccessToken(null)
+					setIsAuthenticated(false)
+					setIsCheckingAuth(false)
+					return
+				}
+
+				if (authData.expiresAt > Date.now() + REFRESH_BUFFER_MS) {
+					setAccessToken(authData.accessToken)
+					setIsAuthenticated(true)
+					setIsCheckingAuth(false)
+					scheduleRefresh(authData)
+				} else if (authData.expiresAt > Date.now()) {
+					refreshSession().finally(() => setIsCheckingAuth(false))
 				} else {
-					// No wallet connected yet, but we have stored credentials.
-					// Keep them in state and schedule refresh to keep session alive.
-					if (Date.now() < data.expiresAt - REFRESH_BUFFER_MS) {
-						setAccessToken(data.accessToken)
-						setIsAuthenticated(true)
-						scheduleRefresh(data.expiresAt)
-						setIsCheckingAuth(false)
-					} else {
-						refreshSession().finally(() => setIsCheckingAuth(false))
-					}
+					refreshSession().finally(() => setIsCheckingAuth(false))
 				}
 			} catch (e) {
 				localStorage.removeItem('doba_auth_data')
@@ -153,7 +116,6 @@ export function useBackendAuth() {
 		}
 	}, [effectiveAddress, refreshSession, scheduleRefresh])
 
-	// Cleanup timer on unmount
 	useEffect(() => {
 		return () => {
 			if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current)
@@ -161,34 +123,31 @@ export function useBackendAuth() {
 	}, [])
 
 	const login = useCallback(async function loginFn(isRetry = false): Promise<string | null> {
-		if (!isConnected || !walletApi || !effectiveAddress) {
+		if (!isConnected || !effectiveAddress) {
 			toast.error('Please connect your Cardano wallet first')
 			return null
 		}
 
 		setIsLoading(true)
 
-		let nonce = preloadedNonce
-		const isExpired = nonceTimestamp && (Date.now() - nonceTimestamp > 4 * 60 * 1000) // 4 minutes
-		if (!nonce || isExpired) {
-			try {
-				const res = await fetch(`${API_URL}/auth/challenge?address=${encodeURIComponent(effectiveAddress)}`)
-				if (!res.ok) {
-					const errData = await res.json().catch(() => ({}))
-					throw new Error(errData.message || 'Failed to initialize secure session')
+		let nonce: string
+		try {
+			const res = await fetch(`${API_URL}/auth/challenge?address=${encodeURIComponent(effectiveAddress)}`)
+			if (!res.ok) {
+				if (res.status === 429) {
+					throw new Error('Too many requests. Please wait a few seconds before trying again.')
 				}
-				const data = await res.json()
-				nonce = data.nonce
-			} catch (err: any) {
-				toast.error(err?.message || 'Failed to initialize secure session. Please try again.')
-				setIsLoading(false)
-				return null
+				const errData = await res.json().catch(() => ({}))
+				const errorMsg = errData.message || errData.error || errData.detail || `Server returned ${res.status}`
+				throw new Error(errorMsg)
 			}
+			const data = await res.json()
+			nonce = data.nonce
+		} catch (err: any) {
+			toast.error(err?.message || 'Failed to initialize secure session. Please try again.')
+			setIsLoading(false)
+			return null
 		}
-
-		// Clear preloaded nonce so it's fresh for next time
-		setPreloadedNonce(null)
-		setNonceTimestamp(null)
 
 		const timestamp = new Date().toISOString()
 		const message = `Sign in to Doba Music\n\nBy signing this message, you agree to the Doba Terms of Service and Privacy Policy.\n\nAddress: ${effectiveAddress}\nNonce: ${nonce}\nTimestamp: ${timestamp}`
@@ -198,7 +157,15 @@ export function useBackendAuth() {
 			.join('')
 
 		try {
-			const signatureResponse = await walletApi.signData(effectiveAddress, hexMessage)
+			let signatureResponse: { signature: string; key: string }
+			if (walletApi && typeof walletApi.signData === 'function') {
+				signatureResponse = await walletApi.signData(effectiveAddress, hexMessage)
+			} else if (lucid) {
+				const sig = await lucid.wallet().signMessage(hexMessage)
+				signatureResponse = { signature: sig.signature, key: sig.key }
+			} else {
+				throw new Error('No active wallet API or Lucid instance available for signing.')
+			}
 			
 			const res = await fetch(`${API_URL}/auth/login`, {
 				method: 'POST',
@@ -214,80 +181,82 @@ export function useBackendAuth() {
 			})
 
 			if (!res.ok) {
-				const errData = await res.json()
+				if (res.status === 429) {
+					throw new Error('Too many login attempts. Please wait a few seconds before trying again.')
+				}
+				const errData = await res.json().catch(() => ({}))
 				if (!isRetry && errData.message && errData.message.toLowerCase().includes('nonce')) {
-					// Secure session expired during the process, refresh and retry
 					toast.info('Secure session expired. Re-initiating authentication...')
 					setIsLoading(false)
 					return loginFn(true)
 				}
-				throw new Error(errData.message || 'Signature verification failed on backend')
+				const errorMsg = errData.message || errData.error || errData.detail || `Login failed (${res.status})`
+				throw new Error(errorMsg)
 			}
 
 			const data = await res.json()
-			const expiresIn = data.expiresIn || 15 * 60
-			const expiresAt = Date.now() + expiresIn * 1000
+			const expiresAt = data.expiresAt
+				? new Date(data.expiresAt).getTime()
+				: Date.now() + (data.expiresIn ? data.expiresIn * 1000 : 3600_000)
 
 			const authData: AuthData = {
 				accessToken: data.accessToken,
-				address: data.address,
+				address: data.address || effectiveAddress,
 				expiresAt
 			}
 
 			localStorage.setItem('doba_auth_data', JSON.stringify(authData))
 			setAccessToken(data.accessToken)
 			setIsAuthenticated(true)
-			toast.success('Successfully authenticated!')
-
-			scheduleRefresh(expiresAt)
-			return data.accessToken
-		} catch (error: any) {
-			const errMessage = typeof error === 'string' ? error : (error?.message || '')
-			if (errMessage.includes('UserDeclined') || errMessage.includes('User declined') || errMessage.includes('cancelled') || errMessage.includes('Refused')) {
-				console.log('User cancelled signature request.')
-				toast.info('Signature request cancelled')
-			} else {
-				console.error('Login error:', error)
-				toast.error(errMessage || 'Authentication failed')
-			}
-			return null
-		} finally {
 			setIsLoading(false)
-		}
-	}, [isConnected, walletName, effectiveAddress, scheduleRefresh, preloadedNonce, nonceTimestamp, walletApi])
 
-	const getValidToken = useCallback(async () => {
-		if (typeof window === 'undefined') return null
-		const stored = localStorage.getItem('doba_auth_data')
-		if (!stored) return null
-
-		try {
-			const data: AuthData = JSON.parse(stored)
-			if (data.address !== effectiveAddress) {
-				logout()
-				return null
-			}
-
-			// If token is expired or close to expiry, refresh it
-			if (Date.now() >= data.expiresAt - REFRESH_BUFFER_MS) {
-				return await refreshSession()
-			}
-
+			scheduleRefresh(authData)
+			toast.success('Successfully authenticated!')
 			return data.accessToken
-		} catch (e) {
-			logout()
+		} catch (err: any) {
+			console.error('Login error:', err)
+			toast.error(err?.message || 'Authentication failed. Please try again.')
+			setIsLoading(false)
 			return null
 		}
-	}, [effectiveAddress, refreshSession, logout])
+	}, [isConnected, walletApi, lucid, effectiveAddress, scheduleRefresh])
+
+	const logoutFn = useCallback(async () => {
+		try {
+			await fetch(`${API_URL}/auth/logout`, {
+				method: 'POST',
+				credentials: 'include'
+			})
+		} catch (e) {}
+
+		if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current)
+		localStorage.removeItem('doba_auth_data')
+		setAccessToken(null)
+		setIsAuthenticated(false)
+		toast.info('Signed out')
+	}, [])
+
+	const getValidToken = useCallback(async (): Promise<string | null> => {
+		const stored = localStorage.getItem('doba_auth_data')
+		if (stored) {
+			try {
+				const authData: AuthData = JSON.parse(stored)
+				if (authData.expiresAt > Date.now() + REFRESH_BUFFER_MS) {
+					return authData.accessToken
+				}
+			} catch (e) {}
+		}
+		return refreshSession()
+	}, [refreshSession])
 
 	return {
 		accessToken,
-		login,
-		getValidToken,
-		logout,
 		isLoading,
 		isAuthenticated,
 		isCheckingAuth,
+		login,
+		logout: logoutFn,
+		getValidToken,
 		effectiveAddress
 	}
 }

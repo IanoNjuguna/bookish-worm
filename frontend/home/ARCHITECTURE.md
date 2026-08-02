@@ -6,9 +6,9 @@ However, because Next.js relies on a persistent running server engine (Node.js) 
 
 Here is exactly how this architecture changes and how our Go subdomains will interface with it:
 
-1. The server will not directly compile the marketplace files into memory, but rather act as a Reverse Proxy for the `marketplace` subdomain.
+1. The server will not directly compile the app files into memory, but rather act as a Reverse Proxy for the `app` microservice.
 
-2. When an inbound request hits `marketplace.doba.world`, the router will intercept it, forward the request internally to our running Next.js node application, grab the server-rendered HTML, and return it to the user.
+2. When an inbound request hits `app.doba.world`, the gateway will intercept it, forward the request internally to our running Next.js node application, grab the server-rendered HTML, and return it to the user.
 
                     ┌─────────────────────────┐
                     │    User Request         │

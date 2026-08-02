@@ -1,4 +1,4 @@
-package about
+package home
 
 import (
 	"embed"

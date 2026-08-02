@@ -34,7 +34,6 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   }
 
   const handleCancel = () => {
-    disconnect()
     onClose()
   }
 

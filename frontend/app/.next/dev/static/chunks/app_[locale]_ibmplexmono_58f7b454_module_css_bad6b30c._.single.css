@@ -1,0 +1,43 @@
+/* [project]/app/[locale]/ibmplexmono_58f7b454.module.css [app-client] (css) */
+@font-face {
+  font-family: ibmPlexMono;
+  src: url("../media/IBMPlexMono_Regular-s.p.f7e26547.ttf") format("truetype");
+  font-display: swap;
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: ibmPlexMono;
+  src: url("../media/IBMPlexMono_Medium-s.p.c4655168.ttf") format("truetype");
+  font-display: swap;
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: ibmPlexMono;
+  src: url("../media/IBMPlexMono_SemiBold-s.p.7fc35be6.ttf") format("truetype");
+  font-display: swap;
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: ibmPlexMono Fallback;
+  src: local(Arial);
+  ascent-override: 77.95%;
+  descent-override: 20.91%;
+  line-gap-override: 0.0%;
+  size-adjust: 131.49%;
+}
+
+.ibmplexmono_58f7b454-module__7ZADzG__className {
+  font-family: ibmPlexMono, ibmPlexMono Fallback;
+}
+
+.ibmplexmono_58f7b454-module__7ZADzG__variable {
+  --font-ibm-plex-mono: "ibmPlexMono", "ibmPlexMono Fallback";
+}
+
+/*# sourceMappingURL=app_%5Blocale%5D_ibmplexmono_58f7b454_module_css_bad6b30c._.single.css.map*/

@@ -11,6 +11,17 @@ export default defineConfig({
   server: {
     host: "::",
     port: 8080,
+    proxy: {
+      "/app": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/app/, ""),
+      },
+      "/_next": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+      },
+    },
     hmr: {
       overlay: false,
     },
@@ -26,7 +37,7 @@ export default defineConfig({
   },
   build: {
     //export prod assets into the go module
-    outDir: path.resolve(__dirname, '../../backend/internal/domains/about/dist'),
+    outDir: path.resolve(__dirname, '../../backend/internal/domains/home/dist'),
     emptyOutDir: true,
 
     // split the massive file

@@ -1,37 +1,104 @@
 package server
 
 import (
-	"doba-monolith/backend/internal/domains/about"
-	"doba-monolith/backend/internal/domains/marketplace"
-	"doba-monolith/backend/internal/domains/studio"
+	"log"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"os"
 	"strings"
 )
 
-func New(marketplaceFS http.Handler) http.Handler {
-	aboutApp := about.RegisterRoutes()
-	marketplaceApp := marketplace.RegisterRoutes(marketplaceFS)
-	studioApp := studio.RegisterRoutes()
+type Config struct {
+	HomeServiceURL string
+	AppServiceURL  string
+}
 
-	// build subdomain multiplexer middleware
-	subdomainRouter := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// check for subdomain
-		parts := strings.Split(r.Host, ".")
-		if len(parts) > 2 {
-			subdomain := parts[0]
-			switch subdomain {
-			case "about":
-				aboutApp.ServeHTTP(w, r)
-				return
-			case "studio":
-				studioApp.ServeHTTP(w, r)
-				return
-			}
+func DefaultConfig() Config {
+	homeURL := os.Getenv("HOME_SERVICE_URL")
+	if homeURL == "" {
+		homeURL = "http://localhost:3001"
+	}
+	appURL := os.Getenv("APP_SERVICE_URL")
+	if appURL == "" {
+		appURL = "http://localhost:3000"
+	}
+	return Config{
+		HomeServiceURL: homeURL,
+		AppServiceURL:  appURL,
+	}
+}
+
+func createReverseProxy(targetURL string) (*httputil.ReverseProxy, error) {
+	target, err := url.Parse(targetURL)
+	if err != nil {
+		return nil, err
+	}
+
+	proxy := httputil.NewSingleHostReverseProxy(target)
+	originalDirector := proxy.Director
+	proxy.Director = func(req *http.Request) {
+		originalDirector(req)
+		req.Host = target.Host
+		if clientIP := req.RemoteAddr; clientIP != "" {
+			req.Header.Set("X-Forwarded-For", clientIP)
+		}
+		if req.TLS != nil {
+			req.Header.Set("X-Forwarded-Proto", "https")
+		} else {
+			req.Header.Set("X-Forwarded-Proto", "http")
+		}
+	}
+
+	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
+		log.Printf("[Gateway Proxy Error] Target %s unreachable: %v", targetURL, err)
+		http.Error(w, "Bad Gateway: Upstream microservice unavailable", http.StatusBadGateway)
+	}
+
+	return proxy, nil
+}
+
+// New creates an API Gateway reverse proxy routing requests between home and app microservices.
+func New(cfg Config) (http.Handler, error) {
+	homeProxy, err := createReverseProxy(cfg.HomeServiceURL)
+	if err != nil {
+		return nil, err
+	}
+
+	appProxy, err := createReverseProxy(cfg.AppServiceURL)
+	if err != nil {
+		return nil, err
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		host := strings.ToLower(r.Host)
+		if idx := strings.Index(host, ":"); idx != -1 {
+			host = host[:idx]
 		}
 
-		// default to marketplace
-		marketplaceApp.ServeHTTP(w, r)
-	})
+		path := r.URL.Path
 
-	return subdomainRouter
+		switch {
+		case host == "app.doba.world" || strings.HasPrefix(host, "app."):
+			log.Printf("[Gateway Router] Routing request %s -> App Service (%s)", r.URL.Path, cfg.AppServiceURL)
+			appProxy.ServeHTTP(w, r)
+		case strings.HasPrefix(path, "/app"):
+			trimmedPath := strings.TrimPrefix(path, "/app")
+			if trimmedPath == "" || !strings.HasPrefix(trimmedPath, "/") {
+				trimmedPath = "/" + trimmedPath
+			}
+			r.URL.Path = trimmedPath
+			log.Printf("[Gateway Router] Path routing /app request (%s -> %s) -> App Service (%s)", path, r.URL.Path, cfg.AppServiceURL)
+			appProxy.ServeHTTP(w, r)
+		case strings.HasPrefix(path, "/_next"):
+			log.Printf("[Gateway Router] Routing Next.js asset %s -> App Service (%s)", r.URL.Path, cfg.AppServiceURL)
+			appProxy.ServeHTTP(w, r)
+		case host == "doba.world" || host == "home.doba.world" || host == "localhost" || host == "127.0.0.1":
+			log.Printf("[Gateway Router] Routing request %s -> Home Service (%s)", r.URL.Path, cfg.HomeServiceURL)
+			homeProxy.ServeHTTP(w, r)
+		default:
+			log.Printf("[Gateway Router] Default routing request %s -> Home Service (%s)", r.URL.Path, cfg.HomeServiceURL)
+			homeProxy.ServeHTTP(w, r)
+		}
+	}), nil
 }

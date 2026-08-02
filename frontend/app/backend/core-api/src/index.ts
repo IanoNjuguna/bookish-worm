@@ -233,9 +233,9 @@ app.post('/upload-assets',
 app.get('/auth/challenge',
   rateLimiter({
     windowMs: 60 * 1000,
-    limit: 5,
+    limit: 30,
     keyGenerator: (c) => c.req.header('x-forwarded-for') || c.req.header('x-real-ip') || 'unknown',
-    handler: (c) => c.json({ error: 'Too many requests', message: 'Max 5 challenge requests per minute. Try again shortly.' }, 429),
+    handler: (c) => c.json({ error: 'Too many requests', message: 'Rate limit exceeded (max 30 challenge requests/min). Try again shortly.' }, 429),
   }),
   async (c) => {
     const address = c.req.query('address')

@@ -47,10 +47,22 @@ export function CardanoProvider({ children }: { children: React.ReactNode }) {
 		const checkConnection = async () => {
 			if (typeof window !== "undefined") {
 				const savedWallet = localStorage.getItem("doba_connected_wallet");
+				const savedSeed = sessionStorage.getItem("doba_session_seed");
+
 				if (savedWallet && !isConnected && !isConnecting) {
-					connect(savedWallet).catch((err) => {
-						console.warn("Auto-reconnection failed:", err);
-					});
+					if (savedWallet === "utxos") {
+						if (savedSeed) {
+							connectFromSeed(savedSeed).catch((err) => {
+								console.warn("Seed auto-reconnection failed:", err);
+							});
+						} else {
+							localStorage.removeItem("doba_connected_wallet");
+						}
+					} else {
+						connect(savedWallet).catch((err) => {
+							console.warn("Auto-reconnection failed:", err);
+						});
+					}
 				}
 			}
 		};

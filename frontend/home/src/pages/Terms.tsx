@@ -1,0 +1,47 @@
+import Navbar from "@/components/doba/Navbar";
+import Footer from "@/components/doba/Footer";
+import VantaBackground from "@/components/doba/VantaBackground";
+import { Link } from "react-router-dom";
+import { IconArrowLeft } from "@tabler/icons-react";
+
+export default function Terms() {
+  return (
+    <div className="min-h-screen relative overflow-hidden flex flex-col justify-between">
+      <VantaBackground />
+      <Navbar />
+
+      <main className="pt-32 sm:pt-40 pb-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-600 dark:text-zinc-400 hover:text-cyber-pink transition-colors mb-6"
+        >
+          <IconArrowLeft size={16} />
+          Back to Home
+        </Link>
+
+        <h1 className="text-4xl sm:text-5xl font-black mb-8 text-foreground tracking-tight">
+          Terms of Service
+        </h1>
+
+        <div className="space-y-6 text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">
+          <section className="glass-surface p-6 sm:p-8 rounded-md border border-black/10 dark:border-white/5 bg-black/[0.02] dark:bg-white/5">
+            <h2 className="text-xl font-bold text-foreground mb-3">1. Ownership & Intellectual Property</h2>
+            <p className="text-sm">Artists retain full copyright to their audio recordings. Purchasing a music NFT grants non-exclusive personal listening and trading rights.</p>
+          </section>
+
+          <section className="glass-surface p-6 sm:p-8 rounded-md border border-black/10 dark:border-white/5 bg-black/[0.02] dark:bg-white/5">
+            <h2 className="text-xl font-bold text-foreground mb-3">2. Transactions</h2>
+            <p className="text-sm">All transactions on the Cardano network are final and non-refundable once confirmed on-chain.</p>
+          </section>
+
+          <section className="glass-surface p-6 sm:p-8 rounded-md border border-black/10 dark:border-white/5 bg-black/[0.02] dark:bg-white/5">
+            <h2 className="text-xl font-bold text-foreground mb-3">3. Age</h2>
+            <p className="text-sm">Users must be at least 7 years old to use the platform.</p>
+          </section>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}

@@ -1,34 +1,30 @@
 package main
 
 import (
-	// "doba-monolith/backend/server"
-	// "embed"
-	// "io/fs"
+	"doba-backend/server"
 	"log"
 	"net/http"
+	"os"
 )
 
-// //go:embed frontend/marketplace/.next
-// var embeddedFiles embed.FS
-
 func main() {
-	log.Println("Application starting...")
-	// distFS, err := fs.Sub(embeddedFiles, "frontend/marketplace/.next")
-	// if err != nil {
-	// 	log.Fatal("failed to get embedded dist fs: ", err)
-	// }
+	log.Println("API Gateway starting...")
 
-	// marketplaceFS := http.FileServer(http.FS(distFS))
+	cfg := server.DefaultConfig()
+	log.Printf("Gateway configuration: HomeService=%s, AppService=%s\n", cfg.HomeServiceURL, cfg.AppServiceURL)
 
-	// srv := server.New(marketplaceFS)
+	gateway, err := server.New(cfg)
+	if err != nil {
+		log.Fatalf("Failed to initialize API Gateway: %v", err)
+	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Received request for /")
-		w.Write([]byte("OK"))
-	})
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 
-	log.Println("Starting server on :8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Fatalf("could not start server: %s\n", err)
+	log.Printf("API Gateway listening on :%s (routing doba.world -> Home, app.doba.world -> App)\n", port)
+	if err := http.ListenAndServe(":"+port, gateway); err != nil {
+		log.Fatalf("Gateway server error: %v", err)
 	}
 }

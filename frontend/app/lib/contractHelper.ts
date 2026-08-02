@@ -55,7 +55,7 @@ export async function getContractAddresses(creatorAddress: string) {
 	if (!distroValidator) throw new Error("frac.distribution.spend validator not found in blueprint");
 
 	// Convert treasury Bech32 address to Plutus Address schema
-	const { paymentCredential, stakeCredential } = getAddressDetails(TREASURY_ADDRESS);
+	const { paymentCredential, stakeCredential } = getAddressDetails(TREASURY_ADDRESS || '');
 	if (!paymentCredential) throw new Error("Invalid treasury address configuration");
 
 	const payCredPlutus = new Constr(paymentCredential.type === "Key" ? 0 : 1, [paymentCredential.hash]);

@@ -25,12 +25,16 @@ const nextConfig = {
   experimental: {
   },
   async rewrites() {
+    let rawUrl = process.env.NEXT_PUBLIC_API_URL || 'https://bookish-worm-production.up.railway.app';
+    if (rawUrl && !rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
+      rawUrl = `https://${rawUrl}`;
+    }
+    const targetUrl = rawUrl.replace(/\/$/, '');
+
     return [
       {
         source: '/api-backend/:path*',
-        destination: process.env.NEXT_PUBLIC_API_URL
-          ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')}/:path*`
-          : 'https://doba-api-494043112081.us-central1.run.app/:path*',
+        destination: `${targetUrl}/:path*`,
       },
     ]
   },

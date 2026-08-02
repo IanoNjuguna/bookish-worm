@@ -128,8 +128,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
             <MobileNavLink href="/deposit" icon={<IconPlus size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('deposit')} setMenuOpen={setHeaderMenuOpen} />
             <MobileNavLink href="/assets" icon={<IconCoins size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('assets')} setMenuOpen={setHeaderMenuOpen} />
 
-
-            {/* Footer Section */}
+            {/* Mobile Footer Section */}
             <div className="border-t border-midnight/[0.08] dark:border-white/[0.08] my-4 pt-4" />
             <div className="px-4 pb-12">
               <Footer />
@@ -193,7 +192,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
             {/* Horizontal Divider */}
             <div className="border-t border-midnight/[0.08] dark:border-white/[0.08] my-4 ml-4 mr-6" />
 
-            {/* Footer Section */}
+            {/* Desktop Footer Section */}
             <div className="relative flex flex-col pt-2">
               {/* Vertical Segment for Footer */}
               <div className="absolute right-0 top-0 bottom-6 w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />

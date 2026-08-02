@@ -163,7 +163,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 	const value = useMemo(() => ({
 		playerState,
 		handlePlayTrack,
-		effectiveAddress,
+		effectiveAddress: effectiveAddress || undefined,
 		isConnected,
 		isAuthenticated: isAuth,
 		isCheckingAuth,

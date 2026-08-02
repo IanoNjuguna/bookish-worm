@@ -50,6 +50,7 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
   const [isSeedModalOpen, setIsSeedModalOpen] = useState(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [seedPhrase, setSeedPhrase] = useState("")
   const [generatedSeed, setGeneratedSeed] = useState("")
   const [seedError, setSeedError] = useState("")
@@ -95,28 +96,23 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
 
       try {
         const wallet = typeof lucid.wallet === 'function' ? lucid.wallet() : lucid.wallet
-        let lovelace = 0n
+        let utxos: any[] = []
 
         if (wallet && typeof wallet.getUtxos === 'function') {
-          const utxos = await wallet.getUtxos()
-          lovelace = utxos.reduce(
-            (total: bigint, utxo: { assets?: { lovelace?: bigint } }) => total + (utxo.assets?.lovelace ?? 0n),
-            0n
-          )
+          utxos = await wallet.getUtxos().catch(() => [])
         } else if (typeof lucid.utxosAt === 'function') {
-          const utxos = await lucid.utxosAt(address)
-          lovelace = utxos.reduce(
-            (total: bigint, utxo: { assets?: { lovelace?: bigint } }) => total + (utxo.assets?.lovelace ?? 0n),
-            0n
-          )
-        } else {
-          throw new Error('No supported wallet balance method found on Lucid instance')
+          utxos = await lucid.utxosAt(address).catch(() => [])
         }
+
+        const lovelace = utxos.reduce(
+          (total: bigint, utxo: { assets?: { lovelace?: bigint } }) => total + (utxo.assets?.lovelace ?? 0n),
+          0n
+        )
 
         const ada = Number(lovelace) / 1000000
         setAdaBalance(ada.toFixed(2))
       } catch (e) {
-        console.error('Failed to fetch ADA balance:', e)
+        setAdaBalance('0.00')
       }
     }
 
@@ -158,7 +154,7 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
               disabled={isConnecting}
               className="bg-lavender hover:bg-lavender/90 text-midnight font-bold h-10 px-6 transition-all rounded-lg flex items-center gap-2"
             >
-              <IconWallet size={16} />
+              <IconKey size={16} />
               {isConnecting ? 'Connecting...' : (t('signIn') || 'Sign In')}
               {!isConnecting && <IconChevronDown size={14} className="ml-1 opacity-50" />}
             </Button>
@@ -212,12 +208,10 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
         </DropdownMenu>
       ) : (
         <>
-          {!isAuthenticated && !isCheckingAuth && (
-            <AuthModal 
-              isOpen={true} 
-              onClose={() => {}} 
-            />
-          )}
+          <AuthModal 
+            isOpen={isAuthModalOpen} 
+            onClose={() => setIsAuthModalOpen(false)} 
+          />
           {/* Desktop version - Dropdown Menu */}
           <div className="hidden lg:block">
             <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
