@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { IconHome as HomeIcon, IconPlaylistAdd as Library, IconSearch as Search, IconCurrencyDollar as DollarSign, IconTrendingUp as TrendingUp, IconUser as User, IconLogout as LogOut, IconPlus, IconMusic as Music, IconCoins } from '@tabler/icons-react'
+import { IconHome as HomeIcon, IconPlaylistAdd as Library, IconSearch as Search, IconCurrencyDollar as DollarSign, IconTrendingUp as TrendingUp, IconUser as User, IconLogout as LogOut, IconMusic as Music } from '@tabler/icons-react'
 import { Link, usePathname } from '@/i18n/navigation'
 import ConnectHeader from '@/components/ConnectHeader'
 import AudioPlayer from '@/components/AudioPlayer'
@@ -117,17 +117,6 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
             <MobileNavLink href="/earnings" icon={<DollarSign size={18} className="text-purple-400 flex-shrink-0" />} label={tNav('earnings')} setMenuOpen={setHeaderMenuOpen} />
             <MobileNavLink href="/analytics" icon={<TrendingUp size={18} className="text-purple-400 flex-shrink-0" />} label={tNav('analytics')} setMenuOpen={setHeaderMenuOpen} />
             <MobileNavLink href="/profile" icon={<User size={18} className="text-purple-400 flex-shrink-0" />} label={tNav('profile')} setMenuOpen={setHeaderMenuOpen} />
-            <div className="border-t border-midnight/[0.08] dark:border-white/[0.08]" />
-
-            <div className="px-0 py-2">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-[#B794F4]">
-                {tNav('wallet')}
-              </h2>
-            </div>
-            <MobileNavLink href="/send-money" icon={<DollarSign size={18} className="text-[#FF1F8A] flex-shrink-0" />} label={tNav('sendMoney')} setMenuOpen={setHeaderMenuOpen} />
-            <MobileNavLink href="/deposit" icon={<IconPlus size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('deposit')} setMenuOpen={setHeaderMenuOpen} />
-            <MobileNavLink href="/assets" icon={<IconCoins size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('assets')} setMenuOpen={setHeaderMenuOpen} />
-
             {/* Mobile Footer Section */}
             <div className="border-t border-midnight/[0.08] dark:border-white/[0.08] my-4 pt-4" />
             <div className="px-4 pb-12">
@@ -171,22 +160,6 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
               <SidebarNavLink href="/earnings" icon={<DollarSign size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('earnings')} />
               <SidebarNavLink href="/analytics" icon={<TrendingUp size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('analytics')} />
               <SidebarNavLink href="/profile" icon={<User size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('profile')} />
-            </div>
-
-            {/* Horizontal Divider */}
-            <div className="border-t border-midnight/[0.08] dark:border-white/[0.08] my-4 ml-4 mr-6" />
-            
-            {/* Wallet Section */}
-            <div className="relative flex flex-col space-y-1 pt-0 pb-4">
-              {/* Vertical Segment for Wallet */}
-              <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
-              
-              <div className="pl-4 pt-2 pb-0 mb-1">
-                <h2 className="text-sm font-semibold text-[#B794F4] uppercase tracking-wider" style={{ letterSpacing: '0.04em' }}>{tNav('wallet')}</h2>
-              </div>
-              <SidebarNavLink href="/send-money" icon={<DollarSign size={18} className="text-[#FF1F8A] flex-shrink-0" />} label={tNav('sendMoney')} />
-              <SidebarNavLink href="/deposit" icon={<IconPlus size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('deposit')} />
-              <SidebarNavLink href="/assets" icon={<IconCoins size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('assets')} />
             </div>
 
             {/* Horizontal Divider */}

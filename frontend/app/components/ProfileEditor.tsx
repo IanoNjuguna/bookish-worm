@@ -3,7 +3,8 @@ import { logger } from '@/lib/logger'
 import { EXPLORER_URL } from '@/lib/config'
 
 import React, { useState, useEffect } from 'react'
-import { IconCopy, IconEdit, IconCheck, IconX, IconLogout, IconExternalLink, IconWallet, IconSettings } from '@tabler/icons-react'
+import { IconCopy, IconEdit, IconCheck, IconX, IconLogout, IconExternalLink, IconWallet, IconSettings, IconCurrencyDollar, IconPlus, IconCoins } from '@tabler/icons-react'
+import { Link } from '@/i18n/navigation'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -311,7 +312,65 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 				</div>
 			</div>
 
+			{/* Wallet Actions Bar */}
+			<div className="pt-6 pb-2 border-t border-midnight/10 dark:border-white/10 relative z-10 mb-8">
+				<h4 className="text-xs font-bold uppercase tracking-wider text-[#B794F4] mb-4 flex items-center gap-2">
+					<span className="w-1.5 h-1.5 rounded-none bg-[#B794F4] inline-block" />
+					Wallet Actions
+				</h4>
+				<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+					<Link
+						href="/send-money"
+						className="flex items-center gap-3.5 p-4 bg-midnight/5 dark:bg-white/[0.03] hover:bg-midnight/10 dark:hover:bg-white/[0.07] border border-midnight/[0.08] dark:border-white/[0.08] hover:border-[#FF1F8A]/50 transition-all duration-200 group rounded-none"
+					>
+						<div className="p-2.5 bg-[#FF1F8A]/10 text-[#FF1F8A] group-hover:scale-110 transition-transform duration-200 shrink-0">
+							<IconCurrencyDollar size={20} />
+						</div>
+						<div>
+							<div className="text-sm font-bold text-midnight dark:text-white group-hover:text-[#FF1F8A] transition-colors">
+								Send Funds
+							</div>
+							<div className="text-xs text-midnight/50 dark:text-white/40 mt-0.5">
+								Transfer ADA or assets
+							</div>
+						</div>
+					</Link>
 
+					<Link
+						href="/deposit"
+						className="flex items-center gap-3.5 p-4 bg-midnight/5 dark:bg-white/[0.03] hover:bg-midnight/10 dark:hover:bg-white/[0.07] border border-midnight/[0.08] dark:border-white/[0.08] hover:border-[#B794F4]/50 transition-all duration-200 group rounded-none"
+					>
+						<div className="p-2.5 bg-[#B794F4]/10 text-[#B794F4] group-hover:scale-110 transition-transform duration-200 shrink-0">
+							<IconPlus size={20} />
+						</div>
+						<div>
+							<div className="text-sm font-bold text-midnight dark:text-white group-hover:text-[#B794F4] transition-colors">
+								Deposit Funds
+							</div>
+							<div className="text-xs text-midnight/50 dark:text-white/40 mt-0.5">
+								Add funds to wallet
+							</div>
+						</div>
+					</Link>
+
+					<Link
+						href="/assets"
+						className="flex items-center gap-3.5 p-4 bg-midnight/5 dark:bg-white/[0.03] hover:bg-midnight/10 dark:hover:bg-white/[0.07] border border-midnight/[0.08] dark:border-white/[0.08] hover:border-[#B794F4]/50 transition-all duration-200 group rounded-none"
+					>
+						<div className="p-2.5 bg-[#B794F4]/10 text-[#B794F4] group-hover:scale-110 transition-transform duration-200 shrink-0">
+							<IconCoins size={20} />
+						</div>
+						<div>
+							<div className="text-sm font-bold text-midnight dark:text-white group-hover:text-[#B794F4] transition-colors">
+								Assets
+							</div>
+							<div className="text-xs text-midnight/50 dark:text-white/40 mt-0.5">
+								View tokens & NFTs
+							</div>
+						</div>
+					</Link>
+				</div>
+			</div>
 
 			{/* Monthly Billboard Section */}
 			<div className="pt-8 border-t border-midnight/10 dark:border-white/10 relative z-10 mb-12">
