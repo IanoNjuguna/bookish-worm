@@ -6,6 +6,11 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
+// When building on Vercel, output to standard 'dist'; otherwise output to Go backend domain
+const outDir = process.env.VERCEL
+  ? path.resolve(__dirname, 'dist')
+  : path.resolve(__dirname, '../../backend/internal/domains/home/dist');
+
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
@@ -31,26 +36,22 @@ export default defineConfig({
     nodePolyfills()
   ],
   resolve: {
-	  alias: {
-		  "@": path.resolve(__dirname, "./src"),
-	  },
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
   },
   build: {
-    //export prod assets into the go module
-    outDir: path.resolve(__dirname, '../../backend/internal/domains/home/dist'),
+    outDir,
     emptyOutDir: true,
 
     // split the massive file
     rollupOptions: {
       output: {
         manualChunks(id: string) {
-          // if code is from node modules, separate it
           if (id.includes('node_modules')) {
-            // group cardano/crypto things into a distinct bundle
             if (id.includes('cardano') || id.includes('lucid') || id.includes('sodium')) {
               return 'cardano';
             }
-            // put other standard UI packages here
             return 'vendor';
           }
         }
