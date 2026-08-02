@@ -129,7 +129,7 @@ const HeroSection = () => {
 
             <div className="pt-2 sm:pt-4">
               <a
-                href={import.meta.env.VITE_APP_URL || "https://app.doba.world"}
+                href={import.meta.env.VITE_APP_URL || "https://doba.world"}
                 className="flex items-center justify-center gap-2 bg-lavender text-black w-full py-3.5 sm:py-4 rounded-md font-extrabold text-sm sm:text-base transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-md"
               >
                 <span>Get Started</span>

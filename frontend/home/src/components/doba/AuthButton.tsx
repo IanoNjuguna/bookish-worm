@@ -1,7 +1,7 @@
 import { IconArrowUpRight } from "@tabler/icons-react";
 
 export const AuthButton = () => {
-  const appUrl = import.meta.env.VITE_APP_URL || "https://app.doba.world";
+  const appUrl = import.meta.env.VITE_APP_URL || "https://doba.world";
 
   return (
     <a
