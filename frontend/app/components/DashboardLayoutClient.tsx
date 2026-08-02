@@ -128,8 +128,8 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
 
       {/* Main Layout */}
       <div className="flex flex-col lg:flex-row flex-1 mt-16 lg:overflow-hidden">
-        <aside className="hidden lg:flex w-[20vw] flex-col bg-transparent overflow-y-auto overflow-x-hidden relative">
-          <nav className="flex flex-col p-4 overflow-y-auto overflow-x-hidden flex-1 relative">
+        <aside className="hidden lg:flex w-[20vw] flex-col bg-transparent overflow-y-auto overflow-x-hidden relative no-scrollbar">
+          <nav className="flex flex-col p-4 overflow-y-auto overflow-x-hidden flex-1 relative no-scrollbar">
             {/* Navigation Section */}
             <div className="relative flex flex-col space-y-1 pb-4">
               {/* Vertical Segment for Navigation */}
