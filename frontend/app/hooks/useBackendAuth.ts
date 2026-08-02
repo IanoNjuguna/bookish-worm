@@ -161,7 +161,7 @@ export function useBackendAuth() {
 			if (walletApi && typeof walletApi.signData === 'function') {
 				signatureResponse = await walletApi.signData(effectiveAddress, hexMessage)
 			} else if (lucid) {
-				const sig = await lucid.wallet().signMessage(hexMessage)
+				const sig = await lucid.wallet().signMessage(effectiveAddress, hexMessage)
 				signatureResponse = { signature: sig.signature, key: sig.key }
 			} else {
 				throw new Error('No active wallet API or Lucid instance available for signing.')
