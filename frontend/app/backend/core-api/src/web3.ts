@@ -195,6 +195,12 @@ export async function getRemainingFractionsOnChain(policyId: string, ticker: str
 			return Number(scriptHolder.quantity)
 		}
 		return 0
+	} catch (koiosErr) {
+		logger.error(`Koios getRemainingFractions failed`, koiosErr)
+		return null
+	}
+}
+
 export async function getCollectorsCountOnChain(policyId: string, ticker: string, tokenId: number): Promise<number | null> {
 	const projectId = process.env.BLOCKFROST_PROJECT_ID || ''
 	if (!projectId) {
