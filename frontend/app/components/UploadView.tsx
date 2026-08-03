@@ -19,6 +19,7 @@ interface Collaborator {
 	split: number
 }
 
+const BACKEND_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://bookish-worm-production.up.railway.app').replace(/\/$/, '')
 const API_URL = '/api-backend'
 
 export default function UploadView() {
@@ -306,7 +307,7 @@ export default function UploadView() {
 					trackFormData.append('audio', t.file!)
 					trackFormData.append('title', t.title)
 
-					const trackRes = await fetch(`${API_URL.replace(/\/$/, '')}/upload-assets`, {
+					const trackRes = await fetch(`${BACKEND_URL}/upload-assets`, {
 						method: 'POST',
 						headers: {
 							'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '',
@@ -334,7 +335,7 @@ export default function UploadView() {
 					formData.append('image', coverFile!)
 					formData.append('title', title)
 
-					const assetRes = await fetch(`${API_URL.replace(/\/$/, '')}/upload-assets`, {
+					const assetRes = await fetch(`${BACKEND_URL}/upload-assets`, {
 						method: 'POST',
 						headers: {
 							'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '',
