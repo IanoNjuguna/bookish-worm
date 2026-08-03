@@ -76,34 +76,10 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
         )}
 
         <div className="h-full px-4 lg:px-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button 
-              onClick={() => setDesktopSidebarOpen(prev => !prev)}
-              className="hidden lg:flex items-center justify-center w-9 h-9 border border-midnight/10 dark:border-white/10 rounded-none bg-midnight/5 dark:bg-white/5 hover:border-cyber-pink/50 transition-colors text-midnight/70 dark:text-white/70 hover:text-midnight dark:hover:text-white group relative"
-              title={desktopSidebarOpen ? "Close sidebar" : "Open sidebar"}
-            >
-              <div className="relative w-5 h-5 flex items-center justify-center">
-                <IconMenu 
-                  size={20} 
-                  className={cn(
-                    "absolute transition-all duration-300 transform",
-                    desktopSidebarOpen ? "opacity-0 rotate-90 scale-50" : "opacity-100 rotate-0 scale-100"
-                  )} 
-                />
-                <IconX 
-                  size={20} 
-                  className={cn(
-                    "absolute transition-all duration-300 transform",
-                    desktopSidebarOpen ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-50"
-                  )} 
-                />
-              </div>
-            </button>
-            <Link href="/" className="flex items-center gap-2">
-              <img src="/doba.png" alt="doba logo" className="w-8 h-8 rounded-lg object-cover dark:invert-0 invert" />
-              <span className="text-midnight dark:text-white text-base sm:text-lg font-extrabold tracking-tight lowercase">doba</span>
-            </Link>
-          </div>
+          <Link href="/" className="flex items-center gap-2">
+            <img src="/doba.png" alt="doba logo" className="w-8 h-8 rounded-lg object-cover dark:invert-0 invert" />
+            <span className="text-midnight dark:text-white text-base sm:text-lg font-extrabold tracking-tight lowercase">doba</span>
+          </Link>
 
           <div className="hidden lg:flex items-center gap-3">
             <ConnectHeader
@@ -125,6 +101,17 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
           </div>
         </div>
       </header>
+
+      {/* Floating Toggle Button when Sidebar is Closed */}
+      {!desktopSidebarOpen && (
+        <button
+          onClick={() => setDesktopSidebarOpen(true)}
+          className="hidden lg:flex fixed top-20 left-4 z-40 items-center justify-center p-2 border border-midnight/10 dark:border-white/10 rounded-none bg-[rgba(250,249,246,0.9)] dark:bg-[rgba(13,13,18,0.9)] backdrop-blur-md hover:border-cyber-pink/50 text-midnight/70 dark:text-white/70 hover:text-midnight dark:hover:text-white transition-all duration-300 shadow-sm"
+          title="Open sidebar"
+        >
+          <IconMenu size={18} />
+        </button>
+      )}
 
       {/* Mobile Menu */}
       {headerMenuOpen && (
@@ -172,7 +159,14 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
               {/* Vertical Segment for Navigation */}
               <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
               
-              <div className="pl-4 pt-0 pb-0 mb-1">
+              <div className="flex items-center gap-2 pl-4 pt-0 pb-1 mb-1">
+                <button
+                  onClick={() => setDesktopSidebarOpen(false)}
+                  className="p-1 border border-midnight/10 dark:border-white/10 rounded-none bg-midnight/5 dark:bg-white/5 hover:border-cyber-pink/50 transition-colors text-midnight/70 dark:text-white/70 hover:text-midnight dark:hover:text-white"
+                  title="Close sidebar"
+                >
+                  <IconX size={15} />
+                </button>
                 <h2 className="text-sm font-semibold uppercase tracking-wider text-purple-400">
                   {tNav('navigation')}
                 </h2>
