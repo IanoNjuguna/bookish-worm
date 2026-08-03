@@ -17,6 +17,7 @@ interface Track {
 	max_supply: string
 	mint_count?: number
 	uploader_address: string
+	image_url?: string
 }
 
 interface RoyaltyEntry {
@@ -27,6 +28,7 @@ interface RoyaltyEntry {
 	shares: number
 	myEarnings: string
 	uploaderAddress: string
+	imageUrl?: string
 }
 
 export default function EarningsView() {
@@ -114,7 +116,8 @@ export default function EarningsView() {
 							mintCount,
 							shares,
 							myEarnings,
-							uploaderAddress: track.uploader_address
+							uploaderAddress: track.uploader_address,
+							imageUrl: track.image_url
 						})
 
 						totalEarned += parseFloat(myEarnings)
@@ -224,8 +227,18 @@ export default function EarningsView() {
 						royaltyTracks.map((entry, idx) => (
 							<div key={idx} className="p-5 flex items-center justify-between hover:bg-midnight/5 dark:hover:bg-white/5 transition duration-300">
 								<div className="flex-1 min-w-0 flex items-center gap-3">
-									<div className="w-8 h-8 rounded-none border border-midnight/10 dark:border-white/10 flex items-center justify-center text-midnight/70 dark:text-white/40 bg-midnight/5 dark:bg-white/5 clip-diamond">
-										<IconMusic size={16} />
+									<div className="w-10 h-10 rounded-none border border-midnight/10 dark:border-white/10 overflow-hidden shrink-0 bg-midnight/5 dark:bg-white/5">
+										{entry.imageUrl ? (
+											<img
+												src={entry.imageUrl.replace('ipfs://', process.env.NEXT_PUBLIC_IPFS_GATEWAY || 'https://gateway.pinata.cloud/ipfs/')}
+												alt={entry.track}
+												className="w-full h-full object-cover"
+											/>
+										) : (
+											<div className="w-full h-full flex items-center justify-center text-midnight/70 dark:text-white/40">
+												<IconMusic size={18} />
+											</div>
+										)}
 									</div>
 									<div className="min-w-0 flex-1">
 										<p className="font-bold text-midnight dark:text-white flex items-center gap-2 truncate">

@@ -104,7 +104,7 @@ export default function MonthlyBillboard({ address }: MonthlyBillboardProps) {
 							{/* Cover Art */}
 							<div className="relative w-12 h-12 shrink-0 group/cover">
 								<img
-									src={track.image_url}
+									src={(track.image_url || '').replace('ipfs://', process.env.NEXT_PUBLIC_IPFS_GATEWAY || 'https://gateway.pinata.cloud/ipfs/')}
 									alt={track.name}
 									className="w-full h-full object-cover rounded-none"
 								/>
