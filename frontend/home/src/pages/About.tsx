@@ -1,8 +1,6 @@
 import Navbar from "@/components/doba/Navbar";
 import Footer from "@/components/doba/Footer";
 import VantaBackground from "@/components/doba/VantaBackground";
-import { Link } from "react-router-dom";
-import { IconArrowLeft } from "@tabler/icons-react";
 
 export default function About() {
   return (
@@ -11,13 +9,6 @@ export default function About() {
       <Navbar />
 
       <main className="pt-32 sm:pt-40 pb-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-600 dark:text-zinc-400 hover:text-cyber-pink transition-colors mb-6"
-        >
-          <IconArrowLeft size={16} />
-          Back to Home
-        </Link>
 
         <h1 className="text-4xl sm:text-5xl font-black mb-8 text-foreground tracking-tight">
           About doba
