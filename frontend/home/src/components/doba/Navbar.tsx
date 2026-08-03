@@ -8,7 +8,7 @@ const Navbar = () => {
         <div className="flex items-center gap-2 sm:gap-8 min-w-0 shrink">
           <a href="#" className="flex items-center gap-2 text-base sm:text-lg font-bold tracking-tight whitespace-nowrap">
             <img src="/doba.png" alt="Doba Logo" className="w-6 h-6 sm:w-8 sm:h-8 object-contain shrink-0 dark:invert-0 invert" />
-            <span className="text-zinc-900 dark:text-white text-sm sm:text-base font-bold whitespace-nowrap">doba</span>
+            <span className="text-zinc-900 dark:text-white text-base sm:text-xl font-extrabold tracking-tight lowercase">doba</span>
           </a>
         </div>
         <div className="flex items-center gap-3 sm:gap-4 shrink-0">

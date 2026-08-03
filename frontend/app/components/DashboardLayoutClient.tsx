@@ -71,6 +71,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
         <div className="h-full px-4 lg:px-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <img src="/doba.png" alt="doba logo" className="w-8 h-8 rounded-lg object-cover dark:invert-0 invert" />
+            <span className="text-midnight dark:text-white text-base sm:text-lg font-extrabold tracking-tight lowercase">doba</span>
           </Link>
 
           <div className="hidden lg:flex items-center gap-3">
