@@ -195,9 +195,49 @@ export async function getRemainingFractionsOnChain(policyId: string, ticker: str
 			return Number(scriptHolder.quantity)
 		}
 		return 0
-	} catch (koiosErr) {
-		logger.error(`Koios getRemainingFractions failed`, koiosErr)
+export async function getCollectorsCountOnChain(policyId: string, ticker: string, tokenId: number): Promise<number | null> {
+	const projectId = process.env.BLOCKFROST_PROJECT_ID || ''
+	if (!projectId) {
+		logger.warn('Blockfrost project ID is not configured.')
+		return null
+	}
+
+	const targetTokenId = tokenId
+	const tokenNameStr = ticker
+		? ticker.toUpperCase().replace(/[^A-Z0-9]/g, "")
+		: 'T' + String(targetTokenId).slice(-11)
+	const assetNameHex = Buffer.from(tokenNameStr).toString('hex')
+	const assetUnit = policyId + '001bc280' + assetNameHex
+
+	try {
+		const api = getBlockfrostApi()
+		const holders = await api.assetsAddresses(assetUnit)
+		if (holders.length === 0) return 0
+		const userHolders = holders.filter(h => !h.address.startsWith('addr_test1w') && !h.address.startsWith('addr1w'))
+		return userHolders.length
+	} catch (blockfrostErr: any) {
+		const status = blockfrostErr?.status_code || blockfrostErr?.status || blockfrostErr?.statusCode
+		if (status === 404) return 0
+		if (status === 429 || (status >= 500 && status < 600)) {
+			logger.warn(`[Blockfrost] ${status} error in getCollectorsCount — falling back to Koios`)
+		}
+	}
+
+	try {
+		const label444NameHex = '001bc280' + assetNameHex
+		const url = `${KOIOS_BASE}/asset_addresses?_asset_policy=${policyId}&_asset_name=${label444NameHex}`
+		const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
+		if (!res.ok) {
+			if (res.status === 404) return 0
+			throw new Error(`Koios asset_addresses failed: ${res.status}`)
+		}
+		const holders: any[] = await res.json()
+		const userHolders = holders.filter(h => !h.payment_address?.startsWith('addr_test1w') && !h.payment_address?.startsWith('addr1w'))
+		return userHolders.length
+	} catch (err) {
+		logger.error(`Koios getCollectorsCount failed`, err)
 		return null
 	}
 }
+
 

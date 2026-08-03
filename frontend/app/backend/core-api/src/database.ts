@@ -1,6 +1,7 @@
 import { logger } from './lib/logger'
 import { createClient } from '@libsql/client'
 import { randomBytes } from 'crypto'
+import { getCollectorsCountOnChain } from './web3'
 
 const url = process.env.TURSO_URL || 'file:doba.db'
 const authToken = process.env.TURSO_AUTH_TOKEN
@@ -519,12 +520,26 @@ export async function getAnalytics(artistAddress: string): Promise<any> {
   })
   const uniqueListeners = Number(listenersRs.rows[0].count)
 
-  // Total Collectors
-  const collectorsRs = await db.execute({
-    sql: `SELECT COUNT(DISTINCT user_address) as count FROM mints WHERE track_id IN (${idsPlaceholder})`,
-    args: trackIds
-  })
-  const totalCollectors = Number(collectorsRs.rows[0].count)
+  // Total Collectors (On-chain verified + DB fallback)
+  let totalCollectors = 0
+  for (const track of tracks) {
+    if (track.splitter) {
+      try {
+        const onChainCollectors = await getCollectorsCountOnChain(track.splitter, track.ticker || '', track.token_id)
+        if (onChainCollectors !== null) {
+          totalCollectors += onChainCollectors
+          continue
+        }
+      } catch (err) {
+        logger.error(`Error fetching on-chain collectors for track ${track.token_id}`, err)
+      }
+    }
+    const collectorsRs = await db.execute({
+      sql: `SELECT COUNT(DISTINCT user_address) as count FROM mints WHERE track_id = ?`,
+      args: [track.token_id]
+    })
+    totalCollectors += Number(collectorsRs.rows[0]?.count || 0)
+  }
 
   // Plays Over Time (Last 30 days)
   const overTimeRs = await db.execute({
