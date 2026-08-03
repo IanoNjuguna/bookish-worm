@@ -35,7 +35,8 @@ export default function AnalyticsView() {
 			setLoading(true)
 			const token = await getValidToken()
 			if (!token) {
-				setError("Not authenticated")
+				setError("Connect your wallet and sign in to view your artist performance.")
+				setLoading(false)
 				return
 			}
 
@@ -61,6 +62,8 @@ export default function AnalyticsView() {
 	useEffect(() => {
 		if (isAuthenticated) {
 			fetchAnalytics()
+		} else {
+			setLoading(false)
 		}
 	}, [isAuthenticated])
 
