@@ -622,7 +622,7 @@ export default function UploadView() {
 								type="text"
 								value={title}
 								onChange={(e) => setTitle(e.target.value)}
-								placeholder={isAlbum ? "Enter album title" : t('trackTitlePlaceholder')}
+								placeholder={isAlbum ? "e.g. Bitcoin" : t('trackTitlePlaceholder')}
 								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 text-midnight dark:text-white focus:outline-none focus:border-cyber-pink focus:ring-1 focus:ring-cyber-pink/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40"
 								required
 							/>
@@ -634,7 +634,7 @@ export default function UploadView() {
 								type="text"
 								value={artistName}
 								onChange={(e) => setArtistName(e.target.value)}
-								placeholder="Enter artist name"
+								placeholder="e.g. Satoshi Nakamoto"
 								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 text-midnight dark:text-white focus:outline-none focus:border-cyber-pink focus:ring-1 focus:ring-cyber-pink/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40"
 								required
 							/>
@@ -653,7 +653,7 @@ export default function UploadView() {
 									const val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12)
 									setTicker(val)
 								}}
-								placeholder="e.g. FTOIC01"
+								placeholder="e.g. BTC"
 								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 text-midnight dark:text-white focus:outline-none focus:border-cyber-pink focus:ring-1 focus:ring-cyber-pink/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40 font-mono text-sm"
 								required
 							/>

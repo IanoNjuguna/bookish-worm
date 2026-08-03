@@ -61,7 +61,7 @@
     "connectToUpload": "Connect your wallet to upload tracks",
     "details": "Track Details",
     "trackTitleLabel": "Title",
-    "trackTitlePlaceholder": "Enter track title",
+    "trackTitlePlaceholder": "e.g. Bitcoin",
     "descriptionLabel": "Lyrics",
     "descriptionPlaceholder": "Enter the lyrics here...",
     "genreLabel": "Genre",
