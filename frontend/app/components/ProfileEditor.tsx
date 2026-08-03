@@ -330,13 +330,13 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 				<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 					<Link
 						href="/send-money"
-						className="flex items-center gap-3.5 p-4 bg-midnight/5 dark:bg-white/[0.03] hover:bg-midnight/10 dark:hover:bg-white/[0.07] border border-midnight/[0.08] dark:border-white/[0.08] hover:border-[#FF1F8A]/50 transition-all duration-200 group rounded-none"
+						className="flex items-center gap-3.5 p-4 bg-midnight/5 dark:bg-white/[0.03] hover:bg-midnight/10 dark:hover:bg-white/[0.07] border border-midnight/[0.08] dark:border-white/[0.08] hover:border-[#B794F4]/50 transition-all duration-200 group rounded-none"
 					>
-						<div className="p-2.5 bg-[#FF1F8A]/10 text-[#FF1F8A] group-hover:scale-110 transition-transform duration-200 shrink-0">
+						<div className="p-2.5 bg-[#B794F4]/10 text-[#B794F4] group-hover:scale-110 transition-transform duration-200 shrink-0">
 							<IconCurrencyDollar size={20} />
 						</div>
 						<div>
-							<div className="text-sm font-bold text-midnight dark:text-white group-hover:text-[#FF1F8A] transition-colors">
+							<div className="text-sm font-bold text-midnight dark:text-white group-hover:text-[#B794F4] transition-colors">
 								Send Funds
 							</div>
 							<div className="text-xs text-midnight/50 dark:text-white/40 mt-0.5">
@@ -347,13 +347,13 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 
 					<Link
 						href="/deposit"
-						className="flex items-center gap-3.5 p-4 bg-midnight/5 dark:bg-white/[0.03] hover:bg-midnight/10 dark:hover:bg-white/[0.07] border border-midnight/[0.08] dark:border-white/[0.08] hover:border-[#B794F4]/50 transition-all duration-200 group rounded-none"
+						className="flex items-center gap-3.5 p-4 bg-midnight/5 dark:bg-white/[0.03] hover:bg-midnight/10 dark:hover:bg-white/[0.07] border border-midnight/[0.08] dark:border-white/[0.08] hover:border-[#FF1F8A]/50 transition-all duration-200 group rounded-none"
 					>
-						<div className="p-2.5 bg-[#B794F4]/10 text-[#B794F4] group-hover:scale-110 transition-transform duration-200 shrink-0">
+						<div className="p-2.5 bg-[#FF1F8A]/10 text-[#FF1F8A] group-hover:scale-110 transition-transform duration-200 shrink-0">
 							<IconPlus size={20} />
 						</div>
 						<div>
-							<div className="text-sm font-bold text-midnight dark:text-white group-hover:text-[#B794F4] transition-colors">
+							<div className="text-sm font-bold text-midnight dark:text-white group-hover:text-[#FF1F8A] transition-colors">
 								Deposit Funds
 							</div>
 							<div className="text-xs text-midnight/50 dark:text-white/40 mt-0.5">
