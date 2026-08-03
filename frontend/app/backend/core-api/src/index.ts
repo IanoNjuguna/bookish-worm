@@ -95,10 +95,20 @@ function clearRefreshCookie(c: any) {
   c.header('Set-Cookie', parts.join('; '))
 }
 
+// Helper to safely drain request body stream on early error responses to prevent HTTP/2 RST_STREAM protocol resets
+const drainBody = async (c: any) => {
+  if (['POST', 'PUT', 'PATCH'].includes(c.req.method)) {
+    try {
+      await c.req.arrayBuffer()
+    } catch (_) {}
+  }
+}
+
 // Authentication Middleware
 const authMiddleware = async (c: any, next: any) => {
   const authHeader = c.req.header('Authorization')
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    await drainBody(c)
     return c.json({ error: 'Unauthorized', message: 'Missing or invalid Authorization header' }, 401)
   }
 
@@ -107,6 +117,7 @@ const authMiddleware = async (c: any, next: any) => {
   const payload = await verifyJWT(token, JWT_SECRET)
 
   if (!payload) {
+    await drainBody(c)
     return c.json({ error: 'Unauthorized', message: 'Invalid or expired access token' }, 401)
   }
 
@@ -117,9 +128,11 @@ const authMiddleware = async (c: any, next: any) => {
 // Simple API Key Middleware for mutating routes (POST, DELETE, PUT)
 app.use('*', async (c, next) => {
   if (['POST', 'DELETE', 'PUT', 'PATCH'].includes(c.req.method)) {
-    // Exclude auth and public play routes from API Key requirement
+    // Exclude auth, user uploads, metadata, and public play routes from API Key requirement
     if (c.req.path.startsWith('/auth/')) return await next()
     if (c.req.path.includes('/play')) return await next()
+    if (c.req.path.startsWith('/upload-assets')) return await next()
+    if (c.req.path.startsWith('/upload-metadata')) return await next()
 
     const apiKey = c.req.header('X-API-Key')
     const validKey = process.env.API_SECRET_KEY || process.env.ADMIN_API_KEY
@@ -127,6 +140,7 @@ app.use('*', async (c, next) => {
     // If a key is configured on the server, enforce it strictly
     if (validKey && apiKey !== validKey) {
       logger.warn(`Unauthorized ${c.req.method} attempt to ${c.req.path} - Invalid or missing API Key`)
+      await drainBody(c)
       return c.json({ error: 'Unauthorized. Invalid or missing X-API-Key.' }, 401)
     }
   }

@@ -159,6 +159,8 @@ export default function UploadView() {
 				formData.append('title', title || 'Untitled')
 
 				const token = await getValidToken()
+				if (!token) return
+
 				const bgHeaders: Record<string, string> = {}
 				const apiKey = process.env.NEXT_PUBLIC_API_KEY
 				if (apiKey && apiKey.trim() !== '') {
