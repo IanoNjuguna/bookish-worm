@@ -95,7 +95,7 @@ export default function MyStudioGrid({ address, onPlay, currentTrackId, isPlayin
 
   if (!ownedTracks.length) {
     return (
-      <div className="glass p-12 text-center rounded-none bg-midnight/[0.02] dark:bg-white/[0.02] border border-midnight/[0.08] dark:border-white/[0.08]">
+      <div className="glass p-12 text-center rounded-2xl bg-midnight/[0.02] dark:bg-white/[0.02] border border-midnight/[0.08] dark:border-white/[0.08] shadow-xl">
         <IconMusic className="w-12 h-12 mx-auto mb-4 text-midnight/50 dark:text-white/20" />
         <h3 className="text-xl font-semibold mb-2">{t('noSongs')}</h3>
         <p className="text-midnight/70 dark:text-white/40 italic text-sm">{t('noSongsDesc') || "You don't own any songs yet. Head to the marketplace to discover music!"}</p>
@@ -124,7 +124,7 @@ export default function MyStudioGrid({ address, onPlay, currentTrackId, isPlayin
             key={track.token_id}
             onMouseEnter={() => setHoveredTrackId(track.token_id)}
             onMouseLeave={() => setHoveredTrackId(null)}
-            className="grid grid-cols-[40px_1fr_auto] md:grid-cols-[48px_1fr_120px_100px_160px_60px] gap-3 md:gap-4 px-3 md:px-4 py-3 md:py-2 hover:bg-midnight/5 dark:hover:bg-white/5 border-b border-white/[0.02] md:border-none transition-colors group items-center"
+            className="grid grid-cols-[40px_1fr_auto] md:grid-cols-[48px_1fr_120px_100px_160px_60px] gap-3 md:gap-4 px-3 md:px-4 py-3 md:py-2 hover:bg-midnight/5 dark:hover:bg-white/5 border-b border-white/[0.02] md:border-none transition-colors group items-center rounded-xl"
           >
             {/* Index / Play Button */}
             <div className="flex justify-center items-center">
@@ -140,7 +140,7 @@ export default function MyStudioGrid({ address, onPlay, currentTrackId, isPlayin
                     url: track.streaming_url || track.audio_url.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/'),
                     collaborators: 0,
                   }, ownedTracks)}
-                  className="w-7 h-7 md:w-6 md:h-6 flex items-center justify-center bg-white text-black rounded-none shadow-sm transition-all active:scale-90"
+                  className="w-7 h-7 md:w-6 md:h-6 flex items-center justify-center bg-white text-black rounded-full shadow-sm transition-all active:scale-90"
                 >
                   {isPlaying && currentTrackId === track.token_id ? (
                     <IconPlayerPause size={14} className="fill-black" />
@@ -167,7 +167,7 @@ export default function MyStudioGrid({ address, onPlay, currentTrackId, isPlayin
                 collaborators: 0,
               }, ownedTracks)}
             >
-              <div className="w-12 h-12 md:w-10 md:h-10 rounded-none overflow-hidden flex-shrink-0 border border-midnight/10 dark:border-white/10">
+              <div className="w-12 h-12 md:w-10 md:h-10 rounded-lg overflow-hidden flex-shrink-0 border border-midnight/10 dark:border-white/10">
                 <img
                   src={(track.image_url || '').replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/')}
                   alt={track.name}
@@ -194,7 +194,7 @@ export default function MyStudioGrid({ address, onPlay, currentTrackId, isPlayin
             </div>
 
             <div className="hidden md:flex items-center text-xs text-midnight/50 dark:text-white/50">
-              <span className="bg-midnight/5 dark:bg-white/5 px-2 py-0.5 rounded-none border border-white/5 font-bold uppercase tracking-widest text-[9px]">{track.genre || 'RARE'}</span>
+              <span className="bg-midnight/5 dark:bg-white/5 px-2 py-0.5 rounded-full border border-white/5 font-bold uppercase tracking-widest text-[9px]">{track.genre || 'RARE'}</span>
             </div>
 
             {/* Streams */}

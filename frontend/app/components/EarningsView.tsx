@@ -178,7 +178,7 @@ export default function EarningsView() {
 
 			<div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
 				{/* Lifetime Earnings */}
-				<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-6 bg-[#FAF9F6] dark:bg-[#0D0D12]/60 relative overflow-hidden group">
+				<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-6 bg-[#FAF9F6] dark:bg-[#0D0D12]/60 relative overflow-hidden group rounded-2xl shadow-lg">
 					<div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-cyber-pink to-transparent" />
 					<div className="flex items-center justify-between mb-4">
 						<h3 className="text-midnight/60 dark:text-white/60 text-xs uppercase tracking-wider font-bold">Lifetime Sales</h3>
@@ -189,7 +189,7 @@ export default function EarningsView() {
 				</div>
 
 				{/* Available ADA */}
-				<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-6 bg-[#FAF9F6] dark:bg-[#0D0D12]/60 relative overflow-hidden group">
+				<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-6 bg-[#FAF9F6] dark:bg-[#0D0D12]/60 relative overflow-hidden group rounded-2xl shadow-lg">
 					<div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-lavender to-transparent" />
 					<div className="flex items-center justify-between mb-4">
 						<h3 className="text-midnight/60 dark:text-white/60 text-xs uppercase tracking-wider font-bold">Wallet Balance</h3>
@@ -200,7 +200,7 @@ export default function EarningsView() {
 				</div>
 
 				{/* Payout System Explanation */}
-				<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-6 bg-[#FAF9F6] dark:bg-[#0D0D12]/40 flex flex-col justify-center">
+				<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-6 bg-[#FAF9F6] dark:bg-[#0D0D12]/40 flex flex-col justify-center rounded-2xl shadow-lg">
 					<h4 className="text-xs uppercase tracking-wider font-bold text-[#B794F4] mb-1">Instant Payouts</h4>
 					<p className="text-xs text-midnight/50 dark:text-white/50 leading-relaxed">
 						Payouts are executed instantly during the purchase transaction. There are no claim queues or extra gas fees to claim your splits!
@@ -208,10 +208,10 @@ export default function EarningsView() {
 				</div>
 			</div>
 
-			<div className="border border-midnight/[0.08] dark:border-white/[0.08] overflow-hidden bg-[#FAF9F6] dark:bg-[#0D0D12]/60">
+			<div className="border border-midnight/[0.08] dark:border-white/[0.08] overflow-hidden bg-[#FAF9F6] dark:bg-[#0D0D12]/60 rounded-2xl shadow-xl">
 				<div className="p-6 border-b border-midnight/[0.08] dark:border-white/[0.08] flex justify-between items-center bg-white/[0.01]">
 					<h3 className="font-bold text-sm uppercase tracking-wider flex items-center gap-2">
-						<span className="w-1 h-4 bg-cyber-pink"></span>
+						<span className="w-1 h-4 bg-cyber-pink rounded-full"></span>
 						Collaborator Splits
 					</h3>
 					<span className="text-[10px] text-midnight/70 dark:text-white/40 uppercase font-mono">Real-Time Split List</span>
@@ -227,7 +227,7 @@ export default function EarningsView() {
 						royaltyTracks.map((entry, idx) => (
 							<div key={idx} className="p-5 flex items-center justify-between hover:bg-midnight/5 dark:hover:bg-white/5 transition duration-300">
 								<div className="flex-1 min-w-0 flex items-center gap-3">
-									<div className="w-10 h-10 rounded-none border border-midnight/10 dark:border-white/10 overflow-hidden shrink-0 bg-midnight/5 dark:bg-white/5">
+									<div className="w-10 h-10 rounded-lg border border-midnight/10 dark:border-white/10 overflow-hidden shrink-0 bg-midnight/5 dark:bg-white/5">
 										{entry.imageUrl ? (
 											<img
 												src={entry.imageUrl.replace('ipfs://', process.env.NEXT_PUBLIC_IPFS_GATEWAY || 'https://gateway.pinata.cloud/ipfs/')}

@@ -349,7 +349,7 @@ export default function NowPlayingSidebar({ track, isVisible, onClose }: NowPlay
 				</div>
 
 				{/* Large Album Art */}
-				<div className="aspect-square w-full rounded-none overflow-hidden border border-midnight/10 dark:border-white/10 group">
+				<div className="aspect-square w-full rounded-2xl overflow-hidden border border-midnight/10 dark:border-white/10 group shadow-xl">
 					<img
 						src={imageUrl}
 						alt={track.name || track.title}
@@ -447,7 +447,7 @@ export default function NowPlayingSidebar({ track, isVisible, onClose }: NowPlay
 					<div className="flex gap-2 pt-2">
 						<Button
 							className={cn(
-								"flex-1 h-12 rounded-none font-display font-bold uppercase tracking-widest text-xs transition-all duration-300",
+								"flex-1 h-12 rounded-xl font-display font-bold uppercase tracking-widest text-xs transition-all duration-300",
 								(mintData.max > 0 && mintData.minted >= mintData.max)
 									? "bg-[#FF1F8A]/10 text-[#FF1F8A] border border-[#FF1F8A]/20 cursor-not-allowed disabled:opacity-100"
 									: hasOwned
@@ -469,7 +469,7 @@ export default function NowPlayingSidebar({ track, isVisible, onClose }: NowPlay
 
 						<Button
 							variant="outline"
-							className="w-12 h-12 p-0 border-midnight/10 dark:border-white/10 hover:bg-midnight/5 dark:hover:bg-white/5 rounded-none"
+							className="w-12 h-12 p-0 border-midnight/10 dark:border-white/10 hover:bg-midnight/5 dark:hover:bg-white/5 rounded-xl"
 							onClick={handleShare}
 							title="Share"
 						>
@@ -478,7 +478,7 @@ export default function NowPlayingSidebar({ track, isVisible, onClose }: NowPlay
 
 						<Button
 							variant="outline"
-							className="w-12 h-12 p-0 border-midnight/10 dark:border-white/10 hover:bg-midnight/5 dark:hover:bg-white/5 rounded-none"
+							className="w-12 h-12 p-0 border-midnight/10 dark:border-white/10 hover:bg-midnight/5 dark:hover:bg-white/5 rounded-xl"
 							onClick={handleCopyLink}
 							title="Copy Link"
 						>

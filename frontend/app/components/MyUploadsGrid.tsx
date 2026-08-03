@@ -56,7 +56,7 @@ export default function MyUploadsGrid({ address }: MyUploadsGridProps) {
 		return (
 			<div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
 				{[...Array(6)].map((_, i) => (
-					<div key={i} className="aspect-[3/4] bg-midnight/5 dark:bg-white/5 animate-pulse" />
+					<div key={i} className="aspect-[3/4] bg-midnight/5 dark:bg-white/5 animate-pulse rounded-2xl" />
 				))}
 			</div>
 		)
@@ -64,7 +64,7 @@ export default function MyUploadsGrid({ address }: MyUploadsGridProps) {
 
 	if (!uploads.length) {
 		return (
-			<div className="glass p-12 text-center rounded-none bg-midnight/[0.02] dark:bg-white/[0.02] border border-midnight/[0.08] dark:border-white/[0.08]">
+			<div className="glass p-12 text-center rounded-2xl bg-midnight/[0.02] dark:bg-white/[0.02] border border-midnight/[0.08] dark:border-white/[0.08] shadow-xl">
 				<IconMusic className="w-12 h-12 mx-auto mb-4 text-midnight/50 dark:text-white/20" />
 				<h3 className="text-xl font-semibold mb-2">No Uploads Yet</h3>
 				<p className="text-midnight/70 dark:text-white/40 italic text-sm">You haven't published any songs on Doba. Head to the Upload tab to mint your first track!</p>

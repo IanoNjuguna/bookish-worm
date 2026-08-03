@@ -248,7 +248,7 @@ export default function AssetsView() {
 	return (
 		<div className="space-y-8 animate-fade-in">
 			{/* Portfolio Balance Header */}
-			<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-6 lg:p-8 bg-[#FAF9F6] dark:bg-[#0D0D12]/60 rounded-none relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+			<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-6 lg:p-8 bg-[#FAF9F6] dark:bg-[#0D0D12]/60 rounded-2xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl">
 				<div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-cyber-pink via-purple-500 to-transparent" />
 				<div>
 					<span className="text-midnight/70 dark:text-white/40 text-xs uppercase tracking-widest font-display font-bold">Total Portfolio Worth</span>
@@ -259,8 +259,8 @@ export default function AssetsView() {
 				</div>
 				
 				<div className="flex gap-3">
-					<div className="bg-white/[0.03] border border-midnight/10 dark:border-white/10 px-4 py-3 rounded-none flex items-center gap-3">
-						<div className="w-8 h-8 rounded-none bg-[#FF1F8A]/10 flex items-center justify-center text-[#FF1F8A]">
+					<div className="bg-white/[0.03] border border-midnight/10 dark:border-white/10 px-4 py-3 rounded-xl flex items-center gap-3">
+						<div className="w-8 h-8 rounded-lg bg-[#FF1F8A]/10 flex items-center justify-center text-[#FF1F8A]">
 							<IconCoins size={18} />
 						</div>
 						<div>
@@ -269,8 +269,8 @@ export default function AssetsView() {
 						</div>
 					</div>
 
-					<div className="bg-white/[0.03] border border-midnight/10 dark:border-white/10 px-4 py-3 rounded-none flex items-center gap-3">
-						<div className="w-8 h-8 rounded-none bg-[#B794F4]/10 flex items-center justify-center text-[#B794F4]">
+					<div className="bg-white/[0.03] border border-midnight/10 dark:border-white/10 px-4 py-3 rounded-xl flex items-center gap-3">
+						<div className="w-8 h-8 rounded-lg bg-[#B794F4]/10 flex items-center justify-center text-[#B794F4]">
 							<IconMusic size={18} />
 						</div>
 						<div>
@@ -314,12 +314,12 @@ export default function AssetsView() {
 				</div>
 			) : activeTab === 'tokens' ? (
 				/* Fungible Tokens List */
-				<div className="border border-midnight/[0.08] dark:border-white/[0.08] rounded-none overflow-hidden bg-[#FAF9F6] dark:bg-[#0D0D12]/60">
+				<div className="border border-midnight/[0.08] dark:border-white/[0.08] rounded-2xl overflow-hidden bg-[#FAF9F6] dark:bg-[#0D0D12]/60 shadow-lg">
 					<div className="divide-y divide-white/[0.08]">
 						{/* ADA */}
 						<div className="p-5 flex items-center justify-between hover:bg-midnight/5 dark:hover:bg-white/5 transition">
 							<div className="flex items-center gap-4">
-								<div className="w-10 h-10 rounded-none bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 flex items-center justify-center font-display font-bold text-midnight dark:text-white text-sm uppercase overflow-hidden">
+								<div className="w-10 h-10 rounded-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 flex items-center justify-center font-display font-bold text-midnight dark:text-white text-sm uppercase overflow-hidden">
 									<img src="https://assets.coingecko.com/coins/images/975/large/cardano.png" alt="ADA" className="w-full h-full object-cover p-1.5" />
 								</div>
 								<div>
@@ -338,7 +338,7 @@ export default function AssetsView() {
 							customTokens.map((token) => (
 								<div key={token.unit} className="p-5 flex items-center justify-between hover:bg-midnight/5 dark:hover:bg-white/5 transition">
 									<div className="flex items-center gap-4">
-										<div className="w-10 h-10 rounded-none bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 flex items-center justify-center font-display font-bold text-midnight dark:text-white text-sm uppercase overflow-hidden">
+										<div className="w-10 h-10 rounded-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 flex items-center justify-center font-display font-bold text-midnight dark:text-white text-sm uppercase overflow-hidden">
 											{token.symbol === 'DOBA' ? (
 												<DobaVisualizer className="text-[#FF1F8A] w-6 h-6 animate-pulse" />
 											) : token.logoUrl ? (

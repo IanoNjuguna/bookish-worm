@@ -116,7 +116,7 @@ export default function AnalyticsView() {
 			{/* Charts Row */}
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 				{/* Plays Over Time */}
-				<div className="bg-midnight/[0.02] dark:bg-white/[0.02] border border-midnight/[0.08] dark:border-white/[0.08] p-6 rounded-none relative overflow-hidden group">
+				<div className="bg-midnight/[0.02] dark:bg-white/[0.02] border border-midnight/[0.08] dark:border-white/[0.08] p-6 rounded-2xl shadow-xl relative overflow-hidden group">
 					<div className="absolute top-0 right-0 w-16 h-16 bg-[#FF1F8A]/5 -mr-8 -mt-8 rotate-45 pointer-events-none" />
 					<h3 className="text-lg font-bold mb-6 flex items-center gap-2 uppercase tracking-tighter">
 						<IconTrendingUp size={20} className="text-[#FF1F8A]" />
@@ -135,7 +135,7 @@ export default function AnalyticsView() {
 								/>
 								<YAxis stroke={mounted && resolvedTheme === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(13,13,18,0.4)'} fontSize={9} />
 								<Tooltip
-									contentStyle={{ backgroundColor: '#1A1A22', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '0' }}
+									contentStyle={{ backgroundColor: '#1A1A22', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
 									itemStyle={{ color: '#FF1F8A', fontSize: '12px' }}
 									labelStyle={{ color: 'rgba(255,255,255,0.5)', fontSize: '10px', marginBottom: '4px' }}
 								/>
@@ -153,7 +153,7 @@ export default function AnalyticsView() {
 				</div>
 
 				{/* Top Tracks */}
-				<div className="bg-midnight/[0.02] dark:bg-white/[0.02] border border-midnight/[0.08] dark:border-white/[0.08] p-6 rounded-none text-midnight dark:text-white relative overflow-hidden group">
+				<div className="bg-midnight/[0.02] dark:bg-white/[0.02] border border-midnight/[0.08] dark:border-white/[0.08] p-6 rounded-2xl shadow-xl text-midnight dark:text-white relative overflow-hidden group">
 					<div className="absolute top-0 right-0 w-16 h-16 bg-[#B794F4]/5 -mr-8 -mt-8 rotate-45 pointer-events-none" />
 					<h3 className="text-lg font-bold mb-6 flex items-center gap-2 uppercase tracking-tighter">
 						<IconMusic size={20} className="text-[#B794F4]" />
@@ -162,7 +162,7 @@ export default function AnalyticsView() {
 					<div className="space-y-4">
 						{data.topTracks.length > 0 ? (
 							data.topTracks.map((track, idx) => (
-								<div key={track.tokenId} className="flex items-center justify-between p-2 sm:p-3 rounded-none hover:bg-midnight/5 dark:hover:bg-white/5 transition-colors group">
+								<div key={track.tokenId} className="flex items-center justify-between p-2 sm:p-3 rounded-xl hover:bg-midnight/5 dark:hover:bg-white/5 transition-colors group">
 									<div className="flex items-center gap-3 sm:gap-4 min-w-0">
 										<span className="text-midnight/70 dark:text-white/30 font-bold italic w-4 flex-shrink-0 text-xs sm:text-sm">{idx + 1}</span>
 										<div className="min-w-0">
@@ -172,9 +172,9 @@ export default function AnalyticsView() {
 									</div>
 									<div className="text-right flex-shrink-0 ml-4">
 										<p className="font-bold text-[#B794F4] text-xs sm:text-sm font-mono whitespace-nowrap">{track.plays} plays</p>
-										<div className="h-1 bg-midnight/10 dark:bg-white/10 w-12 sm:w-20 rounded-none mt-1 overflow-hidden">
+										<div className="h-1 bg-midnight/10 dark:bg-white/10 w-12 sm:w-20 rounded-full mt-1 overflow-hidden">
 											<div
-												className="h-full bg-cyber-pink"
+												className="h-full bg-cyber-pink rounded-full"
 												style={{ width: `${(track.plays / (data.topTracks[0]?.plays || 1)) * 100}%` }}
 											/>
 										</div>
@@ -195,14 +195,14 @@ export default function AnalyticsView() {
 
 function MetricCard({ label, value, icon, subtext }: { label: string; value: string; icon: React.ReactNode; subtext: string }) {
 	return (
-		<div className="bg-midnight/[0.02] dark:bg-white/[0.02] border border-midnight/[0.08] dark:border-white/[0.08] p-6 rounded-none hover:border-[#B794F4]/50 transition-all group relative overflow-hidden">
+		<div className="bg-midnight/[0.02] dark:bg-white/[0.02] border border-midnight/[0.08] dark:border-white/[0.08] p-6 rounded-2xl shadow-lg hover:border-[#B794F4]/50 transition-all group relative overflow-hidden">
 			{/* Geometric Accent */}
 			<div className="absolute top-0 left-0 w-1 h-full bg-[#B794F4]/0 group-hover:bg-[#B794F4]/50 transition-all" />
 			<div className="absolute top-0 right-0 w-8 h-8 bg-midnight/5 dark:bg-white/5 -mr-4 -mt-4 rotate-45 transition-transform group-hover:scale-110" />
 
 			<div className="flex items-center justify-between mb-4">
 				<span className="text-midnight/70 dark:text-white/60 text-[10px] font-black uppercase tracking-[0.2em]">{label}</span>
-				<div className="p-2 bg-midnight/5 dark:bg-white/5 group-hover:bg-midnight/5 dark:hover:bg-white/5 transition-colors border border-white/5">
+				<div className="p-2 bg-midnight/5 dark:bg-white/5 group-hover:bg-midnight/5 dark:hover:bg-white/5 transition-colors border border-white/5 rounded-lg">
 					{icon}
 				</div>
 			</div>

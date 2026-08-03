@@ -402,7 +402,7 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 
 			{/* Wallet Settings Dialog */}
 			<Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-				<DialogContent className="sm:max-w-md bg-[#FAF9F6] dark:bg-[#12121A] border-midnight/10 dark:border-white/10 text-midnight dark:text-white rounded-none">
+				<DialogContent className="sm:max-w-md bg-[#FAF9F6] dark:bg-[#12121A] border-midnight/10 dark:border-white/10 text-midnight dark:text-white rounded-2xl shadow-2xl">
 					<DialogHeader className="mb-4">
 						<DialogTitle className="text-xl font-bold flex items-center gap-2">
 							<IconSettings className="text-lavender" />
@@ -414,7 +414,7 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 						<div>
 							<h3 className="text-sm font-semibold text-midnight/80 dark:text-white/80 mb-2 uppercase tracking-wide">Security</h3>
 							{sessionSeedPhrase ? (
-								<div className="bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 p-4 rounded-none">
+								<div className="bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 p-4 rounded-xl">
 									<div className="flex justify-between items-center mb-2">
 										<span className="text-sm font-medium text-midnight/90 dark:text-white/90">Current Session Recovery Phrase</span>
 										<Button 
@@ -425,12 +425,12 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 											}}
 											variant="ghost" 
 											size="sm" 
-											className="h-8 text-xs text-lavender hover:bg-lavender/10 hover:text-lavender rounded-none"
+											className="h-8 text-xs text-lavender hover:bg-lavender/10 hover:text-lavender rounded-lg"
 										>
 											<IconCopy size={14} className="mr-1" /> Copy
 										</Button>
 									</div>
-									<div className="bg-black/50 p-3 font-mono text-xs leading-relaxed text-midnight/60 dark:text-white/60 select-all break-words rounded-none">
+									<div className="bg-black/50 p-3 font-mono text-xs leading-relaxed text-midnight/60 dark:text-white/60 select-all break-words rounded-lg">
 										{sessionSeedPhrase}
 									</div>
 									<p className="text-[10px] text-midnight/70 dark:text-white/40 mt-2">
@@ -438,7 +438,7 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 									</p>
 								</div>
 							) : (
-								<div className="bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 p-4 rounded-none flex items-center gap-3">
+								<div className="bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 p-4 rounded-xl flex items-center gap-3">
 									<IconWallet className="text-midnight/70 dark:text-white/40" size={24} />
 									<p className="text-sm text-midnight/60 dark:text-white/60">
 										No recovery phrase available. You are likely connected via a browser extension wallet which securely manages your keys.
