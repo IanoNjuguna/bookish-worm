@@ -18,16 +18,26 @@ const app = new Hono()
 
 // CORS: explicit origin allowlist
 const ALLOWED_ORIGINS = [
+  'https://app.doba.world',
   'https://doba.world',
+  'https://www.doba.world',
   'https://about.doba.world',
   'http://localhost:3000',
   'http://localhost:3001',
+  'http://localhost:3002',
 ]
 
 app.use('/*', cors({
   origin: (origin) => {
     if (!origin) return '*' // Non-browser clients (curl, server-to-server)
-    return ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
+    if (
+      ALLOWED_ORIGINS.includes(origin) ||
+      origin.endsWith('.doba.world') ||
+      origin.endsWith('.vercel.app')
+    ) {
+      return origin
+    }
+    return ALLOWED_ORIGINS[0]
   },
   allowHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'Accept', 'Origin', 'X-Requested-With'],
   allowMethods: ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE', 'PATCH'],

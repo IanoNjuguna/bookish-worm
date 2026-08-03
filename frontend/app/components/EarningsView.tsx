@@ -47,26 +47,30 @@ export default function EarningsView() {
 		try {
 			// Get current wallet balance
 			if (lucid) {
-				const wallet = typeof lucid.wallet === 'function' ? lucid.wallet() : lucid.wallet
-				let lovelace = 0n
+				try {
+					const wallet = typeof lucid.wallet === 'function' ? lucid.wallet() : lucid.wallet
+					let lovelace = 0n
 
-				if (wallet && typeof wallet.getUtxos === 'function') {
-					const utxos = (await wallet.getUtxos()) || []
-					lovelace = utxos.reduce(
-						(total: bigint, utxo: { assets?: { lovelace?: bigint } }) => total + (utxo.assets?.lovelace ?? 0n),
-						0n
-					)
-				} else if (wallet && typeof wallet.getLovelace === 'function') {
-					lovelace = BigInt(await wallet.getLovelace())
-				} else if (typeof lucid.utxosAt === 'function' && address) {
-					const utxos = (await lucid.utxosAt(address)) || []
-					lovelace = utxos.reduce(
-						(total: bigint, utxo: { assets?: { lovelace?: bigint } }) => total + (utxo.assets?.lovelace ?? 0n),
-						0n
-					)
+					if (wallet && typeof wallet.getUtxos === 'function') {
+						const utxos = (await wallet.getUtxos()) || []
+						lovelace = utxos.reduce(
+							(total: bigint, utxo: { assets?: { lovelace?: bigint } }) => total + (utxo.assets?.lovelace ?? 0n),
+							0n
+						)
+					} else if (wallet && typeof wallet.getLovelace === 'function') {
+						lovelace = BigInt(await wallet.getLovelace())
+					} else if (typeof lucid.utxosAt === 'function' && address) {
+						const utxos = (await lucid.utxosAt(address)) || []
+						lovelace = utxos.reduce(
+							(total: bigint, utxo: { assets?: { lovelace?: bigint } }) => total + (utxo.assets?.lovelace ?? 0n),
+							0n
+						)
+					}
+
+					setBalance((Number(lovelace) / 1000000).toFixed(2))
+				} catch (e) {
+					console.warn('EarningsView: Wallet bridge request timed out or failed', e)
 				}
-
-				setBalance((Number(lovelace) / 1000000).toFixed(2))
 			}
 
 			// 1. Fetch all tracks
