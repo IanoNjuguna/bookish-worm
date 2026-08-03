@@ -449,6 +449,14 @@ export function formatTxError(error: any): string {
 	}
 
 	if (
+		errorString.includes("invalid choice of collateral") || 
+		errorString.includes("unsuitablecollateralinputs") || 
+		errorString.includes("3129")
+	) {
+		return "Collateral Error (Code 3129): Your Eternl wallet selected a script-locked UTXO as collateral. Please open Eternl -> Wallet Settings -> Collateral, and reset collateral to a pure 5 ADA UTXO.";
+	}
+
+	if (
 		errorString.includes("all inputs are spent") || 
 		errorString.includes("inputs are spent") ||
 		errorString.includes("already been included")
