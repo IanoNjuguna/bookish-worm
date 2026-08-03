@@ -341,8 +341,8 @@ export default function UploadView() {
 				currentAudioName = albumTracks[0].audioName
 				currentStreamingUrl = albumTracks[0].streamingUrl
 			} else {
-				// Upload single track assets if not already uploaded
-				if (!assetsCid || assetsCid !== "READY" || !currentAudioHash) {
+				// Upload single track assets if not already uploaded or if hashes are missing
+				if (!currentAudioHash || !currentImageHash || !assetsCid) {
 					toast.loading("Uploading media to IPFS...", { id: mainToast })
 					const formData = new FormData()
 					formData.append('audio', audioFile!)
@@ -364,6 +364,11 @@ export default function UploadView() {
 					currentImageName = assetData.imageName
 					currentStreamingUrl = assetData.streamingUrl
 				}
+			}
+
+			// Validate IPFS hashes before proceeding to on-chain minting
+			if (!currentAudioHash || !currentImageHash) {
+				throw new Error("Media files were not successfully pinned to IPFS. Please re-select your audio and cover files, then try again.")
 			}
 
 			// 2. Upload Metadata
