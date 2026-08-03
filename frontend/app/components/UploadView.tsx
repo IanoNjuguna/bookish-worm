@@ -278,6 +278,18 @@ export default function UploadView() {
 			let currentImageName = imageFilename || (imageHash ? `cover_${imageHash}.jpg` : '')
 			let currentStreamingUrl = streamingUrl || ''
 
+			const getHeaders = () => {
+				const headers: Record<string, string> = {}
+				const apiKey = process.env.NEXT_PUBLIC_API_KEY
+				if (apiKey && apiKey.trim() !== '') {
+					headers['X-API-Key'] = apiKey.trim()
+				}
+				if (token && token.trim() !== '') {
+					headers['Authorization'] = `Bearer ${token.trim()}`
+				}
+				return headers
+			}
+
 			if (isAlbum) {
 				// 1. Upload cover image first
 				toast.loading("Uploading album cover image...", { id: mainToast })
@@ -285,12 +297,9 @@ export default function UploadView() {
 				imageFormData.append('image', coverFile!)
 				imageFormData.append('title', title)
 
-				const imgRes = await fetch(`${API_URL.replace(/\/$/, '')}/upload-assets`, {
+				const imgRes = await fetch(`${BACKEND_URL}/upload-assets`, {
 					method: 'POST',
-					headers: {
-						'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '',
-						'Authorization': `Bearer ${token}`
-					},
+					headers: getHeaders(),
 					body: imageFormData,
 				})
 
@@ -309,10 +318,7 @@ export default function UploadView() {
 
 					const trackRes = await fetch(`${BACKEND_URL}/upload-assets`, {
 						method: 'POST',
-						headers: {
-							'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '',
-							'Authorization': `Bearer ${token}`
-						},
+						headers: getHeaders(),
 						body: trackFormData,
 					})
 
@@ -337,10 +343,7 @@ export default function UploadView() {
 
 					const assetRes = await fetch(`${BACKEND_URL}/upload-assets`, {
 						method: 'POST',
-						headers: {
-							'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '',
-							'Authorization': `Bearer ${token}`
-						},
+						headers: getHeaders(),
 						body: formData,
 					})
 
@@ -361,8 +364,7 @@ export default function UploadView() {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '',
-					'Authorization': `Bearer ${token}`
+					...getHeaders()
 				},
 				body: JSON.stringify({
 					title: title,
@@ -427,8 +429,7 @@ export default function UploadView() {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
-						'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '',
-						'Authorization': `Bearer ${token}`
+						...getHeaders()
 					},
 					body: JSON.stringify({
 						token_id: tokenId,
@@ -463,8 +464,7 @@ export default function UploadView() {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',
-							'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '',
-							'Authorization': `Bearer ${token}`
+							...getHeaders()
 						},
 						body: JSON.stringify({
 							token_id: tokenId + idx + 1,
@@ -498,8 +498,7 @@ export default function UploadView() {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
-						'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '',
-						'Authorization': `Bearer ${token}`
+						...getHeaders()
 					},
 					body: JSON.stringify({
 						token_id: tokenId,
@@ -534,8 +533,7 @@ export default function UploadView() {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',
-							'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '',
-							'Authorization': `Bearer ${token}`
+							...getHeaders()
 						},
 						body: JSON.stringify({
 							track_id: tokenId,
@@ -552,7 +550,7 @@ export default function UploadView() {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
-						'Authorization': `Bearer ${token}`
+						...getHeaders()
 					},
 					body: JSON.stringify({
 						track_id: tokenId,
