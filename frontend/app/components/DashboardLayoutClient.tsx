@@ -1,16 +1,16 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { IconHome as HomeIcon, IconPlaylistAdd as Library, IconSearch as Search, IconCurrencyDollar as DollarSign, IconTrendingUp as TrendingUp, IconUser as User, IconLogout as LogOut, IconMusic as Music, IconMenu } from '@tabler/icons-react'
+import { IconHome as HomeIcon, IconPlaylistAdd as Library, IconSearch as Search, IconCurrencyDollar as DollarSign, IconTrendingUp as TrendingUp, IconUser as User, IconLogout as LogOut, IconMusic as Music, IconMenu, IconX } from '@tabler/icons-react'
 import { Link, usePathname } from '@/i18n/navigation'
 import ConnectHeader from '@/components/ConnectHeader'
 import AudioPlayer from '@/components/AudioPlayer'
 import NowPlayingSidebar from '@/components/NowPlayingSidebar'
 import Footer from '@/components/Footer'
 import { useCardano } from '@/components/Providers'
-import { cn } from '@/lib/utils'
-import { useTranslations } from 'next-intl'
 import { useAudio } from '@/components/AudioProvider'
+import { useTranslations } from 'next-intl'
+import { cn } from '@/lib/utils'
 
 export default function DashboardLayoutClient({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false)
@@ -58,14 +58,14 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
         
         {/* Desktop Split Divider - Left Segment */}
         <div className={cn(
-          "hidden lg:block absolute bottom-0 h-[1px] bg-midnight/[0.08] dark:bg-white/[0.08] transition-all duration-300",
+          "hidden lg:block absolute bottom-0 h-[1px] bg-midnight/[0.08] dark:bg-white/[0.08] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
           desktopSidebarOpen ? "left-6 right-[calc(100%-20vw+40px)]" : "left-6 right-6"
         )} />
         
         {/* Desktop Split Divider - Middle Segment */}
         {desktopSidebarOpen && (
           <div className={cn(
-            "hidden lg:block absolute bottom-0 left-[calc(20vw+8px)] h-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]",
+            "hidden lg:block absolute bottom-0 left-[calc(20vw+8px)] h-[1px] bg-midnight/[0.08] dark:bg-white/[0.08] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
             (isSidebarOpen && playerState.currentTrack) ? "right-[calc(20rem+24px)]" : "right-6"
           )} />
         )}
@@ -79,10 +79,25 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setDesktopSidebarOpen(prev => !prev)}
-              className="hidden lg:flex items-center justify-center p-2 border border-midnight/10 dark:border-white/10 rounded-none bg-midnight/5 dark:bg-white/5 hover:border-cyber-pink/50 transition-colors text-midnight/70 dark:text-white/70 hover:text-midnight dark:hover:text-white group"
-              title={desktopSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+              className="hidden lg:flex items-center justify-center w-9 h-9 border border-midnight/10 dark:border-white/10 rounded-none bg-midnight/5 dark:bg-white/5 hover:border-cyber-pink/50 transition-colors text-midnight/70 dark:text-white/70 hover:text-midnight dark:hover:text-white group relative"
+              title={desktopSidebarOpen ? "Close sidebar" : "Open sidebar"}
             >
-              <IconMenu size={18} />
+              <div className="relative w-5 h-5 flex items-center justify-center">
+                <IconMenu 
+                  size={20} 
+                  className={cn(
+                    "absolute transition-all duration-300 transform",
+                    desktopSidebarOpen ? "opacity-0 rotate-90 scale-50" : "opacity-100 rotate-0 scale-100"
+                  )} 
+                />
+                <IconX 
+                  size={20} 
+                  className={cn(
+                    "absolute transition-all duration-300 transform",
+                    desktopSidebarOpen ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-50"
+                  )} 
+                />
+              </div>
             </button>
             <Link href="/" className="flex items-center gap-2">
               <img src="/doba.png" alt="doba logo" className="w-8 h-8 rounded-lg object-cover dark:invert-0 invert" />
@@ -146,8 +161,10 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
       {/* Main Layout */}
       <div className="flex flex-col lg:flex-row flex-1 mt-16 lg:overflow-hidden">
         <aside className={cn(
-          "hidden lg:flex flex-col bg-transparent overflow-y-auto overflow-x-hidden relative no-scrollbar transition-all duration-300 ease-in-out shrink-0",
-          desktopSidebarOpen ? "w-[20vw] min-w-[200px] max-w-[260px] opacity-100" : "w-0 opacity-0 pointer-events-none"
+          "hidden lg:flex flex-col bg-transparent overflow-y-auto overflow-x-hidden relative no-scrollbar transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] shrink-0",
+          desktopSidebarOpen 
+            ? "w-[20vw] min-w-[200px] max-w-[260px] opacity-100 translate-x-0" 
+            : "w-0 opacity-0 -translate-x-4 pointer-events-none"
         )}>
           <nav className="flex flex-col p-4 overflow-y-auto overflow-x-hidden flex-1 relative no-scrollbar w-[20vw] min-w-[200px] max-w-[260px]">
             {/* Navigation Section */}
