@@ -15,5 +15,5 @@ export const TREASURY_ADDRESS =
   process.env.NEXT_PUBLIC_TREASURY_ADDRESS_MAINNET ||
   'addr1q9zxp864enlra5tmgl6y32havq946njdxa7qd4gcxetj0seycr094w3r7jt7sp46j7t6gz8k6aljk40k46cjm5epvjzsj0dkpq';
 
-export const FEE_BPS = 700n; // 7% primary platform fee
+export const FEE_BPS = 500n; // 5% primary platform fee (matches deployed mainnet contract)
 export const SECONDARY_FEE_BPS = 300n; // 3% secondary marketplace fee
