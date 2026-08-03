@@ -128,16 +128,20 @@ const authMiddleware = async (c: any, next: any) => {
 // Simple API Key Middleware for mutating routes (POST, DELETE, PUT)
 app.use('*', async (c, next) => {
   if (['POST', 'DELETE', 'PUT', 'PATCH'].includes(c.req.method)) {
-    // Exclude auth, user uploads, metadata, and public play routes from API Key requirement
+    // Exclude auth and public play routes from API Key requirement
     if (c.req.path.startsWith('/auth/')) return await next()
     if (c.req.path.includes('/play')) return await next()
-    if (c.req.path.startsWith('/upload-assets')) return await next()
-    if (c.req.path.startsWith('/upload-metadata')) return await next()
+
+    // If request contains a Bearer authorization token (user session), let authMiddleware handle verification
+    const authHeader = c.req.header('Authorization')
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      return await next()
+    }
 
     const apiKey = c.req.header('X-API-Key')
     const validKey = process.env.API_SECRET_KEY || process.env.ADMIN_API_KEY
 
-    // If a key is configured on the server, enforce it strictly
+    // If a key is configured on the server, enforce it strictly for non-JWT requests
     if (validKey && apiKey !== validKey) {
       logger.warn(`Unauthorized ${c.req.method} attempt to ${c.req.path} - Invalid or missing API Key`)
       await drainBody(c)
