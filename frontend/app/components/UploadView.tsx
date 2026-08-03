@@ -780,10 +780,15 @@ export default function UploadView() {
 
 				{/* Royalties */}
 				<div className="space-y-6">
-					<h3 className="text-xl font-semibold flex items-center gap-2 text-midnight/90 dark:text-white">
-						<span className="w-1 h-6 bg-pink-400 rounded-none"></span>
-						Secondary Sales Royalties
-					</h3>
+					<div>
+						<h3 className="text-xl font-semibold flex items-center gap-2 text-midnight/90 dark:text-white mb-1">
+							<span className="w-1 h-6 bg-pink-400 rounded-none"></span>
+							Secondary Sales Royalties
+						</h3>
+						<p className="text-xs text-midnight/70 dark:text-white/60 pl-3">
+							💡 Earn recurring royalties on-chain whenever fans trade your track fractions on secondary marketplaces.
+						</p>
+					</div>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 						<div className="space-y-2">
 							<label className="text-sm font-medium text-midnight/80 dark:text-white">Royalty Percentage (%)</label>
@@ -795,8 +800,8 @@ export default function UploadView() {
 									max="100"
 									value={royaltyPercentage}
 									onChange={(e) => setRoyaltyPercentage(e.target.value)}
-									placeholder="e.g. 5"
-									className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 pr-14 text-midnight dark:text-white focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40"
+									placeholder="5"
+									className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 pr-14 text-midnight dark:text-white focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400/50 transition-all placeholder:text-midnight/70 dark:placeholder:text-white/50"
 									required
 								/>
 								<div className="absolute right-4 top-1/2 -translate-y-1/2 text-midnight/70 dark:text-white/70 text-xs font-bold font-mono">
@@ -811,8 +816,8 @@ export default function UploadView() {
 								type="text"
 								value={royaltyAddress}
 								onChange={(e) => setRoyaltyAddress(e.target.value)}
-								placeholder="Defaults to creator address"
-								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 text-midnight dark:text-white focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40 font-mono text-xs"
+								placeholder="Defaults to your wallet address"
+								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 text-midnight dark:text-white focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400/50 transition-all placeholder:text-midnight/70 dark:placeholder:text-white/50 font-mono text-xs"
 							/>
 						</div>
 					</div>
