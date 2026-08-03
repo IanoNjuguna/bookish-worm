@@ -897,4 +897,8 @@ app.post('/collaborators', authMiddleware, async (c) => {
   return c.json({ success: true })
 })
 
-export default { port, fetch: app.fetch }
+export default {
+  port,
+  maxRequestBodySize: 100 * 1024 * 1024, // 100 MB max request body size for Bun HTTP/2 engine
+  fetch: app.fetch
+}
