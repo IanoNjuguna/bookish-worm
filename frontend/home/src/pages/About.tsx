@@ -81,7 +81,7 @@ export default function About() {
               </div>
               <div>
                 <strong className="text-foreground font-bold">Secondary Sales (resales):</strong>
-                <p className="ml-4 mt-1">Seller: 85% • Artist: 5% royalty • doba: 10%</p>
+                <p className="ml-4 mt-1">Seller: 92% • Artist: 5% royalty • doba: 3%</p>
               </div>
             </div>
           </section>
