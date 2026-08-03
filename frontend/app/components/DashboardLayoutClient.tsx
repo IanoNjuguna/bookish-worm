@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { IconHome as HomeIcon, IconPlaylistAdd as Library, IconSearch as Search, IconCurrencyDollar as DollarSign, IconTrendingUp as TrendingUp, IconUser as User, IconLogout as LogOut, IconMusic as Music } from '@tabler/icons-react'
+import { IconHome as HomeIcon, IconPlaylistAdd as Library, IconSearch as Search, IconCurrencyDollar as DollarSign, IconTrendingUp as TrendingUp, IconUser as User, IconLogout as LogOut, IconMusic as Music, IconMenu } from '@tabler/icons-react'
 import { Link, usePathname } from '@/i18n/navigation'
 import ConnectHeader from '@/components/ConnectHeader'
 import AudioPlayer from '@/components/AudioPlayer'
