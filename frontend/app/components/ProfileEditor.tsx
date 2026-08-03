@@ -225,7 +225,7 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 	}
 
 	return (
-		<div className="p-8 bg-midnight/5 dark:bg-white-2 border border-midnight/[0.08] dark:border-white/[0.08] relative group overflow-hidden">
+		<div className="p-8 bg-midnight/5 dark:bg-white-2 border border-midnight/[0.08] dark:border-white/[0.08] relative group overflow-hidden rounded-2xl shadow-xl">
 			{/* Decorative gradient match */}
 			<div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-lavender via-lavender/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
@@ -234,7 +234,7 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 					href="https://www.doba.world/support"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="p-2 bg-midnight/5 dark:bg-white/5 hover:bg-midnight/10 dark:hover:bg-white/10 text-midnight/50 dark:text-white/50 hover:text-midnight dark:hover:text-white transition-all inline-flex items-center justify-center"
+					className="p-2 bg-midnight/5 dark:bg-white/5 hover:bg-midnight/10 dark:hover:bg-white/10 text-midnight/50 dark:text-white/50 hover:text-midnight dark:hover:text-white transition-all inline-flex items-center justify-center rounded-lg"
 					title="Help & Support"
 				>
 					<IconHelpCircle size={18} />
@@ -242,7 +242,7 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 				<button
 					type="button"
 					onClick={() => setIsSettingsOpen(true)}
-					className="p-2 bg-midnight/5 dark:bg-white/5 hover:bg-midnight/10 dark:hover:bg-white/10 text-midnight/50 dark:text-white/50 hover:text-midnight dark:hover:text-white transition-all"
+					className="p-2 bg-midnight/5 dark:bg-white/5 hover:bg-midnight/10 dark:hover:bg-white/10 text-midnight/50 dark:text-white/50 hover:text-midnight dark:hover:text-white transition-all rounded-lg"
 					title="Wallet Settings"
 				>
 					<IconSettings size={18} />
@@ -250,7 +250,7 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 				<button
 					type="button"
 					onClick={() => setIsEditing(true)}
-					className="p-2 bg-midnight/5 dark:bg-white/5 hover:bg-midnight/10 dark:hover:bg-white/10 text-midnight/50 dark:text-white/50 hover:text-midnight dark:hover:text-white transition-all"
+					className="p-2 bg-midnight/5 dark:bg-white/5 hover:bg-midnight/10 dark:hover:bg-white/10 text-midnight/50 dark:text-white/50 hover:text-midnight dark:hover:text-white transition-all rounded-lg"
 					title="Edit Profile"
 				>
 					<IconEdit size={18} />
@@ -259,9 +259,9 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 
 			<div className="flex items-start gap-6 mb-8">
 				{profile?.avatar_url ? (
-					<img src={profile.avatar_url} alt="Profile" className="w-24 h-24 object-cover border-4 border-white/5 shadow-2xl rounded-none" />
+					<img src={profile.avatar_url} alt="Profile" className="w-24 h-24 object-cover border-4 border-white/5 shadow-2xl rounded-2xl" />
 				) : (
-					<img src={`https://api.dicebear.com/7.x/identicon/svg?seed=${address}`} alt="Profile" className="w-24 h-24 object-cover border-4 border-white/5 shadow-2xl bg-midnight/5 dark:bg-white/5 rounded-none" />
+					<img src={`https://api.dicebear.com/7.x/identicon/svg?seed=${address}`} alt="Profile" className="w-24 h-24 object-cover border-4 border-white/5 shadow-2xl bg-midnight/5 dark:bg-white/5 rounded-2xl" />
 				)}
 
 				<div className="pt-2">
@@ -274,10 +274,10 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 							activeWalletIcon === 'utxos' ? (
 								<IconWallet size={16} className="text-[#FF1F8A]" />
 							) : (
-								<img src={activeWalletIcon} alt={walletName || 'Wallet'} className="w-5 h-5 object-contain rounded-none" />
+								<img src={activeWalletIcon} alt={walletName || 'Wallet'} className="w-5 h-5 object-contain rounded-full" />
 							)
 						) : (
-							<div className="w-1.5 h-1.5 rounded-none bg-blue-500 animate-pulse" />
+							<div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
 						)}
 						<span className="text-xs font-semibold mr-1">{formatAddress(address)}</span>
 
@@ -286,7 +286,7 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 								navigator.clipboard.writeText(address)
 								toast.success('Address copied!')
 							}}
-							className="p-1 hover:bg-midnight/5 dark:hover:bg-white/[0.1] rounded-none transition"
+							className="p-1 hover:bg-midnight/5 dark:hover:bg-white/[0.1] rounded-lg transition"
 							aria-label="Copy Address"
 							title="Copy Address"
 						>
@@ -297,7 +297,7 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 							href={`${EXPLORER_URL}/address/${address}`}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="p-1 hover:bg-midnight/5 dark:hover:bg-white/[0.1] rounded-none transition"
+							className="p-1 hover:bg-midnight/5 dark:hover:bg-white/[0.1] rounded-lg transition"
 							title="View on Explorer"
 						>
 							<IconExternalLink size={14} className="hover:text-midnight dark:hover:text-white" />
@@ -305,7 +305,7 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 
 						<button
 							onClick={logout}
-							className="p-1 hover:bg-midnight/5 dark:hover:bg-white/[0.1] rounded-none transition"
+							className="p-1 hover:bg-midnight/5 dark:hover:bg-white/[0.1] rounded-lg transition"
 							aria-label="Disconnect"
 							title="Disconnect"
 						>
@@ -324,15 +324,15 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 			{/* Wallet Actions Bar */}
 			<div className="pt-6 pb-2 border-t border-midnight/10 dark:border-white/10 relative z-10 mb-8">
 				<h4 className="text-xs font-bold uppercase tracking-wider text-[#B794F4] mb-4 flex items-center gap-2">
-					<span className="w-1.5 h-1.5 rounded-none bg-[#B794F4] inline-block" />
+					<span className="w-1.5 h-1.5 rounded-full bg-[#B794F4] inline-block" />
 					Wallet Actions
 				</h4>
 				<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 					<Link
 						href="/send-money"
-						className="flex items-center gap-3.5 p-4 bg-midnight/5 dark:bg-white/[0.03] hover:bg-midnight/10 dark:hover:bg-white/[0.07] border border-midnight/[0.08] dark:border-white/[0.08] hover:border-[#B794F4]/50 transition-all duration-200 group rounded-none"
+						className="flex items-center gap-3.5 p-4 bg-midnight/5 dark:bg-white/[0.03] hover:bg-midnight/10 dark:hover:bg-white/[0.07] border border-midnight/[0.08] dark:border-white/[0.08] hover:border-[#B794F4]/50 transition-all duration-200 group rounded-xl"
 					>
-						<div className="p-2.5 bg-[#B794F4]/10 text-[#B794F4] group-hover:scale-110 transition-transform duration-200 shrink-0">
+						<div className="p-2.5 bg-[#B794F4]/10 text-[#B794F4] group-hover:scale-110 transition-transform duration-200 shrink-0 rounded-lg">
 							<IconCurrencyDollar size={20} />
 						</div>
 						<div>
@@ -347,9 +347,9 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 
 					<Link
 						href="/deposit"
-						className="flex items-center gap-3.5 p-4 bg-midnight/5 dark:bg-white/[0.03] hover:bg-midnight/10 dark:hover:bg-white/[0.07] border border-midnight/[0.08] dark:border-white/[0.08] hover:border-[#FF1F8A]/50 transition-all duration-200 group rounded-none"
+						className="flex items-center gap-3.5 p-4 bg-midnight/5 dark:bg-white/[0.03] hover:bg-midnight/10 dark:hover:bg-white/[0.07] border border-midnight/[0.08] dark:border-white/[0.08] hover:border-[#FF1F8A]/50 transition-all duration-200 group rounded-xl"
 					>
-						<div className="p-2.5 bg-[#FF1F8A]/10 text-[#FF1F8A] group-hover:scale-110 transition-transform duration-200 shrink-0">
+						<div className="p-2.5 bg-[#FF1F8A]/10 text-[#FF1F8A] group-hover:scale-110 transition-transform duration-200 shrink-0 rounded-lg">
 							<IconPlus size={20} />
 						</div>
 						<div>
@@ -364,9 +364,9 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 
 					<Link
 						href="/assets"
-						className="flex items-center gap-3.5 p-4 bg-midnight/5 dark:bg-white/[0.03] hover:bg-midnight/10 dark:hover:bg-white/[0.07] border border-midnight/[0.08] dark:border-white/[0.08] hover:border-[#B794F4]/50 transition-all duration-200 group rounded-none"
+						className="flex items-center gap-3.5 p-4 bg-midnight/5 dark:bg-white/[0.03] hover:bg-midnight/10 dark:hover:bg-white/[0.07] border border-midnight/[0.08] dark:border-white/[0.08] hover:border-[#B794F4]/50 transition-all duration-200 group rounded-xl"
 					>
-						<div className="p-2.5 bg-[#B794F4]/10 text-[#B794F4] group-hover:scale-110 transition-transform duration-200 shrink-0">
+						<div className="p-2.5 bg-[#B794F4]/10 text-[#B794F4] group-hover:scale-110 transition-transform duration-200 shrink-0 rounded-lg">
 							<IconCoins size={20} />
 						</div>
 						<div>

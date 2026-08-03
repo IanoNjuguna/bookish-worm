@@ -47,14 +47,14 @@ export default function SearchDashboard() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="I want to listen to ..."
-              className="w-full bg-white dark:bg-white/5 border border-midnight/20 dark:border-white/10 rounded-none pl-12 pr-4 py-[14px] text-midnight dark:text-white focus:outline-none focus:border-cyber-pink focus:ring-1 focus:ring-cyber-pink/50 transition-all placeholder:text-midnight/70 dark:placeholder:text-white/40 text-lg shadow-sm dark:shadow-none"
+              className="w-full bg-white dark:bg-white/5 border border-midnight/20 dark:border-white/10 rounded-xl pl-12 pr-4 py-[14px] text-midnight dark:text-white focus:outline-none focus:border-cyber-pink focus:ring-1 focus:ring-cyber-pink/50 transition-all placeholder:text-midnight/70 dark:placeholder:text-white/40 text-lg shadow-sm dark:shadow-none"
             />
           </div>
           <Select value={selectedGenre} onValueChange={setSelectedGenre}>
-            <SelectTrigger className="w-full md:w-[180px] bg-white dark:bg-white/5 border border-midnight/20 dark:border-white/10 rounded-none h-auto py-4 font-bold uppercase tracking-widest text-[10px] text-midnight dark:text-white/80 hover:bg-midnight/5 dark:hover:bg-white/10 data-[state=open]:border-cyber-pink focus:ring-0 focus:ring-offset-0 transition-all shadow-sm dark:shadow-none">
+            <SelectTrigger className="w-full md:w-[180px] bg-white dark:bg-white/5 border border-midnight/20 dark:border-white/10 rounded-xl h-auto py-4 font-bold uppercase tracking-widest text-[10px] text-midnight dark:text-white/80 hover:bg-midnight/5 dark:hover:bg-white/10 data-[state=open]:border-cyber-pink focus:ring-0 focus:ring-offset-0 transition-all shadow-sm dark:shadow-none">
               <SelectValue placeholder="Genre" />
             </SelectTrigger>
-            <SelectContent className="bg-white dark:bg-[#0D0D12] border border-midnight/20 dark:border-white/10 rounded-none text-midnight dark:text-white/80 shadow-lg">
+            <SelectContent className="bg-white dark:bg-[#0D0D12] border border-midnight/20 dark:border-white/10 rounded-xl text-midnight dark:text-white/80 shadow-lg">
               {GENRES.map((g) => (
                 <SelectItem 
                   key={g} 

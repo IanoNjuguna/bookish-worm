@@ -99,11 +99,11 @@ export function SendFunds() {
 
 	return (
 		<div
-			className="space-y-6 animate-fade-in max-w-md mx-auto p-6 glass text-midnight dark:text-white bg-[#FAF9F6] dark:bg-[#0D0D12]/80 border border-midnight/10 dark:border-white/10 relative overflow-hidden"
+			className="space-y-6 animate-fade-in max-w-md mx-auto p-6 glass text-midnight dark:text-white bg-[#FAF9F6] dark:bg-[#0D0D12]/80 border border-midnight/10 dark:border-white/10 relative overflow-hidden rounded-2xl shadow-xl"
 		>
 			<div className="flex justify-between items-center border-b border-white/5 pb-4">
 				<h3 className="text-lg font-bold text-midnight dark:text-white uppercase tracking-wider flex items-center gap-2">
-					<span className="w-1.5 h-4 bg-cyber-pink inline-block"></span>
+					<span className="w-1.5 h-4 bg-cyber-pink inline-block rounded-full"></span>
 					Send ADA
 				</h3>
 				<span className="text-[10px] text-midnight/70 dark:text-white/60 font-bold uppercase">Cardano Network</span>
@@ -117,7 +117,7 @@ export function SendFunds() {
 						placeholder="addr1..."
 						value={recipient}
 						onChange={(e) => setRecipient(e.target.value)}
-						className="bg-midnight/5 dark:bg-white/5 border-midnight/10 dark:border-white/10 text-sm h-12 text-midnight dark:text-white placeholder:text-midnight/60 dark:placeholder:text-white/50 focus:border-[#FF1F8A]/50 transition-colors rounded-none"
+						className="bg-midnight/5 dark:bg-white/5 border-midnight/10 dark:border-white/10 text-sm h-12 text-midnight dark:text-white placeholder:text-midnight/60 dark:placeholder:text-white/50 focus:border-[#FF1F8A]/50 transition-colors rounded-xl"
 					/>
 				</div>
 
@@ -143,7 +143,7 @@ export function SendFunds() {
 									setAmount(val);
 								}
 							}}
-							className="bg-midnight/5 dark:bg-white/5 border-midnight/10 dark:border-white/10 text-lg h-14 pl-4 pr-12 text-midnight dark:text-white placeholder:text-midnight/60 dark:placeholder:text-white/50 focus:border-[#FF1F8A]/50 transition-colors rounded-none"
+							className="bg-midnight/5 dark:bg-white/5 border-midnight/10 dark:border-white/10 text-lg h-14 pl-4 pr-12 text-midnight dark:text-white placeholder:text-midnight/60 dark:placeholder:text-white/50 focus:border-[#FF1F8A]/50 transition-colors rounded-xl"
 						/>
 						<div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-midnight/70 dark:text-white/60 font-mono text-sm">
 							ADA
@@ -154,7 +154,7 @@ export function SendFunds() {
 						{['25%', '50%', 'MAX'].map((label, idx) => (
 							<button
 								key={label}
-								className={`bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 text-[10px] h-8 hover:bg-midnight/5 dark:hover:bg-white/5 hover:text-midnight dark:hover:text-white rounded-none flex items-center justify-center transition-colors ${idx === 2 ? 'text-[#FF1F8A]/80 border-[#FF1F8A]/20 hover:bg-[#FF1F8A]/20 hover:text-[#FF1F8A]' : 'text-midnight/60 dark:text-white/60'}`}
+								className={`bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 text-[10px] h-8 hover:bg-midnight/5 dark:hover:bg-white/5 hover:text-midnight dark:hover:text-white rounded-lg flex items-center justify-center transition-colors ${idx === 2 ? 'text-[#FF1F8A]/80 border-[#FF1F8A]/20 hover:bg-[#FF1F8A]/20 hover:text-[#FF1F8A]' : 'text-midnight/60 dark:text-white/60'}`}
 								onClick={() => handlePercentage([0.25, 0.5, 1][idx])}
 							>
 								{label}
@@ -168,7 +168,7 @@ export function SendFunds() {
 				<button
 					onClick={handleSend}
 					disabled={!isValid || isSending}
-					className={`w-full h-14 font-bold text-lg transition-all rounded-none flex items-center justify-center gap-2 ${isValid && !isSending
+					className={`w-full h-14 font-bold text-lg transition-all rounded-xl flex items-center justify-center gap-2 ${isValid && !isSending
 						? 'bg-[#B794F4] text-black hover:bg-[#A080E0]'
 						: 'bg-midnight/10 dark:bg-white/10 text-midnight/70 dark:text-white/60 cursor-not-allowed opacity-50'
 						}`}

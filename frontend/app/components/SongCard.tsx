@@ -378,9 +378,9 @@ export default function SongCard({
         onTouchCancel={handleTouchCancel}
         onTouchMove={handleTouchMove}
         className={cn(
-          "group relative flex flex-col p-3 rounded-lg transition-all duration-300 cursor-pointer select-none",
+          "group relative flex flex-col p-3 rounded-2xl transition-all duration-300 cursor-pointer select-none",
           "bg-black/[0.03] dark:bg-white/[0.03] border border-[#f0f0f0] dark:border-white/5",
-          "hover:bg-black/[0.06] dark:hover:bg-white/[0.06] hover:border-black/10 dark:hover:border-white/10 hover:shadow-lg dark:hover:shadow-black/40",
+          "hover:bg-black/[0.06] dark:hover:bg-white/[0.06] hover:border-black/10 dark:hover:border-white/10 hover:shadow-xl dark:hover:shadow-black/40",
           isLongPressed && "scale-[0.97] duration-150",
           isAlbum && isExpanded && "border-b-0 rounded-b-none"
         )}
@@ -390,14 +390,14 @@ export default function SongCard({
           {isAlbum && (
             <>
               {/* Third layer card (furthest back) */}
-              <div className="absolute inset-0 transform translate-x-2 -translate-y-2 scale-[0.96] bg-black/[0.04] dark:bg-white/[0.04] border border-black/10 dark:border-white/10 rounded-md transition-transform duration-300 group-hover:translate-x-2.5 group-hover:-translate-y-2.5 -z-10" />
+              <div className="absolute inset-0 transform translate-x-2 -translate-y-2 scale-[0.96] bg-black/[0.04] dark:bg-white/[0.04] border border-black/10 dark:border-white/10 rounded-xl transition-transform duration-300 group-hover:translate-x-2.5 group-hover:-translate-y-2.5 -z-10" />
               {/* Second layer card (middle) */}
-              <div className="absolute inset-0 transform translate-x-1 -translate-y-1 scale-[0.98] bg-black/[0.08] dark:bg-white/[0.08] border border-black/10 dark:border-white/10 rounded-md transition-transform duration-300 group-hover:translate-x-1.5 group-hover:-translate-y-2.5 -z-10" />
+              <div className="absolute inset-0 transform translate-x-1 -translate-y-1 scale-[0.98] bg-black/[0.08] dark:bg-white/[0.08] border border-black/10 dark:border-white/10 rounded-xl transition-transform duration-300 group-hover:translate-x-1.5 group-hover:-translate-y-2.5 -z-10" />
             </>
           )}
 
           {/* Main Artwork Cover */}
-          <div className="relative w-full h-full rounded-md overflow-hidden z-0">
+          <div className="relative w-full h-full rounded-xl overflow-hidden z-0">
             <img
               src={(imageUrl || '').replace('ipfs://', process.env.NEXT_PUBLIC_IPFS_GATEWAY || 'https://gateway.pinata.cloud/ipfs/')}
               alt={name}

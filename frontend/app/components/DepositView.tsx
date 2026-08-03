@@ -35,10 +35,10 @@ export function DepositView() {
 
 	return (
 		<div className="max-w-md mx-auto animate-fade-in">
-			<div className="glass p-8 relative overflow-hidden text-center space-y-8 bg-[#FAF9F6] dark:bg-[#0D0D12]/80 border border-midnight/10 dark:border-white/10">
+			<div className="glass p-8 relative overflow-hidden text-center space-y-8 bg-[#FAF9F6] dark:bg-[#0D0D12]/80 border border-midnight/10 dark:border-white/10 rounded-2xl shadow-xl">
 				<div className="relative flex justify-center">
-					<div className="p-4 bg-midnight/5 dark:bg-white/[0.03] border border-midnight/10 dark:border-white/10 rounded-none relative">
-						<div className="bg-[#0D0D12] p-4 overflow-hidden shadow-[0_0_30px_rgba(183,148,244,0.1)] border border-midnight/10 dark:border-white/5 rounded-none">
+					<div className="p-4 bg-midnight/5 dark:bg-white/[0.03] border border-midnight/10 dark:border-white/10 rounded-2xl relative">
+						<div className="bg-[#0D0D12] p-4 overflow-hidden shadow-[0_0_30px_rgba(183,148,244,0.1)] border border-midnight/10 dark:border-white/5 rounded-xl">
 							<QRCodeSVG
 								value={address}
 								size={220}
@@ -61,7 +61,7 @@ export function DepositView() {
 				<div className="space-y-4 flex flex-col items-center">
 					<div
 						onClick={handleCopy}
-						className="group flex items-center justify-center gap-4 p-4 bg-midnight/5 dark:bg-black/40 border border-midnight/10 dark:border-white/10 hover:border-midnight/20 dark:border-white/20 transition-all cursor-pointer overflow-hidden rounded-none w-full"
+						className="group flex items-center justify-center gap-4 p-4 bg-midnight/5 dark:bg-black/40 border border-midnight/10 dark:border-white/10 hover:border-midnight/20 dark:border-white/20 transition-all cursor-pointer overflow-hidden rounded-xl w-full"
 					>
 						<code className="text-[13px] font-mono text-midnight/80 dark:text-white/80 select-all break-all">
 							{address}

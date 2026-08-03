@@ -623,7 +623,7 @@ export default function UploadView() {
 								value={title}
 								onChange={(e) => setTitle(e.target.value)}
 								placeholder={isAlbum ? "e.g. Bitcoin" : t('trackTitlePlaceholder')}
-								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 text-midnight dark:text-white focus:outline-none focus:border-cyber-pink focus:ring-1 focus:ring-cyber-pink/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40"
+								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-xl px-4 py-3 text-midnight dark:text-white focus:outline-none focus:border-cyber-pink focus:ring-1 focus:ring-cyber-pink/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40"
 								required
 							/>
 						</div>
@@ -635,7 +635,7 @@ export default function UploadView() {
 								value={artistName}
 								onChange={(e) => setArtistName(e.target.value)}
 								placeholder="e.g. Satoshi Nakamoto"
-								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 text-midnight dark:text-white focus:outline-none focus:border-cyber-pink focus:ring-1 focus:ring-cyber-pink/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40"
+								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-xl px-4 py-3 text-midnight dark:text-white focus:outline-none focus:border-cyber-pink focus:ring-1 focus:ring-cyber-pink/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40"
 								required
 							/>
 						</div>
@@ -654,7 +654,7 @@ export default function UploadView() {
 									setTicker(val)
 								}}
 								placeholder="e.g. BTC"
-								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 text-midnight dark:text-white focus:outline-none focus:border-cyber-pink focus:ring-1 focus:ring-cyber-pink/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40 font-mono text-sm"
+								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-xl px-4 py-3 text-midnight dark:text-white focus:outline-none focus:border-cyber-pink focus:ring-1 focus:ring-cyber-pink/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40 font-mono text-sm"
 								required
 							/>
 						</div>
@@ -888,10 +888,10 @@ export default function UploadView() {
 							<div className="space-y-2">
 								<label className="text-sm font-medium text-midnight/80 dark:text-white">{t('audioLabel')}</label>
 								<div
-									className={`border-2 border-dashed rounded-none h-64 flex flex-col items-center justify-center gap-4 transition-all bg-midnight/[0.02] dark:bg-white/[0.02] group
+									className={`border-2 border-dashed rounded-2xl h-64 flex flex-col items-center justify-center gap-4 transition-all bg-midnight/[0.02] dark:bg-white/[0.02] group
                   ${audioFile ? 'border-cyber-pink/50 bg-cyber-pink/[0.05]' : 'border-midnight/10 dark:border-white/10 hover:border-midnight/30 dark:hover:border-white/30 hover:bg-midnight/5 dark:hover:bg-white/5'}`}
 								>
-									<div className={`p-4 rounded-none transition-colors ${audioFile ? 'bg-cyber-pink/20 text-cyber-pink' : 'bg-midnight/5 dark:bg-white/5 text-midnight/70 dark:text-white/40 group-hover:text-midnight dark:group-hover:text-white'}`}>
+									<div className={`p-4 rounded-xl transition-colors ${audioFile ? 'bg-cyber-pink/20 text-cyber-pink' : 'bg-midnight/5 dark:bg-white/5 text-midnight/70 dark:text-white/40 group-hover:text-midnight dark:group-hover:text-white'}`}>
 										<IconMusic size={32} />
 									</div>
 									<div className="text-center px-4">
@@ -900,7 +900,7 @@ export default function UploadView() {
 										</p>
 										<p className="text-xs text-midnight/70 dark:text-white/70 mb-4">{audioFile ? (audioFile.size / 1024 / 1024).toFixed(2) + ' MB' : t('audioHint')}</p>
 										<label className="cursor-pointer inline-block">
-											<span className="bg-midnight/10 dark:bg-white/10 hover:bg-white/20 text-midnight dark:text-white px-5 py-2.5 rounded-none text-sm font-medium transition-colors">
+											<span className="bg-midnight/10 dark:bg-white/10 hover:bg-white/20 text-midnight dark:text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-colors">
 												{audioFile ? t('changeFile') : t('chooseFile')}
 											</span>
 											<input type="file" accept="audio/*" onChange={handleAudioChange} className="hidden" />
@@ -914,7 +914,7 @@ export default function UploadView() {
 						<div className="space-y-2">
 							<label className="text-sm font-medium text-midnight/80 dark:text-white">{t('coverArtLabel')}</label>
 							<div
-								className={`border-2 border-dashed rounded-none h-64 flex flex-col items-center justify-center gap-4 transition-all bg-midnight/[0.02] dark:bg-white/[0.02] group relative overflow-hidden
+								className={`border-2 border-dashed rounded-2xl h-64 flex flex-col items-center justify-center gap-4 transition-all bg-midnight/[0.02] dark:bg-white/[0.02] group relative overflow-hidden
                 ${coverFile ? 'border-purple-400/50' : 'border-midnight/10 dark:border-white/10 hover:border-midnight/30 dark:hover:border-white/30 hover:bg-midnight/5 dark:hover:bg-white/5'}`}
 							>
 								{coverFile ? (
@@ -931,14 +931,14 @@ export default function UploadView() {
 											<img
 												src={URL.createObjectURL(coverFile)}
 												alt="Preview"
-												className="w-32 h-32 object-cover rounded-none shadow-2xl mb-4 border border-midnight/20 dark:border-white/20"
+												className="w-32 h-32 object-cover rounded-xl shadow-2xl mb-4 border border-midnight/20 dark:border-white/20"
 											/>
 											<p className="text-xs text-midnight/60 dark:text-white/90 mb-2 truncate max-w-[200px]">{coverFile.name}</p>
 										</div>
 									</>
 								) : (
 									<>
-										<div className="p-4 rounded-none bg-midnight/5 dark:bg-white/5 text-midnight/70 dark:text-white/40 group-hover:text-midnight dark:group-hover:text-white transition-colors">
+										<div className="p-4 rounded-xl bg-midnight/5 dark:bg-white/5 text-midnight/70 dark:text-white/40 group-hover:text-midnight dark:group-hover:text-white transition-colors">
 											<IconPhoto size={32} />
 										</div>
 										<div className="text-center">
@@ -950,7 +950,7 @@ export default function UploadView() {
 
 								<div className="relative z-10 text-center">
 									<label className="cursor-pointer inline-block">
-										<span className="bg-midnight/10 dark:bg-white/10 hover:bg-white/20 text-midnight dark:text-white px-5 py-2.5 rounded-none text-sm font-medium transition-colors backdrop-blur-sm">
+										<span className="bg-midnight/10 dark:bg-white/10 hover:bg-white/20 text-midnight dark:text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-colors backdrop-blur-sm">
 											{coverFile ? t('changeCover') : t('chooseFile')}
 										</span>
 										<input type="file" accept="image/*" onChange={handleCoverChange} className="hidden" />

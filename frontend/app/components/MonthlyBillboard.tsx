@@ -82,7 +82,7 @@ export default function MonthlyBillboard({ address }: MonthlyBillboardProps) {
 						<div
 							key={track.token_id}
 							className={cn(
-								"group flex items-center gap-4 p-3 transition-all relative overflow-hidden",
+								"group flex items-center gap-4 p-3 transition-all relative overflow-hidden rounded-xl",
 								"bg-white/[0.03] hover:bg-midnight/5 dark:hover:bg-white/5 border border-white/[0.05] hover:border-lavender/30",
 								isCurrent && "bg-lavender/10 border-lavender/40"
 							)}
@@ -102,11 +102,11 @@ export default function MonthlyBillboard({ address }: MonthlyBillboardProps) {
 							</div>
 
 							{/* Cover Art */}
-							<div className="relative w-12 h-12 shrink-0 group/cover">
+							<div className="relative w-12 h-12 shrink-0 group/cover rounded-lg overflow-hidden">
 								<img
 									src={(track.image_url || '').replace('ipfs://', process.env.NEXT_PUBLIC_IPFS_GATEWAY || 'https://gateway.pinata.cloud/ipfs/')}
 									alt={track.name}
-									className="w-full h-full object-cover rounded-none"
+									className="w-full h-full object-cover rounded-lg"
 								/>
 								<button
 									onClick={() => handlePlayTrack({
