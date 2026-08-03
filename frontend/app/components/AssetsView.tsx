@@ -233,8 +233,8 @@ export default function AssetsView() {
 
 	if (!isConnected) {
 		return (
-			<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-12 text-center bg-[#FAF9F6] dark:bg-[#0D0D12]/60 rounded-none">
-				<div className="w-16 h-16 mx-auto mb-6 bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-[#B794F4] rounded-none">
+			<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-12 text-center bg-[#FAF9F6] dark:bg-[#0D0D12]/60 rounded-2xl shadow-xl">
+				<div className="w-16 h-16 mx-auto mb-6 bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-[#B794F4] rounded-2xl">
 					<IconWallet size={32} />
 				</div>
 				<h3 className="text-xl font-display font-bold mb-2">Connect Wallet</h3>

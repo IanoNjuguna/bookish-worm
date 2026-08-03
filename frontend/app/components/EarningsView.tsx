@@ -149,8 +149,8 @@ export default function EarningsView() {
 					<h2 className="text-2xl font-bold mb-2">{t('title') || 'Earnings & Splits'}</h2>
 					<p className="text-midnight/60 dark:text-white/60">{t('subtitle') || 'View splits and track your Cardano royalties.'}</p>
 				</div>
-				<div className="border border-midnight/[0.08] dark:border-white/[0.08] rounded-none p-12 text-center bg-[#FAF9F6] dark:bg-[#0D0D12]/60">
-					<div className="w-16 h-16 rounded-none mx-auto mb-6 bg-cyber-pink/10 border border-cyber-pink/20 flex items-center justify-center text-cyber-pink clip-diamond">
+				<div className="border border-midnight/[0.08] dark:border-white/[0.08] rounded-2xl p-12 text-center bg-[#FAF9F6] dark:bg-[#0D0D12]/60 shadow-xl">
+					<div className="w-16 h-16 rounded-2xl mx-auto mb-6 bg-cyber-pink/10 border border-cyber-pink/20 flex items-center justify-center text-cyber-pink clip-diamond">
 						<DollarSign size={32} />
 					</div>
 					<h3 className="text-xl font-bold mb-2">{t('signInToView') || 'Connect Your Wallet'}</h3>
