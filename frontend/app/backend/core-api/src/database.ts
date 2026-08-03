@@ -270,8 +270,8 @@ export async function getAllTracks(filters: TrackFilters = {}): Promise<Track[]>
   const args: any[] = []
 
   if (artist) {
-    conditions.push('(artist = ? OR artist COLLATE NOCASE = ? OR uploader_address = ? OR uploader_address COLLATE NOCASE = ?)')
-    args.push(artist, artist, artist, artist)
+    conditions.push('(artist = ? OR artist COLLATE NOCASE = ? OR uploader_address = ? OR uploader_address COLLATE NOCASE = ? OR uploader_payment_address = ? OR uploader_payment_address COLLATE NOCASE = ?)')
+    args.push(artist, artist, artist, artist, artist, artist)
   }
 
   if (genre) {
