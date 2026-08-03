@@ -3,7 +3,7 @@ import { logger } from '@/lib/logger'
 import { EXPLORER_URL } from '@/lib/config'
 
 import React, { useState, useEffect } from 'react'
-import { IconCopy, IconEdit, IconCheck, IconX, IconLogout, IconExternalLink, IconWallet, IconSettings, IconCurrencyDollar, IconPlus, IconCoins } from '@tabler/icons-react'
+import { IconCopy, IconEdit, IconCheck, IconX, IconLogout, IconExternalLink, IconWallet, IconSettings, IconCurrencyDollar, IconPlus, IconCoins, IconHelpCircle } from '@tabler/icons-react'
 import { Link } from '@/i18n/navigation'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -230,6 +230,15 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 			<div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-lavender via-lavender/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
 			<div className="absolute top-6 right-6 flex items-center gap-2 z-30 opacity-0 group-hover:opacity-100 transition-all">
+				<a
+					href="https://www.doba.world/support"
+					target="_blank"
+					rel="noopener noreferrer"
+					className="p-2 bg-midnight/5 dark:bg-white/5 hover:bg-midnight/10 dark:hover:bg-white/10 text-midnight/50 dark:text-white/50 hover:text-midnight dark:hover:text-white transition-all inline-flex items-center justify-center"
+					title="Help & Support"
+				>
+					<IconHelpCircle size={18} />
+				</a>
 				<button
 					type="button"
 					onClick={() => setIsSettingsOpen(true)}
