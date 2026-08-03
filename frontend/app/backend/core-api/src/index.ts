@@ -142,23 +142,17 @@ const getPinataJwt = () => {
 // IPFS Upload Assets Proxy (PIN INDIVIDUALLY)
 app.post('/upload-assets',
   authMiddleware,
-  bodyLimit({
-    maxSize: 50 * 1024 * 1024, // 50 MB
-    onError: (c) => {
-      return c.json({ error: 'Payload Too Large', message: 'Request body exceeds 50 MB limit.' }, 413)
-    }
-  }),
   async (c) => {
     const pinataJwt = getPinataJwt()
-  if (!pinataJwt) return c.json({ error: 'Pinata JWT not configured' }, 500)
+    if (!pinataJwt) return c.json({ error: 'Pinata JWT not configured' }, 500)
 
-  try {
-    const formData = await c.req.formData()
-    const audio = formData.get('audio') as any
-    const image = formData.get('image') as any
-    const title = formData.get('title') as string || 'assets'
+    try {
+      const body = await c.req.parseBody()
+      const audio = body['audio'] as any
+      const image = body['image'] as any
+      const title = (body['title'] as string) || 'assets'
 
-    if (!audio && !image) return c.json({ error: 'Missing files' }, 400)
+      if (!audio && !image) return c.json({ error: 'Missing files' }, 400)
 
     logger.info(`[IPFS] Dual-Pin Start: ${title}`)
 
