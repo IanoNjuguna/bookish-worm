@@ -771,8 +771,17 @@ app.post('/mints', authMiddleware, async (c) => {
 
   if (!track_id) return c.json({ error: 'track_id is required' }, 400)
 
-  // Verify ownership on-chain before writing to database
-  const isVerified = await verifyOwnershipOnChain(userAddress, Number(track_id))
+  const track = await getTrack(Number(track_id))
+  const isUploader = track && track.uploader_address && (
+    track.uploader_address.toLowerCase() === userAddress.toLowerCase()
+  )
+
+  // Verify uploader status or verify on-chain ownership
+  let isVerified = Boolean(isUploader)
+  if (!isVerified) {
+    isVerified = await verifyOwnershipOnChain(userAddress, Number(track_id))
+  }
+
   if (!isVerified) {
     logger.warn(`Unverified mint record attempt for track ${track_id} by ${userAddress}`)
     return c.json({ error: 'Forbidden', message: 'Token ownership could not be verified on-chain.' }, 403)
