@@ -409,7 +409,7 @@
     color: rgba(255, 255, 255, 0.7) !important;
   }
 
-  /* Angular Scrollbar - Sharp corners, geometric design */
+  /* Custom Scrollbar - Purple pill design */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -427,29 +427,24 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, rgba(183, 148, 244, 0.1) 0%, rgba(183, 148, 244, 0.1) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.02);
-    border-radius: 0;
+    background: linear-gradient(135deg, rgba(183, 148, 244, 0.6) 0%, rgba(147, 51, 234, 0.6) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 9999px;
     transition: all 0.2s ease;
-    clip-path: polygon(0 0, 100% 0, 100% 75%, 75% 75%, 75% 100%, 0 100%);
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, rgba(183, 148, 244, 0.1) 0%, rgba(183, 148, 244, 0.1) 50%, rgba(183, 148, 244, 0.1) 100%);
-    border-color: rgba(255, 255, 255, 0.04);
-    transform: scale(1.1);
+    background: linear-gradient(135deg, rgba(183, 148, 244, 0.85) 0%, rgba(147, 51, 234, 0.85) 100%);
+    border-color: rgba(255, 255, 255, 0.2);
   }
 
   ::-webkit-scrollbar-thumb:active {
-    background: linear-gradient(135deg, rgba(183, 148, 244, 0.1) 0%, rgba(183, 148, 244, 0.1) 100%);
-    transform: scale(0.95);
+    background: linear-gradient(135deg, rgba(183, 148, 244, 1) 0%, rgba(147, 51, 234, 1) 100%);
   }
 
-  /* Angular corner pieces - Note: ::before/::after are not supported on scrollbar pseudo-elements */
-
-  /* Firefox Angular Scrollbar */
+  /* Firefox Scrollbar */
   * {
-    scrollbar-color: rgba(183, 148, 244, 0.1) rgba(13, 13, 18, 0.05);
+    scrollbar-color: rgba(183, 148, 244, 0.6) rgba(13, 13, 18, 0.5);
     scrollbar-width: thin;
   }
 
