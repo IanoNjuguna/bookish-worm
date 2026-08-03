@@ -212,24 +212,7 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
             isOpen={isAuthModalOpen} 
             onClose={() => setIsAuthModalOpen(false)} 
           />
-          {/* Desktop version - Wallet badge */}
-          <div className="hidden lg:flex items-center gap-2">
-            <div 
-              onClick={handleCopy}
-              className="flex items-center gap-2 pl-3 pr-3 py-1.5 border border-midnight/10 dark:border-white/10 shrink-0 rounded-none bg-midnight/5 dark:bg-white/5 hover:border-cyber-pink/50 transition-colors cursor-pointer group"
-              title="Click to copy address"
-            >
-              <div className="w-2 h-2 shrink-0 bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)] animate-pulse-scale"></div>
-              <span className="font-mono text-xs font-medium text-midnight/80 dark:text-white/80 group-hover:text-midnight dark:group-hover:text-white group-hover:font-bold transition-all">
-                {formatAddress(address || '', 8, 8)}
-              </span>
-              {copied ? (
-                <IconCheck size={14} className="text-green-500 shrink-0 ml-1" />
-              ) : (
-                <IconCopy size={14} className="text-midnight/70 dark:text-white/40 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-1" />
-              )}
-            </div>
-          </div>
+          {/* Desktop version - Wallet badge removed */}
           
           {/* Mobile version - Full Menu Trigger */}
           <div className="lg:hidden">
