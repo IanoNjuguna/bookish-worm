@@ -1098,14 +1098,13 @@ export default function UploadView() {
 							type="submit"
 							disabled={
 								isUploading || 
-								isAssetsUploading || 
 								(!isAlbum && !audioFile) || 
 								(isAlbum && albumTracks.some(t => !t.file || !t.title)) || 
 								!coverFile || 
 								!cardanoAddress ||
 								!attested
 							}
-							className="w-full bg-[#B794F4] hover:bg-[#A080E0] text-black font-bold py-4 px-6 rounded-none flex items-center justify-center gap-2 transition-all transform active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed group text-xs uppercase tracking-widest"
+							className="w-full bg-[#B794F4] hover:bg-[#A080E0] text-black font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-2 transition-all transform active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed group text-xs uppercase tracking-widest"
 						>
 							{isUploading ? (
 								<>
