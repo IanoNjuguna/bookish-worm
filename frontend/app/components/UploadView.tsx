@@ -890,7 +890,7 @@ export default function UploadView() {
 									className={`border-2 border-dashed rounded-none h-64 flex flex-col items-center justify-center gap-4 transition-all bg-midnight/[0.02] dark:bg-white/[0.02] group
                   ${audioFile ? 'border-cyber-pink/50 bg-cyber-pink/[0.05]' : 'border-midnight/10 dark:border-white/10 hover:border-midnight/30 dark:hover:border-white/30 hover:bg-midnight/5 dark:hover:bg-white/5'}`}
 								>
-									<div className={`p-4 rounded-none transition-colors ${audioFile ? 'bg-cyber-pink/20 text-cyber-pink' : 'bg-midnight/5 dark:bg-white/5 text-midnight/70 dark:text-white/40 group-hover:text-midnight dark:hover:text-white'}`}>
+									<div className={`p-4 rounded-none transition-colors ${audioFile ? 'bg-cyber-pink/20 text-cyber-pink' : 'bg-midnight/5 dark:bg-white/5 text-midnight/70 dark:text-white/40 group-hover:text-midnight dark:group-hover:text-white'}`}>
 										<IconMusic size={32} />
 									</div>
 									<div className="text-center px-4">
@@ -937,7 +937,7 @@ export default function UploadView() {
 									</>
 								) : (
 									<>
-										<div className="p-4 rounded-none bg-midnight/5 dark:bg-white/5 text-midnight/70 dark:text-white/40 group-hover:text-midnight dark:hover:text-white transition-colors">
+										<div className="p-4 rounded-none bg-midnight/5 dark:bg-white/5 text-midnight/70 dark:text-white/40 group-hover:text-midnight dark:group-hover:text-white transition-colors">
 											<IconPhoto size={32} />
 										</div>
 										<div className="text-center">

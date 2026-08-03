@@ -137,11 +137,11 @@ export default function MonthlyBillboard({ address }: MonthlyBillboardProps) {
 							<div className="flex-1 min-w-0">
 								<h5 className={cn(
 									"font-bold truncate text-sm transition-colors",
-									isCurrent ? "text-lavender" : "text-midnight/90 dark:text-white/90 group-hover:text-midnight dark:hover:text-white"
+									isCurrent ? "text-lavender" : "text-midnight dark:text-white group-hover:text-cyber-pink dark:group-hover:text-cyber-pink"
 								)}>
 									{track.name}
 								</h5>
-								<p className="text-xs text-midnight/50 dark:text-white/50 truncate">{track.artist}</p>
+								<p className="text-xs text-midnight/70 dark:text-white/70 truncate">{track.artist}</p>
 							</div>
 
 							{/* Stats */}
