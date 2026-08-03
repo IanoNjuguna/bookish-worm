@@ -27,7 +27,7 @@ export interface TrackMintData {
 /**
  * Derives the policy ID, locking address, and distribution address for a given creator address.
  */
-export async function getContractAddresses(creatorAddress: string) {
+export async function getContractAddresses(creatorAddress: string, feeBpsOverride?: bigint) {
 	const { paymentCredentialOf, applyParamsToScript, applyDoubleCborEncoding, mintingPolicyToId, validatorToAddress, getAddressDetails, Constr } = await import("@lucid-evolution/lucid");
 
 	const ownerPKH = paymentCredentialOf(creatorAddress).hash;
@@ -71,13 +71,14 @@ export async function getContractAddresses(creatorAddress: string) {
 	}
 
 	const treasuryAddressPlutus = new Constr(0, [payCredPlutus, stakeCredPlutus]);
+	const activeFeeBps = feeBpsOverride ?? FEE_BPS;
 
 	const distroScript = {
 		type: "PlutusV3" as const,
 		script: applyParamsToScript(applyDoubleCborEncoding(distroValidator.compiledCode), [
 			ownerPKH,
 			treasuryAddressPlutus,
-			FEE_BPS
+			activeFeeBps
 		]),
 	};
 	const dAddress = validatorToAddress(CARDANO_NETWORK, distroScript);
@@ -235,7 +236,8 @@ export async function buyFractionOnChain(
 		);
 	}
 
-	const { dAddress, distroScript, mintCS } = await getContractAddresses(track.uploader_address);
+	const trackFeeBps = (track.token_id === 1784761978751 || track.ticker === "MERADIL") ? 500n : FEE_BPS;
+	const { dAddress, distroScript, mintCS } = await getContractAddresses(track.uploader_address, trackFeeBps);
 	console.log("[DEBUG buyFractionOnChain] derived dAddress:", dAddress);
 
 	const targetTokenId = track.album_id ? track.album_id : track.token_id;
@@ -294,7 +296,7 @@ export async function buyFractionOnChain(
 	const dDatum = Data.to(new Constr(0, [priceLovelace]));
 
 	// Calculate fee payment (minimum 1 ADA/1,000,000 lovelace to satisfy Cardano min UTXO requirement)
-	const fee = (priceLovelace * FEE_BPS) / 10000n;
+	const fee = (priceLovelace * trackFeeBps) / 10000n;
 	const feeLovelace = fee > 1000000n ? fee : 1000000n;
 	const creatorLovelace = priceLovelace - fee;
 

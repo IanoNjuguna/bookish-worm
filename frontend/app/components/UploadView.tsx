@@ -33,7 +33,7 @@ export default function UploadView() {
 	const [artistName, setArtistName] = useState('')
 	const [description, setDescription] = useState('')
 	const [genre, setGenre] = useState('')
-	const [price, setPrice] = useState('5') // Default to 5 ADA
+	const [price, setPrice] = useState('10') // Default to 10 ADA
 	const [supply, setSupply] = useState('5000')
 	const [royaltyPercentage, setRoyaltyPercentage] = useState('5') // Default to 5%
 	const [royaltyAddress, setRoyaltyAddress] = useState('')
@@ -746,11 +746,11 @@ export default function UploadView() {
 							<div className="relative">
 								<input
 									type="number"
-									step="0.1"
-									min="0.1"
+									step="1"
+									min="10"
 									value={price}
 									onChange={(e) => setPrice(e.target.value)}
-									placeholder="e.g. 5"
+									placeholder="e.g. 10"
 									className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 pr-14 text-midnight dark:text-white focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40"
 									required
 								/>
@@ -758,6 +758,9 @@ export default function UploadView() {
 									ADA
 								</div>
 							</div>
+							<p className="text-xs text-midnight/60 dark:text-white/40">
+								Recommended minimum price is 10 ADA to optimize 10% platform fee and Cardano network rules.
+							</p>
 						</div>
 
 						<div className="space-y-2">
