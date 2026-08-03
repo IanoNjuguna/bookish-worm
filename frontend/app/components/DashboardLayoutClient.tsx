@@ -76,7 +76,19 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
         )}
 
         <div className="h-full px-4 lg:px-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-2">
+            <img src="/doba.png" alt="doba logo" className="w-8 h-8 rounded-lg object-cover dark:invert-0 invert" />
+            <span className="text-midnight dark:text-white text-base sm:text-lg font-extrabold tracking-tight lowercase">doba</span>
+          </Link>
+
+          <div className="hidden lg:flex items-center gap-3">
+            <ConnectHeader
+              address={effectiveAddress || undefined}
+              logout={handleLogout}
+              onNavigate={(_view) => {
+                 // Handled differently now
+              }}
+            />
             <button 
               onClick={() => setDesktopSidebarOpen(prev => !prev)}
               className="hidden lg:flex items-center justify-center p-1.5 transition-colors text-midnight/70 dark:text-white/70 hover:text-midnight dark:hover:text-white group relative shrink-0"
@@ -99,20 +111,6 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
                 />
               </div>
             </button>
-            <Link href="/" className="flex items-center gap-2">
-              <img src="/doba.png" alt="doba logo" className="w-8 h-8 rounded-lg object-cover dark:invert-0 invert" />
-              <span className="text-midnight dark:text-white text-base sm:text-lg font-extrabold tracking-tight lowercase">doba</span>
-            </Link>
-          </div>
-
-          <div className="hidden lg:flex items-center gap-3">
-            <ConnectHeader
-              address={effectiveAddress || undefined}
-              logout={handleLogout}
-              onNavigate={(_view) => {
-                 // Handled differently now
-              }}
-            />
           </div>
 
           <div className="lg:hidden flex items-center gap-2">
