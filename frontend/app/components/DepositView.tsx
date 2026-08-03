@@ -6,7 +6,7 @@ import { IconCopy, IconCheck, IconWallet, IconExternalLink } from '@tabler/icons
 import { toast } from 'sonner'
 import { useAudio } from '@/components/AudioProvider'
 import { useCardano } from '@/components/Providers'
-import { EXPLORER_URL } from '@/lib/config'
+import { EXPLORER_URL, CARDANO_NETWORK } from '@/lib/config'
 
 export function DepositView() {
 	const { address } = useCardano()
@@ -88,7 +88,7 @@ export function DepositView() {
 					</div>
 
 					<div className="flex items-center justify-center gap-2">
-						<span className="text-xs font-mono font-bold tracking-wider text-[#FF1F8A]">CARDANO PREPROD NETWORK</span>
+						<span className="text-xs font-mono font-bold tracking-wider text-[#FF1F8A]">CARDANO {CARDANO_NETWORK.toUpperCase()} NETWORK</span>
 					</div>
 				</div>
 			</div>

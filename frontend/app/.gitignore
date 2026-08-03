@@ -1,1 +1,21 @@
-\n# Local environment variables\n.env.local
+# Next.js build output
+.next/
+out/
+build/
+
+# Local SQLite databases
+*.db
+*.db-journal
+
+# Local environment variables
+.env.local
+.env*.local
+
+# Scratch scripts
+scratch/
+
+# Logs & node_modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

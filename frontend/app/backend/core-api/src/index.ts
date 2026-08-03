@@ -532,14 +532,29 @@ app.get('/songs', async (c) => {
     }
   }
 
-  const tracksWithOwnership = tracks.map(track => {
+  const tracksWithOwnership = await Promise.all(tracks.map(async track => {
     const parentId = track.album_id ? Number(track.album_id) : null
     const isOwned = userMints.includes(track.token_id) || (parentId !== null && userMints.includes(parentId))
+    
+    let mintCount = track.mint_count || 0
+    if (track.splitter) {
+      try {
+        const remaining = await getRemainingFractionsOnChain(track.splitter, track.ticker || '', track.token_id)
+        if (remaining !== null) {
+          const maxSupply = Number(track.max_supply || 0)
+          mintCount = Math.max(0, maxSupply - remaining)
+        }
+      } catch (err) {
+        logger.error(`Error fetching remaining fractions for track ${track.token_id} in /songs`, err)
+      }
+    }
+
     return {
       ...resolveTrackAddress(track),
-      is_owned: isOwned
+      is_owned: isOwned,
+      mint_count: mintCount
     }
-  })
+  }))
 
   return c.json(tracksWithOwnership)
 })
@@ -734,8 +749,15 @@ app.post('/mints', authMiddleware, async (c) => {
 
   if (!track_id) return c.json({ error: 'track_id is required' }, 400)
 
+  // Verify ownership on-chain before writing to database
+  const isVerified = await verifyOwnershipOnChain(userAddress, Number(track_id))
+  if (!isVerified) {
+    logger.warn(`Unverified mint record attempt for track ${track_id} by ${userAddress}`)
+    return c.json({ error: 'Forbidden', message: 'Token ownership could not be verified on-chain.' }, 403)
+  }
+
   try {
-    await addMint({ user_address: userAddress, track_id, tx_hash })
+    await addMint({ user_address: userAddress, track_id: Number(track_id), tx_hash })
     return c.json({ success: true })
   } catch (error: any) {
     logger.error('db addMint failed', error)
@@ -751,16 +773,19 @@ app.post('/mints/sync', authMiddleware, async (c) => {
   if (!Array.isArray(mints)) return c.json({ error: 'mints array is required' }, 400)
 
   try {
-    // Current addMint is idempotent, so we can just loop. 
-    // In a more complex scenario, we'd use a transaction, but for this simple record logging, this is fine.
-    await Promise.all(mints.map(m =>
-      addMint({
-        user_address: userAddress,
-        track_id: m.track_id,
-        tx_hash: m.tx_hash ?? null
-      })
-    ))
-    return c.json({ success: true, count: mints.length })
+    const verifiedMints = []
+    for (const m of mints) {
+      const isVerified = await verifyOwnershipOnChain(userAddress, Number(m.track_id))
+      if (isVerified) {
+        await addMint({
+          user_address: userAddress,
+          track_id: Number(m.track_id),
+          tx_hash: m.tx_hash ?? null
+        })
+        verifiedMints.push(m)
+      }
+    }
+    return c.json({ success: true, count: verifiedMints.length })
   } catch (error: any) {
     logger.error('db sync mints failed', error)
     return c.json({ error: 'Failed to sync mints' }, 500)

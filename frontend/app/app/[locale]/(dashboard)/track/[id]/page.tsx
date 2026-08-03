@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { useAudio } from '@/components/AudioProvider'
 import { useCardano } from '@/components/Providers'
-import { EXPLORER_URL } from '@/lib/config'
+import { EXPLORER_URL, CARDANO_NETWORK } from '@/lib/config'
 import { logger } from '@/lib/logger'
 import { buyFractionOnChain, formatTxError } from '@/lib/contractHelper'
 
@@ -284,7 +284,7 @@ export default function TrackDetailPage() {
 					<IconArrowLeft size={20} />
 				</button>
 				<div className="flex items-center gap-2 bg-midnight/5 dark:bg-white/5 rounded-full px-3 py-1 border border-midnight/10 dark:border-white/10">
-					<span className="text-[10px] font-bold text-[#FF1F8A] uppercase tracking-wider font-mono">CARDANO PREPROD</span>
+					<span className="text-[10px] font-bold text-[#FF1F8A] uppercase tracking-wider font-mono">CARDANO {(track?.chain_id || CARDANO_NETWORK).toUpperCase()}</span>
 				</div>
 			</div>
 

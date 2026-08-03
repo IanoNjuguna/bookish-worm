@@ -1,6 +1,6 @@
 # Doba Protocol: Smart Contract Architecture
 
-This document provides a detailed explanation of the smart contracts that power the fractionalization of music tracks (music NFTs) on the Doba Protocol.
+This document provides a detailed explanation of the smart contracts that power the fractionalization of music records on the Doba Protocol.
 
 The contracts are written in **Aiken** (located in `contracts/validators/frac.ak`) and compile to the Plutus V3 blueprint (`contracts/plutus.json`). The client-side interactions are implemented in TypeScript using **Lucid Evolution** (`contracts/validators/frac.ts` and `contracts/validators/buy.ts`).
 
