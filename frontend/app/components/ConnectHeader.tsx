@@ -260,20 +260,6 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
                   <IconUser size={16} />
                   <span>View Profile</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="flex items-center gap-2 cursor-pointer hover:bg-midnight/5 dark:hover:bg-white/5 p-2.5 rounded-none"
-                  onClick={() => setIsSettingsModalOpen(true)}
-                >
-                  <IconSettings size={16} />
-                  <span>Settings</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="flex items-center gap-2 cursor-pointer hover:bg-midnight/5 dark:hover:bg-white/5 p-2.5 rounded-none"
-                  onClick={() => router.push('/support')}
-                >
-                  <IconHelp size={16} />
-                  <span>Help & Support</span>
-                </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-midnight/10 dark:bg-white/10" />
                 <DropdownMenuItem
                   className="flex items-center gap-2 cursor-pointer hover:bg-red-500/20 text-red-400 p-2.5 rounded-none focus:text-red-400 focus:bg-red-500/20"
