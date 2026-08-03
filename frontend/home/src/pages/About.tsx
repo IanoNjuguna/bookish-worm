@@ -48,7 +48,7 @@ export default function About() {
             </p>
             <ul className="list-disc list-inside space-y-2 ml-2 sm:ml-4 text-zinc-600 dark:text-zinc-300">
               <li>Upload and mint your music as NFTs</li>
-              <li>Set your own prices and keep 93% of primary sales</li>
+              <li>Set your own prices and keep 90% of primary sales</li>
               <li>Earn 5% royalties on all secondary sales forever</li>
               <li>Collaborate with other artists and auto-split revenue</li>
               <li>Build direct relationships with your fans</li>
@@ -77,11 +77,11 @@ export default function About() {
             <div className="bg-black/5 dark:bg-white/5 rounded-md p-5 space-y-3 border border-black/5 dark:border-white/5">
               <div>
                 <strong className="text-foreground font-bold">Primary Sales (first purchase):</strong>
-                <p className="ml-4 mt-1">Artist: 93% • doba: 7%</p>
+                <p className="ml-4 mt-1">Artist: 90% • doba: 10%</p>
               </div>
               <div>
                 <strong className="text-foreground font-bold">Secondary Sales (resales):</strong>
-                <p className="ml-4 mt-1">Seller: 94% • Artist: 5% royalty • doba: 1%</p>
+                <p className="ml-4 mt-1">Seller: 85% • Artist: 5% royalty • doba: 10%</p>
               </div>
             </div>
           </section>

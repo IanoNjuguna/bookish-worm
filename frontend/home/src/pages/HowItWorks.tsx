@@ -109,7 +109,7 @@ export default function HowItWorks() {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-foreground mb-1">Earn Instantly</h3>
-                    <p className="text-sm">Keep 93% of primary sales and earn 5% perpetual secondary royalties paid directly to your wallet.</p>
+                    <p className="text-sm">Keep 90% of primary sales and earn 5% perpetual secondary royalties paid directly to your wallet.</p>
                   </div>
                 </div>
               </div>

@@ -19,13 +19,13 @@ export default function ForArtists() {
 
         <div className="space-y-6 text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">
           <section className="glass-surface p-6 sm:p-8 rounded-md border border-black/10 dark:border-white/5 bg-black/[0.02] dark:bg-white/5">
-            <h2 className="text-2xl font-bold text-foreground mb-3">93% Direct Revenue</h2>
-            <p className="text-sm">Keep 93% of every primary sale directly in your Cardano wallet without waiting months for streaming royalty payouts.</p>
+            <h2 className="text-2xl font-bold text-foreground mb-3">90% Direct Revenue</h2>
+            <p className="text-sm">Keep 90% of every primary sale directly in your Cardano wallet without waiting months for streaming royalty payouts.</p>
           </section>
 
           <section className="glass-surface p-6 sm:p-8 rounded-md border border-black/10 dark:border-white/5 bg-black/[0.02] dark:bg-white/5">
             <h2 className="text-2xl font-bold text-foreground mb-3">Perpetual Royalties</h2>
-            <p className="text-sm">Earn 10-15% on every secondary marketplace sale for the life of your music NFT on Cardano.</p>
+            <p className="text-sm">Earn 5% on every secondary marketplace sale for the life of your music token on Cardano.</p>
           </section>
 
           <section className="glass-surface p-6 sm:p-8 rounded-md border border-black/10 dark:border-white/5 bg-black/[0.02] dark:bg-white/5">
