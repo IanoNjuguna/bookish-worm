@@ -19,7 +19,7 @@ interface Collaborator {
 	split: number
 }
 
-const API_URL = (process.env.NEXT_PUBLIC_API_URL || '/api-backend').replace(/\/$/, '')
+const API_URL = '/api-backend'
 
 export default function UploadView() {
 	const t = useTranslations('upload')
