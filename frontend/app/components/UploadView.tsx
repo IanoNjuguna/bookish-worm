@@ -786,7 +786,7 @@ export default function UploadView() {
 							Secondary Sales Royalties
 						</h3>
 						<p className="text-xs text-midnight/70 dark:text-white/60 pl-3">
-							💡 Earn recurring royalties on-chain whenever fans trade your track fractions on secondary marketplaces.
+							💡 Earn recurring royalties on-chain whenever fans trade your song tokens on secondary marketplaces.
 						</p>
 					</div>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -795,14 +795,10 @@ export default function UploadView() {
 							<div className="relative">
 								<input
 									type="number"
-									step="0.1"
-									min="0"
-									max="100"
-									value={royaltyPercentage}
-									onChange={(e) => setRoyaltyPercentage(e.target.value)}
-									placeholder="5"
-									className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 pr-14 text-midnight dark:text-white focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400/50 transition-all placeholder:text-midnight/70 dark:placeholder:text-white/50"
-									required
+									value="5"
+									disabled
+									readOnly
+									className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 pr-14 text-midnight dark:text-white/90 cursor-not-allowed opacity-75 font-mono select-none"
 								/>
 								<div className="absolute right-4 top-1/2 -translate-y-1/2 text-midnight/70 dark:text-white/70 text-xs font-bold font-mono">
 									%
