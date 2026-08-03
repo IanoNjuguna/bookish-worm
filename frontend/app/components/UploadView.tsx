@@ -759,7 +759,7 @@ export default function UploadView() {
 								</div>
 							</div>
 							<p className="text-xs text-midnight/60 dark:text-white/40">
-								Recommended minimum price is 10 ADA to optimize 10% platform fee and Cardano network rules.
+								Recommended minimum price is 10 ADA
 							</p>
 						</div>
 
