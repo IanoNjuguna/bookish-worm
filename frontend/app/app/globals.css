@@ -405,8 +405,16 @@
   .dark .dark\:placeholder\:text-white\/40::placeholder {
     color: rgba(255, 255, 255, 0.6) !important;
   }
-  .dark .dark\:placeholder\:text-white\/50::placeholder {
-    color: rgba(255, 255, 255, 0.7) !important;
+  /* High contrast light & dark mode placeholders */
+  input::placeholder,
+  textarea::placeholder {
+    color: rgba(13, 13, 18, 0.7) !important;
+    opacity: 1 !important;
+  }
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+    opacity: 1 !important;
   }
 
   /* Custom Scrollbar - Purple pill design */
