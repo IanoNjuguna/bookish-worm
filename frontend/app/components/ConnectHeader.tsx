@@ -252,25 +252,6 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
                     )}
                   </div>
                 </div>
-                <DropdownMenuSeparator className="bg-midnight/10 dark:bg-white/10" />
-                <DropdownMenuItem
-                  className="flex items-center gap-2 cursor-pointer hover:bg-midnight/5 dark:hover:bg-white/5 p-2.5 rounded-none"
-                  onClick={() => onNavigate?.('profile')}
-                >
-                  <IconUser size={16} />
-                  <span>View Profile</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-midnight/10 dark:bg-white/10" />
-                <DropdownMenuItem
-                  className="flex items-center gap-2 cursor-pointer hover:bg-red-500/20 text-red-400 p-2.5 rounded-none focus:text-red-400 focus:bg-red-500/20"
-                  onClick={() => {
-                    if (logout) logout()
-                    else disconnect()
-                  }}
-                >
-                  <IconLogout size={16} />
-                  <span>Disconnect</span>
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
