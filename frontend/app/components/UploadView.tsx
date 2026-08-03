@@ -159,12 +159,18 @@ export default function UploadView() {
 				formData.append('title', title || 'Untitled')
 
 				const token = await getValidToken()
-				const response = await fetch(`${API_URL.replace(/\/$/, '')}/upload-assets`, {
+				const bgHeaders: Record<string, string> = {}
+				const apiKey = process.env.NEXT_PUBLIC_API_KEY
+				if (apiKey && apiKey.trim() !== '') {
+					bgHeaders['X-API-Key'] = apiKey.trim()
+				}
+				if (token && token.trim() !== '') {
+					bgHeaders['Authorization'] = `Bearer ${token.trim()}`
+				}
+
+				const response = await fetch(`${BACKEND_URL}/upload-assets`, {
 					method: 'POST',
-					headers: {
-						'X-API-Key': process.env.NEXT_PUBLIC_API_KEY || '',
-						'Authorization': `Bearer ${token}`
-					},
+					headers: bgHeaders,
 					body: formData,
 				})
 
