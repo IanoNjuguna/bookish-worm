@@ -212,7 +212,7 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
             isOpen={isAuthModalOpen} 
             onClose={() => setIsAuthModalOpen(false)} 
           />
-          {/* Desktop version - Wallet badge + Sidebar Toggle */}
+          {/* Desktop version - Wallet badge */}
           <div className="hidden lg:flex items-center gap-2">
             <div 
               onClick={handleCopy}
@@ -229,23 +229,6 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
                 <IconCopy size={14} className="text-midnight/70 dark:text-white/40 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-1" />
               )}
             </div>
-
-            <button 
-              onClick={onToggleSidebar}
-              className="flex items-center gap-2 p-1.5 border border-midnight/10 dark:border-white/10 shrink-0 rounded-none bg-midnight/5 dark:bg-white/5 hover:border-cyber-pink/50 transition-colors group"
-              title={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
-            >
-              <div className="relative w-5 h-5 flex items-center justify-center">
-                <IconMenu 
-                  size={20} 
-                  className={`absolute text-midnight/70 dark:text-white/70 transition-all duration-300 ${!isSidebarOpen ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 rotate-90 scale-50'}`} 
-                />
-                <IconX 
-                  size={20} 
-                  className={`absolute text-midnight/70 dark:text-white/70 transition-all duration-300 ${isSidebarOpen ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-50'}`} 
-                />
-              </div>
-            </button>
           </div>
           
           {/* Mobile version - Full Menu Trigger */}

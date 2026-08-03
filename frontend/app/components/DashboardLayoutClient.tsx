@@ -137,18 +137,37 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
           desktopSidebarOpen ? "w-[20vw] min-w-[200px] max-w-[260px]" : "w-16"
         )}>
           <nav className="flex flex-col p-4 overflow-y-auto overflow-x-hidden flex-1 relative no-scrollbar">
-            {/* Navigation Section */}
+            {/* Top Toggle Button & Navigation Section */}
             <div className="relative flex flex-col space-y-1 pb-4">
               {/* Vertical Segment for Navigation */}
               <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
               
-              {desktopSidebarOpen && (
-                <div className="pl-4 pt-0 pb-0 mb-1">
+              {desktopSidebarOpen ? (
+                <div className="flex items-center justify-between pl-4 pr-6 pb-2">
                   <h2 className="text-sm font-semibold uppercase tracking-wider text-purple-400">
                     {tNav('navigation')}
                   </h2>
+                  <button
+                    onClick={() => setDesktopSidebarOpen(false)}
+                    className="p-1 border border-midnight/10 dark:border-white/10 rounded-none bg-midnight/5 dark:bg-white/5 hover:border-cyber-pink/50 transition-colors text-midnight/70 dark:text-white/70 hover:text-midnight dark:hover:text-white"
+                    title="Collapse sidebar"
+                  >
+                    <IconMenu size={16} />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center pb-2">
+                  <button
+                    onClick={() => setDesktopSidebarOpen(true)}
+                    className="p-2 border border-midnight/10 dark:border-white/10 rounded-none bg-midnight/5 dark:bg-white/5 hover:border-cyber-pink/50 transition-colors text-midnight/70 dark:text-white/70 hover:text-midnight dark:hover:text-white mb-3"
+                    title="Expand sidebar"
+                  >
+                    <IconMenu size={18} />
+                  </button>
+                  <div className="w-8 border-t border-midnight/[0.12] dark:border-white/[0.12] mb-2" />
                 </div>
               )}
+
               <SidebarNavLink href="/" icon={<HomeIcon size={18} className="text-[#FF1F8A] flex-shrink-0" />} label={tNav('home')} collapsed={!desktopSidebarOpen} />
               <SidebarNavLink href="/library" icon={<Library size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('library')} collapsed={!desktopSidebarOpen} />
               <SidebarNavLink href="/search" icon={<Search size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('search')} collapsed={!desktopSidebarOpen} />
