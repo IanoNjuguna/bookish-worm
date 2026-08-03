@@ -15,6 +15,7 @@ import { useAudio } from '@/components/AudioProvider'
 export default function DashboardLayoutClient({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false)
   const [headerMenuOpen, setHeaderMenuOpen] = useState(false)
+  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true)
   
   const { disconnect } = useCardano()
   const {
@@ -78,8 +79,10 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
             <ConnectHeader
               address={effectiveAddress || undefined}
               logout={handleLogout}
+              onToggleSidebar={() => setDesktopSidebarOpen(prev => !prev)}
+              isSidebarOpen={desktopSidebarOpen}
               onNavigate={(_view) => {
-                 // You'd need router.push(`/${view}`) here, but handled differently now
+                 // Handled differently now
               }}
             />
           </div>
@@ -129,51 +132,60 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
 
       {/* Main Layout */}
       <div className="flex flex-col lg:flex-row flex-1 mt-16 lg:overflow-hidden">
-        <aside className="hidden lg:flex w-[20vw] flex-col bg-transparent overflow-y-auto overflow-x-hidden relative no-scrollbar">
+        <aside className={cn(
+          "hidden lg:flex flex-col bg-transparent overflow-y-auto overflow-x-hidden relative no-scrollbar transition-all duration-300 ease-in-out shrink-0",
+          desktopSidebarOpen ? "w-[20vw] min-w-[200px] max-w-[260px]" : "w-16"
+        )}>
           <nav className="flex flex-col p-4 overflow-y-auto overflow-x-hidden flex-1 relative no-scrollbar">
             {/* Navigation Section */}
             <div className="relative flex flex-col space-y-1 pb-4">
               {/* Vertical Segment for Navigation */}
               <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
               
-              <div className="pl-4 pt-0 pb-0 mb-1">
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-purple-400">
-                  {tNav('navigation')}
-                </h2>
-              </div>
-              <SidebarNavLink href="/" icon={<HomeIcon size={18} className="text-[#FF1F8A] flex-shrink-0" />} label={tNav('home')} />
-              <SidebarNavLink href="/library" icon={<Library size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('library')} />
-              <SidebarNavLink href="/search" icon={<Search size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('search')} />
+              {desktopSidebarOpen && (
+                <div className="pl-4 pt-0 pb-0 mb-1">
+                  <h2 className="text-sm font-semibold uppercase tracking-wider text-purple-400">
+                    {tNav('navigation')}
+                  </h2>
+                </div>
+              )}
+              <SidebarNavLink href="/" icon={<HomeIcon size={18} className="text-[#FF1F8A] flex-shrink-0" />} label={tNav('home')} collapsed={!desktopSidebarOpen} />
+              <SidebarNavLink href="/library" icon={<Library size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('library')} collapsed={!desktopSidebarOpen} />
+              <SidebarNavLink href="/search" icon={<Search size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('search')} collapsed={!desktopSidebarOpen} />
             </div>
             
             {/* Horizontal Divider */}
-            <div className="border-t border-midnight/[0.08] dark:border-white/[0.08] my-4 ml-4 mr-6" />
+            <div className={cn("border-t border-midnight/[0.08] dark:border-white/[0.08] my-4", desktopSidebarOpen ? "ml-4 mr-6" : "mx-2")} />
             
             {/* Creator Section */}
             <div className="relative flex flex-col space-y-1 pt-0 pb-4">
               {/* Vertical Segment for Creator */}
               <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
               
-              <div className="pl-4 pt-2 pb-0 mb-1">
-                <h2 className="text-sm font-semibold text-[#B794F4] uppercase tracking-wider" style={{ letterSpacing: '0.04em' }}>{tNav('creator')}</h2>
-              </div>
-              <SidebarNavLink href="/upload" icon={<Music size={18} className="text-[#FF1F8A] flex-shrink-0" />} label={tNav('upload')} />
-              <SidebarNavLink href="/earnings" icon={<DollarSign size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('earnings')} />
-              <SidebarNavLink href="/analytics" icon={<TrendingUp size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('analytics')} />
-              <SidebarNavLink href="/profile" icon={<User size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('profile')} />
+              {desktopSidebarOpen && (
+                <div className="pl-4 pt-2 pb-0 mb-1">
+                  <h2 className="text-sm font-semibold text-[#B794F4] uppercase tracking-wider" style={{ letterSpacing: '0.04em' }}>{tNav('creator')}</h2>
+                </div>
+              )}
+              <SidebarNavLink href="/upload" icon={<Music size={18} className="text-[#FF1F8A] flex-shrink-0" />} label={tNav('upload')} collapsed={!desktopSidebarOpen} />
+              <SidebarNavLink href="/earnings" icon={<DollarSign size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('earnings')} collapsed={!desktopSidebarOpen} />
+              <SidebarNavLink href="/analytics" icon={<TrendingUp size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('analytics')} collapsed={!desktopSidebarOpen} />
+              <SidebarNavLink href="/profile" icon={<User size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('profile')} collapsed={!desktopSidebarOpen} />
             </div>
 
             {/* Horizontal Divider */}
-            <div className="border-t border-midnight/[0.08] dark:border-white/[0.08] my-4 ml-4 mr-6" />
+            <div className={cn("border-t border-midnight/[0.08] dark:border-white/[0.08] my-4", desktopSidebarOpen ? "ml-4 mr-6" : "mx-2")} />
 
             {/* Desktop Footer Section */}
             <div className="relative flex flex-col pt-2">
               {/* Vertical Segment for Footer */}
               <div className="absolute right-0 top-0 bottom-6 w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
               
-              <div className="pl-4 pr-6 pb-6">
-                <Footer />
-              </div>
+              {desktopSidebarOpen && (
+                <div className="pl-4 pr-6 pb-6">
+                  <Footer />
+                </div>
+              )}
             </div>
           </nav>
         </aside>
@@ -207,7 +219,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
   )
 }
 
-function SidebarNavLink({ href, icon, label }: { href: string, icon: React.ReactNode, label: string }) {
+function SidebarNavLink({ href, icon, label, collapsed }: { href: string, icon: React.ReactNode, label: string, collapsed?: boolean }) {
   const pathname = usePathname()
   const isActive = pathname === href || (href !== '/' && pathname?.startsWith(href))
   
@@ -215,13 +227,15 @@ function SidebarNavLink({ href, icon, label }: { href: string, icon: React.React
     <Link
       href={href}
       prefetch
+      title={collapsed ? label : undefined}
       className={cn(
-        "flex items-center gap-3 px-4 py-2 transition-all duration-200 text-midnight/70 dark:text-white/70 hover:text-midnight dark:hover:text-white md:hover:-translate-y-0.5 md:hover:font-semibold",
+        "flex items-center gap-3 py-2.5 transition-all duration-200 text-midnight/70 dark:text-white/70 hover:text-midnight dark:hover:text-white md:hover:-translate-y-0.5 md:hover:font-semibold rounded-none",
+        collapsed ? "justify-center px-0" : "px-4",
         isActive && "text-midnight dark:text-white font-bold -translate-y-0.5"
       )}
     >
       {icon}
-      <span className="text-sm">{label}</span>
+      {!collapsed && <span className="text-sm truncate">{label}</span>}
     </Link>
   )
 }

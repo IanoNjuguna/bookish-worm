@@ -35,7 +35,7 @@ const formatAddress = (address: string, startChars: number = 10, endChars: numbe
   return `${address.slice(0, startChars)}...${address.slice(-endChars)}`
 }
 
-export default function ConnectHeader({ address: propAddress, logout, onNavigate, onMenuClick, isMenuOpen }: { address?: string, logout?: () => void, onNavigate?: (view: string) => void, onMenuClick?: () => void, isMenuOpen?: boolean }) {
+export default function ConnectHeader({ address: propAddress, logout, onNavigate, onMenuClick, isMenuOpen, onToggleSidebar, isSidebarOpen }: { address?: string, logout?: () => void, onNavigate?: (view: string) => void, onMenuClick?: () => void, isMenuOpen?: boolean, onToggleSidebar?: () => void, isSidebarOpen?: boolean }) {
   const t = useTranslations('header')
   const router = useRouter()
   const { address: cardanoAddress, isConnected, connect, connectFromSeed, disconnect, walletName, lucid, isConnecting, sessionSeedPhrase } = useCardano()
@@ -212,48 +212,40 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
             isOpen={isAuthModalOpen} 
             onClose={() => setIsAuthModalOpen(false)} 
           />
-          {/* Desktop version - Dropdown Menu */}
-          <div className="hidden lg:block">
-            <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 pl-2 pr-3 py-1.5 border border-midnight/10 dark:border-white/10 shrink-0 rounded-none bg-midnight/5 dark:bg-white/5 hover:border-cyber-pink/50 transition-colors group">
-                  <img src={`https://api.dicebear.com/7.x/identicon/svg?seed=${address}`} alt="User Menu" className="w-7 h-7 object-cover opacity-80 rounded-none group-hover:opacity-100 transition-opacity" />
-                  <div className="relative w-5 h-5 flex items-center justify-center">
-                    <IconMenu 
-                      size={20} 
-                      className={`absolute text-midnight/70 dark:text-white/70 transition-all duration-300 ${isDropdownOpen ? 'opacity-0 rotate-90 scale-50' : 'opacity-100 rotate-0 scale-100'}`} 
-                    />
-                    <IconX 
-                      size={20} 
-                      className={`absolute text-midnight/70 dark:text-white/70 transition-all duration-300 ${isDropdownOpen ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-50'}`} 
-                    />
-                  </div>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[200px] bg-[#FAF9F6] dark:bg-[#0D0D12] border-midnight/10 dark:border-white/10 text-midnight dark:text-white rounded-none">
-                <div className="px-3 py-3">
-                  <div 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleCopy();
-                    }}
-                    className="flex items-center justify-between cursor-pointer group"
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 shrink-0 bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)] animate-pulse-scale"></div>
-                      <span className="font-mono text-xs font-medium text-midnight/80 dark:text-white/80 group-hover:text-midnight dark:group-hover:text-white group-hover:font-bold transition-all">
-                        {formatAddress(address || '', 8, 8)}
-                      </span>
-                    </div>
-                    {copied ? (
-                      <IconCheck size={14} className="text-green-500 shrink-0 ml-2" />
-                    ) : (
-                      <IconCopy size={14} className="text-midnight/70 dark:text-white/40 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2" />
-                    )}
-                  </div>
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
+          {/* Desktop version - Wallet badge + Sidebar Toggle */}
+          <div className="hidden lg:flex items-center gap-2">
+            <div 
+              onClick={handleCopy}
+              className="flex items-center gap-2 pl-3 pr-3 py-1.5 border border-midnight/10 dark:border-white/10 shrink-0 rounded-none bg-midnight/5 dark:bg-white/5 hover:border-cyber-pink/50 transition-colors cursor-pointer group"
+              title="Click to copy address"
+            >
+              <div className="w-2 h-2 shrink-0 bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)] animate-pulse-scale"></div>
+              <span className="font-mono text-xs font-medium text-midnight/80 dark:text-white/80 group-hover:text-midnight dark:group-hover:text-white group-hover:font-bold transition-all">
+                {formatAddress(address || '', 8, 8)}
+              </span>
+              {copied ? (
+                <IconCheck size={14} className="text-green-500 shrink-0 ml-1" />
+              ) : (
+                <IconCopy size={14} className="text-midnight/70 dark:text-white/40 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-1" />
+              )}
+            </div>
+
+            <button 
+              onClick={onToggleSidebar}
+              className="flex items-center gap-2 p-1.5 border border-midnight/10 dark:border-white/10 shrink-0 rounded-none bg-midnight/5 dark:bg-white/5 hover:border-cyber-pink/50 transition-colors group"
+              title={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+            >
+              <div className="relative w-5 h-5 flex items-center justify-center">
+                <IconMenu 
+                  size={20} 
+                  className={`absolute text-midnight/70 dark:text-white/70 transition-all duration-300 ${!isSidebarOpen ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 rotate-90 scale-50'}`} 
+                />
+                <IconX 
+                  size={20} 
+                  className={`absolute text-midnight/70 dark:text-white/70 transition-all duration-300 ${isSidebarOpen ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-50'}`} 
+                />
+              </div>
+            </button>
           </div>
           
           {/* Mobile version - Full Menu Trigger */}
