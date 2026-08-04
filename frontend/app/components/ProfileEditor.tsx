@@ -336,7 +336,7 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 							<IconCurrencyDollar size={20} />
 						</div>
 						<div>
-							<div className="text-sm font-bold text-midnight dark:text-white group-hover:text-[#B794F4] transition-colors">
+							<div className="text-sm font-bold text-midnight dark:text-white transition-colors">
 								Send Funds
 							</div>
 							<div className="text-xs text-midnight/50 dark:text-white/40 mt-0.5">
@@ -353,7 +353,7 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 							<IconPlus size={20} />
 						</div>
 						<div>
-							<div className="text-sm font-bold text-midnight dark:text-white group-hover:text-[#FF1F8A] transition-colors">
+							<div className="text-sm font-bold text-midnight dark:text-white transition-colors">
 								Deposit Funds
 							</div>
 							<div className="text-xs text-midnight/50 dark:text-white/40 mt-0.5">
@@ -370,7 +370,7 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 							<IconCoins size={20} />
 						</div>
 						<div>
-							<div className="text-sm font-bold text-midnight dark:text-white group-hover:text-[#B794F4] transition-colors">
+							<div className="text-sm font-bold text-midnight dark:text-white transition-colors">
 								View Assets
 							</div>
 							<div className="text-xs text-midnight/50 dark:text-white/40 mt-0.5">
