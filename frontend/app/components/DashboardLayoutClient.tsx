@@ -216,7 +216,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
         <div className="flex-1 flex flex-col min-w-0 relative lg:min-h-0">
           <div className="flex-1 flex flex-row min-w-0 relative lg:min-h-0">
             <main className="flex-1 overflow-y-auto outline-none lg:h-full">
-              <div className="p-6 pb-24 md:pb-12 max-w-7xl mx-auto">
+              <div className="p-6 pb-32 md:pb-12 max-w-7xl mx-auto">
                 {children}
               </div>
 
