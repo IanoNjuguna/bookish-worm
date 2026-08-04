@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { IconPlayerPlay, IconPlayerPause, IconArrowLeft, IconShare, IconCopy, IconHeart, IconLoader2, IconSquareCheckFilled } from '@tabler/icons-react'
+import { IconPlayerPlay, IconPlayerPause, IconCornerDownLeft, IconShare, IconCopy, IconHeart, IconLoader2, IconSquareCheckFilled } from '@tabler/icons-react'
 import { DobaVisualizer } from '@/components/icons/DobaVisualizer'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -281,10 +281,10 @@ export default function TrackDetailPage() {
 					onClick={() => router.back()}
 					className="p-2 bg-midnight/5 dark:bg-white/5 hover:bg-midnight/10 dark:hover:bg-white/10 rounded-full text-midnight dark:text-white transition-colors"
 				>
-					<IconArrowLeft size={20} />
+					<IconCornerDownLeft size={20} />
 				</button>
 				<div className="flex items-center gap-2 bg-midnight/5 dark:bg-white/5 rounded-full px-3 py-1 border border-midnight/10 dark:border-white/10">
-					<span className="text-[10px] font-bold text-[#FF1F8A] uppercase tracking-wider font-mono">CARDANO {(track?.chain_id || CARDANO_NETWORK).toUpperCase()}</span>
+					<span className="text-[10px] font-bold text-[#FF1F8A] uppercase tracking-wider font-mono">CARDANO NETWORK</span>
 				</div>
 			</div>
 
