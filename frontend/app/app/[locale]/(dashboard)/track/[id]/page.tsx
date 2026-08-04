@@ -439,7 +439,7 @@ export default function TrackDetailPage() {
 										"w-full h-10 flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-all rounded-sm border",
 										(maxSupply > 0 && mintCount >= maxSupply)
 											? "bg-[#FF1F8A]/10 text-[#FF1F8A] border-[#FF1F8A]/20 cursor-not-allowed"
-											: "bg-midnight/5 dark:bg-white/5 hover:bg-midnight dark:hover:bg-white text-midnight/60 dark:text-white/60 hover:text-midnight dark:hover:text-white border-midnight/10 dark:border-white/10"
+											: "bg-midnight/5 dark:bg-white/5 hover:bg-midnight dark:hover:bg-white text-midnight/60 dark:text-white/60 hover:text-white dark:hover:text-midnight border-midnight/10 dark:border-white/10"
 									)}
 								>
 									{isMinting && <IconLoader2 size={14} className="animate-spin" />}
