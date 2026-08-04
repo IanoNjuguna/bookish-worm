@@ -371,7 +371,7 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 						</div>
 						<div>
 							<div className="text-sm font-bold text-midnight dark:text-white group-hover:text-[#B794F4] transition-colors">
-								Assets
+								View Assets
 							</div>
 							<div className="text-xs text-midnight/50 dark:text-white/40 mt-0.5">
 								View tokens & NFTs
