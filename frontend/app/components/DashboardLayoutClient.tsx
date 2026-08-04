@@ -152,7 +152,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
                 {/* Navigation Section */}
                 <div className="relative flex flex-col space-y-0.5">
                   <div className="pl-3 pt-0 pb-0 mb-1">
-                    <h2 className="text-[9px] font-bold uppercase tracking-[0.15em] text-midnight/40 dark:text-white/30">
+                    <h2 className="text-[9px] font-bold uppercase tracking-[0.15em] text-lavender">
                       {tNav('navigation')}
                     </h2>
                   </div>
@@ -164,7 +164,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
                 {/* Creator Section */}
                 <div className="relative flex flex-col space-y-0.5">
                   <div className="pl-3 pt-1 pb-0 mb-1">
-                    <h2 className="text-[9px] font-bold uppercase tracking-[0.15em] text-[#B794F4]" style={{ letterSpacing: '0.15em' }}>
+                    <h2 className="text-[9px] font-bold uppercase tracking-[0.15em] text-lavender">
                       {tNav('creator')}
                     </h2>
                   </div>
