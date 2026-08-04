@@ -9,11 +9,8 @@ import { verifyOwnershipOnChain, getRemainingFractionsOnChain } from './web3'
 import { verifyWalletSignature, signJWT, verifyJWT, generateRefreshToken, getAccessTokenPayload } from './auth'
 import axios from 'axios'
 import FormData from 'form-data'
-import { Buffer } from 'buffer'
 import { jwt } from 'hono/jwt'
-import { Storage } from '@google-cloud/storage'
 
-const storage = new Storage()
 const app = new Hono()
 
 // CORS: explicit origin allowlist
@@ -191,28 +188,13 @@ app.post('/upload-assets',
       logger.debug(`[IPFS] Pinning audio...`)
       const audioRes = await axios.post("https://api.pinata.cloud/pinning/pinFileToIPFS", audioFormData, {
         maxBodyLength: Infinity,
+        timeout: 120000,
         headers: { Authorization: `Bearer ${pinataJwt}`, ...audioFormData.getHeaders() }
       })
       audioHash = audioRes.data.IpfsHash
       logger.info(`[IPFS] Audio Success: ${audioHash}`)
 
-      // UPLOAD AUDIO TO GCS (Optional / Soft Fallback)
-      try {
-        const bucketName = process.env.GCS_BUCKET_NAME || 'doba-music-streaming'
-        const bucket = storage.bucket(bucketName)
-        const gcsFile = bucket.file(audioEntryName)
-        logger.debug(`[GCS] Uploading audio...`)
-        await gcsFile.save(audioBuffer, {
-          metadata: {
-            contentType: audio.type || 'audio/mpeg'
-          }
-        })
-        streamingUrl = `https://storage.googleapis.com/${bucketName}/${audioEntryName}`
-        logger.info(`[GCS] Audio Success: ${streamingUrl}`)
-      } catch (gcsErr: any) {
-        logger.warn(`[GCS] Upload failed (likely missing credentials). Falling back to IPFS gateway. Error: ${gcsErr.message}`)
-        streamingUrl = `https://gateway.pinata.cloud/ipfs/${audioHash}`
-      }
+      streamingUrl = `https://gateway.pinata.cloud/ipfs/${audioHash}`
     }
 
     // 2. PIN IMAGE
@@ -226,6 +208,7 @@ app.post('/upload-assets',
       logger.debug(`[IPFS] Pinning image...`)
       const imageRes = await axios.post("https://api.pinata.cloud/pinning/pinFileToIPFS", imageFormData, {
         maxBodyLength: Infinity,
+        timeout: 120000,
         headers: { Authorization: `Bearer ${pinataJwt}`, ...imageFormData.getHeaders() }
       })
       imageHash = imageRes.data.IpfsHash

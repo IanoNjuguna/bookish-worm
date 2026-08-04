@@ -11,7 +11,6 @@
   "dependencies": {
     "@blockfrost/blockfrost-js": "^5.5.0",
     "@cardano-foundation/cardano-verify-datasignature": "^1.0.0",
-    "@google-cloud/storage": "^7.19.0",
     "@libsql/client": "^0.17.0",
     "axios": "^1.13.5",
     "form-data": "^4.0.5",
