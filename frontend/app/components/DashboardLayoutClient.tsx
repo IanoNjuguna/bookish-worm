@@ -17,7 +17,27 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
   const [headerMenuOpen, setHeaderMenuOpen] = useState(false)
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true)
   
-  const { disconnect } = useCardano()
+  const { address, isConnected, lucid, disconnect } = useCardano()
+  const [walletBalance, setWalletBalance] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (!isConnected || !lucid || !address) {
+      setWalletBalance(null)
+      return
+    }
+    let isMounted = true
+    lucid.wallet.getUtxos().then((utxos: any[]) => {
+      if (!isMounted) return
+      const totalLovelace = utxos.reduce((sum: bigint, utxo: any) => sum + BigInt(utxo.assets.lovelace), 0n)
+      setWalletBalance(Number(totalLovelace) / 1_000_000)
+    }).catch((e: any) => {
+      console.warn("Failed to fetch balance inside DashboardLayoutClient", e)
+    })
+    return () => {
+      isMounted = false
+    }
+  }, [isConnected, lucid, address])
+
   const {
     playerState,
     effectiveAddress,
@@ -140,52 +160,59 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
         {/* Workspace Area: Left Sidebar + Main Content + Right Sidebar */}
         <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden relative">
           <aside className={cn(
-            "hidden lg:flex flex-col bg-transparent overflow-hidden relative transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] shrink-0",
+            "hidden lg:flex flex-col bg-transparent overflow-hidden relative transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] shrink-0 border-r border-midnight/[0.06] dark:border-white/[0.06]",
             desktopSidebarOpen 
               ? "w-[20vw] min-w-[190px] max-w-[240px] opacity-100 translate-x-0" 
               : "w-0 opacity-0 -translate-x-4 pointer-events-none"
           )}>
-            <nav className="flex flex-col justify-between p-3 overflow-hidden flex-1 relative w-[20vw] min-w-[190px] max-w-[240px]">
-              {/* Navigation Section */}
-              <div className="relative flex flex-col space-y-0.5 pb-2">
-                {/* Vertical Segment for Navigation */}
-                <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
-                
-                <div className="pl-3 pt-0 pb-0 mb-0.5">
-                  <h2 className="text-[11px] font-semibold uppercase tracking-wider text-purple-400">
-                    {tNav('navigation')}
-                  </h2>
+            <nav className="flex flex-col p-3 overflow-hidden flex-1 relative w-[20vw] min-w-[190px] max-w-[240px] h-full space-y-4">
+              <div className="space-y-4 flex flex-col">
+                {/* Navigation Section */}
+                <div className="relative flex flex-col space-y-0.5">
+                  <div className="pl-3 pt-0 pb-0 mb-1">
+                    <h2 className="text-[9px] font-bold uppercase tracking-[0.15em] text-midnight/40 dark:text-white/30">
+                      {tNav('navigation')}
+                    </h2>
+                  </div>
+                  <SidebarNavLink href="/" icon={<HomeIcon size={16} />} label={tNav('home')} />
+                  <SidebarNavLink href="/library" icon={<Library size={16} />} label={tNav('library')} />
+                  <SidebarNavLink href="/search" icon={<Search size={16} />} label={tNav('search')} />
                 </div>
-                <SidebarNavLink href="/" icon={<HomeIcon size={16} className="text-[#FF1F8A] flex-shrink-0" />} label={tNav('home')} />
-                <SidebarNavLink href="/library" icon={<Library size={16} className="text-[#B794F4] flex-shrink-0" />} label={tNav('library')} />
-                <SidebarNavLink href="/search" icon={<Search size={16} className="text-[#B794F4] flex-shrink-0" />} label={tNav('search')} />
-              </div>
-              
-              {/* Horizontal Divider */}
-              <div className="border-t border-midnight/[0.08] dark:border-white/[0.08] my-2 ml-3 mr-4" />
-              
-              {/* Creator Section */}
-              <div className="relative flex flex-col space-y-0.5 pt-0 pb-2">
-                {/* Vertical Segment for Creator */}
-                <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
                 
-                <div className="pl-3 pt-1 pb-0 mb-0.5">
-                  <h2 className="text-[11px] font-semibold text-[#B794F4] uppercase tracking-wider" style={{ letterSpacing: '0.04em' }}>{tNav('creator')}</h2>
+                {/* Creator Section */}
+                <div className="relative flex flex-col space-y-0.5">
+                  <div className="pl-3 pt-1 pb-0 mb-1">
+                    <h2 className="text-[9px] font-bold uppercase tracking-[0.15em] text-[#B794F4]" style={{ letterSpacing: '0.15em' }}>
+                      {tNav('creator')}
+                    </h2>
+                  </div>
+                  <SidebarNavLink href="/upload" icon={<Music size={16} />} label={tNav('upload')} />
+                  <SidebarNavLink href="/earnings" icon={<DollarSign size={16} />} label={tNav('earnings')} />
+                  <SidebarNavLink href="/analytics" icon={<TrendingUp size={16} />} label={tNav('analytics')} />
+                  <SidebarNavLink href="/profile" icon={<User size={16} />} label={tNav('profile')} />
                 </div>
-                <SidebarNavLink href="/upload" icon={<Music size={16} className="text-[#FF1F8A] flex-shrink-0" />} label={tNav('upload')} />
-                <SidebarNavLink href="/earnings" icon={<DollarSign size={16} className="text-[#B794F4] flex-shrink-0" />} label={tNav('earnings')} />
-                <SidebarNavLink href="/analytics" icon={<TrendingUp size={16} className="text-[#B794F4] flex-shrink-0" />} label={tNav('analytics')} />
-                <SidebarNavLink href="/profile" icon={<User size={16} className="text-[#B794F4] flex-shrink-0" />} label={tNav('profile')} />
-              </div>
 
-              {/* Horizontal Divider */}
-              <div className="border-t border-midnight/[0.08] dark:border-white/[0.08] my-2 ml-3 mr-4" />
+                {/* Connected Wallet Mini-Card */}
+                {isConnected && address && (
+                  <div className="mx-1 mt-2 p-3 bg-midnight/[0.02] dark:bg-white/[0.02] border border-midnight/[0.06] dark:border-white/[0.06] rounded-none space-y-1.5 select-none">
+                    <div className="flex items-center gap-1.5 text-[8px] font-bold tracking-[0.08em] uppercase text-midnight/40 dark:text-white/30">
+                      <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>Cardano Wallet</span>
+                    </div>
+                    <div className="text-[9px] font-mono text-midnight/60 dark:text-white/50 truncate" title={address}>
+                      {address.slice(0, 10)}...{address.slice(-6)}
+                    </div>
+                    <div className="text-xs font-extrabold text-midnight dark:text-white flex items-baseline gap-0.5 font-mono">
+                      <span className="text-[10px] font-normal text-midnight/50 dark:text-white/40">₳</span>
+                      <span>{walletBalance !== null ? walletBalance.toFixed(2) : "0.00"}</span>
+                      <span className="text-[9px] font-normal text-midnight/40 dark:text-white/35 ml-0.5">ADA</span>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* Desktop Footer Section */}
-              <div className="relative flex flex-col pt-1">
-                {/* Vertical Segment for Footer */}
-                <div className="absolute right-0 top-0 bottom-2 w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
-                
+              <div className="mt-auto pt-3 border-t border-midnight/[0.04] dark:border-white/[0.04]">
                 <div className="pl-3 pr-4 pb-2">
                   <Footer />
                 </div>
@@ -227,13 +254,22 @@ function SidebarNavLink({ href, icon, label, collapsed }: { href: string, icon: 
       prefetch
       title={collapsed ? label : undefined}
       className={cn(
-        "flex items-center gap-2.5 py-1 px-2.5 transition-all duration-200 text-midnight/70 dark:text-white/70 hover:text-midnight dark:hover:text-white md:hover:-translate-y-0.5 rounded-none",
-        collapsed ? "justify-center px-0" : "px-2.5",
-        isActive && "text-midnight dark:text-white font-bold -translate-y-0.5"
+        "flex items-center gap-2.5 py-1.5 px-3 transition-all duration-150 rounded-none relative group select-none",
+        isActive 
+          ? "text-[#FF1F8A] font-bold bg-[#FF1F8A]/5 dark:bg-[#FF1F8A]/10" 
+          : "text-midnight/60 dark:text-white/50 hover:text-midnight dark:hover:text-white hover:bg-midnight/[0.03] dark:hover:bg-white/[0.03]"
       )}
     >
-      {icon}
-      {!collapsed && <span className="text-xs truncate">{label}</span>}
+      {isActive && (
+        <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#FF1F8A]" />
+      )}
+      <span className={cn(
+        "transition-colors duration-150 shrink-0",
+        isActive ? "text-[#FF1F8A]" : "text-midnight/40 dark:text-white/30 group-hover:text-midnight dark:group-hover:text-white"
+      )}>
+        {icon}
+      </span>
+      {!collapsed && <span className="text-xs transition-colors duration-150">{label}</span>}
     </Link>
   )
 }
