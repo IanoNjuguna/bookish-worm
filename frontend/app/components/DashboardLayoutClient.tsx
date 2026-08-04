@@ -145,7 +145,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
               ? "w-[20vw] min-w-[190px] max-w-[240px] opacity-100 translate-x-0" 
               : "w-0 opacity-0 -translate-x-4 pointer-events-none"
           )}>
-            <nav className="flex flex-col p-3 overflow-hidden flex-1 relative w-[20vw] min-w-[190px] max-w-[240px]">
+            <nav className="flex flex-col justify-between p-3 overflow-hidden flex-1 relative w-[20vw] min-w-[190px] max-w-[240px]">
               {/* Navigation Section */}
               <div className="relative flex flex-col space-y-0.5 pb-2">
                 {/* Vertical Segment for Navigation */}
@@ -195,7 +195,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
 
           {/* Content Area */}
           <main className="flex-1 overflow-y-auto outline-none lg:h-full">
-            <div className="p-6 pb-32 md:pb-28 max-w-7xl mx-auto">
+            <div className="p-6 pb-28 md:pb-8 max-w-7xl mx-auto">
               {children}
             </div>
           </main>
