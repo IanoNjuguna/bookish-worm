@@ -2,15 +2,12 @@
 
 <div align="center">
   <img src="https://img.shields.io/badge/Cardano-0033AD?style=for-the-badge&logo=cardano&logoColor=white" alt="Cardano" />
-  <img src="https://img.shields.io/badge/Next.js_14-000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />
-  <img src="https://img.shields.io/badge/Bun-fbf0df?style=for-the-badge&logo=bun&logoColor=black" alt="Bun" />
-  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
   <img src="https://img.shields.io/badge/AGPL-3.0-red?style=for-the-badge" alt="License: AGPL-3.0" />
 </div>
 
 <br />
 
-**Doba** is a high-fidelity music streaming platform built natively on the **Cardano** blockchain.
+**Doba** is a high-fidelity music streaming platform built on the **Cardano** blockchain.
 
 ---
 

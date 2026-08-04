@@ -30,7 +30,7 @@
   },
   "library": {
     "title": "My Playlist",
-    "subtitle": "Your saved tracks and NFTs",
+    "subtitle": "Tracks you have collected",
     "connectWallet": "Connect Your Wallet",
     "connectToView": "Connect your wallet to view your playlist",
     "noSongs": "No songs found",

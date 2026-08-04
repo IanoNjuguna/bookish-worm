@@ -304,7 +304,7 @@ export default function NowPlayingSidebar({ track, isVisible, onClose }: NowPlay
 		return () => window.removeEventListener('keydown', handleEsc)
 	}, [onClose])
 
-	if (!isVisible || !track) return null
+	if (!track) return null
 
 	const imageUrl = (track.image_url || track.cover || '').replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/')
 
@@ -327,11 +327,16 @@ export default function NowPlayingSidebar({ track, isVisible, onClose }: NowPlay
 	}
 
 	return (
-		<aside className="fixed inset-0 z-[100] bg-[rgba(250,249,246,0.95)] dark:bg-[rgba(13,13,18,0.95)] lg:bg-transparent lg:dark:bg-transparent backdrop-blur-md lg:backdrop-blur-none flex flex-col lg:static lg:z-0 lg:w-80 overflow-hidden animate-slide-in-right h-[100dvh] lg:h-full relative">
+		<aside className={cn(
+			"fixed inset-y-0 right-0 z-[100] bg-[rgba(250,249,246,0.95)] dark:bg-[rgba(13,13,18,0.95)] backdrop-blur-md flex flex-col overflow-hidden h-[100dvh] transition-all duration-300 ease-in-out border-l border-midnight/[0.08] dark:border-white/[0.08]",
+			isVisible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 pointer-events-none lg:pointer-events-auto",
+			"lg:translate-x-0 lg:static lg:z-0 lg:bg-transparent lg:dark:bg-transparent lg:backdrop-blur-none lg:h-full",
+			isVisible ? "lg:w-80 lg:opacity-100 lg:visible" : "lg:w-0 lg:opacity-0 lg:invisible lg:pointer-events-none lg:border-l-0"
+		)}>
 			{/* Mobile Top Border Partial */}
 			<div className="lg:hidden absolute top-0 left-4 right-4 h-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
 			
-			<div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-6 relative pb-32">
+			<div className="w-80 flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-6 relative pb-32">
 				{/* Main Content Group */}
 				<div className="relative pb-6">
 					<div className="hidden lg:block absolute left-[-24px] top-[-8px] bottom-[-12px] w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />

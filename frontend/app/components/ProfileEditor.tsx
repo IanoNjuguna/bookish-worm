@@ -227,9 +227,9 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 	return (
 		<div className="p-8 bg-midnight/5 dark:bg-white-2 border border-midnight/[0.08] dark:border-white/[0.08] relative group overflow-hidden rounded-2xl shadow-xl">
 			{/* Decorative gradient match */}
-			<div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-lavender via-lavender/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+			<div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-lavender via-lavender/40 to-transparent opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-500" />
 
-			<div className="absolute top-6 right-6 flex items-center gap-2 z-30 opacity-0 group-hover:opacity-100 transition-all">
+			<div className="absolute top-6 right-6 flex items-center gap-2 z-30 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all">
 				<a
 					href="https://www.doba.world/support"
 					target="_blank"
@@ -257,14 +257,14 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 				</button>
 			</div>
 
-			<div className="flex items-start gap-6 mb-8">
+			<div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 sm:gap-6 mb-8 pt-8 sm:pt-0">
 				{profile?.avatar_url ? (
-					<img src={profile.avatar_url} alt="Profile" className="w-24 h-24 object-cover border-4 border-white/5 shadow-2xl rounded-2xl" />
+					<img src={profile.avatar_url} alt="Profile" className="w-20 h-20 sm:w-24 sm:h-24 object-cover border-4 border-white/5 shadow-2xl rounded-2xl" />
 				) : (
-					<img src={`https://api.dicebear.com/7.x/identicon/svg?seed=${address}`} alt="Profile" className="w-24 h-24 object-cover border-4 border-white/5 shadow-2xl bg-midnight/5 dark:bg-white/5 rounded-2xl" />
+					<img src={`https://api.dicebear.com/7.x/identicon/svg?seed=${address}`} alt="Profile" className="w-20 h-20 sm:w-24 sm:h-24 object-cover border-4 border-white/5 shadow-2xl bg-midnight/5 dark:bg-white/5 rounded-2xl" />
 				)}
 
-				<div className="pt-2">
+				<div className="pt-1 sm:pt-2 flex flex-col items-center sm:items-start">
 					<h3 className="text-2xl font-bold text-midnight dark:text-white mb-1">
 						{profile?.username || 'Anonymous Artist'}
 					</h3>
@@ -327,19 +327,19 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 					<span className="w-1 h-6 bg-lavender rounded-none inline-block"></span>
 					Actions
 				</h4>
-				<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+				<div className="grid grid-cols-3 gap-2 sm:gap-4">
 					<Link
 						href="/send-money"
-						className="flex items-center gap-3.5 p-4 bg-midnight/5 dark:bg-white/[0.03] hover:bg-midnight/10 dark:hover:bg-white/[0.07] border border-midnight/[0.08] dark:border-white/[0.08] hover:border-[#B794F4]/50 transition-all duration-200 group rounded-xl"
+						className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-2 sm:gap-3.5 p-3 sm:p-4 bg-midnight/5 dark:bg-white/[0.03] hover:bg-midnight/10 dark:hover:bg-white/[0.07] border border-midnight/[0.08] dark:border-white/[0.08] hover:border-[#B794F4]/50 transition-all duration-200 group rounded-xl"
 					>
-						<div className="p-2.5 bg-[#B794F4]/10 text-[#B794F4] group-hover:scale-110 transition-transform duration-200 shrink-0 rounded-lg">
-							<IconCurrencyDollar size={20} />
+						<div className="p-2 sm:p-2.5 bg-[#B794F4]/10 text-[#B794F4] group-hover:scale-110 transition-transform duration-200 shrink-0 rounded-lg">
+							<IconCurrencyDollar size={18} className="sm:w-5 sm:h-5" />
 						</div>
-						<div>
-							<div className="text-sm font-bold text-midnight dark:text-white transition-colors">
+						<div className="min-w-0 flex flex-col items-center sm:items-start">
+							<div className="text-[10px] sm:text-sm font-bold text-midnight dark:text-white transition-colors truncate">
 								Send Funds
 							</div>
-							<div className="text-xs text-midnight/50 dark:text-white/40 mt-0.5">
+							<div className="hidden sm:block text-xs text-midnight/50 dark:text-white/40 mt-0.5">
 								Transfer ADA or assets
 							</div>
 						</div>
@@ -347,16 +347,16 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 
 					<Link
 						href="/deposit"
-						className="flex items-center gap-3.5 p-4 bg-midnight/5 dark:bg-white/[0.03] hover:bg-midnight/10 dark:hover:bg-white/[0.07] border border-midnight/[0.08] dark:border-white/[0.08] hover:border-[#FF1F8A]/50 transition-all duration-200 group rounded-xl"
+						className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-2 sm:gap-3.5 p-3 sm:p-4 bg-midnight/5 dark:bg-white/[0.03] hover:bg-midnight/10 dark:hover:bg-white/[0.07] border border-midnight/[0.08] dark:border-white/[0.08] hover:border-[#FF1F8A]/50 transition-all duration-200 group rounded-xl"
 					>
-						<div className="p-2.5 bg-[#FF1F8A]/10 text-[#FF1F8A] group-hover:scale-110 transition-transform duration-200 shrink-0 rounded-lg">
-							<IconPlus size={20} />
+						<div className="p-2 sm:p-2.5 bg-[#FF1F8A]/10 text-[#FF1F8A] group-hover:scale-110 transition-transform duration-200 shrink-0 rounded-lg">
+							<IconPlus size={18} className="sm:w-5 sm:h-5" />
 						</div>
-						<div>
-							<div className="text-sm font-bold text-midnight dark:text-white transition-colors">
+						<div className="min-w-0 flex flex-col items-center sm:items-start">
+							<div className="text-[10px] sm:text-sm font-bold text-midnight dark:text-white transition-colors truncate">
 								Deposit Funds
 							</div>
-							<div className="text-xs text-midnight/50 dark:text-white/40 mt-0.5">
+							<div className="hidden sm:block text-xs text-midnight/50 dark:text-white/40 mt-0.5">
 								Add funds to wallet
 							</div>
 						</div>
@@ -364,16 +364,16 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 
 					<Link
 						href="/assets"
-						className="flex items-center gap-3.5 p-4 bg-midnight/5 dark:bg-white/[0.03] hover:bg-midnight/10 dark:hover:bg-white/[0.07] border border-midnight/[0.08] dark:border-white/[0.08] hover:border-[#B794F4]/50 transition-all duration-200 group rounded-xl"
+						className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-2 sm:gap-3.5 p-3 sm:p-4 bg-midnight/5 dark:bg-white/[0.03] hover:bg-midnight/10 dark:hover:bg-white/[0.07] border border-midnight/[0.08] dark:border-white/[0.08] hover:border-[#B794F4]/50 transition-all duration-200 group rounded-xl"
 					>
-						<div className="p-2.5 bg-[#B794F4]/10 text-[#B794F4] group-hover:scale-110 transition-transform duration-200 shrink-0 rounded-lg">
-							<IconCoins size={20} />
+						<div className="p-2 sm:p-2.5 bg-[#B794F4]/10 text-[#B794F4] group-hover:scale-110 transition-transform duration-200 shrink-0 rounded-lg">
+							<IconCoins size={18} className="sm:w-5 sm:h-5" />
 						</div>
-						<div>
-							<div className="text-sm font-bold text-midnight dark:text-white transition-colors">
+						<div className="min-w-0 flex flex-col items-center sm:items-start">
+							<div className="text-[10px] sm:text-sm font-bold text-midnight dark:text-white transition-colors truncate">
 								View Assets
 							</div>
-							<div className="text-xs text-midnight/50 dark:text-white/40 mt-0.5">
+							<div className="hidden sm:block text-xs text-midnight/50 dark:text-white/40 mt-0.5">
 								View tokens & NFTs
 							</div>
 						</div>
