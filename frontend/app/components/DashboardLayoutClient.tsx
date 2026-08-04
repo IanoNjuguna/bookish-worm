@@ -11,6 +11,7 @@ import { useCardano } from '@/components/Providers'
 import { useAudio } from '@/components/AudioProvider'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
 
 export default function DashboardLayoutClient({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false)
@@ -219,20 +220,19 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
 
                 {/* Connected Wallet Mini-Card */}
                 {isConnected && address && (
-                  <div className="mx-1 mt-2 p-3 bg-midnight/[0.02] dark:bg-white/[0.02] border border-midnight/[0.06] dark:border-white/[0.06] rounded-none space-y-1.5 select-none">
-                    <div className="flex items-center gap-1.5 text-[8px] font-bold tracking-[0.08em] uppercase text-midnight/40 dark:text-white/30">
-                      <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                      <span>Cardano Wallet</span>
-                    </div>
-                    <div className="text-[9px] font-mono text-midnight/60 dark:text-white/50 truncate" title={address}>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(address)
+                      toast.success("Address copied to clipboard")
+                    }}
+                    className="mx-1 mt-2 flex items-center gap-2 p-2 hover:bg-midnight/[0.04] dark:hover:bg-white/[0.04] rounded-none select-none transition-all text-left w-full group border border-transparent hover:border-midnight/[0.06] dark:hover:border-white/[0.06]"
+                    title="Click to copy full address"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                    <span className="text-[10px] font-mono text-midnight/60 dark:text-white/50 group-hover:text-midnight dark:group-hover:text-white transition-colors truncate">
                       {address.slice(0, 10)}...{address.slice(-6)}
-                    </div>
-                    <div className="text-xs font-extrabold text-midnight dark:text-white flex items-baseline gap-0.5 font-mono">
-                      <span className="text-[10px] font-normal text-midnight/50 dark:text-white/40">₳</span>
-                      <span>{walletBalance !== null ? walletBalance.toFixed(2) : "0.00"}</span>
-                      <span className="text-[9px] font-normal text-midnight/40 dark:text-white/35 ml-0.5">ADA</span>
-                    </div>
-                  </div>
+                    </span>
+                  </button>
                 )}
               </div>
 
