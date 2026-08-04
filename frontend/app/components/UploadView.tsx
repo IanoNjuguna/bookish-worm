@@ -3,7 +3,7 @@
 import { logger } from '@/lib/logger'
 import React, { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
-import { IconUpload, IconX, IconPlus, IconMusic, IconPhoto, IconTrash, IconCheck, IconChevronDown } from '@tabler/icons-react'
+import { IconUpload, IconX, IconPlus, IconMusic, IconPhoto, IconTrash, IconCheck, IconChevronDown, IconLoader2, IconAlertTriangle } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -80,6 +80,27 @@ export default function UploadView() {
 	const [albumTracks, setAlbumTracks] = useState<any[]>([
 		{ id: Date.now(), title: '', file: null, audioHash: '', audioName: '', duration: 'PT3M45S', streamingUrl: '' }
 	])
+
+	// Publishing progress tracking state
+	const [uploadStep, setUploadStep] = useState<number>(0) // 0: idle, 1: IPFS, 2: Metadata, 3: Minting, 4: Catalog, 5: Done
+	const [uploadStatusText, setUploadStatusText] = useState<string>('')
+	const [segment1, setSegment1] = useState<number>(0) // Media IPFS (#FF1F8A - Cyber Pink)
+	const [segment2, setSegment2] = useState<number>(0) // CIP-60 Metadata (#B794F4 - Lavender)
+	const [segment3, setSegment3] = useState<number>(0) // On-Chain Minting (#3B82F6 - Electric Blue)
+	const [segment4, setSegment4] = useState<number>(0) // Catalog Indexing (#1DB954 - Emerald Green)
+
+	// Prevent accidental tab closure or refresh while publishing
+	useEffect(() => {
+		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+			if (isUploading) {
+				e.preventDefault()
+				e.returnValue = 'Publishing release in progress. Please do not close or refresh this page.'
+				return e.returnValue
+			}
+		}
+		window.addEventListener('beforeunload', handleBeforeUnload)
+		return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+	}, [isUploading])
 
 	const addAlbumTrack = () => {
 		setAlbumTracks([...albumTracks, { id: Date.now() + Math.random(), title: '', file: null, audioHash: '', audioName: '', duration: 'PT3M45S', streamingUrl: '' }])
@@ -293,6 +314,12 @@ export default function UploadView() {
 		}
 
 		setIsUploading(true)
+		setUploadStep(1)
+		setSegment1(15)
+		setSegment2(0)
+		setSegment3(0)
+		setSegment4(0)
+		setUploadStatusText("Initiating IPFS asset pinning...")
 		const mainToast = toast.loading("Initiating upload process...")
 
 		try {
@@ -316,6 +343,8 @@ export default function UploadView() {
 
 			if (isAlbum) {
 				// 1. Upload cover image first
+				setSegment1(35)
+				setUploadStatusText("Uploading album cover image to IPFS...")
 				toast.loading("Uploading album cover image...", { id: mainToast })
 				const imageFormData = new FormData()
 				imageFormData.append('image', coverFile!)
@@ -331,6 +360,9 @@ export default function UploadView() {
 				// 2. Upload each track audio file sequentially
 				for (let i = 0; i < albumTracks.length; i++) {
 					const t = albumTracks[i]
+					const trackProg = 35 + Math.round(((i + 1) / albumTracks.length) * 65)
+					setSegment1(trackProg)
+					setUploadStatusText(`Uploading album track ${i + 1}/${albumTracks.length}: "${t.title}" to IPFS...`)
 					toast.loading(`Uploading album track ${i + 1}/${albumTracks.length}: ${t.title}...`, { id: mainToast })
 					const trackFormData = new FormData()
 					trackFormData.append('audio', t.file!)
@@ -351,6 +383,8 @@ export default function UploadView() {
 			} else {
 				// Upload single track assets if not already uploaded or if hashes are missing
 				if (!currentAudioHash || !currentImageHash || !assetsCid) {
+					setSegment1(60)
+					setUploadStatusText("Uploading cover artwork and audio track to IPFS...")
 					toast.loading("Uploading media to IPFS...", { id: mainToast })
 					const formData = new FormData()
 					formData.append('audio', audioFile!)
@@ -375,7 +409,12 @@ export default function UploadView() {
 				throw new Error("Media files were not successfully pinned to IPFS. Please re-select your audio and cover files, then try again.")
 			}
 
+			setSegment1(100)
+
 			// 2. Upload Metadata
+			setUploadStep(2)
+			setSegment2(40)
+			setUploadStatusText("Generating CIP-60 release metadata JSON & pinning to IPFS...")
 			toast.loading("Generating release metadata...", { id: mainToast })
 			const metaResponse = await fetch(`${API_URL.replace(/\/$/, '')}/upload-metadata`, {
 				method: 'POST',
@@ -409,11 +448,15 @@ export default function UploadView() {
 
 			if (!metaResponse.ok) throw new Error(`Metadata generation failed: ${await metaResponse.text()}`)
 			const { metadataUri } = await metaResponse.json()
+			setSegment2(100)
 
 			// Generate a unique token_id (millisecond timestamp)
 			const tokenId = Math.floor(Date.now())
 
 			// 2.5 Mint track/album on Cardano chain using Lucid smart contract
+			setUploadStep(3)
+			setSegment3(30)
+			setUploadStatusText("Awaiting wallet signature & submitting on-chain Cardano transaction...")
 			toast.loading("Signing and submitting mint transaction on-chain...", { id: mainToast })
 			const { txHash, policyId } = await mintTrackOnChain(lucid, {
 				token_id: tokenId,
@@ -436,8 +479,12 @@ export default function UploadView() {
 				royaltyAddress: royaltyAddress || cardanoAddress || ''
 			})
 			console.log("On-chain release minted:", txHash, "Policy ID:", policyId)
+			setSegment3(100)
 
 			// 3. Register Release and Tracks in Backend (Catalog Index)
+			setUploadStep(4)
+			setSegment4(40)
+			setUploadStatusText("Registering release catalog & recording creator copy...")
 			toast.loading("Registering release catalog...", { id: mainToast })
 
 			if (isAlbum) {
@@ -580,6 +627,9 @@ export default function UploadView() {
 			}
 
 			setPublishedSongId(tokenId)
+			setSegment4(100)
+			setUploadStep(5)
+			setUploadStatusText("Release published successfully!")
 			toast.success(isAlbum ? "Album published successfully!" : "Track published successfully!", { id: mainToast })
 
 		} catch (error: any) {
@@ -1130,6 +1180,106 @@ export default function UploadView() {
 					)}
 				</div>
 			</form>
+
+			{/* Real-Time Aesthetic Multi-Color Progress Overlay Modal */}
+			{isUploading && (
+				<div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-midnight/80 dark:bg-black/85 backdrop-blur-md animate-fade-in">
+					<div className="w-full max-w-md bg-[#FAF9F6] dark:bg-[#141419] border border-midnight/15 dark:border-white/15 rounded-2xl p-6 shadow-2xl space-y-6">
+						{/* Top Status Header */}
+						<div className="flex items-start gap-4">
+							<div className="p-3 rounded-xl bg-purple-500/10 text-purple-400 shrink-0">
+								<IconLoader2 size={28} className="animate-spin text-[#FF1F8A]" />
+							</div>
+							<div className="space-y-1">
+								<h3 className="text-base font-bold text-midnight dark:text-white flex items-center gap-2">
+									Publishing Release
+								</h3>
+								<p className="text-xs font-semibold text-amber-500 flex items-center gap-1.5">
+									<IconAlertTriangle size={14} className="shrink-0" />
+									Please do not close or refresh this page
+								</p>
+								<p className="text-xs text-midnight/60 dark:text-white/60">
+									Media assets are being pinned to IPFS and signed on Cardano.
+								</p>
+							</div>
+						</div>
+
+						{/* Progress Section */}
+						<div className="space-y-2">
+							<div className="flex items-center justify-between text-xs">
+								<span className="font-medium text-midnight/70 dark:text-white/70 truncate max-w-[260px]">
+									{uploadStatusText || "Processing release..."}
+								</span>
+								<span className="font-extrabold text-midnight dark:text-white">
+									{Math.round((segment1 * 0.25) + (segment2 * 0.25) + (segment3 * 0.25) + (segment4 * 0.25))}%
+								</span>
+							</div>
+
+							{/* 4-Color Segmented Progress Bar */}
+							<div className="w-full bg-midnight/10 dark:bg-white/10 h-3 rounded-full overflow-hidden flex gap-1 p-0.5 border border-midnight/10 dark:border-white/10">
+								{/* Segment 1: Media IPFS (Cyber Pink #FF1F8A) */}
+								<div 
+									className="h-full rounded-full transition-all duration-500 bg-[#FF1F8A] shadow-[0_0_8px_rgba(255,31,138,0.4)]" 
+									style={{ width: `${segment1}%` }} 
+									title="1. Media IPFS Upload"
+								/>
+								{/* Segment 2: Metadata (Lavender #B794F4) */}
+								<div 
+									className="h-full rounded-full transition-all duration-500 bg-[#B794F4] shadow-[0_0_8px_rgba(183,148,244,0.4)]" 
+									style={{ width: `${segment2}%` }} 
+									title="2. CIP-60 Metadata"
+								/>
+								{/* Segment 3: Cardano Minting (Electric Blue #3B82F6) */}
+								<div 
+									className="h-full rounded-full transition-all duration-500 bg-[#3B82F6] shadow-[0_0_8px_rgba(59,130,246,0.4)]" 
+									style={{ width: `${segment3}%` }} 
+									title="3. On-Chain Minting"
+								/>
+								{/* Segment 4: Catalog Index (Emerald Green #1DB954) */}
+								<div 
+									className="h-full rounded-full transition-all duration-500 bg-[#1DB954] shadow-[0_0_8px_rgba(29,185,84,0.4)]" 
+									style={{ width: `${segment4}%` }} 
+									title="4. Catalog Indexing"
+								/>
+							</div>
+						</div>
+
+						{/* 4 Steps Checklist */}
+						<div className="space-y-3 pt-3 border-t border-midnight/10 dark:border-white/10 text-xs">
+							{[
+								{ title: "1. Media IPFS Upload", color: "bg-[#FF1F8A]" },
+								{ title: "2. CIP-60 Metadata Generation", color: "bg-[#B794F4]" },
+								{ title: "3. On-Chain Cardano Minting", color: "bg-[#3B82F6]" },
+								{ title: "4. Catalog Indexing & Finalize", color: "bg-[#1DB954]" }
+							].map((stepItem, idx) => {
+								const stepNum = idx + 1
+								const isDone = uploadStep > stepNum
+								const isCurrent = uploadStep === stepNum
+								return (
+									<div key={idx} className="flex items-center justify-between">
+										<div className="flex items-center gap-2.5">
+											<span className={cn("w-2.5 h-2.5 rounded-full shrink-0", stepItem.color)} />
+											<span className={cn(
+												"font-medium transition-colors",
+												isCurrent ? "text-midnight dark:text-white font-bold" : isDone ? "text-midnight/50 dark:text-white/50" : "text-midnight/30 dark:text-white/30"
+											)}>
+												{stepItem.title}
+											</span>
+										</div>
+										{isDone ? (
+											<IconCheck size={16} className="text-emerald-500 shrink-0" />
+										) : isCurrent ? (
+											<IconLoader2 size={16} className="animate-spin text-purple-400 shrink-0" />
+										) : (
+											<span className="text-[10px] text-midnight/30 dark:text-white/30">Pending</span>
+										)}
+									</div>
+								)
+							})}
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	)
 }
