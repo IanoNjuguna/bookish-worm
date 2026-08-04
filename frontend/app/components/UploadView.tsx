@@ -19,8 +19,28 @@ interface Collaborator {
 	split: number
 }
 
-const BACKEND_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://bookish-worm-production.up.railway.app').replace(/\/$/, '')
+const DIRECT_BACKEND_URL = (process.env.NEXT_PUBLIC_DIRECT_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://bookish-worm-production.up.railway.app').replace(/\/$/, '')
 const API_URL = '/api-backend'
+
+async function uploadAssetsWithFallback(formData: FormData, headers: Record<string, string>): Promise<Response> {
+	try {
+		const directRes = await fetch(`${DIRECT_BACKEND_URL}/upload-assets`, {
+			method: 'POST',
+			headers,
+			body: formData,
+		})
+		if (directRes.ok) return directRes
+		console.warn("Direct asset upload returned non-200 status, attempting proxy fallback...")
+	} catch (err) {
+		console.warn("Direct asset upload network error, attempting proxy fallback...", err)
+	}
+
+	return await fetch(`${API_URL}/upload-assets`, {
+		method: 'POST',
+		headers,
+		body: formData,
+	})
+}
 
 export default function UploadView() {
 	const t = useTranslations('upload')
@@ -170,11 +190,7 @@ export default function UploadView() {
 					bgHeaders['Authorization'] = `Bearer ${token.trim()}`
 				}
 
-				const response = await fetch(`${API_URL}/upload-assets`, {
-					method: 'POST',
-					headers: bgHeaders,
-					body: formData,
-				})
+				const response = await uploadAssetsWithFallback(formData, bgHeaders)
 
 				if (response.ok) {
 					const data = await response.json()
@@ -305,11 +321,7 @@ export default function UploadView() {
 				imageFormData.append('image', coverFile!)
 				imageFormData.append('title', title)
 
-				const imgRes = await fetch(`${API_URL}/upload-assets`, {
-					method: 'POST',
-					headers: getHeaders(),
-					body: imageFormData,
-				})
+				const imgRes = await uploadAssetsWithFallback(imageFormData, getHeaders())
 
 				if (!imgRes.ok) throw new Error(`Cover image upload failed: ${await imgRes.text()}`)
 				const imgData = await imgRes.json()
@@ -324,11 +336,7 @@ export default function UploadView() {
 					trackFormData.append('audio', t.file!)
 					trackFormData.append('title', t.title)
 
-					const trackRes = await fetch(`${API_URL}/upload-assets`, {
-						method: 'POST',
-						headers: getHeaders(),
-						body: trackFormData,
-					})
+					const trackRes = await uploadAssetsWithFallback(trackFormData, getHeaders())
 
 					if (!trackRes.ok) throw new Error(`Track "${t.title}" audio upload failed: ${await trackRes.text()}`)
 					const trackData = await trackRes.json()
@@ -349,11 +357,7 @@ export default function UploadView() {
 					formData.append('image', coverFile!)
 					formData.append('title', title)
 
-					const assetRes = await fetch(`${API_URL}/upload-assets`, {
-						method: 'POST',
-						headers: getHeaders(),
-						body: formData,
-					})
+					const assetRes = await uploadAssetsWithFallback(formData, getHeaders())
 
 					if (!assetRes.ok) throw new Error(`Media upload failed: ${await assetRes.text()}`)
 					const assetData = await assetRes.json()
