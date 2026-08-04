@@ -1,6 +1,8 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useLocale } from 'next-intl'
 import { useCardano } from '@/components/Providers'
 import { IconMusic, IconCoins, IconPhoto, IconWallet } from '@tabler/icons-react'
 import { DobaVisualizer } from '@/components/icons/DobaVisualizer'
@@ -13,6 +15,11 @@ interface Track {
 	image_url: string
 	price?: string
 	is_owned?: boolean
+	quantity?: number
+	supply?: string | number
+	uploader_address?: string
+	ticker?: string
+	album_id?: number | null
 }
 
 interface TokenAsset {
@@ -61,7 +68,81 @@ function hexToString(hex: string): string {
 	}
 }
 
+async function fetchOnChainPricesAndQuantities(
+	ownedTracks: Track[],
+	userUtxoBalances: Record<string, bigint>,
+	lucidInstance: any
+): Promise<Track[]> {
+	try {
+		const { Data } = await import('@lucid-evolution/lucid')
+
+		const updated = await Promise.all(ownedTracks.map(async (track) => {
+			let activePrice = parseFloat(track.price || '5')
+			let ownedQty = track.quantity || 1
+
+			// 1. Check exact quantity owned in user's wallet UTXOs
+			if (userUtxoBalances && Object.keys(userUtxoBalances).length > 0) {
+				for (const [unit, qty] of Object.entries(userUtxoBalances)) {
+					const assetNameHex = unit.slice(56)
+					// Check CIP-68 label 444 hex prefix "001bc280"
+					if (assetNameHex.startsWith('001bc280')) {
+						const tokenNameStr = hexToString(assetNameHex.slice(8))
+						const expectedTokenName = track.ticker
+							? track.ticker.toUpperCase().replace(/[^A-Z0-9]/g, "")
+							: "T" + String(track.album_id ? track.album_id : track.token_id).slice(-11)
+
+						if (tokenNameStr === expectedTokenName && qty > 0n) {
+							ownedQty = Number(qty)
+						}
+					}
+				}
+			}
+
+			// 2. Fetch live active price from distribution contract datum on-chain
+			if (lucidInstance && track.uploader_address && !track.uploader_address.startsWith('stake')) {
+				try {
+					const { getContractAddresses } = await import('@/lib/contractHelper')
+					const { dAddress, mintCS } = await getContractAddresses(track.uploader_address)
+
+					const tokenNameStr = track.ticker
+						? track.ticker.toUpperCase().replace(/[^A-Z0-9]/g, "")
+						: "T" + String(track.album_id ? track.album_id : track.token_id).slice(-11)
+
+					const { fromText, toUnit } = await import('@lucid-evolution/lucid')
+					const tokenName = fromText(tokenNameStr)
+					const fracUnit = toUnit(mintCS, tokenName, 444)
+
+					const utxos = await lucidInstance.utxosAtWithUnit(dAddress, fracUnit)
+					if (utxos && utxos.length > 0 && utxos[0].datum) {
+						const decoded = Data.from(utxos[0].datum)
+						if (decoded && typeof decoded === "object" && "fields" in decoded) {
+							const fields = (decoded as any).fields
+							if (fields && fields.length > 0 && typeof fields[0] === "bigint") {
+								activePrice = Number(fields[0]) / 1000000
+							}
+						}
+					}
+				} catch (e) {
+					// Fallback to database price
+				}
+			}
+
+			return {
+				...track,
+				price: String(activePrice),
+				quantity: ownedQty
+			}
+		}))
+
+		return updated
+	} catch (e) {
+		return ownedTracks
+	}
+}
+
 export default function AssetsView() {
+	const router = useRouter()
+	const locale = useLocale()
 	const { address, isConnected, lucid } = useCardano()
 	
 	const [adaBalance, setAdaBalance] = useState(0)
@@ -110,6 +191,8 @@ export default function AssetsView() {
 			setLoading(true)
 
 			try {
+				let aggregatedBalances: Record<string, bigint> = {}
+
 				// 1. Fetch ADA balance and custom tokens from wallet
 				if (lucid) {
 					const wallet = typeof lucid.wallet === 'function' ? lucid.wallet() : lucid.wallet
@@ -139,7 +222,6 @@ export default function AssetsView() {
 
 					setAdaBalance(Number(lovelace) / 1000000)
 
-					const aggregatedBalances: Record<string, bigint> = {}
 					for (const utxo of utxos) {
 						if (!utxo.assets) continue
 						for (const [unit, qty] of Object.entries(utxo.assets)) {
@@ -195,7 +277,8 @@ export default function AssetsView() {
 				if (res.ok) {
 					const allTracks: Track[] = await res.json()
 					const owned = allTracks.filter(t => t.is_owned)
-					setOwnedNfts(owned)
+					const updatedOwned = await fetchOnChainPricesAndQuantities(owned, aggregatedBalances, lucid)
+					setOwnedNfts(updatedOwned)
 				}
 
 				// 3. Try to fetch real-time ADA price from CoinGecko
@@ -225,8 +308,9 @@ export default function AssetsView() {
 	const adaUsdValue = adaBalance * adaPrice
 	const tokensUsdValue = customTokens.reduce((acc, token) => acc + token.usdValue, 0)
 	const nftUsdValue = ownedNfts.reduce((acc, track) => {
-		const priceInADA = parseFloat(track.price || '5')
-		return acc + (priceInADA * adaPrice)
+		const unitPriceInADA = parseFloat(track.price || '5')
+		const qty = track.quantity || 1
+		return acc + (unitPriceInADA * qty * adaPrice)
 	}, 0)
 
 	const totalUsdValue = adaUsdValue + tokensUsdValue + nftUsdValue
@@ -375,30 +459,56 @@ export default function AssetsView() {
 				/* Non-Fungible Tokens (Music NFTs) Grid */
 				ownedNfts.length > 0 ? (
 					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-						{ownedNfts.map((nft) => (
-							<div key={nft.token_id} className="border border-midnight/[0.08] dark:border-white/[0.08] bg-[#FAF9F6] dark:bg-[#0D0D12]/60 rounded-none overflow-hidden hover:border-midnight/20 dark:hover:border-white/20 transition group">
-								<div className="aspect-square w-full relative overflow-hidden bg-midnight/5 dark:bg-white/5 border-b border-white/5">
-									<img
-										src={nft.image_url.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/')}
-										alt={nft.name}
-										className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-									/>
-									<div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md border border-midnight/10 dark:border-white/10 px-2 py-0.5 rounded-none text-[10px] font-mono text-midnight/80 dark:text-white/80">
-										ID #{nft.token_id}
-									</div>
-								</div>
-								<div className="p-4 space-y-2">
+						{ownedNfts.map((nft) => {
+							const unitPrice = parseFloat(nft.price || '5')
+							const qty = nft.quantity || 1
+							const supply = Number(nft.supply || 1000)
+							const holdingsAda = unitPrice * qty
+							const holdingsUsd = holdingsAda * adaPrice
+							const marketCapAda = unitPrice * supply
+							const marketCapUsd = marketCapAda * adaPrice
+
+							return (
+								<div
+									key={nft.token_id}
+									onClick={() => router.push(`/${locale}/track/${nft.token_id}`)}
+									className="border border-midnight/[0.08] dark:border-white/[0.08] bg-[#FAF9F6] dark:bg-[#0D0D12]/60 rounded-xl overflow-hidden hover:border-cyber-pink/50 transition cursor-pointer group shadow-md hover:shadow-xl flex flex-col justify-between"
+								>
 									<div>
-										<h4 className="font-display font-bold text-midnight dark:text-white truncate">{nft.name}</h4>
-										<p className="text-xs text-midnight/50 dark:text-white/50 truncate">by {nft.artist}</p>
-									</div>
-									<div className="flex justify-between items-center pt-2 border-t border-white/5">
-										<span className="text-[10px] text-midnight/60 dark:text-white/30 uppercase tracking-widest font-display font-bold">EST. WORTH</span>
-										<span className="font-mono text-sm font-bold text-cyber-pink">${(parseFloat(nft.price || '5') * adaPrice).toFixed(2)} USD</span>
+										<div className="aspect-square w-full relative overflow-hidden bg-midnight/5 dark:bg-white/5 border-b border-midnight/5 dark:border-white/5">
+											<img
+												src={nft.image_url.replace('ipfs://', process.env.NEXT_PUBLIC_IPFS_GATEWAY || 'https://gateway.pinata.cloud/ipfs/')}
+												alt={nft.name}
+												className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+											/>
+											<div className="absolute top-3 left-3 bg-cyber-pink/90 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-mono font-bold text-white shadow">
+												{qty} {qty === 1 ? 'Fraction' : 'Fractions'}
+											</div>
+											<div className="absolute top-3 right-3 bg-black/70 backdrop-blur-md border border-white/10 px-2 py-0.5 rounded text-[10px] font-mono text-white/80">
+												ID #{nft.token_id}
+											</div>
+										</div>
+										<div className="p-4 space-y-3">
+											<div>
+												<h4 className="font-display font-bold text-midnight dark:text-white truncate group-hover:text-cyber-pink transition-colors">{nft.name}</h4>
+												<p className="text-xs text-midnight/50 dark:text-white/50 truncate">by {nft.artist}</p>
+											</div>
+
+											<div className="space-y-2 pt-3 border-t border-midnight/10 dark:border-white/10">
+												<div className="flex justify-between items-center text-xs">
+													<span className="text-[10px] text-midnight/60 dark:text-white/40 uppercase tracking-widest font-display font-bold">YOUR HOLDINGS</span>
+													<span className="font-mono font-bold text-cyber-pink">${holdingsUsd.toFixed(2)} USD <span className="text-[10px] text-midnight/40 dark:text-white/40 font-normal">({holdingsAda.toFixed(1)} ADA)</span></span>
+												</div>
+												<div className="flex justify-between items-center text-xs">
+													<span className="text-[10px] text-midnight/60 dark:text-white/40 uppercase tracking-widest font-display font-bold">SONG MARKET CAP</span>
+													<span className="font-mono font-semibold text-midnight/70 dark:text-white/70">${marketCapUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</span>
+												</div>
+											</div>
+										</div>
 									</div>
 								</div>
-							</div>
-						))}
+							)
+						})}
 					</div>
 				) : (
 					<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-12 text-center bg-[#FAF9F6] dark:bg-[#0D0D12]/60 rounded-none">
