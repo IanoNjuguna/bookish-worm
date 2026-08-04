@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react'
 import { SendFunds } from '@/components/SendFunds'
 import { useTranslations } from 'next-intl'
 import { useAudio } from '@/components/AudioProvider'
-import { IconCurrencyDollar as DollarSign } from '@tabler/icons-react'
+import { IconCurrencyDollar as DollarSign, IconCornerDownLeft } from '@tabler/icons-react'
+import { Link } from '@/i18n/navigation'
 
 export default function SendMoneyDashboard() {
   const tNav = useTranslations('nav')
@@ -17,6 +18,16 @@ export default function SendMoneyDashboard() {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      <div className="flex justify-start">
+        <Link 
+          href="/profile"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-midnight/55 dark:text-white/45 hover:text-[#FF1F8A] dark:hover:text-[#FF1F8A] transition-colors group select-none"
+        >
+          <IconCornerDownLeft size={14} className="text-midnight/40 dark:text-white/35 group-hover:text-[#FF1F8A] dark:group-hover:text-[#FF1F8A] transition-colors" />
+          <span>{tNav('profile')}</span>
+        </Link>
+      </div>
+
       <div className="text-center">
         <h2 className="text-2xl font-bold mb-2">{tNav('sendLabel')}</h2>
       </div>
