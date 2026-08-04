@@ -81,13 +81,13 @@ export default function AssetsView() {
 					}
 
 					try {
-						const registryRes = await fetch(`https://raw.githubusercontent.com/cardano-foundation/cardano-token-registry/master/mappings/${token.unit}.json`)
+						const registryRes = await fetch(`/api/token-logo?unit=${token.unit}`)
 						if (registryRes.ok) {
 							const regData = await registryRes.json()
-							if (regData?.logo?.value) {
+							if (regData?.logoUrl) {
 								return {
 									...token,
-									logoUrl: `data:image/png;base64,${regData.logo.value}`
+									logoUrl: regData.logoUrl
 								}
 							}
 						}
