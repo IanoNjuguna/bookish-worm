@@ -170,7 +170,7 @@ export default function UploadView() {
 					bgHeaders['Authorization'] = `Bearer ${token.trim()}`
 				}
 
-				const response = await fetch(`${BACKEND_URL}/upload-assets`, {
+				const response = await fetch(`${API_URL}/upload-assets`, {
 					method: 'POST',
 					headers: bgHeaders,
 					body: formData,
@@ -305,7 +305,7 @@ export default function UploadView() {
 				imageFormData.append('image', coverFile!)
 				imageFormData.append('title', title)
 
-				const imgRes = await fetch(`${BACKEND_URL}/upload-assets`, {
+				const imgRes = await fetch(`${API_URL}/upload-assets`, {
 					method: 'POST',
 					headers: getHeaders(),
 					body: imageFormData,
@@ -324,7 +324,7 @@ export default function UploadView() {
 					trackFormData.append('audio', t.file!)
 					trackFormData.append('title', t.title)
 
-					const trackRes = await fetch(`${BACKEND_URL}/upload-assets`, {
+					const trackRes = await fetch(`${API_URL}/upload-assets`, {
 						method: 'POST',
 						headers: getHeaders(),
 						body: trackFormData,
@@ -349,7 +349,7 @@ export default function UploadView() {
 					formData.append('image', coverFile!)
 					formData.append('title', title)
 
-					const assetRes = await fetch(`${BACKEND_URL}/upload-assets`, {
+					const assetRes = await fetch(`${API_URL}/upload-assets`, {
 						method: 'POST',
 						headers: getHeaders(),
 						body: formData,
