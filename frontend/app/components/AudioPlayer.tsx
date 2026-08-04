@@ -349,7 +349,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
   const accentActive = 'text-[#FF1F8A]'
 
   return (
-    <div className="fixed md:relative bottom-0 left-0 right-0 md:bottom-auto md:left-auto md:right-auto z-50 w-full h-auto md:h-[90px] bg-[#FAF9F6] dark:bg-[#0D0D12] md:bg-transparent border-t border-midnight/[0.08] dark:border-white/[0.08] md:border-t-0 pb-[env(safe-area-inset-bottom)] flex-shrink-0">
+    <div className="fixed bottom-0 left-0 right-0 z-50 w-full h-auto md:h-[90px] bg-[#FAF9F6]/80 dark:bg-[#0D0D12]/80 backdrop-blur-xl border-t border-midnight/[0.08] dark:border-white/[0.08] pb-[env(safe-area-inset-bottom)] flex-shrink-0 transition-colors duration-200">
       {/* Mobile Continuous Divider */}
       <div className="lg:hidden absolute top-0 left-4 right-4 h-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
 
