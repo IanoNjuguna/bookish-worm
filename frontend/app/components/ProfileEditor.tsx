@@ -323,9 +323,9 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 
 			{/* Wallet Actions Bar */}
 			<div className="pt-6 pb-2 border-t border-midnight/10 dark:border-white/10 relative z-10 mb-8">
-				<h4 className="text-xs font-bold uppercase tracking-wider text-[#B794F4] mb-4 flex items-center gap-2">
-					<span className="w-1.5 h-1.5 rounded-full bg-[#B794F4] inline-block" />
-					Wallet Actions
+				<h4 className="text-xl font-bold text-midnight dark:text-white mb-6 flex items-center gap-2">
+					<span className="w-1 h-6 bg-lavender rounded-none inline-block"></span>
+					Actions
 				</h4>
 				<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 					<Link
