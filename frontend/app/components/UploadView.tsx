@@ -961,7 +961,7 @@ export default function UploadView() {
 							Secondary Sales Royalties
 						</h3>
 						<p className="text-xs text-midnight/70 dark:text-white/60 pl-3">
-							💡 Earn recurring royalties on-chain whenever fans trade your song tokens on secondary marketplaces.
+							Earn recurring royalties whenever fans trade your song tokens on secondary marketplaces.
 						</p>
 					</div>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
