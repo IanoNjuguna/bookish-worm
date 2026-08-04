@@ -25,20 +25,9 @@ const ALLOWED_ORIGINS = [
 ]
 
 app.use('/*', cors({
-  origin: (origin) => {
-    if (!origin) return '*' // Non-browser clients (curl, server-to-server)
-    if (
-      ALLOWED_ORIGINS.includes(origin) ||
-      origin.endsWith('.doba.world') ||
-      origin.endsWith('.vercel.app')
-    ) {
-      return origin
-    }
-    return ALLOWED_ORIGINS[0]
-  },
+  origin: '*',
   allowHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'Accept', 'Origin', 'X-Requested-With'],
   allowMethods: ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE', 'PATCH'],
-  credentials: true,
 }))
 
 const SERVER_VERSION = '1.2.5-fix-download-proxy'
@@ -153,6 +142,16 @@ const getPinataJwt = () => {
   if (!jwt) logger.warn('PINATA_JWT is MISSING from process.env')
   return jwt
 }
+
+// Return Pinata JWT for direct browser-to-Pinata IPFS uploads
+app.get('/pinata-jwt',
+  authMiddleware,
+  (c) => {
+    const pinataJwt = getPinataJwt()
+    if (!pinataJwt) return c.json({ error: 'Pinata JWT not configured' }, 500)
+    return c.json({ pinataJwt })
+  }
+)
 
 // IPFS Upload Assets Proxy (PIN INDIVIDUALLY)
 app.post('/upload-assets',

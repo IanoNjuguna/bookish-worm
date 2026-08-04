@@ -22,6 +22,27 @@ interface Collaborator {
 const DIRECT_BACKEND_URL = (process.env.NEXT_PUBLIC_DIRECT_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://bookish-worm-production.up.railway.app').replace(/\/$/, '')
 const API_URL = '/api-backend'
 
+async function uploadToPinataDirect(file: File, name: string, pinataJwt: string): Promise<string> {
+	const formData = new FormData()
+	formData.append('file', file, file.name)
+	formData.append('pinataMetadata', JSON.stringify({ name }))
+
+	const res = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
+		method: 'POST',
+		headers: {
+			'Authorization': `Bearer ${pinataJwt}`
+		},
+		body: formData
+	})
+
+	if (!res.ok) {
+		throw new Error(`Pinata direct upload failed: ${await res.text()}`)
+	}
+
+	const data = await res.json()
+	return data.IpfsHash
+}
+
 async function uploadAssetsWithFallback(formData: FormData, headers: Record<string, string>): Promise<Response> {
 	try {
 		const directRes = await fetch(`${DIRECT_BACKEND_URL}/upload-assets`, {
@@ -395,21 +416,38 @@ export default function UploadView() {
 				return headers
 			}
 
+			// Fetch Pinata JWT for direct browser-to-IPFS pinning if available
+			let pinataJwt: string | null = null
+			try {
+				const jwtRes = await fetch(`${API_URL}/pinata-jwt`, { headers: getHeaders() })
+				if (jwtRes.ok) {
+					const jwtData = await jwtRes.json()
+					if (jwtData.pinataJwt) pinataJwt = jwtData.pinataJwt
+				}
+			} catch (e) {
+				console.warn("Could not fetch direct Pinata JWT, using backend proxy", e)
+			}
+
 			if (isAlbum) {
 				// 1. Upload cover image first
 				setTargetSeg1(35)
 				setUploadStatusText("Uploading album cover image to IPFS...")
 				toast.loading("Uploading album cover image...", { id: mainToast })
-				const imageFormData = new FormData()
-				imageFormData.append('image', coverFile!)
-				imageFormData.append('title', title)
 
-				const imgRes = await uploadAssetsWithFallback(imageFormData, getHeaders())
+				if (pinataJwt && coverFile) {
+					currentImageName = `cover_${Date.now()}.jpg`
+					currentImageHash = await uploadToPinataDirect(coverFile, `${title}_cover`, pinataJwt)
+				} else {
+					const imageFormData = new FormData()
+					imageFormData.append('image', coverFile!)
+					imageFormData.append('title', title)
 
-				if (!imgRes.ok) throw new Error(`Cover image upload failed: ${await imgRes.text()}`)
-				const imgData = await imgRes.json()
-				currentImageHash = imgData.imageHash
-				currentImageName = imgData.imageName
+					const imgRes = await uploadAssetsWithFallback(imageFormData, getHeaders())
+					if (!imgRes.ok) throw new Error(`Cover image upload failed: ${await imgRes.text()}`)
+					const imgData = await imgRes.json()
+					currentImageHash = imgData.imageHash
+					currentImageName = imgData.imageName
+				}
 
 				// 2. Upload each track audio file sequentially
 				for (let i = 0; i < albumTracks.length; i++) {
@@ -418,17 +456,23 @@ export default function UploadView() {
 					setTargetSeg1(trackProg)
 					setUploadStatusText(`Uploading album track ${i + 1}/${albumTracks.length}: "${t.title}" to IPFS...`)
 					toast.loading(`Uploading album track ${i + 1}/${albumTracks.length}: ${t.title}...`, { id: mainToast })
-					const trackFormData = new FormData()
-					trackFormData.append('audio', t.file!)
-					trackFormData.append('title', t.title)
 
-					const trackRes = await uploadAssetsWithFallback(trackFormData, getHeaders())
+					if (pinataJwt && t.file) {
+						t.audioName = `audio_${Date.now()}_${i}.mp3`
+						t.audioHash = await uploadToPinataDirect(t.file, `${t.title}_audio`, pinataJwt)
+						t.streamingUrl = `https://gateway.pinata.cloud/ipfs/${t.audioHash}`
+					} else {
+						const trackFormData = new FormData()
+						trackFormData.append('audio', t.file!)
+						trackFormData.append('title', t.title)
 
-					if (!trackRes.ok) throw new Error(`Track "${t.title}" audio upload failed: ${await trackRes.text()}`)
-					const trackData = await trackRes.json()
-					t.audioHash = trackData.audioHash
-					t.audioName = trackData.audioName
-					t.streamingUrl = trackData.streamingUrl
+						const trackRes = await uploadAssetsWithFallback(trackFormData, getHeaders())
+						if (!trackRes.ok) throw new Error(`Track "${t.title}" audio upload failed: ${await trackRes.text()}`)
+						const trackData = await trackRes.json()
+						t.audioHash = trackData.audioHash
+						t.audioName = trackData.audioName
+						t.streamingUrl = trackData.streamingUrl
+					}
 				}
 				
 				currentAudioHash = albumTracks[0].audioHash
@@ -440,21 +484,31 @@ export default function UploadView() {
 					setTargetSeg1(65)
 					setUploadStatusText("Uploading cover artwork and audio track to IPFS...")
 					toast.loading("Uploading media to IPFS...", { id: mainToast })
-					const formData = new FormData()
-					formData.append('audio', audioFile!)
-					formData.append('image', coverFile!)
-					formData.append('title', title)
 
-					const assetRes = await uploadAssetsWithFallback(formData, getHeaders())
+					if (pinataJwt && audioFile && coverFile) {
+						currentImageName = `cover_${Date.now()}.jpg`
+						currentImageHash = await uploadToPinataDirect(coverFile, `${title}_cover`, pinataJwt)
+						
+						currentAudioName = `audio_${Date.now()}.mp3`
+						currentAudioHash = await uploadToPinataDirect(audioFile, `${title}_audio`, pinataJwt)
+						currentStreamingUrl = `https://gateway.pinata.cloud/ipfs/${currentAudioHash}`
+					} else {
+						const formData = new FormData()
+						formData.append('audio', audioFile!)
+						formData.append('image', coverFile!)
+						formData.append('title', title)
 
-					if (!assetRes.ok) throw new Error(`Media upload failed: ${await assetRes.text()}`)
-					const assetData = await assetRes.json()
+						const assetRes = await uploadAssetsWithFallback(formData, getHeaders())
 
-					currentAudioHash = assetData.audioHash
-					currentImageHash = assetData.imageHash
-					currentAudioName = assetData.audioName
-					currentImageName = assetData.imageName
-					currentStreamingUrl = assetData.streamingUrl
+						if (!assetRes.ok) throw new Error(`Media upload failed: ${await assetRes.text()}`)
+						const assetData = await assetRes.json()
+
+						currentAudioHash = assetData.audioHash
+						currentImageHash = assetData.imageHash
+						currentAudioName = assetData.audioName
+						currentImageName = assetData.imageName
+						currentStreamingUrl = assetData.streamingUrl
+					}
 				}
 			}
 
@@ -1238,26 +1292,21 @@ export default function UploadView() {
 
 			{/* Real-Time Aesthetic Angular Matte Progress Modal */}
 			{isUploading && (
-				<div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-transparent backdrop-blur-xl md:backdrop-blur-2xl animate-fade-in">
+				<div className="fixed inset-0 z-[999] w-screen h-screen flex items-center justify-center p-4 bg-transparent backdrop-blur-xl md:backdrop-blur-2xl animate-fade-in">
 					<div className="w-full max-w-md bg-[#FAF9F6] dark:bg-[#141419] border border-midnight/20 dark:border-white/20 rounded-none p-6 shadow-2xl space-y-6">
 						{/* Top Status Header */}
 						<div className="flex items-start justify-between gap-4">
-							<div className="flex items-start gap-4">
-								<div className="p-3 rounded-none bg-purple-500/10 text-purple-400 shrink-0 border border-purple-500/20">
-									<IconLoader2 size={28} className="animate-spin text-[#D946EF]" />
-								</div>
-								<div className="space-y-1">
-									<h3 className="text-base font-bold text-midnight dark:text-white flex items-center gap-2 tracking-tight">
-										Publishing Release
-									</h3>
-									<p className="text-xs font-semibold text-amber-500 flex items-center gap-1.5 uppercase tracking-wide">
-										<IconAlertTriangle size={14} className="shrink-0 text-amber-500" />
-										Please do not close or refresh this page
-									</p>
-									<p className="text-xs text-midnight/60 dark:text-white/60">
-										Media assets are being pinned to IPFS and signed on Cardano.
-									</p>
-								</div>
+							<div className="space-y-1">
+								<h3 className="text-base font-bold text-midnight dark:text-white flex items-center gap-2 tracking-tight">
+									Publishing Release
+								</h3>
+								<p className="text-xs font-semibold text-amber-500 flex items-center gap-1.5 uppercase tracking-wide">
+									<IconAlertTriangle size={14} className="shrink-0 text-amber-500" />
+									Please do not close or refresh this page
+								</p>
+								<p className="text-xs text-midnight/60 dark:text-white/60">
+									Media assets are being pinned to IPFS and signed on Cardano.
+								</p>
 							</div>
 
 							{/* Subtle Elapsed Timer Badge */}
@@ -1270,11 +1319,8 @@ export default function UploadView() {
 						{/* Progress Section */}
 						<div className="space-y-2">
 							<div className="flex items-center justify-between text-xs">
-								<span className="font-medium text-midnight/70 dark:text-white/70 truncate max-w-[260px]">
+								<span className="font-medium text-midnight/70 dark:text-white/70 truncate max-w-full">
 									{uploadStatusText || "Processing release..."}
-								</span>
-								<span className="font-extrabold text-midnight dark:text-white font-mono text-sm">
-									{Math.round((displaySeg1 * 0.25) + (displaySeg2 * 0.25) + (displaySeg3 * 0.25) + (displaySeg4 * 0.25))}%
 								</span>
 							</div>
 
