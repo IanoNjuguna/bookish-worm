@@ -51,27 +51,8 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
         "fixed top-0 left-0 right-0 z-50 h-16 transition-colors duration-200",
         "bg-[#FAF9F6]/80 dark:bg-[#0D0D12]/80 backdrop-blur-md lg:bg-transparent lg:dark:bg-transparent lg:backdrop-blur-none"
       )}>
-        {/* Mobile Continuous Divider */}
-        <div className="lg:hidden absolute bottom-0 left-4 right-4 h-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
-        
-        {/* Desktop Split Divider - Left Segment */}
-        <div className={cn(
-          "hidden lg:block absolute bottom-0 h-[1px] bg-midnight/[0.08] dark:bg-white/[0.08] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
-          desktopSidebarOpen ? "left-6 right-[calc(100%-20vw+40px)]" : "left-6 right-6"
-        )} />
-        
-        {/* Desktop Split Divider - Middle Segment */}
-        {desktopSidebarOpen && (
-          <div className={cn(
-            "hidden lg:block absolute bottom-0 left-[calc(20vw+8px)] h-[1px] bg-midnight/[0.08] dark:bg-white/[0.08] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
-            (isSidebarOpen && playerState.currentTrack) ? "right-[calc(20rem+24px)]" : "right-6"
-          )} />
-        )}
-
-        {/* Desktop Split Divider - Right Segment */}
-        {(desktopSidebarOpen && isSidebarOpen && playerState.currentTrack) && (
-          <div className="hidden lg:block absolute bottom-0 left-[calc(100%-20rem+24px)] right-6 h-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
-        )}
+        {/* Header Bottom Divider */}
+        <div className="absolute bottom-0 left-4 right-4 lg:left-6 lg:right-6 h-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
 
         <div className="h-full px-4 lg:px-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">

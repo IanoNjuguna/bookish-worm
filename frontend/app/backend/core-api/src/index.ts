@@ -527,18 +527,21 @@ app.get('/songs', async (c) => {
 
   // Check ownership if user is authenticated
   let userMints: number[] = []
+  let userAddress: string | null = null
   const authHeader = c.req.header('Authorization')
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1]
     const payload = await verifyJWT(token, JWT_SECRET)
     if (payload && payload.sub) {
-      userMints = await getUserMints(payload.sub as string)
+      userAddress = payload.sub as string
+      userMints = await getUserMints(userAddress)
     }
   }
 
   const tracksWithOwnership = await Promise.all(tracks.map(async track => {
     const parentId = track.album_id ? Number(track.album_id) : null
-    const isOwned = userMints.includes(track.token_id) || (parentId !== null && userMints.includes(parentId))
+    const isUploader = Boolean(userAddress && track.uploader_address && track.uploader_address.toLowerCase() === userAddress.toLowerCase())
+    const isOwned = isUploader || userMints.includes(track.token_id) || (parentId !== null && userMints.includes(parentId))
     
     let mintCount = track.mint_count || 0
     if (track.splitter) {
@@ -693,7 +696,8 @@ app.get('/songs/:id', async (c) => {
       const userAddress = payload.sub as string
       const userMints = await getUserMints(userAddress)
       const idToCheck = track.album_id ? Number(track.album_id) : id
-      isOwned = userMints.includes(idToCheck)
+      const isUploader = Boolean(track.uploader_address && track.uploader_address.toLowerCase() === userAddress.toLowerCase())
+      isOwned = isUploader || userMints.includes(idToCheck)
 
       if (!isOwned) {
         isOwned = await verifyOwnershipOnChain(userAddress, idToCheck)
