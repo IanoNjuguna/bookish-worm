@@ -55,7 +55,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
         <div className="absolute bottom-0 left-4 right-4 lg:left-6 lg:right-6 h-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
 
         <div className="h-full px-4 lg:px-6 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" onClick={() => setHeaderMenuOpen(false)} className="flex items-center gap-2">
             <img src="/doba.png" alt="doba logo" className="w-8 h-8 rounded-lg object-cover dark:invert-0 invert" />
             <span className="text-midnight dark:text-white text-base sm:text-lg font-extrabold tracking-tight lowercase">doba</span>
           </Link>
@@ -136,85 +136,82 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
       )}
 
       {/* Main Layout */}
-      <div className="flex flex-col lg:flex-row flex-1 mt-16 lg:overflow-hidden">
-        <aside className={cn(
-          "hidden lg:flex flex-col bg-transparent overflow-y-auto overflow-x-hidden relative no-scrollbar transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] shrink-0",
-          desktopSidebarOpen 
-            ? "w-[20vw] min-w-[200px] max-w-[260px] opacity-100 translate-x-0" 
-            : "w-0 opacity-0 -translate-x-4 pointer-events-none"
-        )}>
-          <nav className="flex flex-col p-4 overflow-y-auto overflow-x-hidden flex-1 relative no-scrollbar w-[20vw] min-w-[200px] max-w-[260px]">
-            {/* Navigation Section */}
-            <div className="relative flex flex-col space-y-1 pb-4">
-              {/* Vertical Segment for Navigation */}
-              <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
+      <div className="flex flex-col flex-1 mt-16 min-h-0 lg:overflow-hidden">
+        {/* Workspace Area: Left Sidebar + Main Content + Right Sidebar */}
+        <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden relative">
+          <aside className={cn(
+            "hidden lg:flex flex-col bg-transparent overflow-hidden relative transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] shrink-0",
+            desktopSidebarOpen 
+              ? "w-[20vw] min-w-[190px] max-w-[240px] opacity-100 translate-x-0" 
+              : "w-0 opacity-0 -translate-x-4 pointer-events-none"
+          )}>
+            <nav className="flex flex-col p-3 overflow-hidden flex-1 relative w-[20vw] min-w-[190px] max-w-[240px]">
+              {/* Navigation Section */}
+              <div className="relative flex flex-col space-y-0.5 pb-2">
+                {/* Vertical Segment for Navigation */}
+                <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
+                
+                <div className="pl-3 pt-0 pb-0 mb-0.5">
+                  <h2 className="text-[11px] font-semibold uppercase tracking-wider text-purple-400">
+                    {tNav('navigation')}
+                  </h2>
+                </div>
+                <SidebarNavLink href="/" icon={<HomeIcon size={16} className="text-[#FF1F8A] flex-shrink-0" />} label={tNav('home')} />
+                <SidebarNavLink href="/library" icon={<Library size={16} className="text-[#B794F4] flex-shrink-0" />} label={tNav('library')} />
+                <SidebarNavLink href="/search" icon={<Search size={16} className="text-[#B794F4] flex-shrink-0" />} label={tNav('search')} />
+              </div>
               
-              <div className="pl-4 pt-0 pb-0 mb-1">
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-purple-400">
-                  {tNav('navigation')}
-                </h2>
-              </div>
-              <SidebarNavLink href="/" icon={<HomeIcon size={18} className="text-[#FF1F8A] flex-shrink-0" />} label={tNav('home')} />
-              <SidebarNavLink href="/library" icon={<Library size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('library')} />
-              <SidebarNavLink href="/search" icon={<Search size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('search')} />
-            </div>
-            
-            {/* Horizontal Divider */}
-            <div className="border-t border-midnight/[0.08] dark:border-white/[0.08] my-4 ml-4 mr-6" />
-            
-            {/* Creator Section */}
-            <div className="relative flex flex-col space-y-1 pt-0 pb-4">
-              {/* Vertical Segment for Creator */}
-              <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
+              {/* Horizontal Divider */}
+              <div className="border-t border-midnight/[0.08] dark:border-white/[0.08] my-2 ml-3 mr-4" />
               
-              <div className="pl-4 pt-2 pb-0 mb-1">
-                <h2 className="text-sm font-semibold text-[#B794F4] uppercase tracking-wider" style={{ letterSpacing: '0.04em' }}>{tNav('creator')}</h2>
+              {/* Creator Section */}
+              <div className="relative flex flex-col space-y-0.5 pt-0 pb-2">
+                {/* Vertical Segment for Creator */}
+                <div className="absolute right-0 top-0 bottom-0 w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
+                
+                <div className="pl-3 pt-1 pb-0 mb-0.5">
+                  <h2 className="text-[11px] font-semibold text-[#B794F4] uppercase tracking-wider" style={{ letterSpacing: '0.04em' }}>{tNav('creator')}</h2>
+                </div>
+                <SidebarNavLink href="/upload" icon={<Music size={16} className="text-[#FF1F8A] flex-shrink-0" />} label={tNav('upload')} />
+                <SidebarNavLink href="/earnings" icon={<DollarSign size={16} className="text-[#B794F4] flex-shrink-0" />} label={tNav('earnings')} />
+                <SidebarNavLink href="/analytics" icon={<TrendingUp size={16} className="text-[#B794F4] flex-shrink-0" />} label={tNav('analytics')} />
+                <SidebarNavLink href="/profile" icon={<User size={16} className="text-[#B794F4] flex-shrink-0" />} label={tNav('profile')} />
               </div>
-              <SidebarNavLink href="/upload" icon={<Music size={18} className="text-[#FF1F8A] flex-shrink-0" />} label={tNav('upload')} />
-              <SidebarNavLink href="/earnings" icon={<DollarSign size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('earnings')} />
-              <SidebarNavLink href="/analytics" icon={<TrendingUp size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('analytics')} />
-              <SidebarNavLink href="/profile" icon={<User size={18} className="text-[#B794F4] flex-shrink-0" />} label={tNav('profile')} />
+
+              {/* Horizontal Divider */}
+              <div className="border-t border-midnight/[0.08] dark:border-white/[0.08] my-2 ml-3 mr-4" />
+
+              {/* Desktop Footer Section */}
+              <div className="relative flex flex-col pt-1">
+                {/* Vertical Segment for Footer */}
+                <div className="absolute right-0 top-0 bottom-2 w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
+                
+                <div className="pl-3 pr-4 pb-2">
+                  <Footer />
+                </div>
+              </div>
+            </nav>
+          </aside>
+
+          {/* Content Area */}
+          <main className="flex-1 overflow-y-auto outline-none lg:h-full">
+            <div className="p-6 pb-32 md:pb-28 max-w-7xl mx-auto">
+              {children}
             </div>
+          </main>
 
-            {/* Horizontal Divider */}
-            <div className="border-t border-midnight/[0.08] dark:border-white/[0.08] my-4 ml-4 mr-6" />
-
-            {/* Desktop Footer Section */}
-            <div className="relative flex flex-col pt-2">
-              {/* Vertical Segment for Footer */}
-              <div className="absolute right-0 top-0 bottom-6 w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
-              
-              <div className="pl-4 pr-6 pb-6">
-                <Footer />
-              </div>
-            </div>
-          </nav>
-        </aside>
-
-        {/* Content Area wrapper */}
-        <div className="flex-1 flex flex-col min-w-0 relative lg:min-h-0">
-          <div className="flex-1 flex flex-row min-w-0 relative lg:min-h-0">
-            <main className="flex-1 overflow-y-auto outline-none lg:h-full">
-              <div className="p-6 pb-32 md:pb-12 max-w-7xl mx-auto">
-                {children}
-              </div>
-
-              {/* Footer removed and moved to sidebar/menu */}
-            </main>
-
-            {/* Right Sidebar */}
-            <NowPlayingSidebar
-              track={sidebarTrack}
-              isVisible={isSidebarOpen}
-              onClose={toggleSidebar}
-            />
-          </div>
-
-          {/* Audio Player Footer */}
-          {playerState.currentTrack && (
-            <AudioPlayer playerState={playerState} />
-          )}
+          {/* Right Sidebar */}
+          <NowPlayingSidebar
+            track={sidebarTrack}
+            isVisible={isSidebarOpen}
+            onClose={toggleSidebar}
+          />
         </div>
+
+        {/* Audio Player Footer (Positioned Below Sidebar & Main Workspace) */}
+        {playerState.currentTrack && (
+          <AudioPlayer playerState={playerState} />
+        )}
       </div>
     </div>
   )
@@ -230,13 +227,13 @@ function SidebarNavLink({ href, icon, label, collapsed }: { href: string, icon: 
       prefetch
       title={collapsed ? label : undefined}
       className={cn(
-        "flex items-center gap-3 py-2.5 transition-all duration-200 text-midnight/70 dark:text-white/70 hover:text-midnight dark:hover:text-white md:hover:-translate-y-0.5 md:hover:font-semibold rounded-none",
-        collapsed ? "justify-center px-0" : "px-4",
+        "flex items-center gap-2.5 py-1 px-2.5 transition-all duration-200 text-midnight/70 dark:text-white/70 hover:text-midnight dark:hover:text-white md:hover:-translate-y-0.5 rounded-none",
+        collapsed ? "justify-center px-0" : "px-2.5",
         isActive && "text-midnight dark:text-white font-bold -translate-y-0.5"
       )}
     >
       {icon}
-      {!collapsed && <span className="text-sm truncate">{label}</span>}
+      {!collapsed && <span className="text-xs truncate">{label}</span>}
     </Link>
   )
 }
