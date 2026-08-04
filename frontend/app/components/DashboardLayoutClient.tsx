@@ -26,13 +26,38 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
       return
     }
     let isMounted = true
-    lucid.wallet.getUtxos().then((utxos: any[]) => {
-      if (!isMounted) return
-      const totalLovelace = utxos.reduce((sum: bigint, utxo: any) => sum + BigInt(utxo.assets.lovelace), 0n)
-      setWalletBalance(Number(totalLovelace) / 1_000_000)
-    }).catch((e: any) => {
-      console.warn("Failed to fetch balance inside DashboardLayoutClient", e)
-    })
+
+    const fetchBalance = async () => {
+      try {
+        const wallet = typeof lucid.wallet === 'function' ? lucid.wallet() : (lucid as any).wallet
+        let lovelace = 0n
+
+        if (wallet && typeof wallet.getUtxos === 'function') {
+          const utxos = (await wallet.getUtxos()) || []
+          lovelace = utxos.reduce(
+            (total: bigint, utxo: any) => total + BigInt(utxo.assets?.lovelace ?? 0n),
+            0n
+          )
+        } else if (wallet && typeof wallet.getLovelace === 'function') {
+          lovelace = BigInt(await wallet.getLovelace())
+        } else if (typeof lucid.utxosAt === 'function') {
+          const utxos = (await lucid.utxosAt(address)) || []
+          lovelace = utxos.reduce(
+            (total: bigint, utxo: any) => total + BigInt(utxo.assets?.lovelace ?? 0n),
+            0n
+          )
+        }
+
+        if (isMounted) {
+          setWalletBalance(Number(lovelace) / 1_000_000)
+        }
+      } catch (e) {
+        console.warn("Failed to fetch balance inside DashboardLayoutClient", e)
+      }
+    }
+
+    fetchBalance()
+
     return () => {
       isMounted = false
     }
