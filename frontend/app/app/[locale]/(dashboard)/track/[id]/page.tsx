@@ -11,6 +11,7 @@ import { useCardano } from '@/components/Providers'
 import { EXPLORER_URL, CARDANO_NETWORK } from '@/lib/config'
 import { logger } from '@/lib/logger'
 import { buyFractionOnChain, formatTxError } from '@/lib/contractHelper'
+import { useTranslations } from 'next-intl'
 
 const formatTokenId = (id: string | number) => {
 	const s = String(id)
@@ -41,6 +42,7 @@ interface Track {
 }
 
 export default function TrackDetailPage() {
+	const tNav = useTranslations('nav')
 	const params = useParams()
 	const router = useRouter()
 	const id = params?.id as string
@@ -279,9 +281,10 @@ export default function TrackDetailPage() {
 			<div className="mb-6 flex items-center justify-between">
 				<button
 					onClick={() => router.back()}
-					className="p-2 bg-midnight/5 dark:bg-white/5 hover:bg-midnight/10 dark:hover:bg-white/10 rounded-full text-midnight dark:text-white transition-colors"
+					className="inline-flex items-center gap-1.5 text-xs font-medium text-midnight/55 dark:text-white/45 hover:text-[#FF1F8A] dark:hover:text-[#FF1F8A] transition-colors group select-none"
 				>
-					<IconCornerDownLeft size={20} />
+					<IconCornerDownLeft size={14} className="text-midnight/40 dark:text-white/35 group-hover:text-[#FF1F8A] dark:group-hover:text-[#FF1F8A] transition-colors" />
+					<span>{tNav('profile')}</span>
 				</button>
 				<div className="flex items-center gap-2 bg-midnight/5 dark:bg-white/5 rounded-full px-3 py-1 border border-midnight/10 dark:border-white/10">
 					<span className="text-[10px] font-bold text-[#FF1F8A] uppercase tracking-wider font-mono">CARDANO NETWORK</span>
