@@ -1236,10 +1236,10 @@ export default function UploadView() {
 				</div>
 			</form>
 
-			{/* Real-Time Aesthetic Angular Matte Progress Overlay Modal */}
+			{/* Real-Time Aesthetic Angular Matte Progress Modal */}
 			{isUploading && (
-				<div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-midnight/70 dark:bg-black/80 backdrop-blur-xl md:backdrop-blur-2xl animate-fade-in">
-					<div className="w-full max-w-md bg-[#FAF9F6]/95 dark:bg-[#141419]/95 backdrop-blur-xl border border-midnight/20 dark:border-white/20 rounded-none p-6 shadow-2xl space-y-6">
+				<div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-transparent backdrop-blur-xl md:backdrop-blur-2xl animate-fade-in">
+					<div className="w-full max-w-md bg-[#FAF9F6] dark:bg-[#141419] border border-midnight/20 dark:border-white/20 rounded-none p-6 shadow-2xl space-y-6">
 						{/* Top Status Header */}
 						<div className="flex items-start justify-between gap-4">
 							<div className="flex items-start gap-4">

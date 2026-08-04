@@ -663,7 +663,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
 
             <button
               onClick={togglePlayPause}
-              className="w-9 h-9 flex items-center justify-center bg-midnight dark:bg-white text-white dark:text-black active:scale-90 rounded-none shadow-md shadow-black/20"
+              className="w-9 h-9 flex items-center justify-center bg-midnight dark:bg-white text-white dark:text-black active:scale-90 rounded-none"
               aria-label={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying

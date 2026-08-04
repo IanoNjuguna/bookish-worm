@@ -391,7 +391,7 @@ export default function NowPlayingSidebar({ track, isVisible, onClose }: NowPlay
 
 						<button
 							onClick={togglePlayPause}
-							className="w-14 h-14 bg-white text-black flex items-center justify-center active:scale-90 active:brightness-90 transition-all shadow-xl shadow-black/40"
+							className="w-14 h-14 bg-white text-black flex items-center justify-center active:scale-90 active:brightness-90 transition-all"
 							aria-label={isPlaying ? 'Pause' : 'Play'}
 						>
 							{isPlaying ? <Pause size={28} className="fill-black" /> : <Play size={28} className="fill-black ml-1" />}
