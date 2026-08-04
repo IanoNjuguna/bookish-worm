@@ -49,9 +49,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
       {/* Header */}
       <header className={cn(
         "fixed top-0 left-0 right-0 z-50 h-16 transition-colors duration-200",
-        headerMenuOpen
-          ? "bg-[rgba(250,249,246,0.95)] dark:bg-[rgba(13,13,18,0.95)] backdrop-blur-md"
-          : "bg-transparent backdrop-blur-none"
+        "bg-[#FAF9F6]/80 dark:bg-[#0D0D12]/80 backdrop-blur-md lg:bg-transparent lg:dark:bg-transparent lg:backdrop-blur-none"
       )}>
         {/* Mobile Continuous Divider */}
         <div className="lg:hidden absolute bottom-0 left-4 right-4 h-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
@@ -126,7 +124,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
 
       {/* Mobile Menu */}
       {headerMenuOpen && (
-        <div className="lg:hidden fixed inset-0 top-16 z-[60] animate-slide-in-down bg-[rgba(250,249,246,0.95)] dark:bg-[rgba(13,13,18,0.95)] backdrop-blur-md overflow-hidden">
+        <div className="lg:hidden fixed inset-0 top-16 z-[60] animate-slide-in-down bg-[#FAF9F6]/80 dark:bg-[#0D0D12]/80 backdrop-blur-md overflow-hidden">
           <nav className="flex flex-col p-4 pb-32 space-y-2 h-full overflow-y-auto">
             <div className="px-0 py-2">
               <h2 className="text-sm font-semibold uppercase tracking-wider text-purple-400">
