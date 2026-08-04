@@ -18,51 +18,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
   const [headerMenuOpen, setHeaderMenuOpen] = useState(false)
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true)
   
-  const { address, isConnected, lucid, disconnect } = useCardano()
-  const [walletBalance, setWalletBalance] = useState<number | null>(null)
-
-  useEffect(() => {
-    if (!isConnected || !lucid || !address) {
-      setWalletBalance(null)
-      return
-    }
-    let isMounted = true
-
-    const fetchBalance = async () => {
-      try {
-        const wallet = typeof lucid.wallet === 'function' ? lucid.wallet() : (lucid as any).wallet
-        let lovelace = 0n
-
-        if (wallet && typeof wallet.getUtxos === 'function') {
-          const utxos = (await wallet.getUtxos()) || []
-          lovelace = utxos.reduce(
-            (total: bigint, utxo: any) => total + BigInt(utxo.assets?.lovelace ?? 0n),
-            0n
-          )
-        } else if (wallet && typeof wallet.getLovelace === 'function') {
-          lovelace = BigInt(await wallet.getLovelace())
-        } else if (typeof lucid.utxosAt === 'function') {
-          const utxos = (await lucid.utxosAt(address)) || []
-          lovelace = utxos.reduce(
-            (total: bigint, utxo: any) => total + BigInt(utxo.assets?.lovelace ?? 0n),
-            0n
-          )
-        }
-
-        if (isMounted) {
-          setWalletBalance(Number(lovelace) / 1_000_000)
-        }
-      } catch (e) {
-        console.warn("Failed to fetch balance inside DashboardLayoutClient", e)
-      }
-    }
-
-    fetchBalance()
-
-    return () => {
-      isMounted = false
-    }
-  }, [isConnected, lucid, address])
+  const { disconnect } = useCardano()
 
   const {
     playerState,
@@ -217,23 +173,6 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
                   <SidebarNavLink href="/analytics" icon={<TrendingUp size={16} />} label={tNav('analytics')} />
                   <SidebarNavLink href="/profile" icon={<User size={16} />} label={tNav('profile')} />
                 </div>
-
-                {/* Connected Wallet Mini-Card */}
-                {isConnected && address && (
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(address)
-                      toast.success("Address copied to clipboard")
-                    }}
-                    className="mx-1 mt-2 flex items-center gap-2 p-2 hover:bg-midnight/[0.04] dark:hover:bg-white/[0.04] rounded-none select-none transition-all text-left w-full group border border-transparent hover:border-midnight/[0.06] dark:hover:border-white/[0.06]"
-                    title="Click to copy full address"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-                    <span className="text-[10px] font-mono text-midnight/60 dark:text-white/50 group-hover:text-midnight dark:group-hover:text-white transition-colors truncate">
-                      {address.slice(0, 10)}...{address.slice(-6)}
-                    </span>
-                  </button>
-                )}
               </div>
 
               {/* Desktop Footer Section */}
