@@ -384,7 +384,7 @@ export default function AssetsView() {
 						activeTab === 'nfts' ? 'text-midnight dark:text-white' : 'text-midnight/70 dark:text-white/40 hover:text-midnight dark:hover:text-white'
 					}`}
 				>
-					Non-Fungible Tokens ({ownedNfts.length})
+					Song Tokens ({ownedNfts.length})
 					{activeTab === 'nfts' && (
 						<div className="absolute bottom-0 left-0 w-full h-[2px] bg-cyber-pink" />
 					)}
@@ -458,7 +458,7 @@ export default function AssetsView() {
 			) : (
 				/* Non-Fungible Tokens (Music NFTs) Grid */
 				ownedNfts.length > 0 ? (
-					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+					<div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 md:grid-cols-3 sm:gap-6">
 						{ownedNfts.map((nft) => {
 							const unitPrice = parseFloat(nft.price || '5')
 							const qty = nft.quantity || 1
@@ -469,39 +469,68 @@ export default function AssetsView() {
 							const marketCapUsd = marketCapAda * adaPrice
 
 							return (
-								<div
-									key={nft.token_id}
-									onClick={() => router.push(`/${locale}/track/${nft.token_id}`)}
-									className="border border-midnight/[0.08] dark:border-white/[0.08] bg-[#FAF9F6] dark:bg-[#0D0D12]/60 rounded-xl overflow-hidden hover:border-cyber-pink/50 transition cursor-pointer group shadow-md hover:shadow-xl flex flex-col justify-between"
-								>
-									<div>
-										<div className="aspect-square w-full relative overflow-hidden bg-midnight/5 dark:bg-white/5 border-b border-midnight/5 dark:border-white/5">
-											<img
-												src={nft.image_url.replace('ipfs://', process.env.NEXT_PUBLIC_IPFS_GATEWAY || 'https://gateway.pinata.cloud/ipfs/')}
-												alt={nft.name}
-												className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-											/>
-											<div className="absolute top-3 left-3 bg-cyber-pink/90 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-mono font-bold text-white shadow">
-												{qty} {qty === 1 ? 'Fraction' : 'Fractions'}
+								<div key={nft.token_id}>
+									{/* Mobile List Row (visible only on mobile) */}
+									<div 
+										onClick={() => router.push(`/${locale}/track/${nft.token_id}`)}
+										className="flex sm:hidden items-center justify-between p-3 bg-[#FAF9F6] dark:bg-[#0D0D12]/60 border border-midnight/[0.08] dark:border-white/[0.08] rounded-xl hover:border-cyber-pink/50 transition cursor-pointer active:scale-[0.98]"
+									>
+										<div className="flex items-center gap-3 min-w-0">
+											<div className="w-12 h-12 relative rounded-lg overflow-hidden bg-midnight/5 dark:bg-white/5 flex-shrink-0">
+												<img
+													src={nft.image_url.replace('ipfs://', process.env.NEXT_PUBLIC_IPFS_GATEWAY || 'https://gateway.pinata.cloud/ipfs/')}
+													alt={nft.name}
+													className="w-full h-full object-cover"
+												/>
+												<div className="absolute -bottom-1 -right-1 bg-cyber-pink px-1 py-0.5 rounded text-[8px] font-mono font-bold text-white leading-none scale-90">
+													x{qty}
+												</div>
 											</div>
-											<div className="absolute top-3 right-3 bg-black/70 backdrop-blur-md border border-white/10 px-2 py-0.5 rounded text-[10px] font-mono text-white/80">
-												ID #{nft.token_id}
+											<div className="min-w-0">
+												<h4 className="font-display font-bold text-sm text-midnight dark:text-white truncate">{nft.name}</h4>
+												<p className="text-[10px] text-midnight/50 dark:text-white/50 truncate">by {nft.artist}</p>
 											</div>
 										</div>
-										<div className="p-4 space-y-3">
-											<div>
-												<h4 className="font-display font-bold text-midnight dark:text-white truncate group-hover:text-cyber-pink transition-colors">{nft.name}</h4>
-												<p className="text-xs text-midnight/50 dark:text-white/50 truncate">by {nft.artist}</p>
-											</div>
+										<div className="text-right flex-shrink-0 pl-2">
+											<div className="font-mono font-bold text-xs text-cyber-pink">${holdingsUsd.toFixed(2)}</div>
+											<div className="text-[9px] text-midnight/40 dark:text-white/40 font-mono">({holdingsAda.toFixed(1)} ADA)</div>
+										</div>
+									</div>
 
-											<div className="space-y-2 pt-3 border-t border-midnight/10 dark:border-white/10">
-												<div className="flex justify-between items-center text-xs">
-													<span className="text-[10px] text-midnight/60 dark:text-white/40 uppercase tracking-widest font-display font-bold">YOUR HOLDINGS</span>
-													<span className="font-mono font-bold text-cyber-pink">${holdingsUsd.toFixed(2)} USD <span className="text-[10px] text-midnight/40 dark:text-white/40 font-normal">({holdingsAda.toFixed(1)} ADA)</span></span>
+									{/* Desktop Card (visible only on sm screens and up) */}
+									<div
+										onClick={() => router.push(`/${locale}/track/${nft.token_id}`)}
+										className="hidden sm:flex flex-col justify-between h-full border border-midnight/[0.08] dark:border-white/[0.08] bg-[#FAF9F6] dark:bg-[#0D0D12]/60 rounded-xl overflow-hidden hover:border-cyber-pink/50 transition cursor-pointer group shadow-md hover:shadow-xl"
+									>
+										<div>
+											<div className="aspect-square w-full relative overflow-hidden bg-midnight/5 dark:bg-white/5 border-b border-midnight/5 dark:border-white/5">
+												<img
+													src={nft.image_url.replace('ipfs://', process.env.NEXT_PUBLIC_IPFS_GATEWAY || 'https://gateway.pinata.cloud/ipfs/')}
+													alt={nft.name}
+													className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+												/>
+												<div className="absolute top-3 left-3 bg-cyber-pink/90 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-mono font-bold text-white shadow">
+													{qty} {qty === 1 ? 'Fraction' : 'Fractions'}
 												</div>
-												<div className="flex justify-between items-center text-xs">
-													<span className="text-[10px] text-midnight/60 dark:text-white/40 uppercase tracking-widest font-display font-bold">SONG MARKET CAP</span>
-													<span className="font-mono font-semibold text-midnight/70 dark:text-white/70">${marketCapUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</span>
+												<div className="absolute top-3 right-3 bg-black/70 backdrop-blur-md border border-white/10 px-2 py-0.5 rounded text-[10px] font-mono text-white/80">
+													ID #{nft.token_id}
+												</div>
+											</div>
+											<div className="p-4 space-y-3">
+												<div>
+													<h4 className="font-display font-bold text-midnight dark:text-white truncate group-hover:text-cyber-pink transition-colors">{nft.name}</h4>
+													<p className="text-xs text-midnight/50 dark:text-white/50 truncate">by {nft.artist}</p>
+												</div>
+
+												<div className="space-y-2 pt-3 border-t border-midnight/10 dark:border-white/10">
+													<div className="flex justify-between items-center text-xs">
+														<span className="text-[10px] text-midnight/60 dark:text-white/40 uppercase tracking-widest font-display font-bold">YOUR HOLDINGS</span>
+														<span className="font-mono font-bold text-cyber-pink">${holdingsUsd.toFixed(2)} USD <span className="text-[10px] text-midnight/40 dark:text-white/40 font-normal font-mono">({holdingsAda.toFixed(1)} ADA)</span></span>
+													</div>
+													<div className="flex justify-between items-center text-xs">
+														<span className="text-[10px] text-midnight/60 dark:text-white/40 uppercase tracking-widest font-display font-bold">SONG MARKET CAP</span>
+														<span className="font-mono font-semibold text-midnight/70 dark:text-white/70">${marketCapUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</span>
+													</div>
 												</div>
 											</div>
 										</div>
