@@ -136,6 +136,43 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
     fetchMintData()
   }, [currentTrack?.id, (currentTrack as any)?.token_id, effectiveAddress, checkOwnership, fetchMintData])
 
+  // HTML5 Media Session API Integration for system notifications/lock screen
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'mediaSession' in navigator && currentTrack) {
+      try {
+        navigator.mediaSession.metadata = new window.MediaMetadata({
+          title: currentTrack.title,
+          artist: currentTrack.creator,
+          album: 'Doba Protocol',
+          artwork: [
+            { src: currentTrack.cover, sizes: '96x96' },
+            { src: currentTrack.cover, sizes: '128x128' },
+            { src: currentTrack.cover, sizes: '192x192' },
+            { src: currentTrack.cover, sizes: '256x256' },
+            { src: currentTrack.cover, sizes: '384x384' },
+            { src: currentTrack.cover, sizes: '512x512' },
+          ],
+        })
+
+        // Bind lock screen playback controls to player actions
+        navigator.mediaSession.setActionHandler('play', () => {
+          togglePlayPause()
+        })
+        navigator.mediaSession.setActionHandler('pause', () => {
+          togglePlayPause()
+        })
+        navigator.mediaSession.setActionHandler('previoustrack', () => {
+          previous()
+        })
+        navigator.mediaSession.setActionHandler('nexttrack', () => {
+          next()
+        })
+      } catch (err) {
+        logger.error('AudioPlayer: Failed to set mediaSession metadata', err)
+      }
+    }
+  }, [currentTrack, isPlaying, togglePlayPause, next, previous])
+
   const handleMint = async (e: React.MouseEvent) => {
     e.stopPropagation()
     if (!isAuthenticated || !currentTrack) {
