@@ -151,11 +151,11 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
       </div>
       <button
         onClick={() => window.dispatchEvent(new CustomEvent('doba-trigger-tour'))}
-        className="w-10 h-10 flex items-center justify-center border border-midnight/10 dark:border-white/10 hover:border-cyber-pink/50 dark:hover:border-cyber-pink/50 text-midnight/70 dark:text-white/70 hover:text-[#FF1F8A] dark:hover:text-[#FF1F8A] transition-colors rounded-lg bg-midnight/5 dark:bg-white/5"
+        className="flex items-center justify-center text-midnight/70 dark:text-white/70 hover:text-[#FF1F8A] dark:hover:text-[#FF1F8A] transition-colors outline-none bg-transparent"
         title="Start Walkthrough Tour"
         aria-label="Start Walkthrough Tour"
       >
-        <IconHelp size={20} />
+        <IconHelp size={22} />
       </button>
       {!isConnected ? (
         <DropdownMenu>

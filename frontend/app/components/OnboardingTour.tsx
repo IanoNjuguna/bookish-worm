@@ -458,10 +458,33 @@ export default function OnboardingTour() {
 	}
 
 	// Enforce center alignment globally for all onboarding steps to occupy viewport center space and display flawlessly on mobile
-	const steps = getSteps().map(step => ({
-		...step,
-		placement: 'center' as const
-	}))
+	const rawSteps = getSteps()
+	const steps = rawSteps.map(step => {
+		const targetSelector = typeof step.target === 'string' ? step.target : ''
+		let useBodyFallback = false
+
+		if (typeof window !== 'undefined' && targetSelector && targetSelector !== 'body') {
+			try {
+				const element = document.querySelector(targetSelector)
+				if (!element) {
+					useBodyFallback = true
+				} else {
+					const rect = element.getBoundingClientRect()
+					if (rect.width === 0 && rect.height === 0) {
+						useBodyFallback = true
+					}
+				}
+			} catch (e) {
+				useBodyFallback = true
+			}
+		}
+
+		return {
+			...step,
+			target: useBodyFallback ? 'body' : step.target,
+			placement: 'center' as const
+		}
+	})
 
 	return (
 		<Joyride
