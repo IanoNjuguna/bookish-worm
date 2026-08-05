@@ -460,12 +460,9 @@ export default function OnboardingTour() {
 		const { status, action, index, type, step } = data
 		const finishedStatuses = ['finished', 'skipped']
 
-		// Fire the install prompt when the user advances through the install step
-		if (
-			type === 'step:after' &&
-			action === 'next' &&
-			(step as any)?.data?.isInstallStep
-		) {
+		// Fire the install prompt when the tour naturally finishes (which ends on the install step)
+		// or if the user interacts with the install step specifically
+		if (status === 'finished' || ((step as any)?.data?.isInstallStep && type === 'step:after')) {
 			window.dispatchEvent(new CustomEvent('doba-trigger-install'))
 		}
 
