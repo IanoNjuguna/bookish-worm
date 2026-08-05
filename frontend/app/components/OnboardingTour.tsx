@@ -108,6 +108,25 @@ export default function OnboardingTour() {
 	const [key, setKey] = useState(0) // Force reset/remount Joyride
 	const [hasSongs, setHasSongs] = useState(false) // Dynamic library branching state
 
+	// Helper to get page identifier for path-segmented onboarding
+	const getPageKey = (): string => {
+		if (pathname.includes('/profile') || pathname.includes('/assets')) return 'profile'
+		if (pathname.includes('/track/')) return 'track'
+		if (pathname.includes('/upload')) return 'upload'
+		if (pathname.includes('/library')) return 'library'
+		if (pathname.includes('/search')) return 'search'
+		if (pathname.includes('/earnings')) return 'earnings'
+		if (pathname.includes('/analytics')) return 'analytics'
+		if (pathname.includes('/deposit')) return 'deposit'
+		if (pathname.includes('/send-money')) return 'send_money'
+		return 'dashboard'
+	}
+
+	const getTourStorageKey = (): string => {
+		const pageKey = (isConnected && address) ? getPageKey() : 'auth'
+		return `doba_completed_tour_${pageKey}`
+	}
+
 	// Fetch owned songs to determine library page onboarding branch
 	useEffect(() => {
 		if (isConnected && address) {
@@ -132,14 +151,17 @@ export default function OnboardingTour() {
 		}
 	}, [isConnected, address, pathname])
 
+	// Just-In-Time Contextual Tour auto-run trigger per page
 	useEffect(() => {
-		// Auto-run only if they have not completed onboarding before
-		const hasCompletedTour = localStorage.getItem('doba_completed_onboarding')
-		if (!hasCompletedTour) {
+		setRun(false) // Reset any running state when path/auth updates
+		const storageKey = getTourStorageKey()
+		const hasCompleted = localStorage.getItem(storageKey)
+		
+		if (!hasCompleted) {
 			const timer = setTimeout(() => setRun(true), 1500)
 			return () => clearTimeout(timer)
 		}
-	}, [])
+	}, [pathname, isConnected, address])
 
 	useEffect(() => {
 		// Listen for custom trigger events from the header help button
@@ -396,7 +418,8 @@ export default function OnboardingTour() {
 
 		if (finishedStatuses.includes(status)) {
 			setRun(false)
-			localStorage.setItem('doba_completed_onboarding', 'true')
+			const storageKey = getTourStorageKey()
+			localStorage.setItem(storageKey, 'true')
 		}
 	}
 
