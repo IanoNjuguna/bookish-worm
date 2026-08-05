@@ -225,7 +225,7 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 	}
 
 	return (
-		<div className="p-8 bg-midnight/5 dark:bg-white-2 border border-midnight/[0.08] dark:border-white/[0.08] relative group overflow-hidden rounded-2xl shadow-xl">
+		<div id="profile-card" className="p-8 bg-midnight/5 dark:bg-white-2 border border-midnight/[0.08] dark:border-white/[0.08] relative group overflow-hidden rounded-2xl shadow-xl">
 			{/* Decorative gradient match */}
 			<div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-lavender via-lavender/40 to-transparent opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-500" />
 
@@ -327,7 +327,7 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 					<span className="w-1 h-6 bg-lavender rounded-none inline-block"></span>
 					Actions
 				</h4>
-				<div className="grid grid-cols-3 gap-2 sm:gap-4">
+				<div id="profile-actions-bar" className="grid grid-cols-3 gap-2 sm:gap-4">
 					<Link
 						href="/send-money"
 						className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-2 sm:gap-3.5 p-3 sm:p-4 bg-midnight/5 dark:bg-white/[0.03] hover:bg-midnight/10 dark:hover:bg-white/[0.07] border border-midnight/[0.08] dark:border-white/[0.08] hover:border-[#B794F4]/50 transition-all duration-200 group rounded-xl"
@@ -392,7 +392,7 @@ export function ProfileEditor({ address, tProfile, logout }: any) {
 			</div>
 
 			{/* Uploads Grid */}
-			<div className="pt-8 border-t border-midnight/10 dark:border-white/10 relative z-10 mb-12">
+			<div id="my-uploads-section" className="pt-8 border-t border-midnight/10 dark:border-white/10 relative z-10 mb-12">
 				<h4 className="text-xl font-bold text-midnight dark:text-white mb-6 flex items-center gap-2">
 					<span className="w-1 h-6 bg-lavender rounded-none inline-block"></span>
 					My Uploads

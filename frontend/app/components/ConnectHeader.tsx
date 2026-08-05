@@ -146,11 +146,22 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
 
   return (
     <div className="flex items-center gap-3 relative">
-      <ThemeToggle />
+      <div id="theme-toggle-btn">
+        <ThemeToggle />
+      </div>
+      <button
+        onClick={() => window.dispatchEvent(new CustomEvent('doba-trigger-tour'))}
+        className="w-10 h-10 flex items-center justify-center border border-midnight/10 dark:border-white/10 hover:border-cyber-pink/50 dark:hover:border-cyber-pink/50 text-midnight/70 dark:text-white/70 hover:text-[#FF1F8A] dark:hover:text-[#FF1F8A] transition-colors rounded-lg bg-midnight/5 dark:bg-white/5"
+        title="Start Walkthrough Tour"
+        aria-label="Start Walkthrough Tour"
+      >
+        <IconHelp size={20} />
+      </button>
       {!isConnected ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
+              id="connect-wallet-btn"
               disabled={isConnecting}
               className="bg-lavender hover:bg-lavender/90 text-midnight font-bold h-10 px-6 transition-all rounded-lg flex items-center gap-2"
             >

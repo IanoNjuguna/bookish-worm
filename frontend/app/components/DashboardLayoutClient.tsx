@@ -7,6 +7,7 @@ import ConnectHeader from '@/components/ConnectHeader'
 import AudioPlayer from '@/components/AudioPlayer'
 import NowPlayingSidebar from '@/components/NowPlayingSidebar'
 import Footer from '@/components/Footer'
+import OnboardingTour from '@/components/OnboardingTour'
 import { useCardano } from '@/components/Providers'
 import { useAudio } from '@/components/AudioProvider'
 import { useTranslations } from 'next-intl'
@@ -48,6 +49,7 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
 
   return (
     <div className="h-[100dvh] text-midnight dark:text-white flex flex-col">
+      <OnboardingTour />
       {/* Header */}
       <header className={cn(
         "fixed top-0 left-0 right-0 z-50 h-16 transition-colors duration-200",
@@ -157,7 +159,9 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
                     </h2>
                   </div>
                   <SidebarNavLink href="/" icon={<HomeIcon size={16} />} label={tNav('home')} />
-                  <SidebarNavLink href="/library" icon={<Library size={16} />} label={tNav('library')} />
+                  <div id="side-nav-library">
+                    <SidebarNavLink href="/library" icon={<Library size={16} />} label={tNav('library')} />
+                  </div>
                   <SidebarNavLink href="/search" icon={<Search size={16} />} label={tNav('search')} />
                 </div>
                 

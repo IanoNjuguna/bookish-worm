@@ -553,6 +553,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
           </div>
 
           <button
+            id="sidebar-toggle-btn"
             onClick={toggleSidebar}
             className={cn(
               "p-1.5 transition-all hover:scale-110",

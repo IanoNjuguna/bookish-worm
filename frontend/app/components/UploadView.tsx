@@ -784,7 +784,7 @@ export default function UploadView() {
 
 			<form onSubmit={handleSubmit} className="space-y-10">
 				{/* Track Details */}
-				<div className="space-y-6">
+				<div id="upload-details-form" className="space-y-6">
 					<h3 className="text-xl font-semibold flex items-center gap-2 text-midnight/90 dark:text-white">
 						<span className="w-1 h-6 bg-cyber-pink rounded-none"></span>
 						{isAlbum ? "Album Details" : t('details')}
@@ -954,7 +954,7 @@ export default function UploadView() {
 				</div>
 
 				{/* Royalties */}
-				<div className="space-y-6">
+				<div id="upload-royalties-section" className="space-y-6">
 					<div>
 						<h3 className="text-xl font-semibold flex items-center gap-2 text-midnight/90 dark:text-white mb-1">
 							<span className="w-1 h-6 bg-pink-400 rounded-none"></span>
@@ -1063,6 +1063,7 @@ export default function UploadView() {
 							<div className="space-y-2">
 								<label className="text-sm font-medium text-midnight/80 dark:text-white">{t('audioLabel')}</label>
 								<div
+									id="upload-audio-zone"
 									className={`border-2 border-dashed rounded-2xl h-64 flex flex-col items-center justify-center gap-4 transition-all bg-midnight/[0.02] dark:bg-white/[0.02] group
                   ${audioFile ? 'border-cyber-pink/50 bg-cyber-pink/[0.05]' : 'border-midnight/10 dark:border-white/10 hover:border-midnight/30 dark:hover:border-white/30 hover:bg-midnight/5 dark:hover:bg-white/5'}`}
 								>

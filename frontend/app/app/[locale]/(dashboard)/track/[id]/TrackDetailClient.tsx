@@ -291,7 +291,7 @@ export default function TrackDetailClient({ initialTrack }: { initialTrack: Trac
 			{/* Main Track Header - Split Layout */}
 			<div className="flex flex-col md:flex-row gap-8 items-start mb-8">
 				{/* Left Side: Artwork with Play Button overlay */}
-				<div className="relative group aspect-square w-full max-w-[320px] mx-auto md:mx-0 flex-shrink-0 border border-midnight/10 dark:border-white/10 bg-midnight/5 dark:bg-white/5">
+				<div id="track-artwork-container" className="relative group aspect-square w-full max-w-[320px] mx-auto md:mx-0 flex-shrink-0 border border-midnight/10 dark:border-white/10 bg-midnight/5 dark:bg-white/5">
 					<img
 						src={resolveIpfs(track.image_url)}
 						alt={track.name}
@@ -335,7 +335,7 @@ export default function TrackDetailClient({ initialTrack }: { initialTrack: Trac
 					</div>
 
 					{/* Pricing & Mint Card */}
-					<div className="w-full mt-2">
+					<div id="track-collect-container" className="w-full mt-2">
 						<div className="flex items-center justify-between mb-4">
 							{hasOwned ? (
 								<div className="flex items-center gap-1.5 text-green-500 text-sm font-bold font-mono">
@@ -470,7 +470,7 @@ export default function TrackDetailClient({ initialTrack }: { initialTrack: Trac
 				</div>
 
 				{/* Right 1/3: Blockchain Details */}
-				<div className="space-y-4">
+				<div id="blockchain-details-section" className="space-y-4">
 					<h2 className="text-xs font-bold uppercase tracking-widest text-midnight/40 dark:text-white/30">
 						Blockchain Details
 					</h2>
