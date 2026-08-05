@@ -194,7 +194,8 @@ export async function getTrack(tokenId: number): Promise<Track | null> {
     sql: `
       SELECT *, 
              (SELECT COUNT(*) FROM plays p WHERE p.track_id = token_id) as play_count,
-             (SELECT COUNT(*) FROM mints m WHERE m.track_id = token_id) as mint_count
+             (SELECT COUNT(*) FROM mints m WHERE m.track_id = token_id) as mint_count,
+             (SELECT name FROM tracks t2 WHERE t2.token_id = tracks.album_id) as album_name
       FROM tracks 
       WHERE token_id = ?
     `,

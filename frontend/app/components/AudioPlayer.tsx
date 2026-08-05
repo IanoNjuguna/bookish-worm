@@ -59,18 +59,19 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
   const [mintData, setMintData] = useState({ minted: 0, max: 0 })
   const [uploaderAddress, setUploaderAddress] = useState<string | null>(null)
   const [albumId, setAlbumId] = useState<number | null>(null)
+  const [albumName, setAlbumName] = useState<string | null>(null)
   const [ticker, setTicker] = useState<string | null>(null)
-
+ 
   const progressBarRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const locale = useLocale()
-
+ 
   // Real-time ownership checking for current track on Cardano
   const checkOwnership = useCallback(async () => {
     if (!effectiveAddress || !currentTrack) return
     const tokenId = currentTrack.id
     if (tokenId === undefined || tokenId === null) return
-
+ 
     try {
       const authData = typeof window !== 'undefined' ? localStorage.getItem('doba_auth_data') : null
       const headers: Record<string, string> = {}
@@ -80,7 +81,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
           headers['Authorization'] = `Bearer ${parsedAuth.accessToken}`
         }
       }
-
+ 
       const res = await fetch(`/api-backend/songs/${tokenId}`, { headers })
       if (res.ok) {
         const data = await res.json()
@@ -91,6 +92,9 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
         if (data.album_id !== undefined) {
           setAlbumId(data.album_id)
         }
+        if (data.album_name) {
+          setAlbumName(data.album_name)
+        }
         if (data.ticker) {
           setTicker(data.ticker)
         }
@@ -99,7 +103,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
       logger.error('AudioPlayer: Error checking ownership', e)
     }
   }, [effectiveAddress, currentTrack])
-
+ 
   const fetchMintData = useCallback(async () => {
     if (!currentTrack) return
     const tokenId = currentTrack.id
@@ -107,7 +111,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
       setMintData({ minted: 0, max: 0 })
       return
     }
-
+ 
     try {
       const res = await fetch(`/api-backend/songs/${tokenId}`)
       if (res.ok) {
@@ -122,6 +126,9 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
         if (data.album_id !== undefined) {
           setAlbumId(data.album_id)
         }
+        if (data.album_name) {
+          setAlbumName(data.album_name)
+        }
         if (data.ticker) {
           setTicker(data.ticker)
         }
@@ -130,12 +137,13 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
       logger.error('AudioPlayer: Error fetching mint data', err)
     }
   }, [currentTrack])
-
+ 
   useEffect(() => {
+    setAlbumName(null)
     checkOwnership()
     fetchMintData()
   }, [currentTrack?.id, (currentTrack as any)?.token_id, effectiveAddress, checkOwnership, fetchMintData])
-
+ 
   // HTML5 Media Session API Integration for system notifications/lock screen
   useEffect(() => {
     if (typeof window !== 'undefined' && 'mediaSession' in navigator && currentTrack) {
@@ -143,7 +151,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
         navigator.mediaSession.metadata = new window.MediaMetadata({
           title: currentTrack.title,
           artist: currentTrack.creator,
-          album: 'Doba Protocol',
+          album: albumName || 'Single',
           artwork: [
             { src: currentTrack.cover, sizes: '96x96' },
             { src: currentTrack.cover, sizes: '128x128' },
@@ -153,7 +161,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
             { src: currentTrack.cover, sizes: '512x512' },
           ],
         })
-
+ 
         // Bind lock screen playback controls to player actions
         navigator.mediaSession.setActionHandler('play', () => {
           togglePlayPause()
@@ -171,7 +179,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
         logger.error('AudioPlayer: Failed to set mediaSession metadata', err)
       }
     }
-  }, [currentTrack, isPlaying, togglePlayPause, next, previous])
+  }, [currentTrack, isPlaying, albumName, togglePlayPause, next, previous])
 
   const handleMint = async (e: React.MouseEvent) => {
     e.stopPropagation()
