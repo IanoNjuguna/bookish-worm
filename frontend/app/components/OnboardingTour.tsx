@@ -40,40 +40,40 @@ const CustomTooltip = ({
 	return (
 		<div
 			{...tooltipProps}
-			className="rounded-none border-2 border-double border-[#C1A87D] bg-[#0D2418] text-[#FAF9F6] max-w-[340px] p-5 shadow-2xl relative overflow-hidden"
+			className="rounded-none border-2 border-double border-[#B794F4] bg-[#0D0D12] text-[#FAF9F6] max-w-[340px] p-5 shadow-2xl relative overflow-hidden"
 			style={{
-				backgroundImage: 'radial-gradient(rgba(193, 168, 125, 0.08) 15%, transparent 16%)',
+				backgroundImage: 'radial-gradient(rgba(183, 148, 244, 0.08) 15%, transparent 16%)',
 				backgroundSize: '5px 5px',
 			}}
 		>
 			{/* Printed paper wear overlay */}
-			<div className="absolute inset-0 opacity-10 bg-[linear-gradient(rgba(193,168,125,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(193,168,125,0.05)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
+			<div className="absolute inset-0 opacity-10 bg-[linear-gradient(rgba(183,148,244,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(183,148,244,0.04)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
 
 			{/* Saturated Fujifilm Velvia Lens Flare effect */}
 			<div className="absolute -top-16 -right-16 w-32 h-32 bg-gradient-to-br from-[#B57EDC]/10 via-[#FF1F8A]/5 to-transparent rounded-full blur-2xl pointer-events-none" />
 
 			{/* Tooltip Header */}
 			{step.title && (
-				<h5 className="font-chivo font-black text-sm uppercase tracking-wider text-[#FAF9F6] border-b border-[#C1A87D]/30 pb-2 mb-3 flex items-center justify-between">
+				<h5 className="font-chivo font-black text-sm uppercase tracking-wider text-[#FAF9F6] border-b border-[#B794F4]/30 pb-2 mb-3 flex items-center justify-between">
 					<span>{step.title}</span>
-					<span className="font-mono text-[10px] text-[#C1A87D] bg-[#0D2418] border border-[#C1A87D]/30 px-1.5 py-0.5">
+					<span className="font-mono text-[10px] text-[#B794F4] bg-[#0D0D12] border border-[#B794F4]/30 px-1.5 py-0.5">
 						SPEC {index + 1}/{size}
 					</span>
 				</h5>
 			)}
 
 			{/* Tooltip Body */}
-			<div className="font-mono text-[11px] text-[#E5D7B7] leading-relaxed mb-6 whitespace-normal">
+			<div className="font-mono text-[11px] text-[#E2DCF0] leading-relaxed mb-6 whitespace-normal">
 				{step.content}
 			</div>
 
 			{/* Tooltip Controls */}
-			<div className="flex items-center justify-between pt-2.5 border-t border-[#C1A87D]/20">
+			<div className="flex items-center justify-between pt-2.5 border-t border-[#B794F4]/20">
 				<div>
 					{index > 0 && (
 						<button
 							{...backProps}
-							className="font-mono text-[10px] text-[#C1A87D]/70 hover:text-[#C1A87D] uppercase tracking-wider transition-colors mr-3.5 outline-none"
+							className="font-mono text-[10px] text-[#B794F4]/70 hover:text-[#B794F4] uppercase tracking-wider transition-colors mr-3.5 outline-none"
 						>
 							&lt; BACK
 						</button>
@@ -87,7 +87,7 @@ const CustomTooltip = ({
 				</div>
 				<button
 					{...primaryProps}
-					className="font-chivo font-black text-[11px] uppercase bg-[#B57EDC] hover:bg-[#A36CCB] text-[#0D2418] px-4 py-2 rounded-none tracking-widest transition-all shadow-[2px_2px_0px_#C1A87D] active:translate-y-[1px] active:shadow-[1px_1px_0px_#C1A87D] outline-none"
+					className="font-chivo font-black text-[11px] uppercase bg-[#B57EDC] hover:bg-[#A36CCB] text-[#0D2418] px-4 py-2 rounded-none tracking-widest transition-all shadow-[2px_2px_0px_#B794F4] active:translate-y-[1px] active:shadow-[1px_1px_0px_#B794F4] outline-none"
 				>
 					{isLastStep ? 'COMPLETE' : 'NEXT >'}
 				</button>
@@ -412,7 +412,7 @@ export default function OnboardingTour() {
 			beaconComponent={CustomBeacon}
 			styles={{
 				options: {
-					overlayColor: 'rgba(11, 30, 20, 0.82)', // Saturated deep forest green with Fujfilm Velvia color grading feel
+					overlayColor: 'rgba(13, 13, 18, 0.85)', // Unified dark brand theme overlay
 					zIndex: 10000,
 				}
 			} as any}
