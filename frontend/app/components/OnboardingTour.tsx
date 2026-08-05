@@ -6,6 +6,8 @@ import { useParams, usePathname } from 'next/navigation'
 import { Step } from 'react-joyride'
 import { useTranslations } from 'next-intl'
 import { useCardano } from '@/components/Providers'
+import { useTheme } from 'next-themes'
+import { cn } from '@/lib/utils'
 
 // Dynamically import Joyride with SSR disabled and resolve the named export to prevent TypeScript compilation errors
 const Joyride = dynamic(() => import('react-joyride').then(mod => mod.Joyride), { ssr: false }) as any
@@ -19,80 +21,8 @@ const CustomBeacon = ({ beaconRef, ...props }: any) => {
 			className="relative flex h-6 w-6 cursor-pointer justify-center items-center"
 		>
 			<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#B57EDC] opacity-75"></span>
-			<span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#B57EDC] border-2 border-[#0D2418] shadow-md"></span>
+			<span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#B57EDC] border-2 border-[#0D0D12] shadow-md"></span>
 		</span>
-	)
-}
-
-// Custom 90s Sportswear Tooltip Component
-const CustomTooltip = ({
-	backProps,
-	closeProps,
-	primaryProps,
-	skipProps,
-	tooltipProps,
-	index,
-	isLastStep,
-	size,
-	step,
-	continuous,
-}: any) => {
-	return (
-		<div
-			{...tooltipProps}
-			className="rounded-none border-2 border-double border-[#B794F4] bg-[#0D0D12] text-[#FAF9F6] max-w-[340px] p-5 shadow-2xl relative overflow-hidden"
-			style={{
-				backgroundImage: 'radial-gradient(rgba(183, 148, 244, 0.08) 15%, transparent 16%)',
-				backgroundSize: '5px 5px',
-			}}
-		>
-			{/* Printed paper wear overlay */}
-			<div className="absolute inset-0 opacity-10 bg-[linear-gradient(rgba(183,148,244,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(183,148,244,0.04)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
-
-			{/* Saturated Fujifilm Velvia Lens Flare effect */}
-			<div className="absolute -top-16 -right-16 w-32 h-32 bg-gradient-to-br from-[#B57EDC]/10 via-[#FF1F8A]/5 to-transparent rounded-full blur-2xl pointer-events-none" />
-
-			{/* Tooltip Header */}
-			{step.title && (
-				<h5 className="font-chivo font-black text-sm uppercase tracking-wider text-[#FAF9F6] border-b border-[#B794F4]/30 pb-2 mb-3 flex items-center justify-between">
-					<span>{step.title}</span>
-					<span className="font-mono text-[10px] text-[#B794F4] bg-[#0D0D12] border border-[#B794F4]/30 px-1.5 py-0.5">
-						SPEC {index + 1}/{size}
-					</span>
-				</h5>
-			)}
-
-			{/* Tooltip Body */}
-			<div className="font-mono text-[11px] text-[#E2DCF0] leading-relaxed mb-6 whitespace-normal">
-				{step.content}
-			</div>
-
-			{/* Tooltip Controls */}
-			<div className="flex items-center justify-between pt-2.5 border-t border-[#B794F4]/20">
-				<div>
-					{index > 0 && (
-						<button
-							{...backProps}
-							className="font-mono text-[10px] text-[#B794F4]/70 hover:text-[#B794F4] uppercase tracking-wider transition-colors mr-3.5 outline-none"
-						>
-							&lt; BACK
-						</button>
-					)}
-					<button
-						{...skipProps}
-						className="font-mono text-[10px] text-red-400/60 hover:text-red-400 uppercase tracking-wider transition-colors outline-none"
-					>
-						[SKIP]
-					</button>
-				</div>
-				<button
-					{...primaryProps}
-					className="font-chivo font-black text-[11px] uppercase bg-[#B57EDC] hover:bg-[#A36CCB] text-[#0D2418] px-4 py-2 rounded-none tracking-widest transition-all shadow-[2px_2px_0px_#B794F4] active:translate-y-[1px] active:shadow-[1px_1px_0px_#B794F4] outline-none"
-				>
-					{isLastStep ? 'COMPLETE' : 'NEXT >'}
-				</button>
-			</div>
-		</div>
 	)
 }
 
@@ -100,6 +30,7 @@ export default function OnboardingTour() {
 	const tNav = useTranslations('nav')
 	const pathname = usePathname() || ''
 	const params = useParams()
+	const { resolvedTheme } = useTheme()
 	
 	// Cardano Wallet Authentication State
 	const { isConnected, address } = useCardano()
@@ -107,6 +38,109 @@ export default function OnboardingTour() {
 	const [run, setRun] = useState(false)
 	const [key, setKey] = useState(0) // Force reset/remount Joyride
 	const [hasSongs, setHasSongs] = useState(false) // Dynamic library branching state
+
+	// Custom 90s Sportswear Tooltip Component with dynamic theme-aware contrast color schemes
+	const CustomTooltip = ({
+		backProps,
+		closeProps,
+		primaryProps,
+		skipProps,
+		tooltipProps,
+		index,
+		isLastStep,
+		size,
+		step,
+		continuous,
+	}: any) => {
+		const isDarkTheme = resolvedTheme === 'dark'
+
+		return (
+			<div
+				{...tooltipProps}
+				className={cn(
+					"rounded-none border-2 border-double border-[#B794F4] p-5 shadow-2xl relative overflow-hidden w-[calc(100vw-32px)] sm:max-w-[340px] focus:outline-none",
+					isDarkTheme 
+						? "bg-[#FAF9F6] text-[#0D0D12]" 
+						: "bg-[#0D0D12] text-[#FAF9F6]"
+				)}
+				style={{
+					backgroundImage: 'radial-gradient(rgba(183, 148, 244, 0.08) 15%, transparent 16%)',
+					backgroundSize: '5px 5px',
+				}}
+			>
+				{/* Printed paper wear overlay */}
+				<div className={cn(
+					"absolute inset-0 opacity-10 pointer-events-none",
+					isDarkTheme
+						? "bg-[linear-gradient(rgba(13,13,18,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(13,13,18,0.04)_1px,transparent_1px)] bg-[size:20px_20px]"
+						: "bg-[linear-gradient(rgba(183,148,244,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(183,148,244,0.04)_1px,transparent_1px)] bg-[size:20px_20px]"
+				)} />
+
+				{/* Saturated Fujifilm Velvia Lens Flare effect */}
+				<div className="absolute -top-16 -right-16 w-32 h-32 bg-gradient-to-br from-[#B57EDC]/10 via-[#FF1F8A]/5 to-transparent rounded-full blur-2xl pointer-events-none" />
+
+				{/* Tooltip Header */}
+				{step.title && (
+					<h5 className={cn(
+						"font-chivo font-black text-sm uppercase tracking-wider border-b pb-2 mb-3 flex items-center justify-between",
+						isDarkTheme ? "text-[#0D0D12] border-[#B794F4]/30" : "text-[#FAF9F6] border-[#B794F4]/30"
+					)}>
+						<span>{step.title}</span>
+						<span className={cn(
+							"font-mono text-[10px] border px-1.5 py-0.5",
+							isDarkTheme 
+								? "text-[#B794F4] bg-[#FAF9F6] border-[#B794F4]/30" 
+								: "text-[#B794F4] bg-[#0D0D12] border-[#B794F4]/30"
+						)}>
+							SPEC {index + 1}/{size}
+						</span>
+					</h5>
+				)}
+
+				{/* Tooltip Body */}
+				<div className={cn(
+					"font-mono text-[11px] leading-relaxed mb-6 whitespace-normal",
+					isDarkTheme ? "text-[#333333]" : "text-[#E2DCF0]"
+				)}>
+					{step.content}
+				</div>
+
+				{/* Tooltip Controls */}
+				<div className="flex items-center justify-between pt-2.5 border-t border-[#B794F4]/20">
+					<div>
+						{index > 0 && (
+							<button
+								{...backProps}
+								className={cn(
+									"font-mono text-[10px] uppercase tracking-wider transition-colors mr-3.5 outline-none",
+									isDarkTheme ? "text-[#B794F4] hover:text-[#B794F4]/80" : "text-[#B794F4]/70 hover:text-[#B794F4]"
+								)}
+							>
+								&lt; BACK
+							</button>
+						)}
+						<button
+							{...skipProps}
+							className="font-mono text-[10px] text-red-400/60 hover:text-red-400 uppercase tracking-wider transition-colors outline-none"
+						>
+							[SKIP]
+						</button>
+					</div>
+					<button
+						{...primaryProps}
+						className={cn(
+							"font-chivo font-black text-[11px] uppercase px-4 py-2 rounded-none tracking-widest transition-all outline-none",
+							isDarkTheme
+								? "bg-[#0D0D12] hover:bg-[#2A2A38] text-[#FAF9F6] shadow-[2px_2px_0px_#B794F4] active:shadow-[1px_1px_0px_#B794F4] active:translate-y-[1px]"
+								: "bg-[#FAF9F6] hover:bg-[#EAEAEF] text-[#0D0D12] shadow-[2px_2px_0px_#B794F4] active:shadow-[1px_1px_0px_#B794F4] active:translate-y-[1px]"
+						)}
+					>
+						{isLastStep ? 'COMPLETE' : 'NEXT >'}
+					</button>
+				</div>
+			</div>
+		)
+	}
 
 	// Helper to get page identifier for path-segmented onboarding
 	const getPageKey = (): string => {
@@ -246,7 +280,7 @@ export default function OnboardingTour() {
 			return [
 				{
 					target: '#upload-audio-zone',
-					content: 'DRAG AND DROP WAV/MP3 AUDIO FILES. DECENTRALIZED ASSETS ARE AUTOMATICALLY PINNED ON IPFS.',
+					content: 'DRAG AND DROP WAV/MP3 AUDIO FILES. DECENTRALIZED ASSETS ARE AUTOMATICALLY PINSED ON IPFS.',
 					title: 'AUDIO SOURCE BUFFER',
 					placement: 'bottom',
 					skipBeacon: true,
@@ -423,6 +457,12 @@ export default function OnboardingTour() {
 		}
 	}
 
+	// Enforce center alignment globally for all onboarding steps to occupy viewport center space and display flawlessly on mobile
+	const steps = getSteps().map(step => ({
+		...step,
+		placement: 'center' as const
+	}))
+
 	return (
 		<Joyride
 			key={key}
@@ -430,12 +470,12 @@ export default function OnboardingTour() {
 			continuous={true}
 			run={run}
 			scrollToFirstStep={true}
-			steps={getSteps()}
+			steps={steps}
 			tooltipComponent={CustomTooltip}
 			beaconComponent={CustomBeacon}
 			styles={{
 				options: {
-					overlayColor: 'rgba(13, 13, 18, 0.85)', // Unified dark brand theme overlay
+					overlayColor: resolvedTheme === 'dark' ? 'rgba(13, 13, 18, 0.75)' : 'rgba(250, 249, 246, 0.75)',
 					zIndex: 10000,
 				}
 			} as any}
