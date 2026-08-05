@@ -165,8 +165,10 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
 
         navigator.mediaSession.metadata = new window.MediaMetadata({
           title: currentTrack.title,
-          artist: currentTrack.creator,
-          album: albumName || 'Single',
+          // Append $TICKER to artist name for Web3 identity recognition on lock screens
+          artist: ticker ? `${currentTrack.creator} $${ticker}` : currentTrack.creator,
+          // Album name if part of a collection; otherwise 'Single · Doba' for brand visibility
+          album: albumName ? `${albumName} · Doba` : 'Single · Doba',
           artwork: artworkUrl ? [
             { src: artworkUrl, sizes: '96x96',   type: 'image/jpeg' },
             { src: artworkUrl, sizes: '128x128',  type: 'image/jpeg' },

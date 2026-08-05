@@ -14,6 +14,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/ThemeProvider"
 import { DynamicFavicon } from "@/components/DynamicFavicon"
 import { Toaster } from "@/components/ui/sonner"
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt"
 
 const chivo = localFont({
 	src: [
@@ -60,9 +61,24 @@ export const metadata: Metadata = {
 	metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
 	title: 'Doba | Release and collect music records as digital assets',
 	description: 'Doba is a distribution service for artists to release music and manage their careers.',
+	manifest: '/manifest.json',
+	appleWebApp: {
+		capable: true,
+		statusBarStyle: 'black-translucent',
+		title: 'Doba',
+		startupImage: '/icons/icon-512x512.png',
+	},
 	icons: {
-		icon: '/doba.ico', // Favicon: public/doba.ico
-		apple: '/doba.png', // For iOS home screens
+		icon: [
+			{ url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+			{ url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
+			{ url: '/doba.ico' },
+		],
+		apple: [
+			{ url: '/icons/icon-152x152.png', sizes: '152x152', type: 'image/png' },
+			{ url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+		],
+		shortcut: '/doba.ico',
 	},
 	openGraph: {
 		images: [
@@ -80,6 +96,7 @@ export const metadata: Metadata = {
 	},
 	other: {
 		'talentapp:project_verification': '44388cc20c53b76e658fd42a0679e234c22e2f97278196bf75bfc12e67b05bcaf81b5726868e4e6582739e7aa4395fde04629e0d2c409431da28f053f2ff59c6',
+		'mobile-web-app-capable': 'yes',
 	},
 }
 
@@ -123,6 +140,7 @@ export default async function LocaleLayout({ children, params }: Props) {
 					</ThemeProvider>
 				</NextIntlClientProvider>
 				<DynamicFavicon />
+				<PWAInstallPrompt />
 				<Toaster position="bottom-right" closeButton />
 				<SpeedInsights />
 				<Analytics />
