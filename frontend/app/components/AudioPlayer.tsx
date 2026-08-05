@@ -148,18 +148,33 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
   useEffect(() => {
     if (typeof window !== 'undefined' && 'mediaSession' in navigator && currentTrack) {
       try {
+        // Resolve IPFS cover URIs to public HTTPS URLs — the Media Session API
+        // artwork fetcher runs as a standalone HTTP client and cannot handle ipfs:// URIs
+        const resolveArtworkUrl = (raw: string): string => {
+          if (!raw) return ''
+          if (raw.startsWith('ipfs://')) {
+            return raw.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/')
+          }
+          // Bare IPFS hash (Qm... or bafy...)
+          if (raw.startsWith('Qm') || raw.startsWith('bafy')) {
+            return `https://gateway.pinata.cloud/ipfs/${raw}`
+          }
+          return raw
+        }
+        const artworkUrl = resolveArtworkUrl(currentTrack.cover)
+
         navigator.mediaSession.metadata = new window.MediaMetadata({
           title: currentTrack.title,
           artist: currentTrack.creator,
           album: albumName || 'Single',
-          artwork: [
-            { src: currentTrack.cover, sizes: '96x96' },
-            { src: currentTrack.cover, sizes: '128x128' },
-            { src: currentTrack.cover, sizes: '192x192' },
-            { src: currentTrack.cover, sizes: '256x256' },
-            { src: currentTrack.cover, sizes: '384x384' },
-            { src: currentTrack.cover, sizes: '512x512' },
-          ],
+          artwork: artworkUrl ? [
+            { src: artworkUrl, sizes: '96x96',   type: 'image/jpeg' },
+            { src: artworkUrl, sizes: '128x128',  type: 'image/jpeg' },
+            { src: artworkUrl, sizes: '192x192',  type: 'image/jpeg' },
+            { src: artworkUrl, sizes: '256x256',  type: 'image/jpeg' },
+            { src: artworkUrl, sizes: '384x384',  type: 'image/jpeg' },
+            { src: artworkUrl, sizes: '512x512',  type: 'image/jpeg' },
+          ] : [],
         })
  
         // Bind lock screen playback controls to player actions
