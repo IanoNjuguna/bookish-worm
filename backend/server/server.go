@@ -1,7 +1,6 @@
 package server
 
 import (
-	"doba-backend/internal/domains/home"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -61,7 +60,10 @@ func createReverseProxy(targetURL string) (*httputil.ReverseProxy, error) {
 
 // New creates an API Gateway reverse proxy routing requests between home and app microservices.
 func New(cfg Config) (http.Handler, error) {
-	homeHandler := home.RegisterRoutes()
+	homeProxy, err := createReverseProxy(cfg.HomeServiceURL)
+	if err != nil {
+		return nil, err
+	}
 
 	appProxy, err := createReverseProxy(cfg.AppServiceURL)
 	if err != nil {
@@ -91,9 +93,12 @@ func New(cfg Config) (http.Handler, error) {
 		case strings.HasPrefix(path, "/_next"):
 			log.Printf("[Gateway Router] Routing Next.js asset %s -> App Service (%s)", r.URL.Path, cfg.AppServiceURL)
 			appProxy.ServeHTTP(w, r)
+		case host == "doba.world" || host == "home.doba.world" || host == "localhost" || host == "127.0.0.1":
+			log.Printf("[Gateway Router] Routing request %s -> Home Service (%s)", r.URL.Path, cfg.HomeServiceURL)
+			homeProxy.ServeHTTP(w, r)
 		default:
-			log.Printf("[Gateway Router] Serving static embedded Home page for %s", r.URL.Path)
-			homeHandler.ServeHTTP(w, r)
+			log.Printf("[Gateway Router] Default routing request %s -> Home Service (%s)", r.URL.Path, cfg.HomeServiceURL)
+			homeProxy.ServeHTTP(w, r)
 		}
 	}), nil
 }
