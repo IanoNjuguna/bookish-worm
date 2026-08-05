@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { IconDownload, IconX } from '@tabler/icons-react'
 import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[]
@@ -81,7 +82,15 @@ export function PWAInstallPrompt() {
   }, [])
 
   const handleInstall = async () => {
-    if (!deferredPrompt) return
+    if (!deferredPrompt) {
+      // Fallback if the programmatic prompt isn't available
+      toast("To install, click the Install icon [↓] in your URL bar, or 'Add to Home Screen' in your browser menu.", {
+        icon: '📱',
+        duration: 5000,
+      })
+      setShowBanner(false)
+      return
+    }
     await deferredPrompt.prompt()
     const { outcome } = await deferredPrompt.userChoice
     if (outcome === 'accepted') {
