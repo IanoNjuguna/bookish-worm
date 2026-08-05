@@ -77,18 +77,21 @@ export const useAudioPlayer = () => {
 
   const next = useCallback(() => {
     setPlayerState((prev) => {
+      if (prev.queue.length === 0) return prev
       const nextIndex = (prev.currentIndex + 1) % prev.queue.length
       const nextTrack = prev.queue[nextIndex]
       return {
         ...prev,
         currentTrack: nextTrack,
         currentIndex: nextIndex,
+        isPlaying: true, // always autoplay on skip/next
       }
     })
   }, [])
 
   const previous = useCallback(() => {
     setPlayerState((prev) => {
+      if (prev.queue.length === 0) return prev
       const prevIndex =
         prev.currentIndex === 0
           ? prev.queue.length - 1
@@ -98,6 +101,7 @@ export const useAudioPlayer = () => {
         ...prev,
         currentTrack: prevTrack,
         currentIndex: prevIndex,
+        isPlaying: true, // always autoplay on skip/previous
       }
     })
   }, [])

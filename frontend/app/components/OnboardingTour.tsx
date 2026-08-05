@@ -446,9 +446,28 @@ export default function OnboardingTour() {
 		]
 	}
 
+	// Install step appended to every tour flow
+	const INSTALL_STEP = {
+		target: 'body',
+		placement: 'center' as const,
+		title: 'INSTALL DOBA',
+		content: 'Add Doba to your home screen for instant access, lock screen music controls, and push notifications \u2014 no App Store required.',
+		skipBeacon: true,
+		data: { isInstallStep: true },
+	}
+
 	const handleJoyrideCallback = (data: any) => {
-		const { status } = data
+		const { status, action, index, type, step } = data
 		const finishedStatuses = ['finished', 'skipped']
+
+		// Fire the install prompt when the user advances through the install step
+		if (
+			type === 'step:after' &&
+			action === 'next' &&
+			(step as any)?.data?.isInstallStep
+		) {
+			window.dispatchEvent(new CustomEvent('doba-trigger-install'))
+		}
 
 		if (finishedStatuses.includes(status)) {
 			setRun(false)
@@ -458,7 +477,7 @@ export default function OnboardingTour() {
 	}
 
 	// Enforce center alignment globally for all onboarding steps to occupy viewport center space and display flawlessly on mobile
-	const rawSteps = getSteps()
+	const rawSteps = [...getSteps(), INSTALL_STEP]
 	const steps = rawSteps.map(step => {
 		const targetSelector = typeof step.target === 'string' ? step.target : ''
 		let useBodyFallback = false
@@ -489,7 +508,7 @@ export default function OnboardingTour() {
 	return (
 		<Joyride
 			key={key}
-			onEvent={handleJoyrideCallback}
+			callback={handleJoyrideCallback}
 			continuous={true}
 			run={run}
 			scrollToFirstStep={true}

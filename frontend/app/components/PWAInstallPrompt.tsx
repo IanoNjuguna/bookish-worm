@@ -15,6 +15,7 @@ export function PWAInstallPrompt() {
   const [showBanner, setShowBanner] = useState(false)
   const [isInstalled, setIsInstalled] = useState(false)
   const [isIOSPrompt, setIsIOSPrompt] = useState(false)
+  const [isIOS, setIsIOS] = useState(false)
 
   useEffect(() => {
     // Register service worker
@@ -34,26 +35,49 @@ export function PWAInstallPrompt() {
     // Detect iOS Safari (doesn't support beforeinstallprompt)
     const ios = /iphone|ipad|ipod/i.test(navigator.userAgent)
     const safari = /safari/i.test(navigator.userAgent) && !/chrome/i.test(navigator.userAgent)
+    setIsIOS(ios && safari)
 
-    // Dismiss tracking via localStorage
-    const dismissed = localStorage.getItem('doba_pwa_dismissed')
-    if (dismissed) return
-
-    // iOS: Show custom Safari install instructions after delay
-    if (ios && safari) {
-      const timer = setTimeout(() => setIsIOSPrompt(true), 4000)
-      return () => clearTimeout(timer)
-    }
-
-    // Android/Desktop: listen for the browser's native install event
+    // Capture the native install prompt event immediately — do NOT auto-show
+    // The banner is shown either via the onboarding tour trigger or automatically
+    // after 4 seconds (only if user hasn't dismissed before)
     const handler = (e: Event) => {
       e.preventDefault()
       setDeferredPrompt(e as BeforeInstallPromptEvent)
-      setTimeout(() => setShowBanner(true), 4000)
+      // Auto-show after delay only if not dismissed before
+      const dismissed = localStorage.getItem('doba_pwa_dismissed')
+      if (!dismissed) {
+        setTimeout(() => setShowBanner(true), 4000)
+      }
+    }
+    window.addEventListener('beforeinstallprompt', handler)
+
+    // iOS: auto-show after delay if not dismissed
+    if (ios && safari) {
+      const dismissed = localStorage.getItem('doba_pwa_dismissed')
+      if (!dismissed) {
+        const timer = setTimeout(() => setIsIOSPrompt(true), 4000)
+        return () => {
+          window.removeEventListener('beforeinstallprompt', handler)
+          clearTimeout(timer)
+        }
+      }
     }
 
-    window.addEventListener('beforeinstallprompt', handler)
-    return () => window.removeEventListener('beforeinstallprompt', handler)
+    // Listen for manual trigger from onboarding tour — always show, even if dismissed before
+    const onTourTrigger = () => {
+      localStorage.removeItem('doba_pwa_dismissed') // Reset dismiss so user can re-install
+      if (ios && safari) {
+        setIsIOSPrompt(true)
+      } else {
+        setShowBanner(true)
+      }
+    }
+    window.addEventListener('doba-trigger-install', onTourTrigger)
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler)
+      window.removeEventListener('doba-trigger-install', onTourTrigger)
+    }
   }, [])
 
   const handleInstall = async () => {

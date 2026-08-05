@@ -411,12 +411,18 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
     setRepeatMode((m) => (m === 'off' ? 'all' : m === 'all' ? 'one' : 'off'))
   }
 
-  if (!currentTrack) return null
+  // Keep player mounted even when no track is selected — prevents audio element destruction during track transitions
+  const isVisible = !!currentTrack
+  // Non-null alias — safe to use inside JSX that is only rendered/visible when isVisible is true
+  const track = currentTrack!
 
   const accentActive = 'text-[#FF1F8A]'
 
   return (
-    <div className="fixed md:relative bottom-0 left-0 right-0 md:bottom-auto md:left-auto md:right-auto z-50 w-full h-auto md:h-[90px] bg-[#FAF9F6]/80 dark:bg-[#0D0D12]/80 backdrop-blur-xl border-t border-midnight/[0.08] dark:border-white/[0.08] pb-[env(safe-area-inset-bottom)] flex-shrink-0 transition-colors duration-200">
+    <div className={cn(
+      "fixed md:relative bottom-0 left-0 right-0 md:bottom-auto md:left-auto md:right-auto z-50 w-full h-auto md:h-[90px] bg-[#FAF9F6]/80 dark:bg-[#0D0D12]/80 backdrop-blur-xl border-t border-midnight/[0.08] dark:border-white/[0.08] pb-[env(safe-area-inset-bottom)] flex-shrink-0 transition-all duration-300",
+      isVisible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-full md:translate-y-0 pointer-events-none'
+    )}>
       {/* Mobile Continuous Divider */}
       <div className="lg:hidden absolute top-0 left-4 right-4 h-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
 
@@ -446,18 +452,18 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
           className="flex items-center gap-6 w-[30%] min-w-[240px] flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
           onClick={() => {
             handleOpenSidebar({
-              ...currentTrack,
-              token_id: currentTrack.id, // Ensure token_id is available for mint counter
-              name: currentTrack.title,
-              artist: currentTrack.creator,
-              image_url: currentTrack.cover
+              ...track,
+              token_id: track.id, // Ensure token_id is available for mint counter
+              name: track.title,
+              artist: track.creator,
+              image_url: track.cover
             })
           }}
         >
           <div className="w-12 h-12 rounded-md flex-shrink-0 overflow-hidden bg-midnight/5 dark:bg-white/5 text-xs">
             <img
-              src={(currentTrack.cover || '').replace('ipfs://', process.env.NEXT_PUBLIC_IPFS_GATEWAY || 'https://gateway.pinata.cloud/ipfs/')}
-              alt={currentTrack.title}
+              src={(track.cover || '').replace('ipfs://', process.env.NEXT_PUBLIC_IPFS_GATEWAY || 'https://gateway.pinata.cloud/ipfs/')}
+              alt={track.title}
               className="w-full h-full object-cover"
             />
           </div>
@@ -465,12 +471,17 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
           <div className="min-w-0 flex-1 pl-2">
             <div className="marquee-container">
               <div className="marquee-content">
-                <span className="text-sm font-semibold text-midnight dark:text-white pr-12">{currentTrack.title}</span>
+                <span className="text-sm font-semibold text-midnight dark:text-white pr-12">{track.title}</span>
               </div>
             </div>
             <p className="text-xs text-midnight/50 dark:text-white/50 truncate mt-0.5">
-              {currentTrack.creator}
+              {track?.creator}
             </p>
+            {ticker && (
+              <p className="text-[10px] font-mono text-[#B57EDC] truncate mt-0.5 tracking-wide">
+                ${ticker} on Doba
+              </p>
+            )}
           </div>
 
           {isPlaying && (
@@ -659,17 +670,17 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
             className="w-10 h-10 flex-shrink-0 overflow-hidden bg-midnight/5 dark:bg-white/5 cursor-pointer rounded-none"
             onClick={() => {
               handleOpenSidebar({
-                ...currentTrack,
-                token_id: currentTrack.id,
-                name: currentTrack.title,
-                artist: currentTrack.creator,
-                image_url: currentTrack.cover
+                ...track,
+                token_id: track.id,
+                name: track.title,
+                artist: track.creator,
+                image_url: track.cover
               })
             }}
           >
             <img
-              src={(currentTrack.cover || '').replace('ipfs://', process.env.NEXT_PUBLIC_IPFS_GATEWAY || 'https://gateway.pinata.cloud/ipfs/')}
-              alt={currentTrack.title}
+              src={(track.cover || '').replace('ipfs://', process.env.NEXT_PUBLIC_IPFS_GATEWAY || 'https://gateway.pinata.cloud/ipfs/')}
+              alt={track.title}
               className="w-full h-full object-cover"
             />
           </div>
@@ -679,16 +690,16 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
             className="flex-1 min-w-0 flex items-center gap-2 pl-2"
             onClick={() => {
               handleOpenSidebar({
-                ...currentTrack,
-                token_id: currentTrack.id,
-                name: currentTrack.title,
-                artist: currentTrack.creator,
-                image_url: currentTrack.cover
+                ...track,
+                token_id: track.id,
+                name: track.title,
+                artist: track.creator,
+                image_url: track.cover
               })
             }}
           >
             <div className="min-w-0 flex-shrink truncate">
-              <h4 className="text-sm font-bold text-midnight dark:text-white truncate">{currentTrack.title}</h4>
+              <h4 className="text-sm font-bold text-midnight dark:text-white truncate">{track.title}</h4>
             </div>
 
             <div className="flex-shrink-0">
