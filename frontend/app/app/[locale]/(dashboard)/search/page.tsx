@@ -40,7 +40,7 @@ export default function SearchDashboard() {
       <div className="space-y-4">
         <h2 className="text-2xl font-bold">{tSearch('title')}</h2>
         <div className="flex flex-col md:flex-row gap-2">
-          <div className="relative group flex-1">
+          <div id="search-input-container" className="relative group flex-1">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-midnight/70 dark:text-white/60 group-focus-within:text-cyber-pink transition-colors" size={20} />
             <input
               type="text"
@@ -73,34 +73,36 @@ export default function SearchDashboard() {
           </Select>
         </div>
       </div>
-      <MarketplaceGrid
-        isSidebarOpen={isSidebarOpen}
-        searchQuery={debouncedSearch}
-        genre={selectedGenre}
-        currentTrackId={playerState.currentTrack?.id}
-        isPlaying={playerState.isPlaying}
-        onPlay={(track, tracks) => handlePlayTrack({
-          ...track,
-          id: track.token_id,
-          title: track.name,
-          creator: track.artist,
-          cover: track.image_url,
-          url: track.streaming_url || track.audio_url.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/'),
-          collaborators: 0,
-          genre: track.genre,
-          description: track.description
-        }, tracks.map(t => ({
-          ...t,
-          id: t.token_id,
-          title: t.name,
-          creator: t.artist,
-          cover: t.image_url,
-          url: t.streaming_url || t.audio_url.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/'),
-          collaborators: 0,
-          genre: t.genre,
-          description: t.description
-        })))}
-      />
+      <div id="search-marketplace-grid">
+        <MarketplaceGrid
+          isSidebarOpen={isSidebarOpen}
+          searchQuery={debouncedSearch}
+          genre={selectedGenre}
+          currentTrackId={playerState.currentTrack?.id}
+          isPlaying={playerState.isPlaying}
+          onPlay={(track, tracks) => handlePlayTrack({
+            ...track,
+            id: track.token_id,
+            title: track.name,
+            creator: track.artist,
+            cover: track.image_url,
+            url: track.streaming_url || track.audio_url.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/'),
+            collaborators: 0,
+            genre: track.genre,
+            description: track.description
+          }, tracks.map(t => ({
+            ...t,
+            id: t.token_id,
+            title: t.name,
+            creator: t.artist,
+            cover: t.image_url,
+            url: t.streaming_url || t.audio_url.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/'),
+            collaborators: 0,
+            genre: t.genre,
+            description: t.description
+          })))}
+        />
+      </div>
     </div>
   )
 }

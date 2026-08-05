@@ -89,7 +89,7 @@ export default function AnalyticsView() {
 	return (
 		<div className="space-y-8 animate-fade-in">
 			{/* Metrics Row */}
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+			<div id="analytics-metrics-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 				<MetricCard
 					label="Total Plays"
 					value={data.totalPlays.toLocaleString()}
@@ -117,7 +117,7 @@ export default function AnalyticsView() {
 			</div>
 
 			{/* Charts Row */}
-			<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+			<div id="analytics-charts-row" className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 				{/* Plays Over Time */}
 				<div className="bg-midnight/[0.02] dark:bg-white/[0.02] border border-midnight/[0.08] dark:border-white/[0.08] p-6 rounded-2xl shadow-xl relative overflow-hidden group">
 					<div className="absolute top-0 right-0 w-16 h-16 bg-[#FF1F8A]/5 -mr-8 -mt-8 rotate-45 pointer-events-none" />

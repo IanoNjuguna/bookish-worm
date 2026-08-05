@@ -180,7 +180,7 @@ export default function EarningsView() {
 				</button>
 			</div>
 
-			<div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+			<div id="earnings-metrics-grid" className="grid grid-cols-1 sm:grid-cols-3 gap-6">
 				{/* Lifetime Earnings */}
 				<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-6 bg-[#FAF9F6] dark:bg-[#0D0D12]/60 relative overflow-hidden group rounded-2xl shadow-lg">
 					<div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-cyber-pink to-transparent" />
@@ -212,7 +212,7 @@ export default function EarningsView() {
 				</div>
 			</div>
 
-			<div className="border border-midnight/[0.08] dark:border-white/[0.08] overflow-hidden bg-[#FAF9F6] dark:bg-[#0D0D12]/60 rounded-2xl shadow-xl">
+			<div id="earnings-splits-list" className="border border-midnight/[0.08] dark:border-white/[0.08] overflow-hidden bg-[#FAF9F6] dark:bg-[#0D0D12]/60 rounded-2xl shadow-xl">
 				<div className="p-6 border-b border-midnight/[0.08] dark:border-white/[0.08] flex justify-between items-center bg-white/[0.01]">
 					<h3 className="font-bold text-sm uppercase tracking-wider flex items-center gap-2">
 						<span className="w-1 h-4 bg-cyber-pink rounded-full"></span>

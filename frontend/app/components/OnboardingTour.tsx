@@ -283,6 +283,89 @@ export default function OnboardingTour() {
 			]
 		}
 
+		// Search Page Context
+		if (pathname.includes('/search')) {
+			return [
+				{
+					target: '#search-input-container',
+					content: 'SEARCH BY KEYWORDS OR FILTER BY MUSIC GENRES TO PINPOINT TARGET SONG FRACTIONS.',
+					title: 'FILTER SPECIFICATION',
+					placement: 'bottom',
+					skipBeacon: true,
+				},
+				{
+					target: '#search-marketplace-grid',
+					content: 'BROWSE MINTED TITLES, SCARCITY PERCENTAGES, AND PRICES BEFORE ACQUISITION.',
+					title: 'MARKETPLACE INDEX',
+					placement: 'top',
+				}
+			]
+		}
+
+		// Earnings Page Context
+		if (pathname.includes('/earnings')) {
+			return [
+				{
+					target: '#earnings-metrics-grid',
+					content: 'TRACK YOUR LIFETIME ON-CHAIN SALES VOLUME AND SECURE WALLET CUSTODY ASSETS.',
+					title: 'REVENUE AUDIT',
+					placement: 'bottom',
+					skipBeacon: true,
+				},
+				{
+					target: '#earnings-splits-list',
+					content: 'VERIFY REAL-TIME COLLABORATOR REVENUE DIVISION SPLITS CONFIGURED PER SONG.',
+					title: 'COLLABORATOR MATRIX',
+					placement: 'top',
+				}
+			]
+		}
+
+		// Analytics Page Context
+		if (pathname.includes('/analytics')) {
+			return [
+				{
+					target: '#analytics-metrics-grid',
+					content: 'AUDIT TOTAL STREAMS, GEOGRAPHIC LISTENER ENGAGEMENT, AND MONTHLY RETENTION RATES.',
+					title: 'METRIC SPECIFICATION',
+					placement: 'bottom',
+					skipBeacon: true,
+				},
+				{
+					target: '#analytics-charts-row',
+					content: 'VISUAL STREAM DATA RECORD PLOTTED OVER RECENT INTERVALS.',
+					title: 'PERFORMANCE CHARTS',
+					placement: 'top',
+				}
+			]
+		}
+
+		// Deposit Page Context
+		if (pathname.includes('/deposit')) {
+			return [
+				{
+					target: '#deposit-funds-container',
+					content: 'FUND YOUR INTEGRATED CARDANO WALLET TO BEGIN COLLECTING OR MINTING.',
+					title: 'DEPOSIT ENGINE',
+					placement: 'bottom',
+					skipBeacon: true,
+				}
+			]
+		}
+
+		// Send Money Page Context
+		if (pathname.includes('/send-money')) {
+			return [
+				{
+					target: '#send-funds-container',
+					content: 'TRANSFER ADA OR COLLECTED NFT FRACTIONS TO EXTERNAL BLOCKCHAIN IDENTITIES.',
+					title: 'TRANSFER ENGINE',
+					placement: 'bottom',
+					skipBeacon: true,
+				}
+			]
+		}
+
 		// Default / Home / General Dashboard Context
 		return [
 			{

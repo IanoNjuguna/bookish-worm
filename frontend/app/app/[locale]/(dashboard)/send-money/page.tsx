@@ -17,7 +17,7 @@ export default function SendMoneyDashboard() {
   if (!mounted) return null
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div id="send-funds-container" className="space-y-6 animate-fade-in">
       <div className="flex justify-start">
         <Link 
           href="/profile"
