@@ -6,7 +6,7 @@ import { useRouter } from '@/i18n/navigation'
 import { useCardano } from './Providers'
 import { useAudio } from '@/components/AudioProvider'
 import { Button } from '@/components/ui/button'
-import { IconCopy, IconCheck, IconExternalLink, IconLogout, IconWallet, IconChevronDown, IconBrandGoogle, IconUser, IconSettings, IconHelp, IconMenu, IconX, IconHome, IconPlaylistAdd, IconSearch, IconMusic, IconCurrencyDollar, IconTrendingUp, IconPlus, IconCoins, IconKey, IconShieldCheck } from '@tabler/icons-react'
+import { IconCopy, IconCheck, IconExternalLink, IconLogout, IconWallet, IconChevronDown, IconBrandGoogle, IconBrandDiscord, IconBrandX, IconUser, IconSettings, IconHelp, IconMenu, IconX, IconHome, IconPlaylistAdd, IconSearch, IconMusic, IconCurrencyDollar, IconTrendingUp, IconPlus, IconCoins, IconKey, IconShieldCheck } from '@tabler/icons-react'
 import { toast } from 'sonner'
 import { EXPLORER_URL } from '@/lib/config'
 import { ThemeToggle } from './ThemeToggle'
@@ -38,7 +38,7 @@ const formatAddress = (address: string, startChars: number = 10, endChars: numbe
 export default function ConnectHeader({ address: propAddress, logout, onNavigate, onMenuClick, isMenuOpen, onToggleSidebar, isSidebarOpen }: { address?: string, logout?: () => void, onNavigate?: (view: string) => void, onMenuClick?: () => void, isMenuOpen?: boolean, onToggleSidebar?: () => void, isSidebarOpen?: boolean }) {
   const t = useTranslations('header')
   const router = useRouter()
-  const { address: cardanoAddress, isConnected, connect, connectFromSeed, disconnect, walletName, lucid, isConnecting, sessionSeedPhrase } = useCardano()
+  const { address: cardanoAddress, isConnected, connect, connectFromSeed, connectSocial, disconnect, walletName, lucid, isConnecting, sessionSeedPhrase } = useCardano()
   const { isAuthenticated, isCheckingAuth, login } = useAudio()
   // Use the payment address (addr_test1...) for display; fall back to propAddress if no wallet connected
   const address = cardanoAddress || propAddress
@@ -171,6 +171,40 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[240px] bg-[#FAF9F6] dark:bg-[#0D0D12] border-midnight/10 dark:border-white/10 text-midnight dark:text-white">
+            <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-midnight/50 dark:text-white/40 px-3 py-1.5">Social Login</DropdownMenuLabel>
+            <DropdownMenuItem
+              onClick={() => connectSocial('google')}
+              className="flex items-center gap-3 cursor-pointer hover:bg-midnight/5 dark:hover:bg-white/5 p-3 rounded-none"
+            >
+              <div className="w-6 h-6 rounded-none flex items-center justify-center">
+                <IconBrandGoogle size={20} className="text-[#4285F4]" />
+              </div>
+              <span className="font-medium text-sm">Continue with Google</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => connectSocial('discord')}
+              className="flex items-center gap-3 cursor-pointer hover:bg-midnight/5 dark:hover:bg-white/5 p-3 rounded-none"
+            >
+              <div className="w-6 h-6 rounded-none flex items-center justify-center">
+                <IconBrandDiscord size={20} className="text-[#5865F2]" />
+              </div>
+              <span className="font-medium text-sm">Continue with Discord</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => connectSocial('twitter')}
+              className="flex items-center gap-3 cursor-pointer hover:bg-midnight/5 dark:hover:bg-white/5 p-3 rounded-none"
+            >
+              <div className="w-6 h-6 rounded-none flex items-center justify-center">
+                <IconBrandX size={20} />
+              </div>
+              <span className="font-medium text-sm">Continue with X</span>
+            </DropdownMenuItem>
+            {availableWallets.length > 0 && (
+              <>
+                <DropdownMenuSeparator className="bg-midnight/10 dark:bg-white/10" />
+                <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-midnight/50 dark:text-white/40 px-3 py-1.5">Browser Wallets</DropdownMenuLabel>
+              </>
+            )}
             {availableWallets.length > 0 && availableWallets.map((wallet) => (
               <DropdownMenuItem
                 key={wallet.id}
