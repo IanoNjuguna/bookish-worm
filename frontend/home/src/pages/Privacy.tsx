@@ -1,10 +1,27 @@
+import { Helmet } from "react-helmet-async";
 import Navbar from "@/components/doba/Navbar";
 import Footer from "@/components/doba/Footer";
 import VantaBackground from "@/components/doba/VantaBackground";
 
 export default function Privacy() {
   return (
-    <div className="min-h-screen relative overflow-hidden flex flex-col justify-between">
+    <>
+      <Helmet>
+        <title>Privacy | pre-drop your music on doba</title>
+        <meta name="description" content="Read the doba Privacy Policy. We do not collect personal emails or passwords; authentication uses Cardano wallet addresses." />
+        <meta property="og:title" content="Privacy Policy | Doba" />
+        <meta property="og:description" content="doba Privacy Policy: no personal emails, no passwords, cryptographic wallet auth." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://doba.world/privacy" />
+        <meta property="og:image" content="https://doba.world/doba-og.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Privacy Policy | Doba" />
+        <meta name="twitter:description" content="doba Privacy Policy: no personal emails, no passwords, cryptographic wallet auth." />
+        <meta name="twitter:image" content="https://doba.world/doba-og.png" />
+        <link rel="canonical" href="https://doba.world/privacy" />
+      </Helmet>
+
+      <div className="min-h-screen relative overflow-hidden flex flex-col justify-between">
       <VantaBackground />
       <Navbar />
 
@@ -24,5 +41,6 @@ export default function Privacy() {
 
       <Footer />
     </div>
+    </>
   );
 }

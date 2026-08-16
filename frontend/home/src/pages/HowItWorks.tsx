@@ -1,10 +1,28 @@
+import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import Navbar from "@/components/doba/Navbar";
 import Footer from "@/components/doba/Footer";
 import VantaBackground from "@/components/doba/VantaBackground";
 
 export default function HowItWorks() {
   return (
-    <div className="min-h-screen relative overflow-hidden flex flex-col justify-between">
+    <>
+      <Helmet>
+        <title>How It Works | pre-drop your music on doba</title>
+        <meta name="description" content="Learn how fans collect and stream music on doba, and how artists upload releases, set splits, and earn instantly." />
+        <meta property="og:title" content="How It Works | Doba" />
+        <meta property="og:description" content="A step-by-step guide to collecting music on doba and releasing music as an artist." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://doba.world/how-it-works" />
+        <meta property="og:image" content="https://doba.world/doba-og.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="How It Works | Doba" />
+        <meta name="twitter:description" content="A step-by-step guide to collecting music on doba and releasing music as an artist." />
+        <meta name="twitter:image" content="https://doba.world/doba-og.png" />
+        <link rel="canonical" href="https://doba.world/how-it-works" />
+      </Helmet>
+
+      <div className="min-h-screen relative overflow-hidden flex flex-col justify-between">
       <VantaBackground />
       <Navbar />
 
@@ -120,5 +138,6 @@ export default function HowItWorks() {
 
       <Footer />
     </div>
+    </>
   );
 }
