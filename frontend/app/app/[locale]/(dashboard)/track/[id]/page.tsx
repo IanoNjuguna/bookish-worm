@@ -31,29 +31,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 		}
 	}
 
-	const coverUrl = (track.image_url || '').replace('ipfs://', process.env.NEXT_PUBLIC_IPFS_GATEWAY || 'https://gateway.pinata.cloud/ipfs/')
-
 	return {
 		title: `${track.name} by ${track.artist} | Doba`,
 		description: track.description || `Listen to ${track.name} by ${track.artist} on Doba.`,
 		openGraph: {
 			title: `${track.name} by ${track.artist} | Doba`,
 			description: track.description || `Listen to ${track.name} by ${track.artist} on Doba.`,
-			images: [
-				{
-					url: coverUrl,
-					width: 600,
-					height: 600,
-					alt: `${track.name} Cover Art`,
-				},
-			],
+			// og:image comes from opengraph-image.tsx (composed 1200×630 share card)
 			type: 'music.song',
 		},
 		twitter: {
 			card: 'summary_large_image',
 			title: `${track.name} by ${track.artist} | Doba`,
 			description: track.description || `Listen to ${track.name} by ${track.artist} on Doba.`,
-			images: [coverUrl],
+			// twitter:image falls back to the generated og card
 		},
 	}
 }
