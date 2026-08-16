@@ -34,7 +34,8 @@
     "connectWallet": "Connect Your Wallet",
     "connectToView": "Connect your wallet to view your playlist",
     "noSongs": "No songs found",
-    "noSongsDesc": "You don't own any songs yet. Head to the marketplace to discover music!"
+    "noSongsDesc": "You don't own any songs yet. Head to the marketplace to discover music!",
+    "discoverMusic": "Discover Music"
   },
   "search": {
     "title": "Search",
@@ -177,5 +178,13 @@
     "previousTrack": "Previous track",
     "nextTrack": "Next track",
     "play": "Play {title}"
+  },
+  "onboarding": {
+    "title": "Get started",
+    "stepConnect": "Connect your wallet",
+    "stepVerify": "Verify your signature",
+    "stepCollect": "Collect your first track",
+    "dismiss": "Dismiss",
+    "nudgeCollect": "Tap the diamond on any track to collect it — own a piece of the music."
   }
 }

@@ -34,7 +34,8 @@
     "connectWallet": "ウォレットを接続",
     "connectToView": "ウォレットを接続してライブラリを表示",
     "noSongs": "曲が見つかりませんでした",
-    "noSongsDesc": "まだ曲を所有していません。マーケットプレイスで音楽を見つけましょう！"
+    "noSongsDesc": "まだ曲を所有していません。マーケットプレイスで音楽を見つけましょう！",
+    "discoverMusic": "音楽を見つける"
   },
   "search": {
     "title": "検索",
@@ -178,5 +179,13 @@
     "previousTrack": "前のトラック",
     "nextTrack": "次のトラック",
     "play": "{title} を再生"
+  },
+  "onboarding": {
+    "title": "はじめに",
+    "stepConnect": "ウォレットを接続",
+    "stepVerify": "署名を確認",
+    "stepCollect": "最初のトラックをコレクト",
+    "dismiss": "閉じる",
+    "nudgeCollect": "トラックのダイヤモンドをタップしてコレクトし、音楽の一部を所有しましょう。"
   }
 }

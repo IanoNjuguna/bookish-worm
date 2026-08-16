@@ -34,7 +34,8 @@
     "connectWallet": "Kết nối ví của bạn",
     "connectToView": "Kết nối ví của bạn để xem thư viện",
     "noSongs": "Không tìm thấy bài hát",
-    "noSongsDesc": "Bạn chưa sở hữu bài hát nào. Hãy đến thị trường để khám phá âm nhạc!"
+    "noSongsDesc": "Bạn chưa sở hữu bài hát nào. Hãy đến thị trường để khám phá âm nhạc!",
+    "discoverMusic": "Khám phá âm nhạc"
   },
   "search": {
     "title": "Tìm Kiếm",
@@ -178,5 +179,13 @@
     "previousTrack": "Bài trước",
     "nextTrack": "Bài tiếp",
     "play": "Phát {title}"
+  },
+  "onboarding": {
+    "title": "Bắt đầu",
+    "stepConnect": "Kết nối ví của bạn",
+    "stepVerify": "Xác minh chữ ký của bạn",
+    "stepCollect": "Sưu tầm bài hát đầu tiên",
+    "dismiss": "Bỏ qua",
+    "nudgeCollect": "Chạm vào viên kim cương trên bất kỳ bài hát nào để sưu tầm — sở hữu một phần âm nhạc."
   }
 }
