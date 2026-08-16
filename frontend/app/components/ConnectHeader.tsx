@@ -6,7 +6,7 @@ import { useRouter } from '@/i18n/navigation'
 import { useCardano } from './Providers'
 import { useAudio } from '@/components/AudioProvider'
 import { Button } from '@/components/ui/button'
-import { IconCopy, IconCheck, IconExternalLink, IconLogout, IconWallet, IconChevronDown, IconBrandGoogle, IconBrandDiscord, IconBrandX, IconUser, IconSettings, IconHelp, IconMenu, IconX, IconHome, IconPlaylistAdd, IconSearch, IconMusic, IconCurrencyDollar, IconTrendingUp, IconPlus, IconCoins, IconKey, IconShieldCheck } from '@tabler/icons-react'
+import { IconCopy, IconCheck, IconExternalLink, IconLogout, IconWallet, IconChevronDown, IconBrandGoogle, IconBrandDiscord, IconBrandX, IconUser, IconSettings, IconMenu, IconX, IconHome, IconPlaylistAdd, IconSearch, IconMusic, IconCurrencyDollar, IconTrendingUp, IconPlus, IconCoins, IconKey, IconShieldCheck } from '@tabler/icons-react'
 import { toast } from 'sonner'
 import { EXPLORER_URL } from '@/lib/config'
 import { ThemeToggle } from './ThemeToggle'
@@ -21,6 +21,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { AuthModal } from '@/components/AuthModal'
+import LanguageSwitcher from './LanguageSwitcher'
 
 interface CardanoWalletInfo {
   id: string;
@@ -149,14 +150,7 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
       <div id="theme-toggle-btn">
         <ThemeToggle />
       </div>
-      <button
-        onClick={() => window.dispatchEvent(new CustomEvent('doba-trigger-tour'))}
-        className="flex items-center justify-center text-midnight/70 dark:text-white/70 hover:text-[#FF1F8A] dark:hover:text-[#FF1F8A] transition-colors outline-none bg-transparent"
-        title="Start Walkthrough Tour"
-        aria-label="Start Walkthrough Tour"
-      >
-        <IconHelp size={22} />
-      </button>
+      <LanguageSwitcher />
       {!isConnected ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -170,31 +164,31 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
               {!isConnecting && <IconChevronDown size={14} className="ml-1 opacity-50" />}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-[240px] bg-[#FAF9F6] dark:bg-[#0D0D12] border-midnight/10 dark:border-white/10 text-midnight dark:text-white">
+          <DropdownMenuContent align="end" className="w-[240px] bg-background dark:bg-midnight border-midnight/10 dark:border-white/10 text-midnight dark:text-white">
             <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-midnight/50 dark:text-white/40 px-3 py-1.5">Social Login</DropdownMenuLabel>
             <DropdownMenuItem
               onClick={() => connectSocial('google')}
-              className="flex items-center gap-3 cursor-pointer hover:bg-midnight/5 dark:hover:bg-white/5 p-3 rounded-none"
+              className="flex items-center gap-3 cursor-pointer hover:bg-midnight/5 dark:hover:bg-white/5 p-3 rounded-md"
             >
-              <div className="w-6 h-6 rounded-none flex items-center justify-center">
+              <div className="w-6 h-6 rounded-md flex items-center justify-center">
                 <IconBrandGoogle size={20} className="text-[#4285F4]" />
               </div>
               <span className="font-medium text-sm">Continue with Google</span>
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => connectSocial('discord')}
-              className="flex items-center gap-3 cursor-pointer hover:bg-midnight/5 dark:hover:bg-white/5 p-3 rounded-none"
+              className="flex items-center gap-3 cursor-pointer hover:bg-midnight/5 dark:hover:bg-white/5 p-3 rounded-md"
             >
-              <div className="w-6 h-6 rounded-none flex items-center justify-center">
+              <div className="w-6 h-6 rounded-md flex items-center justify-center">
                 <IconBrandDiscord size={20} className="text-[#5865F2]" />
               </div>
               <span className="font-medium text-sm">Continue with Discord</span>
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => connectSocial('twitter')}
-              className="flex items-center gap-3 cursor-pointer hover:bg-midnight/5 dark:hover:bg-white/5 p-3 rounded-none"
+              className="flex items-center gap-3 cursor-pointer hover:bg-midnight/5 dark:hover:bg-white/5 p-3 rounded-md"
             >
-              <div className="w-6 h-6 rounded-none flex items-center justify-center">
+              <div className="w-6 h-6 rounded-md flex items-center justify-center">
                 <IconBrandX size={20} />
               </div>
               <span className="font-medium text-sm">Continue with X</span>
@@ -209,12 +203,12 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
               <DropdownMenuItem
                 key={wallet.id}
                 onClick={() => connect(wallet.id)}
-                className="flex items-center gap-3 cursor-pointer hover:bg-midnight/5 dark:hover:bg-white/5 p-3 rounded-none"
+                className="flex items-center gap-3 cursor-pointer hover:bg-midnight/5 dark:hover:bg-white/5 p-3 rounded-md"
               >
                 {wallet.icon ? (
-                  <img src={wallet.icon} alt={wallet.name} className="w-6 h-6 rounded-none" />
+                  <img src={wallet.icon} alt={wallet.name} className="w-6 h-6 rounded-md" />
                 ) : (
-                  <div className="w-6 h-6 rounded-none bg-midnight/10 dark:bg-white/10 flex items-center justify-center">
+                  <div className="w-6 h-6 rounded-md bg-midnight/10 dark:bg-white/10 flex items-center justify-center">
                     <IconWallet size={14} />
                   </div>
                 )}
@@ -233,18 +227,18 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
                   toast.error("Failed to generate seed phrase")
                 }
               }}
-              className="flex items-center gap-3 cursor-pointer hover:bg-midnight/5 dark:hover:bg-white/5 p-3 rounded-none"
+              className="flex items-center gap-3 cursor-pointer hover:bg-midnight/5 dark:hover:bg-white/5 p-3 rounded-md"
             >
-              <div className="w-6 h-6 rounded-none bg-midnight/10 dark:bg-white/10 flex items-center justify-center text-[#FF1F8A]">
+              <div className="w-6 h-6 rounded-md bg-midnight/10 dark:bg-white/10 flex items-center justify-center text-pink-600 dark:text-cyber-pink">
                 <IconPlus size={14} />
               </div>
-              <span className="font-medium text-sm text-[#FF1F8A]">Create Wallet (Test Mode)</span>
+              <span className="font-medium text-sm text-pink-600 dark:text-cyber-pink">Create Wallet (Test Mode)</span>
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => setIsSeedModalOpen(true)}
-              className="flex items-center gap-3 cursor-pointer hover:bg-midnight/5 dark:hover:bg-white/5 p-3 rounded-none"
+              className="flex items-center gap-3 cursor-pointer hover:bg-midnight/5 dark:hover:bg-white/5 p-3 rounded-md"
             >
-              <div className="w-6 h-6 rounded-none bg-midnight/10 dark:bg-white/10 flex items-center justify-center text-lavender">
+              <div className="w-6 h-6 rounded-md bg-midnight/10 dark:bg-white/10 flex items-center justify-center text-lavender">
                 <IconKey size={14} />
               </div>
               <span className="font-medium text-sm text-lavender">Import Seed (Test Mode)</span>
@@ -263,9 +257,9 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
           <div className="lg:hidden">
             <button 
               onClick={onMenuClick}
-              className="flex items-center gap-2 pl-2 pr-3 py-1.5 border border-midnight/10 dark:border-white/10 shrink-0 rounded-none bg-midnight/5 dark:bg-white/5 hover:border-cyber-pink/50 transition-colors group"
+              className="flex items-center gap-2 pl-2 pr-3 py-1.5 border border-midnight/10 dark:border-white/10 shrink-0 rounded-md bg-midnight/5 dark:bg-white/5 hover:border-cyber-pink/50 transition-colors group"
             >
-              <img src={`https://api.dicebear.com/7.x/identicon/svg?seed=${address}`} alt="User Menu" className="w-7 h-7 object-cover opacity-80 rounded-none group-hover:opacity-100 transition-opacity" />
+              <img src={`https://api.dicebear.com/7.x/identicon/svg?seed=${address}`} alt="User Menu" className="w-7 h-7 object-cover opacity-80 rounded-md group-hover:opacity-100 transition-opacity" />
               <div className="relative w-5 h-5 flex items-center justify-center">
                 <IconMenu 
                   size={20} 
@@ -282,7 +276,7 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
       )}
 
       <Dialog open={isSeedModalOpen} onOpenChange={setIsSeedModalOpen}>
-        <DialogContent className="sm:max-w-md bg-[#FAF9F6] dark:bg-[#12121A] border-midnight/10 dark:border-white/10 text-midnight dark:text-white rounded-none">
+        <DialogContent className="sm:max-w-md bg-background dark:bg-card border-midnight/10 dark:border-white/10 text-midnight dark:text-white rounded-md">
           <DialogHeader className="mb-4">
             <DialogTitle className="text-xl text-center font-bold">Import Seed Phrase</DialogTitle>
             <DialogDescription className="text-midnight/60 dark:text-white/60 text-center pt-2">
@@ -297,7 +291,7 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
                 placeholder="word1 word2 word3..." 
                 value={seedPhrase}
                 onChange={(e) => { setSeedPhrase(e.target.value); setSeedError(""); }}
-                className="bg-midnight/5 dark:bg-white/5 border-midnight/10 dark:border-white/10 text-midnight dark:text-white rounded-none focus-visible:ring-lavender"
+                className="bg-midnight/5 dark:bg-white/5 border-midnight/10 dark:border-white/10 text-midnight dark:text-white rounded-md focus-visible:ring-lavender"
               />
               {seedError && <p className="text-red-400 text-xs font-medium mt-2 ml-1">{seedError}</p>}
             </div>
@@ -315,7 +309,7 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
                 }
               }}
               disabled={isConnecting || !seedPhrase.trim()}
-              className="bg-lavender hover:bg-lavender/90 text-midnight font-bold rounded-none"
+              className="bg-lavender hover:bg-lavender/90 text-midnight font-bold rounded-md"
             >
               {isConnecting ? "Connecting..." : "Connect"}
             </Button>
@@ -323,7 +317,7 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
         </DialogContent>
       </Dialog>
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="sm:max-w-md bg-[#FAF9F6] dark:bg-[#12121A] border-midnight/10 dark:border-white/10 text-midnight dark:text-white rounded-none">
+        <DialogContent className="sm:max-w-md bg-background dark:bg-card border-midnight/10 dark:border-white/10 text-midnight dark:text-white rounded-md">
           <DialogHeader className="mb-4">
             <DialogTitle className="text-xl text-center font-bold">Save Your Recovery Phrase</DialogTitle>
             <DialogDescription className="text-midnight/60 dark:text-white/60 text-center pt-2">
@@ -333,7 +327,7 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
           </DialogHeader>
 
           <div className="flex flex-col gap-4 py-2">
-            <div className="bg-black/50 border border-midnight/10 dark:border-white/10 p-4 font-mono text-sm leading-relaxed text-lavender select-all rounded-none break-words">
+            <div className="bg-black/50 border border-midnight/10 dark:border-white/10 p-4 font-mono text-sm leading-relaxed text-lavender select-all rounded-md break-words">
               {generatedSeed}
             </div>
             
@@ -343,7 +337,7 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
                 toast.success("Copied to clipboard")
               }}
               variant="outline"
-              className="bg-transparent border-midnight/20 dark:border-white/20 hover:bg-midnight/5 dark:hover:bg-white/5 text-midnight dark:text-white rounded-none"
+              className="bg-transparent border-midnight/20 dark:border-white/20 hover:bg-midnight/5 dark:hover:bg-white/5 text-midnight dark:text-white rounded-md"
             >
               <IconCopy size={16} className="mr-2" /> Copy to Clipboard
             </Button>
@@ -359,7 +353,7 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
                 }
               }}
               disabled={isConnecting}
-              className="bg-[#FF1F8A] hover:bg-[#FF1F8A]/90 text-midnight dark:text-white font-bold rounded-none mt-2"
+              className="bg-cyber-pink hover:bg-cyber-pink/90 text-midnight dark:text-white font-bold rounded-md mt-2"
             >
               {isConnecting ? "Connecting..." : "I have securely saved it"}
             </Button>
@@ -368,7 +362,7 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
       </Dialog>
       
       <Dialog open={isSettingsModalOpen} onOpenChange={setIsSettingsModalOpen}>
-        <DialogContent className="sm:max-w-md bg-[#FAF9F6] dark:bg-[#12121A] border-midnight/10 dark:border-white/10 text-midnight dark:text-white rounded-none">
+        <DialogContent className="sm:max-w-md bg-background dark:bg-card border-midnight/10 dark:border-white/10 text-midnight dark:text-white rounded-md">
           <DialogHeader className="mb-4">
             <DialogTitle className="text-xl font-bold flex items-center gap-2">
               <IconSettings className="text-lavender" />
@@ -380,7 +374,7 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
             <div>
               <h3 className="text-sm font-semibold text-midnight/80 dark:text-white/80 mb-2 uppercase tracking-wide">Security</h3>
               {sessionSeedPhrase ? (
-                <div className="bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 p-4 rounded-none">
+                <div className="bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 p-4 rounded-md">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm font-medium text-midnight/90 dark:text-white/90">Current Session Recovery Phrase</span>
                     <Button 
@@ -390,12 +384,12 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
                       }}
                       variant="ghost" 
                       size="sm" 
-                      className="h-8 text-xs text-lavender hover:bg-lavender/10 hover:text-lavender rounded-none"
+                      className="h-8 text-xs text-lavender hover:bg-lavender/10 hover:text-lavender rounded-md"
                     >
                       <IconCopy size={14} className="mr-1" /> Copy
                     </Button>
                   </div>
-                  <div className="bg-black/50 p-3 font-mono text-xs leading-relaxed text-midnight/60 dark:text-white/60 select-all break-words rounded-none">
+                  <div className="bg-black/50 p-3 font-mono text-xs leading-relaxed text-midnight/60 dark:text-white/60 select-all break-words rounded-md">
                     {sessionSeedPhrase}
                   </div>
                   <p className="text-[10px] text-midnight/70 dark:text-white/40 mt-2">
@@ -403,7 +397,7 @@ export default function ConnectHeader({ address: propAddress, logout, onNavigate
                   </p>
                 </div>
               ) : (
-                <div className="bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 p-4 rounded-none flex items-center gap-3">
+                <div className="bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 p-4 rounded-md flex items-center gap-3">
                   <IconKey className="text-midnight/70 dark:text-white/40" size={24} />
                   <p className="text-sm text-midnight/60 dark:text-white/60">
                     No recovery phrase available. You are likely connected via a browser extension wallet which securely manages your keys.

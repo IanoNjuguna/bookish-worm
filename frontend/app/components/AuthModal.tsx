@@ -40,7 +40,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent 
-        className="sm:max-w-md bg-[#FAF9F6] dark:bg-[#12121A] border-midnight/10 dark:border-white/10 text-midnight dark:text-white outline-none rounded-2xl shadow-2xl"
+        className="sm:max-w-md bg-background dark:bg-card border-midnight/10 dark:border-white/10 text-midnight dark:text-white outline-none rounded-2xl shadow-2xl"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
@@ -79,7 +79,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
             <Button
               onClick={handleLogin}
               disabled={isLoading || !agreedToTos}
-              className="w-full bg-[#FF1F8A] hover:bg-[#FF1F8A]/90 text-white font-bold h-12 text-base transition-all rounded-lg flex items-center justify-center gap-2"
+              className="w-full bg-cyber-pink hover:bg-cyber-pink/90 text-white font-bold h-12 text-base transition-all rounded-lg flex items-center justify-center gap-2"
             >
               {isLoading ? 'Verifying...' : 'Finish Setup'}
             </Button>

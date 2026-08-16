@@ -7,6 +7,7 @@ import { useAudio } from '@/components/AudioProvider'
 import { Button } from '@/components/ui/button'
 import { IconUser as User } from '@tabler/icons-react'
 import { useCardano } from '@/components/Providers'
+import PagePanel from '@/components/PagePanel'
 
 export default function ProfileDashboard() {
   const tProfile = useTranslations('profile')
@@ -27,32 +28,32 @@ export default function ProfileDashboard() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">{tProfile('title')}</h2>
-        <p className="text-midnight/60 dark:text-white/60">{tProfile('subtitle')}</p>
-      </div>
+    <div className="animate-fade-in">
       {isAuthenticated && effectiveAddress ? (
-        <ProfileEditor
-          address={cardanoAddress || effectiveAddress}
-          tProfile={tProfile}
-          logout={handleLogout}
-        />
+        <PagePanel className="max-w-3xl mx-auto">
+          <ProfileEditor
+            address={cardanoAddress || effectiveAddress}
+            tProfile={tProfile}
+            logout={handleLogout}
+          />
+        </PagePanel>
       ) : (
-        <div className="p-12 text-center rounded-none bg-midnight/5 dark:bg-white-2 border border-midnight/[0.08] dark:border-white/[0.08] max-w-md mx-auto">
-          <User className="w-12 h-12 mx-auto mb-4 text-lavender/40" />
-          <h3 className="text-xl font-semibold mb-2">
+        <PagePanel className="max-w-md mx-auto p-10 sm:p-12 text-center">
+          <div className="w-14 h-14 mx-auto mb-5 flex items-center justify-center rounded-2xl bg-lavender/10 text-lavender">
+            <User className="w-7 h-7" />
+          </div>
+          <h3 className="text-xl font-bold text-midnight dark:text-white mb-2">
             {effectiveAddress ? "Verify Ownership" : tProfile('connectWallet')}
           </h3>
-          <p className="text-midnight/60 dark:text-white/60 mb-6">
-            {effectiveAddress 
-              ? "Please sign the authentication request in your wallet to access your profile." 
+          <p className="text-sm text-midnight/60 dark:text-white/60 mb-6 leading-relaxed">
+            {effectiveAddress
+              ? "Please sign the authentication request in your wallet to access your profile."
               : tProfile('signInToView')}
           </p>
           {effectiveAddress ? (
             <Button
               onClick={() => login()}
-              className="bg-lavender hover:bg-lavender/90 text-midnight font-bold py-2 px-6 rounded-none transition-all mx-auto block"
+              className="bg-lavender hover:bg-lavender/90 text-midnight font-bold px-6 py-2 h-auto rounded-xl transition-all"
             >
               Sign In with Wallet
             </Button>
@@ -61,7 +62,7 @@ export default function ProfileDashboard() {
               Use the "Connect Wallet" button in the header.
             </div>
           )}
-        </div>
+        </PagePanel>
       )}
     </div>
   )
