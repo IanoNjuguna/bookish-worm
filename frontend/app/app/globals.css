@@ -5,36 +5,6 @@
 @tailwind utilities;
 
 @layer utilities {
-  .clip-angular-br {
-    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
-  }
-  .clip-angular-br-sm {
-    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
-  }
-  .clip-angular-bl-sm {
-    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 15% 100%, 0% 85%);
-  }
-  .clip-angular-qr {
-    clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
-  }
-  .clip-angular-avatar {
-    clip-path: polygon(50% 0%, 93% 15%, 100% 50%, 93% 85%, 50% 100%, 7% 85%, 0% 50%, 7% 15%);
-  }
-  .clip-angular-card {
-    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%);
-  }
-  .clip-tag {
-    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-  }
-  .clip-hexagon {
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  }
-  .clip-diamond {
-    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-  }
-  .bg-premium-gradient {
-    background: linear-gradient(135deg, rgba(13, 13, 18, 0.95) 0%, rgba(20, 20, 25, 0.95) 100%);
-  }
   .shadow-pink-glow {
     box-shadow: 0 0 20px rgba(255, 31, 138, 0.3);
   }
@@ -75,12 +45,46 @@
     text-wrap: balance;
   }
 
+  /* Rounded glass system (aligned with home). `.glass` is the legacy alias of `.glass-surface`. */
+  .glass-surface {
+    @apply backdrop-blur-xl rounded-2xl border;
+    background-color: rgba(13, 13, 18, 0.06);
+    border-color: rgba(13, 13, 18, 0.12);
+  }
+
+  .dark .glass-surface {
+    background-color: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
   .glass {
-    @apply bg-white/[0.02] backdrop-blur-md border border-white/[0.08];
+    @apply glass-surface;
+  }
+
+  .glass-surface-hover {
+    @apply glass-surface transition-all duration-500;
+  }
+
+  .glass-surface-hover:hover {
+    box-shadow: 0 8px 24px rgba(255, 31, 138, 0.15);
+    border-color: rgba(255, 255, 255, 0.12);
   }
 
   .glass-hover {
-    @apply glass transition-all duration-300 hover:bg-white/[0.05] hover:border-white/[0.12];
+    @apply glass-surface transition-all duration-300 hover:bg-white/[0.05] hover:border-white/[0.12];
+  }
+
+  .glow-button {
+    @apply bg-lavender text-black font-semibold px-6 py-3 rounded-lg transition-all duration-300;
+  }
+
+  .glow-button:hover {
+    @apply opacity-90;
+    transform: translateY(-1px);
+  }
+
+  .outline-button {
+    @apply glass-surface text-foreground font-semibold px-6 py-3 rounded-lg transition-all duration-300 hover:border-foreground/20;
   }
 
   .gradient-text {
@@ -284,8 +288,7 @@
     --card: 0 0% 100%;
     --card-foreground: 240 18% 6%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 18% 6%;
-    --primary: 310 98% 51%;
+    --popover-foreground: 240 18% 6%;    --primary: 310 98% 51%;
     --primary-foreground: 0 0% 98%;
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
@@ -303,7 +306,7 @@
     --chart-3: 200 90% 50%;
     --chart-4: 280 85% 55%;
     --chart-5: 340 75% 55%;
-    --radius: 0;
+    --radius: 0.75rem;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 18% 6%;
     --sidebar-primary: 310 98% 51%;
@@ -317,9 +320,9 @@
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
+    --card: 240 10% 7%;
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
+    --popover: 240 10% 7%;
     --popover-foreground: 0 0% 98%;
     --primary: 310 98% 51%;
     --primary-foreground: 0 0% 3%;
@@ -339,7 +342,7 @@
     --chart-3: 200 90% 50%;
     --chart-4: 280 85% 55%;
     --chart-5: 340 75% 55%;
-    --radius: 0;
+    --radius: 0.75rem;
     --sidebar-background: 0 0% 3.9%;
     --sidebar-foreground: 0 0% 98%;
     --sidebar-primary: 310 98% 51%;
@@ -361,17 +364,34 @@
   }
 
   body {
-    @apply bg-[#FAF9F6] text-midnight selection:bg-lavender/30 selection:text-midnight relative min-h-screen overflow-x-hidden;
-    background: radial-gradient(circle at top right, rgba(183, 148, 244, 0.05), transparent 40%),
-                radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.05), transparent 40%),
-                linear-gradient(135deg, #FAF9F6 0%, #F5F5F0 100%);
+    @apply bg-background text-midnight selection:bg-lavender/30 selection:text-midnight relative min-h-screen overflow-x-hidden;
   }
 
   .dark body {
-    @apply bg-[#0D0D12] text-white selection:text-white;
-    background: radial-gradient(circle at top right, rgba(183, 148, 244, 0.05), transparent 40%),
-                radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.05), transparent 40%),
-                linear-gradient(135deg, #0D0D12 0%, #141419 100%);
+    @apply bg-midnight text-white selection:text-white;
+  }
+
+  /* Enhance text contrast in light mode */
+  .text-midnight\/20 {
+    color: rgba(13, 13, 18, 0.45) !important;
+  }
+  .text-midnight\/30 {
+    color: rgba(13, 13, 18, 0.55) !important;
+  }
+  .text-midnight\/35 {
+    color: rgba(13, 13, 18, 0.6) !important;
+  }
+  .text-midnight\/40 {
+    color: rgba(13, 13, 18, 0.65) !important;
+  }
+  .text-midnight\/50 {
+    color: rgba(13, 13, 18, 0.75) !important;
+  }
+  .text-midnight\/60 {
+    color: rgba(13, 13, 18, 0.85) !important;
+  }
+  .text-midnight\/70 {
+    color: rgba(13, 13, 18, 0.93) !important;
   }
 
   /* Enhance text contrast in dark mode */
@@ -417,43 +437,17 @@
     opacity: 1 !important;
   }
 
-  /* Custom Scrollbar - Purple pill design */
+  /* Scrollbars hidden app-wide, all screen sizes — scrolling still works
+     (wheel/touch/keyboard), the chrome just never renders. Same trick as .no-scrollbar. */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    display: none;
+    width: 0;
+    height: 0;
   }
 
-  ::-webkit-scrollbar-track {
-    background: rgba(13, 13, 18, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  ::-webkit-scrollbar-button {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, rgba(183, 148, 244, 0.6) 0%, rgba(147, 51, 234, 0.6) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 9999px;
-    transition: all 0.2s ease;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, rgba(183, 148, 244, 0.85) 0%, rgba(147, 51, 234, 0.85) 100%);
-    border-color: rgba(255, 255, 255, 0.2);
-  }
-
-  ::-webkit-scrollbar-thumb:active {
-    background: linear-gradient(135deg, rgba(183, 148, 244, 1) 0%, rgba(147, 51, 234, 1) 100%);
-  }
-
-  /* Firefox Scrollbar */
   * {
-    scrollbar-color: rgba(183, 148, 244, 0.6) rgba(13, 13, 18, 0.5);
-    scrollbar-width: thin;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 
   /* 3D Card Flip Helper Classes */
