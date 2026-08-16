@@ -22,6 +22,7 @@ import { useLocale } from 'next-intl'
 import { cn } from '@/lib/utils'
 import type { useAudioPlayer } from '@/hooks/useAudioPlayer'
 import { toast } from 'sonner'
+import { markCollected } from '@/lib/onboarding'
 import { useAudio } from './AudioProvider'
 import { useCardano } from '@/components/Providers'
 import { EXPLORER_URL } from '@/lib/config'
@@ -271,6 +272,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
       }
 
       setHasOwned(true)
+      markCollected()
       toast.success(`"${currentTrack.title}" collected!`, { id: mainToast })
     } catch (error: any) {
       logger.error('AudioPlayer: Collection Error', error)
@@ -416,26 +418,13 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
   // Non-null alias — safe to use inside JSX that is only rendered/visible when isVisible is true
   const track = currentTrack!
 
-  const accentActive = 'text-[#FF1F8A]'
+  const accentActive = 'text-pink-600 dark:text-cyber-pink'
 
   return (
     <div className={cn(
-      "fixed md:relative bottom-0 left-0 right-0 md:bottom-auto md:left-auto md:right-auto z-50 w-full h-auto md:h-[90px] bg-[#FAF9F6]/80 dark:bg-[#0D0D12]/80 backdrop-blur-xl border-t border-midnight/[0.08] dark:border-white/[0.08] pb-[env(safe-area-inset-bottom)] flex-shrink-0 transition-all duration-300",
-      isVisible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-full md:translate-y-0 pointer-events-none'
+      "fixed bottom-3 left-3 right-3 lg:bottom-4 lg:left-6 lg:right-6 z-50 h-auto md:h-[90px] glass-surface bg-midnight/[0.02] dark:bg-white/[0.02] backdrop-blur-2xl shadow-lg pb-[env(safe-area-inset-bottom)] transition-all duration-300",
+      isVisible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-full pointer-events-none'
     )}>
-      {/* Mobile Continuous Divider */}
-      <div className="lg:hidden absolute top-0 left-4 right-4 h-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
-
-      {/* Desktop Left Segment */}
-      <div className={cn(
-        "hidden lg:block absolute top-0 left-6 h-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]",
-        isSidebarOpen ? "right-[calc(20rem+12px)]" : "right-6"
-      )} />
-
-      {/* Desktop Right Segment */}
-      {isSidebarOpen && (
-        <div className="hidden lg:block absolute top-0 left-[calc(100%-20rem+12px)] right-6 h-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
-      )}
       <audio
         ref={audioRef}
         preload="auto"
@@ -478,7 +467,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
               {track?.creator}
             </p>
             {ticker && (
-              <p className="text-[10px] font-mono text-[#B57EDC] truncate mt-0.5 tracking-wide">
+              <p className="text-[10px] font-mono text-purple-600 dark:text-lavender truncate mt-0.5 tracking-wide">
                 ${ticker} on Doba
               </p>
             )}
@@ -489,7 +478,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
               {[0, 1, 2].map((i) => (
                 <div
                   key={i}
-                  className="w-[3px] bg-[#FF1F8A] equalizer-bar h-full"
+                  className="w-[3px] bg-pink-600 dark:bg-cyber-pink equalizer-bar h-full"
                   style={{ '--delay': `${i * 0.2}s` } as React.CSSProperties}
                 />
               ))}
@@ -505,7 +494,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
               aria-label="Shuffle"
             >
               <IconArrowsShuffle size={16} />
-              {isShuffle && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#FF1F8A]" />}
+              {isShuffle && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-pink-600 dark:bg-cyber-pink" />}
             </button>
 
             <button
@@ -518,7 +507,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
 
             <button
               onClick={togglePlayPause}
-              className="w-10 h-10 flex items-center justify-center flex-shrink-0 transition-all bg-midnight dark:bg-white hover:bg-midnight/90 dark:hover:bg-white/90 text-white dark:text-black active:scale-95 active:brightness-75 rounded-none"
+              className="w-10 h-10 flex items-center justify-center flex-shrink-0 transition-all bg-midnight dark:bg-white hover:bg-midnight/90 dark:hover:bg-white/90 text-white dark:text-black active:scale-95 active:brightness-75 rounded-md"
               aria-label={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying
@@ -541,7 +530,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
               aria-label="Repeat"
             >
               {repeatMode === 'one' ? <IconRepeatOnce size={16} /> : <IconRepeat size={16} />}
-              {repeatMode !== 'off' && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#FF1F8A]" />}
+              {repeatMode !== 'off' && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-pink-600 dark:bg-cyber-pink" />}
             </button>
           </div>
 
@@ -557,13 +546,13 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
               role="slider"
               aria-label="Track Progress"
             >
-              <div className="absolute inset-y-0 my-auto h-[3px] w-full bg-midnight/10 dark:bg-white/10" />
+              <div className="absolute inset-y-0 my-auto h-[3px] w-full bg-midnight/10 dark:bg-white/10 rounded-full" />
               <div
-                className="absolute inset-y-0 my-auto h-[3px] bg-cyber-pink"
+                className="absolute inset-y-0 my-auto h-[3px] bg-pink-600 dark:bg-cyber-pink rounded-full"
                 style={{ width: `${progressPercent}%` }}
               />
               <div
-                className="absolute w-3 h-3 bg-white shadow-md transition-opacity -translate-x-1/2 opacity-0 group-hover:opacity-100 clip-diamond"
+                className="absolute w-3 h-3 bg-white shadow-md transition-opacity -translate-x-1/2 opacity-0 group-hover:opacity-100 rounded-full border border-midnight/10"
                 style={{ left: `${progressPercent}%` }}
               />
             </div>
@@ -580,19 +569,19 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
             disabled={isMinting || (mintData.max > 0 && mintData.minted >= mintData.max)}
             className={cn(
               "p-2 transition-all hover:scale-110 active:scale-95 flex items-center justify-center flex-shrink-0 group/heart",
-              hasOwned ? "text-cyber-pink" : (mintData.max > 0 && mintData.minted >= mintData.max) ? "text-lavender" : "text-midnight/70 dark:text-white/40 hover:text-midnight dark:hover:text-white"
+              hasOwned ? "text-pink-600 dark:text-cyber-pink" : (mintData.max > 0 && mintData.minted >= mintData.max) ? "text-lavender" : "text-midnight/70 dark:text-white/40 hover:text-midnight dark:hover:text-white"
             )}
             title={hasOwned ? "Collected" : (mintData.max > 0 && mintData.minted >= mintData.max) ? "Sold Out" : "Collect"}
           >
             {isMinting ? (
-              <IconLoader2 size={22} className="animate-spin text-cyber-pink" />
+              <IconLoader2 size={22} className="animate-spin text-pink-600 dark:text-cyber-pink" />
             ) : hasOwned ? (
               <IconHeart
                 size={22}
-                className="fill-cyber-pink text-cyber-pink"
+                className="fill-pink-600 dark:fill-cyber-pink text-pink-600 dark:text-cyber-pink"
               />
             ) : (mintData.max > 0 && mintData.minted >= mintData.max) ? (
-              <DobaVisualizer size={22} className="text-[#FF1F8A]" />
+              <DobaVisualizer size={22} className="text-pink-600 dark:text-cyber-pink" />
             ) : (
               <IconHeart
                 size={22}
@@ -618,13 +607,13 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
               role="slider"
               aria-label="Volume"
             >
-              <div className="absolute inset-y-0 my-auto h-[3px] w-full bg-white/20" />
+              <div className="absolute inset-y-0 my-auto h-[3px] w-full bg-midnight/10 dark:bg-white/20 rounded-full" />
               <div
-                className="absolute inset-y-0 my-auto h-[3px] bg-[#FF1F8A]"
+                className="absolute inset-y-0 my-auto h-[3px] bg-pink-600 dark:bg-cyber-pink rounded-full"
                 style={{ width: `${(isMuted ? 0 : volume) * 100}%` }}
               />
               <div
-                className="absolute w-3 h-3 bg-white shadow-md transition-opacity -translate-x-1/2 opacity-0 group-hover:opacity-100 clip-diamond"
+                className="absolute w-3 h-3 bg-white shadow-md transition-opacity -translate-x-1/2 opacity-0 group-hover:opacity-100 rounded-full border border-midnight/10"
                 style={{ left: `${(isMuted ? 0 : volume) * 100}%` }}
               />
             </div>
@@ -635,7 +624,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
             onClick={toggleSidebar}
             className={cn(
               "p-1.5 transition-all hover:scale-110",
-              isSidebarOpen ? "text-[#FF1F8A]" : "text-midnight/70 dark:text-white/40 hover:text-midnight dark:hover:text-white"
+              isSidebarOpen ? "text-pink-600 dark:text-cyber-pink" : "text-midnight/70 dark:text-white/40 hover:text-midnight dark:hover:text-white"
             )}
             title="Now Playing View"
           >
@@ -648,7 +637,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
       <div className="flex md:hidden flex-col items-center">
         {/* Mobile Progress Bar (Stick to top of player) */}
         <div
-          className="h-2 w-full bg-midnight/10 dark:bg-white/10 relative cursor-pointer group"
+          className="h-2 self-stretch mx-3 mt-1 bg-midnight/10 dark:bg-white/10 relative cursor-pointer group overflow-hidden rounded-full"
           onClick={handleProgressClick}
           role="slider"
           aria-label="Track Progress"
@@ -657,7 +646,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
           aria-valuemax={100}
         >
           <div
-            className="h-full bg-cyber-pink"
+            className="h-full bg-pink-600 dark:bg-cyber-pink rounded-full"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -667,7 +656,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
         >
           {/* Row 1: Artwork */}
           <div
-            className="w-10 h-10 flex-shrink-0 overflow-hidden bg-midnight/5 dark:bg-white/5 cursor-pointer rounded-none"
+            className="w-10 h-10 flex-shrink-0 overflow-hidden bg-midnight/5 dark:bg-white/5 cursor-pointer rounded-md"
             onClick={() => {
               handleOpenSidebar({
                 ...track,
@@ -708,18 +697,18 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
                 disabled={isMinting}
                 className={cn(
                   "flex items-center active:scale-95 transition-transform",
-                  hasOwned ? "text-cyber-pink" : (mintData.max > 0 && mintData.minted >= mintData.max) ? "text-[#FF1F8A]" : "text-midnight/70 dark:text-white/40"
+                  hasOwned ? "text-pink-600 dark:text-cyber-pink" : (mintData.max > 0 && mintData.minted >= mintData.max) ? "text-pink-600 dark:text-cyber-pink" : "text-midnight/70 dark:text-white/40"
                 )}
               >
                 {isMinting ? (
-                  <IconLoader2 size={16} className="animate-spin text-cyber-pink" />
+                  <IconLoader2 size={16} className="animate-spin text-pink-600 dark:text-cyber-pink" />
                 ) : hasOwned ? (
                   <IconHeart
                     size={16}
-                    className="fill-cyber-pink text-cyber-pink"
+                    className="fill-pink-600 dark:fill-cyber-pink text-pink-600 dark:text-cyber-pink"
                   />
                 ) : (mintData.max > 0 && mintData.minted >= mintData.max) ? (
-                  <DobaVisualizer size={16} className="text-[#FF1F8A]" />
+                  <DobaVisualizer size={16} className="text-pink-600 dark:text-cyber-pink" />
                 ) : (
                   <IconHeart
                     size={16}
@@ -742,7 +731,7 @@ export default function AudioPlayer({ playerState }: AudioPlayerProps) {
 
             <button
               onClick={togglePlayPause}
-              className="w-9 h-9 flex items-center justify-center bg-midnight dark:bg-white text-white dark:text-black active:scale-90 rounded-none"
+              className="w-9 h-9 flex items-center justify-center bg-midnight dark:bg-white text-white dark:text-black active:scale-90 rounded-md"
               aria-label={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying
