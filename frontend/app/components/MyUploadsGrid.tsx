@@ -20,11 +20,12 @@ interface Track {
 
 interface MyUploadsGridProps {
 	address?: string
+	onUploadsLoaded?: (hasUploads: boolean) => void
 }
 
 const API_URL = '/api-backend'
 
-export default function MyUploadsGrid({ address }: MyUploadsGridProps) {
+export default function MyUploadsGrid({ address, onUploadsLoaded }: MyUploadsGridProps) {
 	const { playerState, handlePlayTrack } = useAudio()
 	const [uploads, setUploads] = useState<Track[]>([])
 	const [loading, setLoading] = useState(true)
@@ -33,6 +34,7 @@ export default function MyUploadsGrid({ address }: MyUploadsGridProps) {
 		const fetchUploads = async () => {
 			if (!address) {
 				setLoading(false)
+				onUploadsLoaded?.(false)
 				return
 			}
 
@@ -42,8 +44,10 @@ export default function MyUploadsGrid({ address }: MyUploadsGridProps) {
 				if (!res.ok) throw new Error('Failed to fetch user uploads')
 				const userTracks: Track[] = await res.json()
 				setUploads(userTracks)
+				onUploadsLoaded?.(userTracks.length > 0)
 			} catch (error) {
 				logger.error('Profile: Error fetching uploads', error)
+				onUploadsLoaded?.(false)
 			} finally {
 				setLoading(false)
 			}
@@ -54,9 +58,9 @@ export default function MyUploadsGrid({ address }: MyUploadsGridProps) {
 
 	if (loading) {
 		return (
-			<div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+			<div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-6">
 				{[...Array(6)].map((_, i) => (
-					<div key={i} className="aspect-[3/4] bg-midnight/5 dark:bg-white/5 animate-pulse rounded-2xl" />
+					<div key={i} className="aspect-[3/4] glass animate-pulse rounded-xl" />
 				))}
 			</div>
 		)

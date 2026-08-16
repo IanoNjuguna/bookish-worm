@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLocale } from 'next-intl'
 import { useCardano } from '@/components/Providers'
-import { IconMusic, IconCoins, IconPhoto, IconWallet } from '@tabler/icons-react'
+import { IconMusic, IconCoins, IconPhoto, IconWallet, IconLoader2 } from '@tabler/icons-react'
 import { DobaVisualizer } from '@/components/icons/DobaVisualizer'
 
 interface Track {
@@ -20,6 +20,7 @@ interface Track {
 	uploader_address?: string
 	ticker?: string
 	album_id?: number | null
+	splitter?: string
 }
 
 interface TokenAsset {
@@ -304,27 +305,45 @@ export default function AssetsView() {
 		fetchAssets()
 	}, [isConnected, address, lucid])
 
+	// doba token = minted under a doba policy (protocol minting policy or a
+	// per-release splitter policy) or the DOBA ecosystem token. Everything
+	// else is a Cardano token.
+	const dobaPolicies = new Set<string>(
+		[process.env.NEXT_PUBLIC_MINTING_POLICY_ID, ...ownedNfts.map((t) => t.splitter)]
+			.filter((p): p is string => Boolean(p))
+	)
+	const isDobaToken = (t: TokenAsset) => dobaPolicies.has(t.policyId) || t.symbol === 'DOBA'
+	const cardanoTokens = customTokens.filter((t) => !isDobaToken(t))
+	const dobaToken = customTokens.find((t) => t.symbol === 'DOBA')
+
 	// Calculate portfolio values
 	const adaUsdValue = adaBalance * adaPrice
-	const tokensUsdValue = customTokens.reduce((acc, token) => acc + token.usdValue, 0)
+	const tokensUsdValue = cardanoTokens.reduce((acc, token) => acc + token.usdValue, 0)
 	const nftUsdValue = ownedNfts.reduce((acc, track) => {
 		const unitPriceInADA = parseFloat(track.price || '5')
 		const qty = track.quantity || 1
 		return acc + (unitPriceInADA * qty * adaPrice)
 	}, 0)
+	const dobaUsdValue = nftUsdValue + (dobaToken?.usdValue || 0)
 
-	const totalUsdValue = adaUsdValue + tokensUsdValue + nftUsdValue
+	const totalUsdValue = adaUsdValue + tokensUsdValue + dobaUsdValue
 
 	if (!isConnected) {
 		return (
-			<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-12 text-center bg-[#FAF9F6] dark:bg-[#0D0D12]/60 rounded-2xl shadow-xl">
-				<div className="w-16 h-16 mx-auto mb-6 bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-[#B794F4] rounded-2xl">
+			<div className="glass-surface p-12 text-center rounded-2xl shadow-xl">
+				<div className="w-16 h-16 mx-auto mb-6 bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-lavender rounded-2xl">
 					<IconWallet size={32} />
 				</div>
 				<h3 className="text-xl font-display font-bold mb-2">Connect Wallet</h3>
 				<p className="text-midnight/50 dark:text-white/50 text-sm max-w-sm mx-auto mb-6">
 					Connect your Cardano wallet to view your asset balances, custom tokens, and collected NFTs.
 				</p>
+					<button
+						onClick={() => document.getElementById('connect-wallet-btn')?.click()}
+						className="bg-lavender hover:bg-lavender/90 text-midnight font-bold text-xs uppercase tracking-widest px-6 py-3 rounded-xl transition-all"
+					>
+						Connect Wallet
+					</button>
 			</div>
 		)
 	}
@@ -332,8 +351,7 @@ export default function AssetsView() {
 	return (
 		<div className="space-y-8 animate-fade-in">
 			{/* Portfolio Balance Header */}
-			<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-6 lg:p-8 bg-[#FAF9F6] dark:bg-[#0D0D12]/60 rounded-2xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl">
-				<div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-cyber-pink via-purple-500 to-transparent" />
+			<div className="glass-surface p-6 lg:p-8 rounded-2xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl">
 				<div>
 					<span className="text-midnight/70 dark:text-white/40 text-xs uppercase tracking-widest font-display font-bold">Total Portfolio Worth</span>
 					<h3 className="text-4xl font-bold text-midnight dark:text-white mt-1 font-mono">${totalUsdValue.toFixed(2)} <span className="text-sm font-sans font-normal text-midnight/70 dark:text-white/40">USD</span></h3>
@@ -344,22 +362,22 @@ export default function AssetsView() {
 				
 				<div className="flex gap-3">
 					<div className="bg-white/[0.03] border border-midnight/10 dark:border-white/10 px-4 py-3 rounded-xl flex items-center gap-3">
-						<div className="w-8 h-8 rounded-lg bg-[#FF1F8A]/10 flex items-center justify-center text-[#FF1F8A]">
+						<div className="w-8 h-8 rounded-lg bg-cyber-pink/10 flex items-center justify-center text-pink-600 dark:text-cyber-pink">
 							<IconCoins size={18} />
 						</div>
 						<div>
-							<p className="text-[10px] text-midnight/70 dark:text-white/40 uppercase font-display font-bold leading-none mb-1">Tokens Worth</p>
+							<p className="text-[10px] text-midnight/70 dark:text-white/40 uppercase font-display font-bold leading-none mb-1">Wallet</p>
 							<p className="font-mono text-sm font-bold text-midnight dark:text-white">${(adaUsdValue + tokensUsdValue).toFixed(2)}</p>
 						</div>
 					</div>
 
 					<div className="bg-white/[0.03] border border-midnight/10 dark:border-white/10 px-4 py-3 rounded-xl flex items-center gap-3">
-						<div className="w-8 h-8 rounded-lg bg-[#B794F4]/10 flex items-center justify-center text-[#B794F4]">
+						<div className="w-8 h-8 rounded-lg bg-lavender/10 flex items-center justify-center text-lavender">
 							<IconMusic size={18} />
 						</div>
 						<div>
-							<p className="text-[10px] text-midnight/70 dark:text-white/40 uppercase font-display font-bold leading-none mb-1">NFTs Worth</p>
-							<p className="font-mono text-sm font-bold text-midnight dark:text-white">${nftUsdValue.toFixed(2)}</p>
+							<p className="text-[10px] text-midnight/70 dark:text-white/40 uppercase font-display font-bold leading-none mb-1">Doba Tokens</p>
+							<p className="font-mono text-sm font-bold text-midnight dark:text-white">${dobaUsdValue.toFixed(2)}</p>
 						</div>
 					</div>
 				</div>
@@ -373,9 +391,9 @@ export default function AssetsView() {
 						activeTab === 'tokens' ? 'text-midnight dark:text-white' : 'text-midnight/70 dark:text-white/40 hover:text-midnight dark:hover:text-white'
 					}`}
 				>
-					Fungible Tokens
+					Wallet
 					{activeTab === 'tokens' && (
-						<div className="absolute bottom-0 left-0 w-full h-[2px] bg-cyber-pink" />
+						<div className="absolute bottom-0 left-0 w-full h-[2px] bg-pink-600 dark:bg-cyber-pink rounded-full" />
 					)}
 				</button>
 				<button
@@ -384,22 +402,22 @@ export default function AssetsView() {
 						activeTab === 'nfts' ? 'text-midnight dark:text-white' : 'text-midnight/70 dark:text-white/40 hover:text-midnight dark:hover:text-white'
 					}`}
 				>
-					Song Tokens ({ownedNfts.length})
+					Doba Tokens ({ownedNfts.length})
 					{activeTab === 'nfts' && (
-						<div className="absolute bottom-0 left-0 w-full h-[2px] bg-cyber-pink" />
+						<div className="absolute bottom-0 left-0 w-full h-[2px] bg-pink-600 dark:bg-cyber-pink rounded-full" />
 					)}
 				</button>
 			</div>
 
 			{loading ? (
 				<div className="p-12 text-center">
-					<div className="w-8 h-8 border-2 border-[#FF1F8A] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+					<IconLoader2 size={32} className="animate-spin text-pink-600 dark:text-cyber-pink mx-auto mb-4" />
 					<p className="text-midnight/70 dark:text-white/40 text-sm italic">Loading your portfolio assets...</p>
 				</div>
 			) : activeTab === 'tokens' ? (
-				/* Fungible Tokens List */
-				<div className="border border-midnight/[0.08] dark:border-white/[0.08] rounded-2xl overflow-hidden bg-[#FAF9F6] dark:bg-[#0D0D12]/60 shadow-lg">
-					<div className="divide-y divide-white/[0.08]">
+				/* Wallet Tokens */
+				<div className="glass-surface rounded-2xl overflow-hidden shadow-lg">
+					<div className="divide-y divide-midnight/[0.06] dark:divide-white/[0.06]">
 						{/* ADA */}
 						<div className="p-5 flex items-center justify-between hover:bg-midnight/5 dark:hover:bg-white/5 transition">
 							<div className="flex items-center gap-4">
@@ -418,13 +436,13 @@ export default function AssetsView() {
 						</div>
 
 						{/* Custom Tokens */}
-						{customTokens.length > 0 ? (
-							customTokens.map((token) => (
+						{cardanoTokens.length > 0 ? (
+							cardanoTokens.map((token) => (
 								<div key={token.unit} className="p-5 flex items-center justify-between hover:bg-midnight/5 dark:hover:bg-white/5 transition">
 									<div className="flex items-center gap-4">
 										<div className="w-10 h-10 rounded-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 flex items-center justify-center font-display font-bold text-midnight dark:text-white text-sm uppercase overflow-hidden">
 											{token.symbol === 'DOBA' ? (
-												<DobaVisualizer className="text-[#FF1F8A] w-6 h-6 animate-pulse" />
+												<DobaVisualizer className="text-pink-600 dark:text-cyber-pink w-6 h-6 animate-pulse" />
 											) : token.logoUrl ? (
 												<img src={token.logoUrl} alt={token.symbol} className="w-full h-full object-cover" />
 											) : (
@@ -450,14 +468,33 @@ export default function AssetsView() {
 							))
 						) : (
 							<div className="p-8 text-center text-midnight/70 dark:text-white/40 text-sm">
-								No custom fungible tokens found in this wallet.
+								No other tokens found in this wallet.
 							</div>
 						)}
 					</div>
 				</div>
 			) : (
-				/* Non-Fungible Tokens (Music NFTs) Grid */
-				ownedNfts.length > 0 ? (
+				/* Doba Tokens: ecosystem token + music fractions */
+				(dobaToken || ownedNfts.length > 0) ? (
+					<>
+						{dobaToken && (
+							<div className="glass-surface rounded-xl p-4 mb-6 flex items-center justify-between">
+								<div className="flex items-center gap-3">
+									<div className="w-10 h-10 rounded-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 flex items-center justify-center">
+										<DobaVisualizer className="text-pink-600 dark:text-cyber-pink w-6 h-6" />
+									</div>
+									<div>
+										<h4 className="font-display font-bold text-midnight dark:text-white">DOBA</h4>
+										<p className="text-xs text-midnight/70 dark:text-white/40 font-mono">Doba Ecosystem Token</p>
+									</div>
+								</div>
+								<div className="text-right">
+									<p className="font-bold font-mono text-midnight dark:text-white">{dobaToken.balance.toLocaleString()} DOBA</p>
+									<p className="text-xs text-midnight/70 dark:text-white/40 font-mono">${dobaToken.usdValue.toFixed(2)} USD</p>
+								</div>
+							</div>
+						)}
+				{ownedNfts.length > 0 ? (
 					<div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 md:grid-cols-3 sm:gap-6">
 						{ownedNfts.map((nft) => {
 							const unitPrice = parseFloat(nft.price || '5')
@@ -473,7 +510,7 @@ export default function AssetsView() {
 									{/* Mobile List Row (visible only on mobile) */}
 									<div 
 										onClick={() => router.push(`/${locale}/track/${nft.token_id}`)}
-										className="flex sm:hidden items-center justify-between p-3 bg-[#FAF9F6] dark:bg-[#0D0D12]/60 border border-midnight/[0.08] dark:border-white/[0.08] rounded-xl hover:border-cyber-pink/50 transition cursor-pointer active:scale-[0.98]"
+										className="flex sm:hidden items-center justify-between p-3 glass-surface rounded-xl hover:border-cyber-pink/50 transition cursor-pointer active:scale-[0.98]"
 									>
 										<div className="flex items-center gap-3 min-w-0">
 											<div className="w-12 h-12 relative rounded-lg overflow-hidden bg-midnight/5 dark:bg-white/5 flex-shrink-0">
@@ -482,7 +519,7 @@ export default function AssetsView() {
 													alt={nft.name}
 													className="w-full h-full object-cover"
 												/>
-												<div className="absolute -bottom-1 -right-1 bg-cyber-pink px-1 py-0.5 rounded text-[8px] font-mono font-bold text-white leading-none scale-90">
+												<div className="absolute -bottom-1 -right-1 bg-cyber-pink px-1.5 py-0.5 rounded-full text-[8px] font-mono font-bold text-white leading-none scale-90">
 													x{qty}
 												</div>
 											</div>
@@ -492,7 +529,7 @@ export default function AssetsView() {
 											</div>
 										</div>
 										<div className="text-right flex-shrink-0 pl-2">
-											<div className="font-mono font-bold text-xs text-cyber-pink">${holdingsUsd.toFixed(2)}</div>
+											<div className="font-mono font-bold text-xs text-pink-600 dark:text-cyber-pink">${holdingsUsd.toFixed(2)}</div>
 											<div className="text-[9px] text-midnight/40 dark:text-white/40 font-mono">({holdingsAda.toFixed(1)} ADA)</div>
 										</div>
 									</div>
@@ -500,7 +537,7 @@ export default function AssetsView() {
 									{/* Desktop Card (visible only on sm screens and up) */}
 									<div
 										onClick={() => router.push(`/${locale}/track/${nft.token_id}`)}
-										className="hidden sm:flex flex-col justify-between h-full border border-midnight/[0.08] dark:border-white/[0.08] bg-[#FAF9F6] dark:bg-[#0D0D12]/60 rounded-xl overflow-hidden hover:border-cyber-pink/50 transition cursor-pointer group shadow-md hover:shadow-xl"
+										className="hidden sm:flex flex-col justify-between h-full glass-surface rounded-2xl overflow-hidden hover:border-cyber-pink/50 transition cursor-pointer group shadow-md hover:shadow-xl"
 									>
 										<div>
 											<div className="aspect-square w-full relative overflow-hidden bg-midnight/5 dark:bg-white/5 border-b border-midnight/5 dark:border-white/5">
@@ -509,23 +546,23 @@ export default function AssetsView() {
 													alt={nft.name}
 													className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
 												/>
-												<div className="absolute top-3 left-3 bg-cyber-pink/90 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-mono font-bold text-white shadow">
+												<div className="absolute top-3 left-3 bg-cyber-pink/90 backdrop-blur-md px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold text-white shadow">
 													{qty} {qty === 1 ? 'Fraction' : 'Fractions'}
 												</div>
-												<div className="absolute top-3 right-3 bg-black/70 backdrop-blur-md border border-white/10 px-2 py-0.5 rounded text-[10px] font-mono text-white/80">
+												<div className="absolute top-3 right-3 bg-black/70 backdrop-blur-md border border-white/10 px-2.5 py-0.5 rounded-full text-[10px] font-mono text-white/80">
 													ID #{nft.token_id}
 												</div>
 											</div>
 											<div className="p-4 space-y-3">
 												<div>
-													<h4 className="font-display font-bold text-midnight dark:text-white truncate group-hover:text-cyber-pink transition-colors">{nft.name}</h4>
+													<h4 className="font-display font-bold text-midnight dark:text-white truncate group-hover:text-pink-600 dark:group-hover:text-cyber-pink transition-colors">{nft.name}</h4>
 													<p className="text-xs text-midnight/50 dark:text-white/50 truncate">by {nft.artist}</p>
 												</div>
 
-												<div className="space-y-2 pt-3 border-t border-midnight/10 dark:border-white/10">
+												<div className="space-y-2 pt-3 border-t border-midnight/[0.06] dark:border-white/[0.06]">
 													<div className="flex justify-between items-center text-xs">
 														<span className="text-[10px] text-midnight/60 dark:text-white/40 uppercase tracking-widest font-display font-bold">YOUR HOLDINGS</span>
-														<span className="font-mono font-bold text-cyber-pink">${holdingsUsd.toFixed(2)} USD <span className="text-[10px] text-midnight/40 dark:text-white/40 font-normal font-mono">({holdingsAda.toFixed(1)} ADA)</span></span>
+														<span className="font-mono font-bold text-pink-600 dark:text-cyber-pink">${holdingsUsd.toFixed(2)} USD <span className="text-[10px] text-midnight/40 dark:text-white/40 font-normal font-mono">({holdingsAda.toFixed(1)} ADA)</span></span>
 													</div>
 													<div className="flex justify-between items-center text-xs">
 														<span className="text-[10px] text-midnight/60 dark:text-white/40 uppercase tracking-widest font-display font-bold">SONG MARKET CAP</span>
@@ -539,13 +576,21 @@ export default function AssetsView() {
 							)
 						})}
 					</div>
+				) : null}
+					</>
 				) : (
-					<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-12 text-center bg-[#FAF9F6] dark:bg-[#0D0D12]/60 rounded-none">
+					<div className="glass-surface p-12 text-center rounded-2xl">
 						<IconPhoto className="w-12 h-12 mx-auto mb-4 text-midnight/50 dark:text-white/20" />
-						<h4 className="text-lg font-display font-bold mb-1">No NFTs Found</h4>
+						<h4 className="text-lg font-display font-bold mb-1">No Doba Tokens Yet</h4>
 						<p className="text-midnight/70 dark:text-white/40 text-sm max-w-xs mx-auto">
-							You don't own any music NFTs yet. Head over to the Marketplace to buy and collect tracks!
+							You don't hold any doba tokens yet. Head over to the Marketplace to buy and collect tracks!
 						</p>
+						<button
+							onClick={() => router.push(`/${locale}`)}
+							className="mt-6 inline-flex items-center gap-2 bg-cyber-pink hover:bg-cyber-pink/90 text-white font-bold text-xs uppercase tracking-widest px-5 py-3 rounded-xl transition-all"
+						>
+							Discover Music
+						</button>
 					</div>
 				)
 			)}

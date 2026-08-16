@@ -2,7 +2,9 @@
 
 import { logger } from '@/lib/logger'
 import { useEffect, useState } from 'react'
+import { IconMusic } from '@tabler/icons-react'
 import SongCard from './SongCard'
+import CollectNudge from './CollectNudge'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 
@@ -121,7 +123,7 @@ export default function MarketplaceGrid({
           : "grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
       )}>
         {[...Array(12)].map((_, i) => (
-          <div key={i} className="aspect-[3/4] bg-midnight/5 dark:bg-white/5 animate-pulse" />
+          <div key={i} className="aspect-[3/4] glass-surface animate-pulse" />
         ))}
       </div>
     )
@@ -129,8 +131,12 @@ export default function MarketplaceGrid({
 
   if (!tracks.length) {
     return (
-      <div className="bg-midnight/[0.02] dark:bg-white/[0.02] border border-white/5 p-20 text-center">
-        <p className="text-midnight/70 dark:text-white/40 italic text-sm">{t('noSongs')}</p>
+      <div id="marketplace-empty-state" className="glass-surface rounded-2xl p-12 text-center">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-midnight/5 dark:bg-white/5 flex items-center justify-center">
+          <IconMusic size={32} strokeWidth={1} className="text-midnight/40 dark:text-white/40" />
+        </div>
+        <h3 className="text-xl font-semibold text-midnight dark:text-white mb-2">{t('noSongs')}</h3>
+        <p className="text-sm text-midnight/60 dark:text-white/50">Check back soon for new releases.</p>
       </div>
     )
   }
@@ -183,6 +189,7 @@ export default function MarketplaceGrid({
 
   return (
     <div className="space-y-8">
+      <CollectNudge />
       {splitPlaylist && collectedTracks.length > 0 ? (
         <>
           {/* My Playlist Section */}
@@ -217,7 +224,7 @@ export default function MarketplaceGrid({
 
           {/* Discover Music Section */}
           {discoverSingles.length > 0 && (
-            <div className="space-y-4 pt-6 border-t border-midnight/10 dark:border-white/10">
+            <div className="space-y-4 pt-6 border-t border-midnight/[0.06] dark:border-white/[0.06]">
               <h2 className="text-2xl font-bold text-midnight dark:text-white">{tHome('discoverMusic')}</h2>
               <div className={gridClass}>
                 {discoverSingles.map((track) => {
@@ -246,7 +253,7 @@ export default function MarketplaceGrid({
 
           {/* Top Albums Section */}
           {discoverAlbums.length > 0 && (
-            <div className="space-y-4 pt-6 border-t border-midnight/10 dark:border-white/10">
+            <div className="space-y-4 pt-6 border-t border-midnight/[0.06] dark:border-white/[0.06]">
               <h2 className="text-2xl font-bold text-midnight dark:text-white">Top Albums</h2>
               <div className={gridClass}>
                 {discoverAlbums.map((track) => {
@@ -311,7 +318,7 @@ export default function MarketplaceGrid({
 
           {/* Top Albums Section */}
           {discoverAlbums.length > 0 && (
-            <div className="space-y-4 pt-6 border-t border-midnight/10 dark:border-white/10">
+            <div className="space-y-4 pt-6 border-t border-midnight/[0.06] dark:border-white/[0.06]">
               <h2 className="text-2xl font-bold text-midnight dark:text-white">Top Albums</h2>
               <div className={gridClass}>
                 {discoverAlbums.map((track) => {

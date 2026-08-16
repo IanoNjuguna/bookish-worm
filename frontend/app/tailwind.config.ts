@@ -76,13 +76,9 @@ const config: Config = {
         'card-glow': '0 0 20px rgba(255, 31, 138, 0.1)',
       },
       borderRadius: {
-        DEFAULT: '0px',
-        sm: '0px',
-        md: '0px',
-        lg: '0px',
-        xl: '0px',
-        '2xl': '0px',
-        '3xl': '0px',
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
       },
       keyframes: {
         'accordion-down': {

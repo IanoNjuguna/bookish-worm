@@ -34,7 +34,8 @@
     "connectWallet": "Conecta Tu Billetera",
     "connectToView": "Conecta tu billetera para ver tu biblioteca",
     "noSongs": "No se encontraron canciones",
-    "noSongsDesc": "Aún no tienes canciones. ¡Ve al mercado para descubrir música!"
+    "noSongsDesc": "Aún no tienes canciones. ¡Ve al mercado para descubrir música!",
+    "discoverMusic": "Descubrir música"
   },
   "search": {
     "title": "Buscar",
@@ -178,5 +179,13 @@
     "previousTrack": "Canción anterior",
     "nextTrack": "Siguiente canción",
     "play": "Reproducir {title}"
+  },
+  "onboarding": {
+    "title": "Comenzar",
+    "stepConnect": "Conecta tu wallet",
+    "stepVerify": "Verifica tu firma",
+    "stepCollect": "Colecciona tu primer track",
+    "dismiss": "Descartar",
+    "nudgeCollect": "Toca el diamante en cualquier tema para coleccionarlo y ser dueño de una parte de la música."
   }
 }

@@ -1,10 +1,27 @@
+import { Helmet } from "react-helmet-async";
 import Navbar from "@/components/doba/Navbar";
 import Footer from "@/components/doba/Footer";
 import VantaBackground from "@/components/doba/VantaBackground";
 
 export default function Terms() {
   return (
-    <div className="min-h-screen relative overflow-hidden flex flex-col justify-between">
+    <>
+      <Helmet>
+        <title>Terms | pre-drop your music on doba</title>
+        <meta name="description" content="Read the doba Terms of Service, including ownership, transactions, and platform use." />
+        <meta property="og:title" content="Terms of Service | Doba" />
+        <meta property="og:description" content="doba Terms of Service for artists, fans, and collectors." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://doba.world/terms" />
+        <meta property="og:image" content="https://doba.world/doba-og.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Terms of Service | Doba" />
+        <meta name="twitter:description" content="doba Terms of Service for artists, fans, and collectors." />
+        <meta name="twitter:image" content="https://doba.world/doba-og.png" />
+        <link rel="canonical" href="https://doba.world/terms" />
+      </Helmet>
+
+      <div className="min-h-screen relative overflow-hidden flex flex-col justify-between">
       <VantaBackground />
       <Navbar />
 
@@ -34,5 +51,6 @@ export default function Terms() {
 
       <Footer />
     </div>
+    </>
   );
 }

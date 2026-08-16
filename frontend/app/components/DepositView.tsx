@@ -31,25 +31,22 @@ export function DepositView() {
 		)
 	}
 
-	const truncatedAddress = address.length > 19 ? `${address.slice(0, 10)}...${address.slice(-9)}` : address
-
 	return (
-		<div className="max-w-md mx-auto animate-fade-in">
-			<div className="glass p-8 relative overflow-hidden text-center space-y-8 bg-[#FAF9F6] dark:bg-[#0D0D12]/80 border border-midnight/10 dark:border-white/10 rounded-2xl shadow-xl">
-				<div className="relative flex justify-center">
-					<div className="p-4 bg-midnight/5 dark:bg-white/[0.03] border border-midnight/10 dark:border-white/10 rounded-2xl relative">
-						<div className="bg-[#0D0D12] p-4 overflow-hidden shadow-[0_0_30px_rgba(183,148,244,0.1)] border border-midnight/10 dark:border-white/5 rounded-xl">
+		<div className="relative text-center space-y-6">
+				<div className="flex justify-center">
+					<div className="p-3 bg-midnight/5 dark:bg-white/[0.03] border border-midnight/10 dark:border-white/10 rounded-2xl">
+						<div className="bg-midnight p-3 rounded-xl">
 							<QRCodeSVG
 								value={address}
-								size={220}
+								size={200}
 								bgColor="#0D0D12"
 								fgColor="#B794F4"
 								level="H"
 								includeMargin={false}
 								imageSettings={{
 									src: "/doba.png",
-									height: 48,
-									width: 48,
+									height: 44,
+									width: 44,
 									excavate: true,
 								}}
 							/>
@@ -58,45 +55,38 @@ export function DepositView() {
 				</div>
 
 				{/* Address Section */}
-				<div className="space-y-4 flex flex-col items-center">
-					<div
+				<div className="space-y-4">
+					<div className="flex items-center justify-center gap-2">
+						<span className="text-[10px] font-mono font-bold uppercase tracking-widest text-pink-600 dark:text-cyber-pink">
+							Cardano {CARDANO_NETWORK.toUpperCase()} Network
+						</span>
+					</div>
+
+					<button
 						onClick={handleCopy}
-						className="group flex items-center justify-center gap-4 p-4 bg-midnight/5 dark:bg-black/40 border border-midnight/10 dark:border-white/10 hover:border-midnight/20 dark:border-white/20 transition-all cursor-pointer overflow-hidden rounded-xl w-full"
+						className="group w-full flex items-center justify-between gap-3 p-3 bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 hover:border-midnight/20 dark:hover:border-white/20 transition-all rounded-xl"
 					>
-						<code className="text-[13px] font-mono text-midnight/80 dark:text-white/80 select-all break-all">
+						<code className="text-xs sm:text-sm font-mono text-midnight/80 dark:text-white/80 select-all break-all text-left">
 							{address}
 						</code>
-						<div className="flex items-center gap-2">
-							<div className="flex-shrink-0">
-								{copied ? (
-									<IconCheck className="w-4 h-4 text-green-400" />
-								) : (
-									<IconCopy className="w-4 h-4 text-midnight/70 dark:text-white/40 group-hover:text-midnight dark:hover:text-white transition-colors" />
-								)}
+						<div className="flex items-center gap-1 shrink-0">
+							<div className="w-8 h-8 flex items-center justify-center rounded-lg text-midnight/60 dark:text-white/40 group-hover:text-midnight dark:group-hover:text-white group-hover:bg-midnight/5 dark:group-hover:bg-white/5 transition-colors">
+								{copied ? <IconCheck size={16} className="text-emerald-500" /> : <IconCopy size={16} />}
 							</div>
 							<a
 								href={`${EXPLORER_URL}/address/${address}`}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="flex-shrink-0 text-midnight/70 dark:text-white/40 hover:text-midnight dark:hover:text-white transition-colors"
+								className="w-8 h-8 flex items-center justify-center rounded-lg text-midnight/60 dark:text-white/40 hover:text-midnight dark:hover:text-white hover:bg-midnight/5 dark:hover:bg-white/5 transition-colors"
 								onClick={(e) => e.stopPropagation()}
 								title="View on CardanoScan"
 							>
-								<IconExternalLink className="w-4 h-4" />
+								<IconExternalLink size={16} />
 							</a>
 						</div>
-					</div>
-
-					<div className="flex items-center justify-center gap-2">
-						<span className="text-xs font-mono font-bold tracking-wider text-[#FF1F8A]">CARDANO {CARDANO_NETWORK.toUpperCase()} NETWORK</span>
-					</div>
+					</button>
 				</div>
 			</div>
-
-			{/* Decorative Elements */}
-			<div className="absolute top-0 right-0 w-32 h-32 bg-purple-600/10 blur-[60px] pointer-events-none"></div>
-			<div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-600/10 blur-[60px] pointer-events-none"></div>
-		</div>
 	)
 }
 

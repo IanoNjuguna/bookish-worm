@@ -1,24 +1,18 @@
 'use client'
 
 import React from 'react'
-import { IconX, IconMicrophone, IconExternalLink, IconShare, IconCopy, IconSquareCheckFilled, IconLoader2 } from '@tabler/icons-react'
+import { IconX, IconMicrophone, IconExternalLink, IconShare, IconCopy, IconSquareCheckFilled, IconLoader2, IconMusic } from '@tabler/icons-react'
 import { useLocale } from 'next-intl'
 import Link from 'next/link'
-import { DobaVisualizer } from '@/components/icons/DobaVisualizer'
 import { Button } from '@/components/ui/button'
 import { useCardano } from '@/components/Providers'
 import { EXPLORER_URL } from '@/lib/config'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { markCollected } from '@/lib/onboarding'
 import { useAudio } from '@/components/AudioProvider'
 import { buyFractionOnChain, formatTxError } from '@/lib/contractHelper'
 import { IconPlayerPlay as Play, IconPlayerPause as Pause, IconPlayerSkipBack as SkipBack, IconPlayerSkipForward as SkipForward } from '@tabler/icons-react'
-
-const formatTokenId = (id: string | number) => {
-	const s = String(id)
-	if (s.length <= 10) return s
-	return `${s.slice(0, 4)}...${s.slice(-4)}`
-}
 
 interface NowPlayingSidebarProps {
 	track: any | null
@@ -27,9 +21,9 @@ interface NowPlayingSidebarProps {
 }
 
 export default function NowPlayingSidebar({ track, isVisible, onClose }: NowPlayingSidebarProps) {
-	const { playerState, effectiveAddress, isAuthenticated, getValidToken, login, accessToken } = useAudio()
+	const { playerState, effectiveAddress, isAuthenticated, getValidToken, login } = useAudio()
 	const locale = useLocale()
-	const { address: cardanoAddress, isConnected, lucid } = useCardano()
+	const { address: cardanoAddress, lucid } = useCardano()
 
 	const {
 		isPlaying,
@@ -38,8 +32,7 @@ export default function NowPlayingSidebar({ track, isVisible, onClose }: NowPlay
 		togglePlayPause,
 		next,
 		previous,
-		seek,
-		audioRef
+		seek
 	} = playerState
 
 	const [mintData, setMintData] = React.useState<{ minted: number, max: number }>({ minted: 0, max: 0 })
@@ -194,7 +187,7 @@ export default function NowPlayingSidebar({ track, isVisible, onClose }: NowPlay
 							href={`${EXPLORER_URL}/tx/${txHash}`}
 							target="_blank"
 							rel="noreferrer"
-							className="text-xs text-[#B794F4] hover:underline"
+							className="text-xs text-lavender hover:underline"
 						>
 							View on Explorer
 						</a>
@@ -220,6 +213,7 @@ export default function NowPlayingSidebar({ track, isVisible, onClose }: NowPlay
 			}
 
 			setHasOwned(true)
+			markCollected()
 			fetchMintData()
 			if (mainToast) {
 				toast.success(`"${track.name || track.title}" collected!`, { id: mainToast })
@@ -326,191 +320,224 @@ export default function NowPlayingSidebar({ track, isVisible, onClose }: NowPlay
 		}
 	}
 
+	const isSoldOut = mintData.max > 0 && mintData.minted >= mintData.max
+
 	return (
 		<aside className={cn(
-			"fixed inset-y-0 right-0 z-[100] bg-[rgba(250,249,246,0.95)] dark:bg-[rgba(13,13,18,0.95)] backdrop-blur-md flex flex-col overflow-hidden h-[100dvh] transition-all duration-300 ease-in-out border-l border-midnight/[0.08] dark:border-white/[0.08]",
-			isVisible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 pointer-events-none lg:pointer-events-auto",
-			"lg:translate-x-0 lg:static lg:z-0 lg:bg-transparent lg:dark:bg-transparent lg:backdrop-blur-none lg:h-full",
-			isVisible ? "lg:w-80 lg:opacity-100 lg:visible" : "lg:w-0 lg:opacity-0 lg:invisible lg:pointer-events-none lg:border-l-0"
+			"fixed inset-x-3 top-20 bottom-3 z-[60] lg:static lg:inset-auto flex flex-col overflow-hidden transition-all duration-300 ease-in-out shrink-0 glass-surface rounded-2xl shadow-xl min-h-0",
+			isVisible
+				? "opacity-100 translate-y-0 lg:translate-x-0 lg:w-80 lg:mt-24 lg:mr-4 lg:mb-28 lg:ml-0"
+				: "opacity-0 pointer-events-none translate-y-6 lg:translate-y-0 lg:translate-x-4 lg:w-0 lg:m-0"
 		)}>
-			{/* Mobile Top Border Partial */}
-			<div className="lg:hidden absolute top-0 left-4 right-4 h-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
-			
-			<div className="w-80 flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-6 relative pb-32">
-				{/* Main Content Group */}
-				<div className="relative pb-6">
-					<div className="hidden lg:block absolute left-[-24px] top-[-8px] bottom-[-12px] w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
-					<div className="space-y-6">
-				{/* Top Label & Close Button */}
-				<div className="flex items-center justify-between mb-2">
-					<p className="text-[10px] uppercase tracking-widest text-midnight/70 dark:text-white/40 font-display font-bold">Explore</p>
-					<button
-						onClick={onClose}
-						className="p-1.5 hover:bg-midnight/5 dark:hover:bg-white/5 rounded-full transition-colors text-midnight/70 dark:text-white/40 hover:text-midnight dark:hover:text-white"
-						title="Close"
-					>
-						<IconX size={16} />
-					</button>
-				</div>
+			{/* Feathered vertical edge rule (desktop) */}
+			<div className="hidden lg:block absolute left-0 top-4 bottom-4 w-[1px] rounded-full bg-gradient-to-b from-transparent via-midnight/[0.08] dark:via-white/[0.08] to-transparent" />
+			{/* Mobile top border partial */}
+			<div className="lg:hidden absolute top-0 left-4 right-4 h-[1px] rounded-full bg-gradient-to-r from-transparent via-midnight/[0.08] dark:via-white/[0.08] to-transparent" />
 
-				{/* Large Album Art */}
-				<div className="aspect-square w-full rounded-2xl overflow-hidden border border-midnight/10 dark:border-white/10 group shadow-xl">
-					<img
-						src={imageUrl}
-						alt={track.name || track.title}
-						className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-					/>
-				</div>
-
-				{/* Mobile Audio Controls */}
-				<div className="lg:hidden space-y-6 pt-2">
-					<div className="space-y-2">
-						<div
-							className="h-1.5 w-full bg-midnight/10 dark:bg-white/10 relative cursor-pointer group"
-							onClick={handleProgressClick}
-							role="slider"
-							aria-label="Track Progress"
-							aria-valuenow={Math.round(progressPercent)}
-							aria-valuemin={0}
-							aria-valuemax={100}
+			<div className={cn(
+				"w-full lg:w-80 flex-1 min-h-0 overflow-y-auto overflow-x-hidden no-scrollbar p-5 relative pb-4 transition-opacity duration-150 ease-out",
+				isVisible ? "opacity-100" : "opacity-0"
+			)}>
+				<div className="space-y-6">
+					{/* Large Album Art */}
+					<div className="relative w-full aspect-square lg:w-36 lg:h-36 rounded-2xl overflow-hidden border border-midnight/10 dark:border-white/10 shadow-lg group bg-midnight/5 dark:bg-white/5 flex items-center justify-center">
+						<button
+							onClick={onClose}
+							className="absolute top-3 right-3 z-10 w-12 h-12 flex items-center justify-center rounded-xl bg-midnight/70 dark:bg-white/70 text-white dark:text-midnight shadow-lg hover:bg-midnight dark:hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:hidden"
+							title="Close"
+							aria-label="Close now playing panel"
 						>
-							<div
-								className="absolute inset-y-0 left-0 bg-cyber-pink transition-all h-full"
-								style={{ width: `${progressPercent}%` }}
+							<IconX size={18} />
+						</button>
+						{imageUrl ? (
+							<img
+								src={imageUrl}
+								alt={track.name || track.title}
+								className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
 							/>
-						</div>
-						<div className="flex items-center justify-between text-[10px] text-midnight/70 dark:text-white/40 tabular-nums font-bold uppercase tracking-widest">
-							<span>{formatTime(currentTime)}</span>
-							<span>{formatTime(duration)}</span>
-						</div>
+						) : (
+							<IconMusic size={64} strokeWidth={1} className="text-midnight/30 dark:text-white/30" />
+						)}
 					</div>
 
-					<div className="flex items-center justify-center gap-10">
-						<button
-							onClick={previous}
-							className="p-2 text-midnight/60 dark:text-white/60 active:text-midnight dark:text-white active:scale-95 transition-all"
-							aria-label="Previous"
-						>
-							<SkipBack size={28} className="fill-midnight dark:fill-white" />
-						</button>
+					{/* Track Info */}
+					<div className="space-y-5">
+						<div className="space-y-2 text-left">
+							<h2 className="text-xl font-display font-bold text-midnight dark:text-white tracking-tight leading-tight">
+								{track.name || track.title}
+							</h2>
+							<div className="flex items-center justify-start gap-2 text-midnight/80 dark:text-lavender font-bold">
+								<IconMicrophone size={14} />
+								<p className="text-xs font-display font-bold uppercase tracking-widest">{track.artist || track.creator}</p>
+							</div>
+						</div>
 
-						<button
-							onClick={togglePlayPause}
-							className="w-14 h-14 bg-white text-black flex items-center justify-center active:scale-90 active:brightness-90 transition-all"
-							aria-label={isPlaying ? 'Pause' : 'Play'}
-						>
-							{isPlaying ? <Pause size={28} className="fill-black" /> : <Play size={28} className="fill-black ml-1" />}
-						</button>
+						{/* Price & Mint Info */}
+						<div className="space-y-2">
+							<div className="flex items-center justify-between">
+								{hasOwned ? (
+									<div className="flex items-center gap-1.5 text-emerald-500">
+										<IconSquareCheckFilled size={18} />
+										<span className="text-xs font-bold uppercase tracking-widest">Collected</span>
+									</div>
+								) : (
+									<span className="text-pink-600 dark:text-cyber-pink font-display font-bold text-lg">{track.price || '5'} ADA</span>
+								)}
+								<span className="text-[10px] text-midnight/70 dark:text-white/40 font-display font-bold uppercase tracking-widest">
+									{mintData.max === 0
+										? `${mintData.minted} Collected`
+										: `${mintData.minted} / ${mintData.max} Edition`}
+								</span>
+							</div>
+							<div className="h-[3px] w-full bg-midnight/10 dark:bg-white/10 rounded-full overflow-hidden">
+								<div
+									className="h-full bg-pink-600 dark:bg-cyber-pink transition-all duration-1000 rounded-full"
+									style={{ width: mintData.max === 0 ? '100%' : `${(mintData.minted / (mintData.max || 1)) * 100}%` }}
+								/>
+							</div>
+						</div>
 
-						<button
-							onClick={next}
-							className="p-2 text-midnight/60 dark:text-white/60 active:text-midnight dark:text-white active:scale-95 transition-all"
-							aria-label="Next"
-						>
-							<SkipForward size={28} className="fill-midnight dark:fill-white" />
-						</button>
+						{/* Action Buttons */}
+						<div className="flex gap-2">
+						{!hasOwned && !isSoldOut && (
+							<Button
+								className="flex-1 h-12 rounded-xl font-display font-bold uppercase tracking-widest text-xs transition-all duration-300 bg-cyber-pink hover:bg-cyber-pink/90 text-white"
+								onClick={handleMint}
+								disabled={isMinting}
+							>
+								{isMinting && <IconLoader2 size={16} className="animate-spin mr-2" />}
+								Collect
+							</Button>
+						)}
+
+							<Button
+								variant="outline"
+								className="flex-1 lg:flex-none lg:w-12 h-12 p-0 rounded-xl border-midnight/10 dark:border-white/10 hover:bg-midnight/5 dark:hover:bg-white/5"
+								onClick={handleShare}
+								title="Share"
+							>
+								<IconShare size={18} className="text-midnight/60 dark:text-white/60" />
+							</Button>
+
+							<Button
+								variant="outline"
+								className="flex-1 lg:flex-none lg:w-12 h-12 p-0 rounded-xl border-midnight/10 dark:border-white/10 hover:bg-midnight/5 dark:hover:bg-white/5"
+								onClick={handleCopyLink}
+								title="Copy Link"
+							>
+								<IconCopy size={18} className="text-midnight/60 dark:text-white/60" />
+							</Button>
+
+							<Button
+								variant="outline"
+								className="flex-1 lg:flex-none lg:w-12 h-12 p-0 rounded-xl border-midnight/10 dark:border-white/10 hover:bg-midnight/5 dark:hover:bg-white/5"
+								asChild
+								title="View more"
+							>
+								<Link
+									href={`/${locale}/track/${track.token_id ?? track.id}`}
+									onClick={onClose}
+									aria-label="View full song details"
+								>
+									<IconExternalLink size={18} className="text-midnight/60 dark:text-white/60" />
+								</Link>
+							</Button>
+						</div>
+
+						{/* Owner actions */}
+						{hasOwned && (
+							<div className="grid grid-cols-2 gap-2">
+								<Button
+									variant="outline"
+									className="h-11 rounded-xl text-xs font-display font-bold uppercase tracking-widest border-midnight/10 dark:border-white/10 hover:bg-midnight/5 dark:hover:bg-white/5"
+									onClick={handleDownload}
+								>
+									Download
+								</Button>
+								{!isSoldOut && (
+									<Button
+										variant="outline"
+										className="h-11 rounded-xl text-xs font-display font-bold uppercase tracking-widest border-midnight/10 dark:border-white/10 hover:bg-midnight/5 dark:hover:bg-white/5"
+										onClick={handleMint}
+										disabled={isMinting}
+									>
+										{isMinting && <IconLoader2 size={16} className="animate-spin mr-2" />}
+										Collect More
+									</Button>
+								)}
+							</div>
+						)}
 					</div>
 				</div>
 
-				{/* Track Info */}
-				<div className="space-y-4">
-					<div className="space-y-1">
-						<h2 className="text-2xl font-display font-bold text-midnight dark:text-white tracking-tight leading-tight">
-							{track.name || track.title}
-						</h2>
-						<div className="flex items-center gap-2 text-[#B794F4] font-bold">
-							<IconMicrophone size={14} />
-							<p className="text-sm font-display font-bold uppercase tracking-widest">{track.artist || track.creator}</p>
-						</div>
-					</div>
-
-					{/* Price & Mint Info */}
-					<div className="space-y-2 pt-2">
-						<div className="flex items-center justify-between">
-							{hasOwned ? (
-								<div className="flex items-center gap-1.5 text-[#1DB954]">
-									<IconSquareCheckFilled size={18} />
-								</div>
-							) : (
-								<span className="text-cyber-pink font-display font-bold text-lg">{track.price || '5'} ADA</span>
-							)}
-							<span className="text-[10px] text-midnight/70 dark:text-white/40 font-display font-bold uppercase tracking-widest">
-								{mintData.max === 0
-									? `${mintData.minted} Collected`
-									: `${mintData.minted} / ${mintData.max} Edition`}
-							</span>
-						</div>
-						<div className="h-[2px] w-full bg-midnight/5 dark:bg-white/5 relative overflow-hidden">
+				{/* Mobile full-page extras (desktop uses the bottom player bar) */}
+				<div className="lg:hidden space-y-6 pt-6 mt-6 border-t border-midnight/[0.06] dark:border-white/[0.06]">
+					{/* Playback controls */}
+					<div className="space-y-4">
+						<div className="space-y-2">
 							<div
-								className="absolute inset-y-0 left-0 bg-cyber-pink transition-all duration-1000"
-								style={{ width: mintData.max === 0 ? '100%' : `${(mintData.minted / (mintData.max || 1)) * 100}%` }}
-							/>
+								className="h-[3px] w-full bg-midnight/10 dark:bg-white/10 relative cursor-pointer group overflow-hidden rounded-full"
+								onClick={handleProgressClick}
+								role="slider"
+								aria-label="Track Progress"
+								aria-valuenow={Math.round(progressPercent)}
+								aria-valuemin={0}
+								aria-valuemax={100}
+							>
+								<div
+									className="absolute inset-y-0 left-0 bg-pink-600 dark:bg-cyber-pink transition-all h-full rounded-full"
+									style={{ width: `${progressPercent}%` }}
+								/>
+								<div
+									className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-pink-600 dark:bg-cyber-pink border border-midnight/10 dark:border-white/10 opacity-0 group-hover:opacity-100 transition-opacity"
+									style={{ left: `calc(${progressPercent}% - 6px)` }}
+								/>
+							</div>
+							<div className="flex items-center justify-between text-[10px] text-midnight/70 dark:text-white/40 tabular-nums font-bold uppercase tracking-widest">
+								<span>{formatTime(currentTime)}</span>
+								<span>{formatTime(duration)}</span>
+							</div>
+						</div>
+
+						<div className="flex items-center justify-center gap-10">
+							<button
+								onClick={previous}
+								className="p-2 text-midnight/60 dark:text-white/60 hover:text-midnight dark:hover:text-white active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
+								aria-label="Previous"
+							>
+								<SkipBack size={28} className="fill-midnight dark:fill-white" />
+							</button>
+
+							<button
+								onClick={togglePlayPause}
+								className="w-14 h-14 rounded-xl bg-lavender text-midnight flex items-center justify-center shadow-lg active:scale-90 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+								aria-label={isPlaying ? 'Pause' : 'Play'}
+							>
+								{isPlaying ? <Pause size={28} className="fill-midnight" /> : <Play size={28} className="fill-midnight ml-1" />}
+							</button>
+
+							<button
+								onClick={next}
+								className="p-2 text-midnight/60 dark:text-white/60 hover:text-midnight dark:hover:text-white active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
+								aria-label="Next"
+							>
+								<SkipForward size={28} className="fill-midnight dark:fill-white" />
+							</button>
 						</div>
 					</div>
 
-					{/* Action Buttons */}
-					<div className="flex gap-2 pt-2">
-						<Button
-							className={cn(
-								"flex-1 h-12 rounded-xl font-display font-bold uppercase tracking-widest text-xs transition-all duration-300",
-								(mintData.max > 0 && mintData.minted >= mintData.max)
-									? "bg-[#FF1F8A]/10 text-[#FF1F8A] border border-[#FF1F8A]/20 cursor-not-allowed disabled:opacity-100"
-									: hasOwned
-										? "bg-[#1DB954]/10 border border-[#1DB954]/20 text-[#1DB954] hover:bg-[#1DB954]/20 cursor-default disabled:opacity-100"
-										: "bg-[#B794F4] hover:bg-[#A080E0] text-black"
-							)}
-							onClick={!(mintData.max > 0 && mintData.minted >= mintData.max) && !hasOwned && !isMinting ? handleMint : undefined}
-							disabled={(mintData.max > 0 && mintData.minted >= mintData.max) || hasOwned || isMinting}
-						>
-							{isMinting ? (
-								<IconLoader2 size={16} className="animate-spin mr-2" />
-							) : (mintData.max > 0 && mintData.minted >= mintData.max) ? (
-								<DobaVisualizer size={16} className="mr-2 text-[#FF1F8A]" />
-							) : hasOwned ? (
-								<IconSquareCheckFilled size={16} className="mr-2" />
-							) : null}
-							{(mintData.max > 0 && mintData.minted >= mintData.max) ? 'SOLD OUT' : hasOwned ? 'Collected' : 'Collect'}
-						</Button>
-
-						<Button
-							variant="outline"
-							className="w-12 h-12 p-0 border-midnight/10 dark:border-white/10 hover:bg-midnight/5 dark:hover:bg-white/5 rounded-xl"
-							onClick={handleShare}
-							title="Share"
-						>
-							<IconShare size={18} className="text-midnight/60 dark:text-white/60" />
-						</Button>
-
-						<Button
-							variant="outline"
-							className="w-12 h-12 p-0 border-midnight/10 dark:border-white/10 hover:bg-midnight/5 dark:hover:bg-white/5 rounded-xl"
-							onClick={handleCopyLink}
-							title="Copy Link"
-						>
-							<IconCopy size={18} className="text-midnight/60 dark:text-white/60" />
-						</Button>
-					</div>
-				</div>
-			</div>
-		</div>
-
-				{/* Lyrics Section */}
-				{(track.description || track.lyrics) && (
-					<div className="relative pb-6">
-						<div className="hidden lg:block absolute left-[-24px] top-[12px] bottom-[-12px] w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
-						<div className="space-y-3 pt-6 border-t border-white/5 relative">
+					{/* Lyrics */}
+					{(track.description || track.lyrics) && (
+						<div className="space-y-3">
 							<p className="text-[10px] uppercase tracking-widest text-midnight/70 dark:text-white/40 font-display font-bold">Lyrics</p>
 							<p className="text-midnight/80 dark:text-white/80 text-sm leading-relaxed whitespace-pre-line">
 								{track.description || track.lyrics}
 							</p>
 						</div>
-					</div>
-				)}
+					)}
 
-				{/* Blockchain Info */}
-				<div className="relative pb-6">
-					<div className="hidden lg:block absolute left-[-24px] top-[12px] bottom-[0px] w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
-					<div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5 relative">
+					{/* Details grid */}
+					<div className="grid grid-cols-2 gap-4">
 						<div className="col-span-2">
 							<p className="text-[10px] uppercase tracking-widest text-midnight/70 dark:text-white/40 font-display font-bold">Genre</p>
 							<p className="text-midnight dark:text-white text-sm">{track.genre || 'RARE'}</p>
@@ -521,9 +548,9 @@ export default function NowPlayingSidebar({ track, isVisible, onClose }: NowPlay
 								<Link
 									href={`/${locale}/track/${track.token_id ?? track.id}`}
 									onClick={onClose}
-									className="text-cyber-pink hover:underline text-sm font-mono block"
+									className="text-pink-600 dark:text-cyber-pink hover:underline text-sm font-mono block"
 								>
-									#{formatTokenId(track.token_id ?? track.id)}
+									#{track.token_id ?? track.id}
 								</Link>
 							</div>
 						)}
@@ -537,7 +564,7 @@ export default function NowPlayingSidebar({ track, isVisible, onClose }: NowPlay
 										href={`${EXPLORER_URL}/tokenPolicy/${policyId}`}
 										target="_blank"
 										rel="noreferrer"
-										className="text-cyber-pink hover:underline text-xs font-mono block truncate"
+										className="text-pink-600 dark:text-cyber-pink hover:underline text-xs font-mono block truncate"
 									>
 										{policyId.slice(0, 8)}...{policyId.slice(-8)}
 									</a>
@@ -554,79 +581,15 @@ export default function NowPlayingSidebar({ track, isVisible, onClose }: NowPlay
 										href={`${EXPLORER_URL}/address/${creator}`}
 										target="_blank"
 										rel="noreferrer"
-										className="text-cyber-pink hover:underline text-xs font-mono block truncate"
+										className="text-pink-600 dark:text-cyber-pink hover:underline text-xs font-mono block truncate"
 									>
 										{creator.slice(0, 10)}...{creator.slice(-8)}
 									</a>
 								</div>
 							);
 						})()}
-						{(() => {
-							const policyId = splitter || track.splitter;
-							if (!policyId) return null;
-							const targetTokenId = albumId !== null ? albumId : (track.album_id ? Number(track.album_id) : (track.id !== undefined ? track.id : track.token_id));
-							const tokenNameStr = ticker
-								? ticker.toUpperCase().replace(/[^A-Z0-9]/g, "")
-								: (track.ticker
-									? track.ticker.toUpperCase().replace(/[^A-Z0-9]/g, "")
-									: 'T' + String(targetTokenId).slice(-11));
-							const toHex = (str: string) => Array.from(str).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join('');
-							const assetNameHex = toHex(tokenNameStr);
-							const assetUnit = policyId + '000643b0' + assetNameHex;
-							return (
-								<div className="col-span-2">
-									<p className="text-[10px] uppercase tracking-widest text-midnight/70 dark:text-white/40 font-display font-bold">Provenance</p>
-									<a
-										href={`${EXPLORER_URL}/token/${assetUnit}`}
-										target="_blank"
-										rel="noreferrer"
-										className="text-cyber-pink hover:underline text-xs font-mono block truncate"
-									>
-										{tokenNameStr} (Reference NFT)
-									</a>
-								</div>
-							);
-						})()}
 					</div>
-				</div>
 
-				{/* Actions */}
-				<div className="relative">
-					<div className="hidden lg:block absolute left-[-24px] top-[12px] bottom-[-102px] w-[1px] bg-midnight/[0.08] dark:bg-white/[0.08]" />
-					<div className="flex flex-col gap-3 pt-6 border-t border-white/5 relative">
-						<Button
-							className={cn(
-								"w-full font-display font-bold py-6 rounded-none transition-all duration-300",
-								hasOwned
-									? "bg-[#B794F4] hover:bg-[#B794F4]/90 text-black"
-									: "bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 text-midnight/50 dark:text-white/20 cursor-not-allowed"
-							)}
-							onClick={hasOwned ? handleDownload : undefined}
-							disabled={!hasOwned}
-						>
-							{hasOwned ? 'Download' : 'Collect to Download'}
-						</Button>
-
-						{hasOwned && !(mintData.max > 0 && mintData.minted >= mintData.max) && (
-							<div className="flex flex-col gap-2 pt-2 relative">
-								<p className="text-[11px] italic text-midnight/60 dark:text-white/60 text-center font-serif leading-relaxed px-2 mt-1">
-									you can collect another song token to support the artist
-								</p>
-								<Button
-									variant="outline"
-									className={cn(
-										"w-full border-midnight/10 dark:border-white/10 hover:bg-midnight/5 dark:hover:bg-white/5 text-[10px] uppercase font-display font-bold text-midnight/60 dark:text-white/60 tracking-widest py-4 rounded-none h-auto",
-										(mintData.max > 0 && mintData.minted >= mintData.max) && "opacity-50 cursor-not-allowed"
-									)}
-									onClick={handleMint}
-									disabled={isMinting || (mintData.max > 0 && mintData.minted >= mintData.max)}
-								>
-									{isMinting && <IconLoader2 size={16} className="animate-spin mr-2" />}
-									{(mintData.max > 0 && mintData.minted >= mintData.max) ? 'SOLD OUT' : 'Collect More'}
-								</Button>
-							</div>
-						)}
-					</div>
 				</div>
 			</div>
 		</aside>

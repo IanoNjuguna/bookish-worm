@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 import { useCardano } from '@/components/Providers'
 import { EXPLORER_URL } from '@/lib/config'
 import { toast } from 'sonner'
+import { markCollected } from '@/lib/onboarding'
 
 import { useRouter } from 'next/navigation'
 import { useLocale } from 'next-intl'
@@ -266,13 +267,14 @@ export default function SongCard({
 
       // Update local state immediately
       setHasOwned(true)
+      markCollected()
       toast.success(
         <div className="flex flex-col gap-1">
           <p className="font-bold">"{name}" collected!</p>
           <a
             href={`${EXPLORER_URL}/tx/${txHash}`}
             target="_blank"
-            className="text-[10px] text-cyber-pink hover:underline flex items-center gap-1"
+            className="text-[10px] text-pink-600 dark:text-cyber-pink hover:underline flex items-center gap-1"
           >
             View on Explorer
           </a>
@@ -378,9 +380,8 @@ export default function SongCard({
         onTouchCancel={handleTouchCancel}
         onTouchMove={handleTouchMove}
         className={cn(
-          "group relative flex flex-col p-3 rounded-2xl transition-all duration-300 cursor-pointer select-none",
-          "bg-black/[0.03] dark:bg-white/[0.03] border border-[#f0f0f0] dark:border-white/5",
-          "hover:bg-black/[0.06] dark:hover:bg-white/[0.06] hover:border-black/10 dark:hover:border-white/10 hover:shadow-xl dark:hover:shadow-black/40",
+          "group relative flex flex-col p-3 rounded-2xl cursor-pointer select-none glass-surface transition-all duration-300",
+          "hover:bg-midnight/[0.03] dark:hover:bg-white/[0.03] hover:border-midnight/15 dark:hover:border-white/15",
           isLongPressed && "scale-[0.97] duration-150",
           isAlbum && isExpanded && "border-b-0 rounded-b-none"
         )}
@@ -413,7 +414,7 @@ export default function SongCard({
                   onPlay()
                 }}
                 className={cn(
-                  "absolute right-3 bottom-3 z-30 w-10 h-10 bg-lavender hover:bg-lavender/90 hover:scale-105 active:scale-95 text-black rounded-full flex items-center justify-center transition-all duration-300 transform translate-y-2 opacity-0",
+                  "absolute right-3 bottom-3 z-30 w-10 h-10 bg-lavender hover:bg-lavender/90 hover:scale-105 active:scale-95 text-black rounded-md flex items-center justify-center transition-all duration-300 transform translate-y-2 opacity-0",
                   "group-hover:translate-y-0 group-hover:opacity-100",
                   isPlaying && "translate-y-0 opacity-100"
                 )}
@@ -443,17 +444,17 @@ export default function SongCard({
             {/* Diamonds data in top left corner */}
             <div className="absolute top-2 left-2 z-20">
               {(mintData.max > 0 && mintData.minted >= mintData.max) ? (
-                <IconDiamondFilled size={22} className="text-[#FF1F8A]" />
+                <IconDiamondFilled size={22} className="text-cyber-pink" />
               ) : hasOwned ? (
-                <IconDiamondFilled size={22} className="text-[#1DB954]" />
+                <IconDiamondFilled size={22} className="text-emerald-500" />
               ) : (
                 <button 
                   type="button"
                   disabled={isMinting}
                   onClick={handleMint}
-                  className="text-white/70 hover:text-[#FF1F8A] transition-colors duration-200"
+                  className="text-white/70 hover:text-cyber-pink transition-colors duration-200"
                 >
-                  {isMinting ? <IconLoader2 size={22} className="animate-spin text-[#FF1F8A]" /> : <IconDiamond size={22} />}
+                  {isMinting ? <IconLoader2 size={22} className="animate-spin text-pink-600 dark:text-cyber-pink" /> : <IconDiamond size={22} />}
                 </button>
               )}
             </div>
@@ -491,7 +492,7 @@ export default function SongCard({
                 {artist}
               </span>
             </div>
-            <span className="text-[10px] font-sans font-bold text-purple-600 dark:text-[#B794F4] flex-shrink-0">
+            <span className="text-[10px] font-sans font-bold text-purple-600 dark:text-lavender flex-shrink-0">
               {isAlbum ? (
                 albumTracks && albumTracks.length > 0
                   ? `${albumTracks.filter((t: { is_owned?: boolean }) => !t.is_owned).reduce((sum, t: { price?: string }) => sum + Number(t.price || 5), 0)} ADA`
@@ -525,7 +526,7 @@ export default function SongCard({
             isExpanded ? "max-h-[300px] opacity-100" : "max-h-0 opacity-0"
           )}
         >
-          <div className="border border-t-0 border-[#f0f0f0] dark:border-white/5 rounded-b-lg bg-black/[0.02] dark:bg-white/[0.02] px-3 pb-3 pt-1">
+          <div className="glass-surface border-t-0 rounded-t-none rounded-b-lg px-3 pb-3 pt-1">
             <div className="overflow-y-auto max-h-[260px] space-y-0.5 custom-scrollbar">
               {albumTracks.map((t, index) => {
                 const isTrackPlaying = playerState?.isPlaying && (currentPlayingId === t.token_id || currentPlayingId === t.id)
@@ -541,7 +542,7 @@ export default function SongCard({
                     className={cn(
                       "flex items-center justify-between py-2 px-2 rounded text-[11px] cursor-pointer transition-colors w-full min-w-0",
                       isTrackPlaying 
-                        ? "bg-purple-600/10 dark:bg-[#B794F4]/15 text-purple-600 dark:text-[#B794F4] font-semibold" 
+                        ? "bg-purple-600/10 dark:bg-lavender/15 text-purple-600 dark:text-lavender font-semibold" 
                         : "hover:bg-black/5 dark:hover:bg-white/5 text-black/70 dark:text-white/70"
                     )}
                   >
@@ -551,7 +552,7 @@ export default function SongCard({
                     </div>
                     <div className="flex-shrink-0">
                       {isTrackPlaying ? (
-                        <IconPlayerPause size={12} className="text-cyber-pink fill-cyber-pink" />
+                        <IconPlayerPause size={12} className="text-pink-600 dark:text-cyber-pink fill-pink-600 dark:fill-cyber-pink" />
                       ) : (
                         <IconPlayerPlay size={12} className="text-black/25 dark:text-white/25" />
                       )}

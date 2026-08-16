@@ -2,15 +2,16 @@
 
 import React, { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { IconPlayerPlay, IconPlayerPause, IconCornerDownLeft, IconShare, IconCopy, IconHeart, IconLoader2, IconSquareCheckFilled } from '@tabler/icons-react'
+import { IconPlayerPlay, IconPlayerPause, IconChevronLeft, IconShare, IconCopy, IconHeart, IconLoader2, IconSquareCheckFilled, IconMusic } from '@tabler/icons-react'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
+import { markCollected } from '@/lib/onboarding'
 import { useAudio } from '@/components/AudioProvider'
 import { useCardano } from '@/components/Providers'
 import { EXPLORER_URL } from '@/lib/config'
 import { logger } from '@/lib/logger'
 import { buyFractionOnChain, formatTxError } from '@/lib/contractHelper'
-import { useTranslations } from 'next-intl'
 
 const formatTokenId = (id: string | number) => {
 	const s = String(id)
@@ -41,7 +42,6 @@ interface Track {
 }
 
 export default function TrackDetailClient({ initialTrack }: { initialTrack: Track | null }) {
-	const tNav = useTranslations('nav')
 	const params = useParams()
 	const router = useRouter()
 	const id = params?.id as string
@@ -151,6 +151,7 @@ export default function TrackDetailClient({ initialTrack }: { initialTrack: Trac
 			await lucid.awaitTx(txHash)
 
 			setHasOwned(true)
+			markCollected()
 			if (mainToast) {
 				toast.success(
 					<div className="flex flex-col gap-1">
@@ -159,7 +160,7 @@ export default function TrackDetailClient({ initialTrack }: { initialTrack: Trac
 							href={`${EXPLORER_URL}/tx/${txHash}`}
 							target="_blank"
 							rel="noreferrer"
-							className="text-[10px] text-cyber-pink hover:underline flex items-center gap-1"
+							className="text-[10px] text-pink-600 dark:text-cyber-pink hover:underline flex items-center gap-1"
 						>
 							View on Explorer
 						</a>
@@ -255,7 +256,7 @@ export default function TrackDetailClient({ initialTrack }: { initialTrack: Trac
 	if (loading) {
 		return (
 			<div className="min-h-screen bg-transparent flex items-center justify-center">
-				<IconLoader2 size={32} className="animate-spin text-cyber-pink" />
+				<IconLoader2 size={32} className="animate-spin text-pink-600 dark:text-cyber-pink" />
 			</div>
 		)
 	}
@@ -264,45 +265,55 @@ export default function TrackDetailClient({ initialTrack }: { initialTrack: Trac
 		return (
 			<div className="min-h-screen bg-transparent flex flex-col items-center justify-center gap-4">
 				<p className="text-midnight/70 dark:text-white/40">Track not found</p>
-				<button onClick={() => router.push(`/${locale}/assets`)} className="text-cyber-pink text-sm underline">Go back to assets</button>
+				<button onClick={() => router.push(`/${locale}/assets`)} className="text-pink-600 dark:text-cyber-pink text-sm underline">Go back to assets</button>
 			</div>
 		)
 	}
 
 	const mintCount = track.mint_count || 0
 	const maxSupply = track.max_supply ? parseInt(track.max_supply) : 5000
+	const isSoldOut = maxSupply > 0 && mintCount >= maxSupply
 
 	return (
 		<div className={cn(
 			"min-h-screen bg-transparent text-midnight dark:text-white",
 			playerState.currentTrack ? "pb-32 lg:pb-0" : ""
 		)}>
-			{/* Back Button Layout */}
-			<div className="mb-6 flex items-center justify-between">
-				<button
-					onClick={() => router.push(`/${locale}/assets`)}
-					className="inline-flex items-center gap-1.5 text-xs font-medium text-midnight/55 dark:text-white/45 hover:text-[#FF1F8A] dark:hover:text-[#FF1F8A] transition-colors group select-none"
-				>
-					<IconCornerDownLeft size={14} className="text-midnight/40 dark:text-white/35 group-hover:text-[#FF1F8A] dark:group-hover:text-[#FF1F8A] transition-colors" />
-					<span>{tNav('assets')}</span>
-				</button>
-			</div>
-
 			{/* Main Track Header - Split Layout */}
-			<div className="flex flex-col md:flex-row gap-8 items-start mb-8">
+			<div className="flex flex-col md:flex-row gap-5 md:gap-8 items-start mb-6 md:mb-8">
 				{/* Left Side: Artwork with Play Button overlay */}
-				<div id="track-artwork-container" className="relative group aspect-square w-full max-w-[320px] mx-auto md:mx-0 flex-shrink-0 border border-midnight/10 dark:border-white/10 bg-midnight/5 dark:bg-white/5">
-					<img
-						src={resolveIpfs(track.image_url)}
-						alt={track.name}
-						className="w-full h-full object-cover"
-					/>
+				<div id="track-artwork-container" className="relative group w-full aspect-square md:w-80 md:flex-shrink-0 overflow-hidden glass-surface shadow-xl">
+					<button
+						onClick={() => {
+							if (typeof window !== 'undefined' && window.history.length > 1) {
+								router.back()
+							} else {
+								router.push(`/${locale}`)
+							}
+						}}
+						className="absolute top-3 left-3 z-20 w-12 h-12 flex items-center justify-center rounded-xl bg-midnight/70 dark:bg-white/70 text-white dark:text-midnight shadow-lg hover:bg-midnight dark:hover:bg-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:hidden"
+						title="Back"
+						aria-label="Go back"
+					>
+						<IconChevronLeft size={20} />
+					</button>
+					{track.image_url ? (
+						<img
+							src={resolveIpfs(track.image_url)}
+							alt={track.name}
+							className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+						/>
+					) : (
+						<div className="w-full h-full flex items-center justify-center bg-midnight/5 dark:bg-white/5">
+							<IconMusic size={80} strokeWidth={1} className="text-midnight/30 dark:text-white/30" />
+						</div>
+					)}
 					{/* Play/Pause Hover Overlay */}
 					<button
 						onClick={togglePlay}
-						className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+						className="absolute inset-0 z-10 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
 					>
-						<div className="w-16 h-16 rounded-full bg-white flex items-center justify-center transform scale-90 group-hover:scale-100 transition-transform duration-300 shadow-xl">
+						<div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center transform scale-90 group-hover:scale-100 transition-transform duration-300 shadow-xl">
 							{isPlaying ? (
 								<IconPlayerPause size={32} className="fill-black text-black ml-0" />
 							) : (
@@ -313,34 +324,37 @@ export default function TrackDetailClient({ initialTrack }: { initialTrack: Trac
 				</div>
 
 				{/* Right Side: Track Info & Collect Action */}
-				<div className="flex-1 w-full flex flex-col justify-between min-h-[320px]">
+				<div className="flex-1 w-full flex flex-col md:justify-between md:min-h-[320px]">
 					<div>
 						{/* Genre & Token ID tags */}
 						<div className="flex items-center gap-2 mb-3">
-							<span className="text-[9px] font-bold text-cyber-pink bg-cyber-pink/10 border border-cyber-pink/20 px-2 py-0.5 uppercase tracking-widest">
+							<span className="text-[9px] font-bold text-pink-600 dark:text-cyber-pink bg-cyber-pink/10 border border-cyber-pink/20 px-2.5 py-0.5 uppercase tracking-widest rounded-full">
 								{track.genre || 'RARE'}
 							</span>
-							<span className="text-[9px] font-bold text-midnight/60 dark:text-white/30 bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 px-2 py-0.5 uppercase tracking-widest">
+							<span className="text-[9px] font-bold text-midnight/60 dark:text-white/30 bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 px-2.5 py-0.5 uppercase tracking-widest rounded-full">
 								#{formatTokenId(track.token_id)}
 							</span>
 						</div>
 
 						{/* Title & Artist */}
-						<h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-midnight dark:text-white mb-2">
+						<h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-midnight dark:text-white mb-1 md:mb-2">
 							{track.name}
 						</h1>
-						<p className="text-base text-midnight/60 dark:text-white/50 font-medium tracking-wide mb-6">
+						<p className="text-base text-midnight/60 dark:text-white/50 font-medium tracking-wide mb-4 md:mb-6">
 							{track.artist}
 						</p>
 					</div>
 
 					{/* Pricing & Mint Card */}
-					<div id="track-collect-container" className="w-full mt-2">
+					<div id="track-collect-container" className="w-full md:mt-2 glass-surface rounded-2xl p-5 shadow-lg">
 						<div className="flex items-center justify-between mb-4">
 							{hasOwned ? (
-								<div className="flex items-center gap-1.5 text-green-500 text-sm font-bold font-mono">
-									<IconSquareCheckFilled size={18} />
-									COLLECTED
+								<div>
+									<p className="text-[10px] uppercase tracking-wider text-midnight/40 dark:text-white/35 font-bold mb-0.5">Status</p>
+									<div className="flex items-center gap-1.5 text-emerald-500 text-sm font-bold font-mono">
+										<IconSquareCheckFilled size={18} />
+										Collected
+									</div>
 								</div>
 							) : (
 								<div>
@@ -361,100 +375,79 @@ export default function TrackDetailClient({ initialTrack }: { initialTrack: Trac
 
 						{/* Scarcity Progress Bar */}
 						{maxSupply > 0 && (
-							<div className="w-full h-1.5 bg-midnight/5 dark:bg-white/5 rounded-full overflow-hidden border border-white/5 mb-6">
+							<div className="h-[3px] w-full bg-midnight/10 dark:bg-white/10 rounded-full overflow-hidden mb-5 md:mb-6">
 								<div
-									className="h-full bg-cyber-pink shadow-[0_0_10px_rgba(255,31,138,0.5)] transition-all duration-1000 ease-out"
+									className="h-full bg-pink-600 dark:bg-cyber-pink transition-all duration-1000 rounded-full"
 									style={{
-										width: `${Math.max(2, Math.min(100, (mintCount / maxSupply) * 100))}%`
+										width: `${Math.min(100, (mintCount / maxSupply) * 100)}%`
 									}}
 								/>
 							</div>
 						)}
 
-						{/* Collect / Share / Copy Buttons */}
-						<div className="flex items-center gap-3">
-							<button
-								onClick={handleMint}
-								disabled={isMinting || (maxSupply > 0 && mintCount >= maxSupply) || hasOwned}
-								className={cn(
-									"flex-[3] h-12 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest transition-all rounded-sm",
-									(maxSupply > 0 && mintCount >= maxSupply)
-										? "bg-[#FF1F8A]/10 text-[#FF1F8A] border border-[#FF1F8A]/20 cursor-not-allowed"
-										: hasOwned
-											? "bg-green-500/10 text-green-400 border border-green-500/20 cursor-default"
-											: "bg-[#B794F4] hover:bg-[#B794F4]/80 text-black border border-[#B794F4]/20",
-									isMinting && "opacity-50 cursor-not-allowed"
-								)}
-							>
-								{isMinting ? (
-									<IconLoader2 size={18} className="animate-spin" />
-								) : (maxSupply > 0 && mintCount >= maxSupply) ? (
-									<span className="font-bold text-[#FF1F8A]">SOLD OUT</span>
-								) : hasOwned ? (
-									<IconSquareCheckFilled size={18} />
-								) : (
-									<IconHeart size={18} />
-								)}
-								{isMinting ? 'Collecting' : (maxSupply > 0 && mintCount >= maxSupply) ? '' : hasOwned ? 'Collected' : 'Collect'}
-							</button>
+						{/* Actions */}
+						<div className="flex gap-3">
+							{hasOwned ? (
+								<Button
+									onClick={handleDownload}
+									className="flex-1 h-12 rounded-xl bg-lavender hover:bg-lavender/80 text-black border border-lavender/20 text-xs font-bold uppercase tracking-widest"
+								>
+									Download Track
+								</Button>
+							) : !isSoldOut ? (
+								<Button
+									onClick={handleMint}
+									disabled={isMinting}
+									className="flex-1 h-12 rounded-xl bg-cyber-pink hover:bg-cyber-pink/90 text-white text-xs font-bold uppercase tracking-widest"
+								>
+									{isMinting && <IconLoader2 size={18} className="animate-spin" />}
+									Collect
+								</Button>
+							) : null}
 
-							<button
+							<Button
+								variant="outline"
 								onClick={handleShare}
-								className="w-12 h-12 flex items-center justify-center border border-midnight/10 dark:border-white/10 hover:bg-midnight/5 dark:hover:bg-white/5 rounded-sm"
+								className="flex-1 lg:flex-none lg:w-12 h-12 p-0 rounded-xl border-midnight/10 dark:border-white/10 hover:bg-midnight/5 dark:hover:bg-white/5"
 								title="Share"
 							>
 								<IconShare size={18} className="text-midnight/60 dark:text-white/60" />
-							</button>
+							</Button>
 
-							<button
+							<Button
+								variant="outline"
 								onClick={handleCopyLink}
-								className="w-12 h-12 flex items-center justify-center border border-midnight/10 dark:border-white/10 hover:bg-midnight/5 dark:hover:bg-white/5 rounded-sm"
+								className="flex-1 lg:flex-none lg:w-12 h-12 p-0 rounded-xl border-midnight/10 dark:border-white/10 hover:bg-midnight/5 dark:hover:bg-white/5"
 								title="Copy Link"
 							>
 								<IconCopy size={18} className="text-midnight/60 dark:text-white/60" />
-							</button>
+							</Button>
+
+							{hasOwned && !isSoldOut && (
+								<Button
+									variant="outline"
+									onClick={handleMint}
+									disabled={isMinting}
+									className="flex-1 lg:flex-none lg:w-12 h-12 p-0 rounded-xl border-midnight/10 dark:border-white/10 hover:bg-midnight/5 dark:hover:bg-white/5"
+									title="Collect More"
+								>
+									{isMinting ? (
+										<IconLoader2 size={18} className="animate-spin text-midnight/60 dark:text-white/60" />
+									) : (
+										<IconHeart size={18} className="text-midnight/60 dark:text-white/60" />
+									)}
+								</Button>
+							)}
 						</div>
 
-						{/* Download Button */}
-						{hasOwned && (
-							<button
-								onClick={handleDownload}
-								className="w-full mt-3 h-11 flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-all bg-[#B794F4] hover:bg-[#B794F4]/80 text-black border border-[#B794F4]/20 rounded-sm"
-							>
-								Download Track
-							</button>
-						)}
-
-						{/* Collect More Section if Owned */}
-						{hasOwned && !(maxSupply > 0 && mintCount >= maxSupply) && (
-							<div className="mt-4 flex flex-col gap-2 border-t border-midnight/10 dark:border-white/5 pt-4">
-								<p className="text-[10px] italic text-midnight/50 dark:text-white/40 text-center">
-									You can collect another song token to support the artist
-								</p>
-								<button
-									type="button"
-									onClick={handleMint}
-									disabled={isMinting || (maxSupply > 0 && mintCount >= maxSupply)}
-									className={cn(
-										"w-full h-10 flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-all rounded-sm border",
-										(maxSupply > 0 && mintCount >= maxSupply)
-											? "bg-[#FF1F8A]/10 text-[#FF1F8A] border-[#FF1F8A]/20 cursor-not-allowed"
-											: "bg-midnight/5 dark:bg-white/5 hover:bg-midnight dark:hover:bg-white text-midnight/60 dark:text-white/60 hover:text-white dark:hover:text-black hover:text-opacity-100 dark:hover:text-opacity-100 border-midnight/10 dark:border-white/10"
-									)}
-								>
-									{isMinting && <IconLoader2 size={14} className="animate-spin" />}
-									{(maxSupply > 0 && mintCount >= maxSupply) ? 'SOLD OUT' : 'Collect More'}
-								</button>
-							</div>
-						)}
 					</div>
 				</div>
 			</div>
 
 			{/* Grid: Lyrics/Description & Blockchain Details */}
-			<div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-8 border-t border-midnight/10 dark:border-white/5">
+			<div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 pt-6 md:pt-8">
 				{/* Left 2/3: Description / Lyrics */}
-				<div className="lg:col-span-2 space-y-4">
+				<div className="lg:col-span-2 space-y-4 glass-surface rounded-2xl p-5 sm:p-6">
 					<h2 className="text-xs font-bold uppercase tracking-widest text-midnight/40 dark:text-white/30">
 						Lyrics / Description
 					</h2>
@@ -470,7 +463,7 @@ export default function TrackDetailClient({ initialTrack }: { initialTrack: Trac
 				</div>
 
 				{/* Right 1/3: Blockchain Details */}
-				<div id="blockchain-details-section" className="space-y-4">
+				<div id="blockchain-details-section" className="space-y-4 glass-surface rounded-2xl p-5 sm:p-6">
 					<h2 className="text-xs font-bold uppercase tracking-widest text-midnight/40 dark:text-white/30">
 						Blockchain Details
 					</h2>
@@ -484,7 +477,7 @@ export default function TrackDetailClient({ initialTrack }: { initialTrack: Trac
 										href={`${EXPLORER_URL}/tokenPolicy/${policyId}`}
 										target="_blank"
 										rel="noreferrer"
-										className="text-xs text-cyber-pink hover:underline font-mono block truncate"
+										className="text-xs text-pink-600 dark:text-cyber-pink hover:underline font-mono block truncate"
 									>
 										{policyId.slice(0, 10)}...{policyId.slice(-10)}
 									</a>
@@ -501,7 +494,7 @@ export default function TrackDetailClient({ initialTrack }: { initialTrack: Trac
 									href={`${EXPLORER_URL}/address/${track.uploader_address}`}
 									target="_blank"
 									rel="noreferrer"
-									className="text-xs text-cyber-pink hover:underline font-mono block truncate"
+									className="text-xs text-pink-600 dark:text-cyber-pink hover:underline font-mono block truncate"
 								>
 									{track.uploader_address.slice(0, 12)}...{track.uploader_address.slice(-10)}
 								</a>
@@ -527,7 +520,7 @@ export default function TrackDetailClient({ initialTrack }: { initialTrack: Trac
 											href={`${EXPLORER_URL}/token/${assetUnit}`}
 											target="_blank"
 											rel="noreferrer"
-											className="text-xs text-cyber-pink hover:underline font-mono block truncate"
+											className="text-xs text-pink-600 dark:text-cyber-pink hover:underline font-mono block truncate"
 										>
 											{tokenNameStr} (Reference NFT)
 										</a>
@@ -540,7 +533,7 @@ export default function TrackDetailClient({ initialTrack }: { initialTrack: Trac
 						<div>
 							<p className="text-[10px] uppercase tracking-widest text-midnight/40 dark:text-white/35 font-bold mb-1.5">Token ID</p>
 							{track.token_id !== undefined ? (
-								<span className="text-xs text-cyber-pink font-mono block">
+								<span className="text-xs text-pink-600 dark:text-cyber-pink font-mono block">
 									#{track.token_id}
 								</span>
 							) : (

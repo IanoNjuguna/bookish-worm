@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 
 const NotFound = () => {
   const location = useLocation();
@@ -10,7 +11,23 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-void text-foreground">
+    <>
+      <Helmet>
+        <title>Page not found | pre-drop your music on doba</title>
+        <meta name="description" content="The page you are looking for does not exist. Return to the doba homepage or go back." />
+        <meta property="og:title" content="Page not found | Doba" />
+        <meta property="og:description" content="This page does not exist on doba.world." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://doba.world/404" />
+        <meta property="og:image" content="https://doba.world/doba-og.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Page not found | Doba" />
+        <meta name="twitter:description" content="This page does not exist on doba.world." />
+        <meta name="twitter:image" content="https://doba.world/doba-og.png" />
+        <link rel="canonical" href="https://doba.world/404" />
+      </Helmet>
+
+      <main className="relative min-h-screen overflow-hidden bg-void text-foreground">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,hsl(var(--cyber-pink)/0.2),transparent_35%),radial-gradient(circle_at_80%_75%,hsl(var(--lavender)/0.2),transparent_40%)]" />
 
       <div className="container relative z-10 mx-auto flex min-h-screen items-center justify-center px-6 py-16 md:px-12">
@@ -48,6 +65,7 @@ const NotFound = () => {
         </section>
       </div>
     </main>
+    </>
   );
 };
 

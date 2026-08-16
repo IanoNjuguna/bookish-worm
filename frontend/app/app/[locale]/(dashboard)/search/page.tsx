@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { useAudio } from '@/components/AudioProvider'
 import { IconSearch as Search } from '@tabler/icons-react'
 import { cn } from '@/lib/utils'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -38,32 +39,32 @@ export default function SearchDashboard() {
   return (
     <div className="space-y-8 animate-fade-in pb-20">
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold">{tSearch('title')}</h2>
-        <div className="flex flex-col md:flex-row gap-2">
+        <h2 className="text-3xl font-bold text-midnight dark:text-white">{tSearch('title')}</h2>
+        <div className="flex flex-col md:flex-row gap-3">
           <div id="search-input-container" className="relative group flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-midnight/70 dark:text-white/60 group-focus-within:text-cyber-pink transition-colors" size={20} />
-            <input
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-midnight/60 dark:text-white/50 group-focus-within:text-pink-600 dark:group-focus-within:text-cyber-pink transition-colors" size={20} />
+            <Input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="I want to listen to ..."
-              className="w-full bg-white dark:bg-white/5 border border-midnight/20 dark:border-white/10 rounded-xl pl-12 pr-4 py-[14px] text-midnight dark:text-white focus:outline-none focus:border-cyber-pink focus:ring-1 focus:ring-cyber-pink/50 transition-all placeholder:text-midnight/70 dark:placeholder:text-white/40 text-lg shadow-sm dark:shadow-none"
+              className="w-full bg-midnight/5 dark:bg-white/5 border-midnight/10 dark:border-white/10 rounded-xl pl-12 pr-4 h-11 md:h-12 text-midnight dark:text-white focus-visible:ring-lavender focus-visible:ring-offset-0"
             />
           </div>
           <Select value={selectedGenre} onValueChange={setSelectedGenre}>
-            <SelectTrigger className="w-full md:w-[180px] bg-white dark:bg-white/5 border border-midnight/20 dark:border-white/10 rounded-xl h-auto py-4 font-bold uppercase tracking-widest text-[10px] text-midnight dark:text-white/80 hover:bg-midnight/5 dark:hover:bg-white/10 data-[state=open]:border-cyber-pink focus:ring-0 focus:ring-offset-0 transition-all shadow-sm dark:shadow-none">
+            <SelectTrigger className="w-full md:w-[180px] bg-midnight/5 dark:bg-white/5 border-midnight/10 dark:border-white/10 rounded-xl h-11 md:h-12 text-sm font-medium text-midnight dark:text-white hover:bg-midnight/10 dark:hover:bg-white/10 data-[state=open]:border-lavender">
               <SelectValue placeholder="Genre" />
             </SelectTrigger>
-            <SelectContent className="bg-white dark:bg-[#0D0D12] border border-midnight/20 dark:border-white/10 rounded-xl text-midnight dark:text-white/80 shadow-lg">
+            <SelectContent className="bg-popover text-popover-foreground border border-midnight/10 dark:border-white/10 rounded-xl">
               {GENRES.map((g) => (
                 <SelectItem 
                   key={g} 
                   value={g} 
                   className={cn(
-                    "font-bold uppercase tracking-widest text-[10px] cursor-pointer !bg-transparent transition-all",
+                    "text-sm cursor-pointer transition-colors",
                     selectedGenre === g 
-                      ? "text-cyber-pink focus:text-cyber-pink" 
-                      : "text-midnight/80 dark:text-white/60 focus:text-midnight dark:focus:text-white focus:font-semibold"
+                      ? "text-pink-600 dark:text-cyber-pink font-semibold" 
+                      : "text-midnight/80 dark:text-white/70"
                   )}
                 >
                   {g}

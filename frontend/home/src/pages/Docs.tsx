@@ -1,10 +1,27 @@
+import { Helmet } from "react-helmet-async";
 import Navbar from "@/components/doba/Navbar";
 import Footer from "@/components/doba/Footer";
 import VantaBackground from "@/components/doba/VantaBackground";
 
 export default function Docs() {
   return (
-    <div className="min-h-screen relative overflow-hidden flex flex-col justify-between">
+    <>
+      <Helmet>
+        <title>Docs | pre-drop your music on doba</title>
+        <meta name="description" content="Everything you need to know about using doba, from getting started to smart contract mechanics on Cardano." />
+        <meta property="og:title" content="Documentation | Doba" />
+        <meta property="og:description" content="Read the doba documentation: wallet setup, smart contracts, and how the platform works." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://doba.world/docs" />
+        <meta property="og:image" content="https://doba.world/doba-og.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Documentation | Doba" />
+        <meta name="twitter:description" content="Read the doba documentation: wallet setup, smart contracts, and how the platform works." />
+        <meta name="twitter:image" content="https://doba.world/doba-og.png" />
+        <link rel="canonical" href="https://doba.world/docs" />
+      </Helmet>
+
+      <div className="min-h-screen relative overflow-hidden flex flex-col justify-between">
       <VantaBackground />
       <Navbar />
 
@@ -44,5 +61,6 @@ export default function Docs() {
 
       <Footer />
     </div>
+    </>
   );
 }

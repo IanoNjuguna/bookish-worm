@@ -34,7 +34,8 @@
     "connectWallet": "连接您的钱包",
     "connectToView": "连接您的钱包以查看媒体库",
     "noSongs": "未找到歌曲",
-    "noSongsDesc": "您还没有拥有任何歌曲。去市场发现音乐吧！"
+    "noSongsDesc": "您还没有拥有任何歌曲。去市场发现音乐吧！",
+    "discoverMusic": "发现音乐"
   },
   "search": {
     "title": "搜索",
@@ -178,5 +179,13 @@
     "previousTrack": "上一首",
     "nextTrack": "下一首",
     "play": "播放 {title}"
+  },
+  "onboarding": {
+    "title": "开始使用",
+    "stepConnect": "连接你的钱包",
+    "stepVerify": "验证你的签名",
+    "stepCollect": "收藏你的第一首歌曲",
+    "dismiss": "忽略",
+    "nudgeCollect": "点击任意歌曲上的钻石图标即可收藏，拥有这首音乐的一部分。"
   }
 }

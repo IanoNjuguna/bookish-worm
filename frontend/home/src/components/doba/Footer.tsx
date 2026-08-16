@@ -18,6 +18,8 @@ const Footer = () => {
               <Link to="/how-it-works" className="hover:text-cyber-pink transition-colors">How It Works</Link>
               <span className="text-zinc-400 dark:text-white/20">·</span>
               <Link to="/docs" className="hover:text-cyber-pink transition-colors">Docs</Link>
+              <span className="text-zinc-400 dark:text-white/20">·</span>
+              <Link to="/media-kit" className="hover:text-cyber-pink transition-colors">Media Kit</Link>
             </div>
           </div>
 
@@ -28,6 +30,10 @@ const Footer = () => {
             </span>
             <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
               <Link to="/for-artists" className="hover:text-cyber-pink transition-colors">For Artists</Link>
+              <span className="text-zinc-400 dark:text-white/20">·</span>
+              <Link to="/pre-drop" className="hover:text-cyber-pink transition-colors">Pre-drop</Link>
+              <span className="text-zinc-400 dark:text-white/20">·</span>
+              <Link to="/research" className="hover:text-cyber-pink transition-colors">Research</Link>
               <span className="text-zinc-400 dark:text-white/20">·</span>
               <Link to="/support" className="hover:text-cyber-pink transition-colors">Support</Link>
               <span className="text-zinc-400 dark:text-white/20">·</span>

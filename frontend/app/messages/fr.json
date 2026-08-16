@@ -34,7 +34,8 @@
     "connectWallet": "Connectez Votre Portefeuille",
     "connectToView": "Connectez votre portefeuille pour voir votre bibliothèque",
     "noSongs": "Aucun morceau trouvé",
-    "noSongsDesc": "Vous ne possédez pas encore de morceaux. Rendez-vous sur le marché pour découvrir de la musique !"
+    "noSongsDesc": "Vous ne possédez pas encore de morceaux. Rendez-vous sur le marché pour découvrir de la musique !",
+    "discoverMusic": "Découvrir la musique"
   },
   "search": {
     "title": "Rechercher",
@@ -178,5 +179,13 @@
     "previousTrack": "Morceau précédent",
     "nextTrack": "Morceau suivant",
     "play": "Jouer {title}"
+  },
+  "onboarding": {
+    "title": "Pour commencer",
+    "stepConnect": "Connectez votre wallet",
+    "stepVerify": "Vérifiez votre signature",
+    "stepCollect": "Collectionnez votre premier titre",
+    "dismiss": "Ignorer",
+    "nudgeCollect": "Touchez le losange sur un titre pour le collectionner et posséder une part de la musique."
   }
 }

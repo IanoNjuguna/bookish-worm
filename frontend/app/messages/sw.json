@@ -34,7 +34,8 @@
     "connectWallet": "Unganisha Pochi Yako",
     "connectToView": "Unganisha pochi yako kuona maktaba yako",
     "noSongs": "Hakuna nyimbo zilizopatikana",
-    "noSongsDesc": "Bado haumiliki nyimbo zozote. Nenda sokoni kugundua muziki!"
+    "noSongsDesc": "Bado haumiliki nyimbo zozote. Nenda sokoni kugundua muziki!",
+    "discoverMusic": "Gundua muziki"
   },
   "search": {
     "title": "Tafuta",
@@ -178,5 +179,13 @@
     "previousTrack": "Wimbo uliopita",
     "nextTrack": "Wimbo unaofuata",
     "play": "Cheza {title}"
+  },
+  "onboarding": {
+    "title": "Anza",
+    "stepConnect": "Unganisha pochi yako",
+    "stepVerify": "Thibitisha saini yako",
+    "stepCollect": "Kusanya wimbo wako wa kwanza",
+    "dismiss": "Ondoa",
+    "nudgeCollect": "Gusa almasi kwenye wimbo wowote kuukusanya — miliki sehemu ya muziki."
   }
 }

@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { IconUpload, IconX, IconPlus, IconMusic, IconPhoto, IconTrash, IconCheck, IconChevronDown, IconLoader2, IconAlertTriangle, IconClock } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
@@ -16,11 +17,16 @@ import { mintTrackOnChain, formatTxError } from '@/lib/contractHelper'
 
 interface Collaborator {
 	address: string
-	split: number
+	split: string | number
 }
 
 const DIRECT_BACKEND_URL = (process.env.NEXT_PUBLIC_DIRECT_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://bookish-worm-production.up.railway.app').replace(/\/$/, '')
 const API_URL = '/api-backend'
+
+const formatAddress = (addr: string | undefined) => {
+	if (!addr || addr.length <= 16) return addr || ''
+	return `${addr.substring(0, 10)}...${addr.substring(addr.length - 6)}`
+}
 
 async function uploadToPinataDirect(file: File, name: string, pinataJwt: string): Promise<string> {
 	const formData = new FormData()
@@ -107,10 +113,10 @@ export default function UploadView() {
 	const [uploadStatusText, setUploadStatusText] = useState<string>('')
 	
 	// Target progress values set by async workflow steps
-	const [targetSeg1, setTargetSeg1] = useState<number>(0) // Media IPFS (#D946EF - Muted Pink)
-	const [targetSeg2, setTargetSeg2] = useState<number>(0) // CIP-60 Metadata (#A855F7 - Muted Purple)
-	const [targetSeg3, setTargetSeg3] = useState<number>(0) // On-Chain Minting (#3B82F6 - Muted Blue)
-	const [targetSeg4, setTargetSeg4] = useState<number>(0) // Catalog Indexing (#10B981 - Muted Emerald)
+	const [targetSeg1, setTargetSeg1] = useState<number>(0) // Media IPFS (fuchsia-500)
+	const [targetSeg2, setTargetSeg2] = useState<number>(0) // CIP-60 Metadata (purple-500)
+	const [targetSeg3, setTargetSeg3] = useState<number>(0) // On-Chain Minting (blue-500)
+	const [targetSeg4, setTargetSeg4] = useState<number>(0) // Catalog Indexing (emerald-500)
 
 	// Display progress values smoothly ticking towards target values
 	const [displaySeg1, setDisplaySeg1] = useState<number>(0)
@@ -335,13 +341,19 @@ export default function UploadView() {
 	}
 
 	const addCollaborator = () => {
-		setCollaborators([...collaborators, { address: '', split: 0 }])
+		setCollaborators([...collaborators, { address: '', split: '' }])
 	}
 
 	const updateCollaborator = (index: number, field: keyof Collaborator, value: string | number) => {
 		const newCollaborators = [...collaborators]
 		if (field === 'split') {
-			newCollaborators[index].split = Number(value)
+			if (value !== '') {
+				const sanitized = String(value).replace(/^0+(?=\d)/, '').slice(0, 3)
+				const num = Number(sanitized)
+				newCollaborators[index].split = num > 100 ? '100' : sanitized
+			} else {
+				newCollaborators[index].split = value
+			}
 		} else {
 			newCollaborators[index].address = String(value)
 		}
@@ -750,43 +762,40 @@ export default function UploadView() {
 	}
 
 	return (
-		<div className="space-y-8 animate-fade-in max-w-4xl mx-auto pb-20">
+		<div className="space-y-8 animate-fade-in">
 			<div className="border-b border-midnight/10 dark:border-white/10 pb-6">
 				<h2 className="text-3xl font-bold mb-2 text-midnight dark:text-white">{t('title')}</h2>
 				
-				<div className="flex gap-3 mt-4">
-					<button
-						type="button"
-						onClick={() => setIsAlbum(false)}
-						className={cn(
-							"px-4 py-2 text-xs uppercase tracking-wider font-semibold transition-all border border-midnight/10 dark:border-white/10",
-							!isAlbum 
-								? "bg-cyber-pink text-white border-cyber-pink shadow-md" 
-								: "bg-transparent text-midnight/60 dark:text-white/90 hover:bg-midnight/5 dark:hover:bg-white/5"
-						)}
-					>
-						Single Track
-					</button>
-					<button
-						type="button"
-						onClick={() => setIsAlbum(true)}
-						className={cn(
-							"px-4 py-2 text-xs uppercase tracking-wider font-semibold transition-all border border-midnight/10 dark:border-white/10",
-							isAlbum 
-								? "bg-cyber-pink text-white border-cyber-pink shadow-md" 
-								: "bg-transparent text-midnight/60 dark:text-white/90 hover:bg-midnight/5 dark:hover:bg-white/5"
-						)}
-					>
-						Album / Release
-					</button>
-				</div>
+				<div className="inline-flex p-1 mt-4 rounded-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10">
+				{[
+					{ label: 'single', value: false },
+					{ label: 'album', value: true },
+				].map(({ label, value }) => {
+					const isActive = isAlbum === value
+					return (
+						<button
+							key={label}
+							type="button"
+							onClick={() => setIsAlbum(value)}
+							className={cn(
+								"px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+								isActive
+									? "bg-cyber-pink text-white"
+									: "text-midnight/60 dark:text-white/60 hover:text-midnight dark:hover:text-white hover:bg-midnight/5 dark:hover:bg-white/5"
+							)}
+						>
+							{label}
+						</button>
+					)
+				})}
+			</div>
 			</div>
 
 			<form onSubmit={handleSubmit} className="space-y-10">
 				{/* Track Details */}
-				<div id="upload-details-form" className="space-y-6">
+				<div id="upload-details-form" className="space-y-6 glass-surface rounded-2xl p-5 sm:p-6">
 					<h3 className="text-xl font-semibold flex items-center gap-2 text-midnight/90 dark:text-white">
-						<span className="w-1 h-6 bg-cyber-pink rounded-none"></span>
+						<span className="w-1 h-6 bg-pink-600 dark:bg-cyber-pink rounded-xl"></span>
 						{isAlbum ? "Album Details" : t('details')}
 					</h3>
 
@@ -798,7 +807,7 @@ export default function UploadView() {
 								value={title}
 								onChange={(e) => setTitle(e.target.value)}
 								placeholder={isAlbum ? "e.g. Bitcoin" : t('trackTitlePlaceholder')}
-								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-xl px-4 py-3 text-midnight dark:text-white focus:outline-none focus:border-cyber-pink focus:ring-1 focus:ring-cyber-pink/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40"
+								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-xl px-4 py-3 text-midnight dark:text-white focus:border-lavender focus:ring-1 focus:ring-lavender/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40"
 								required
 							/>
 						</div>
@@ -810,7 +819,7 @@ export default function UploadView() {
 								value={artistName}
 								onChange={(e) => setArtistName(e.target.value)}
 								placeholder="e.g. Satoshi Nakamoto"
-								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-xl px-4 py-3 text-midnight dark:text-white focus:outline-none focus:border-cyber-pink focus:ring-1 focus:ring-cyber-pink/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40"
+								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-xl px-4 py-3 text-midnight dark:text-white focus:border-lavender focus:ring-1 focus:ring-lavender/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40"
 								required
 							/>
 						</div>
@@ -829,7 +838,7 @@ export default function UploadView() {
 									setTicker(val)
 								}}
 								placeholder="e.g. BTC"
-								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-xl px-4 py-3 text-midnight dark:text-white focus:outline-none focus:border-cyber-pink focus:ring-1 focus:ring-cyber-pink/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40 font-mono text-sm"
+								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-xl px-4 py-3 text-midnight dark:text-white focus:border-lavender focus:ring-1 focus:ring-lavender/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40 font-mono text-sm"
 								required
 							/>
 						</div>
@@ -837,12 +846,12 @@ export default function UploadView() {
 						<div className="space-y-2">
 							<label className="text-sm font-medium text-midnight/80 dark:text-white">{t('genreLabel')}</label>
 							<div className="relative">
-								<Command className="bg-[#FAF9F6] dark:bg-[#0D0D12] text-midnight dark:text-white rounded-none overflow-visible">
+								<Command className="bg-transparent text-midnight dark:text-white rounded-xl overflow-visible">
 									<Popover open={open} onOpenChange={setOpen}>
 										<PopoverTrigger asChild>
 											<div 
 												className={cn(
-													"relative flex items-center w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 px-1 text-midnight dark:text-white transition-all cursor-text",
+													"relative flex items-center w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-xl px-1 text-midnight dark:text-white transition-all cursor-text",
 													open ? "border-cyber-pink" : "hover:bg-midnight/10 dark:hover:bg-white/10"
 												)}
 												onClick={() => setOpen(true)}
@@ -853,14 +862,14 @@ export default function UploadView() {
 													onValueChange={(val) => {
 														if (!open) setOpen(true);
 													}}
-													className="h-11 text-base border-0 focus:ring-0 placeholder:text-midnight/90 dark:placeholder:text-white/90"
+													className="h-11 text-base border-0 focus:ring-0 rounded-xl placeholder:text-midnight/60 dark:placeholder:text-white/40"
 													wrapperClassName="border-0 w-full"
 												/>
 												<IconChevronDown className="absolute right-4 h-4 w-4 shrink-0 opacity-50 pointer-events-none" />
 											</div>
 										</PopoverTrigger>
 										<PopoverContent 
-											className="w-[--radix-popover-trigger-width] p-0 bg-[#FAF9F6] dark:bg-[#0D0D12] border-midnight/10 dark:border-white/10 border-t-0 rounded-none"
+											className="w-[--radix-popover-trigger-width] p-0 glass-surface border-t-0 rounded-xl"
 											onOpenAutoFocus={(e) => e.preventDefault()}
 										>
 											<CommandList>
@@ -882,7 +891,7 @@ export default function UploadView() {
 															<IconCheck
 																className={cn(
 																	"mr-2 h-4 w-4",
-																	genre === g ? "opacity-100 text-cyber-pink" : "opacity-0"
+																	genre === g ? "opacity-100 text-pink-600 dark:text-cyber-pink" : "opacity-0"
 																)}
 															/>
 															{g}
@@ -904,15 +913,15 @@ export default function UploadView() {
 							onChange={(e) => setDescription(e.target.value)}
 							placeholder={t('descriptionPlaceholder')}
 							rows={4}
-							className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 text-midnight dark:text-white focus:outline-none focus:border-cyber-pink focus:ring-1 focus:ring-cyber-pink/50 transition-all resize-none placeholder:text-midnight/60 dark:placeholder:text-white/40"
+							className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-xl px-4 py-3 text-midnight dark:text-white focus:border-lavender focus:ring-1 focus:ring-lavender/50 transition-all resize-none placeholder:text-midnight/60 dark:placeholder:text-white/40"
 						/>
 					</div>
 				</div>
 
 				{/* Pricing */}
-				<div className="space-y-6">
+				<div className="space-y-6 glass-surface rounded-2xl p-5 sm:p-6">
 					<h3 className="text-xl font-semibold flex items-center gap-2 text-midnight/90 dark:text-white">
-						<span className="w-1 h-6 bg-purple-400 rounded-none"></span>
+						<span className="w-1 h-6 bg-purple-400 rounded-xl"></span>
 						Pricing & Supply
 					</h3>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -926,7 +935,7 @@ export default function UploadView() {
 									value={price}
 									onChange={(e) => setPrice(e.target.value)}
 									placeholder="e.g. 10"
-									className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 pr-14 text-midnight dark:text-white focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40"
+									className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-xl px-4 py-3 pr-14 text-midnight dark:text-white focus:border-lavender focus:ring-1 focus:ring-lavender/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40"
 									required
 								/>
 								<div className="absolute right-4 top-1/2 -translate-y-1/2 text-midnight/70 dark:text-white/70 text-xs font-bold font-mono">
@@ -946,7 +955,7 @@ export default function UploadView() {
 								value={supply}
 								onChange={(e) => setSupply(e.target.value)}
 								placeholder={t('maxSupplyPlaceholder')}
-								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 text-midnight dark:text-white focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40"
+								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-xl px-4 py-3 text-midnight dark:text-white focus:border-lavender focus:ring-1 focus:ring-lavender/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40"
 								required
 							/>
 						</div>
@@ -954,11 +963,11 @@ export default function UploadView() {
 				</div>
 
 				{/* Royalties */}
-				<div id="upload-royalties-section" className="space-y-6">
+				<div id="upload-royalties-section" className="space-y-6 glass-surface rounded-2xl p-5 sm:p-6">
 					<div>
 						<h3 className="text-xl font-semibold flex items-center gap-2 text-midnight/90 dark:text-white mb-1">
-							<span className="w-1 h-6 bg-pink-400 rounded-none"></span>
-							Secondary Sales Royalties
+							<span className="w-1 h-6 bg-pink-400 rounded-xl"></span>
+							Secondary Royalties
 						</h3>
 						<p className="text-xs text-midnight/70 dark:text-white/60 pl-3">
 							Earn recurring royalties whenever fans trade your song tokens on secondary marketplaces.
@@ -973,7 +982,7 @@ export default function UploadView() {
 									value="5"
 									disabled
 									readOnly
-									className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 pr-14 text-midnight dark:text-white/90 cursor-not-allowed opacity-75 font-mono select-none"
+									className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-xl px-4 py-3 pr-14 text-midnight dark:text-white/90 cursor-not-allowed opacity-75 font-mono select-none"
 								/>
 								<div className="absolute right-4 top-1/2 -translate-y-1/2 text-midnight/70 dark:text-white/70 text-xs font-bold font-mono">
 									%
@@ -988,16 +997,16 @@ export default function UploadView() {
 								value={royaltyAddress}
 								onChange={(e) => setRoyaltyAddress(e.target.value)}
 								placeholder="Defaults to your wallet address"
-								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 text-midnight dark:text-white focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400/50 transition-all placeholder:text-midnight/70 dark:placeholder:text-white/50 font-mono text-xs"
+								className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-xl px-4 py-3 text-midnight dark:text-white focus:border-lavender focus:ring-1 focus:ring-lavender/50 transition-all placeholder:text-midnight/70 dark:placeholder:text-white/50 font-mono text-xs"
 							/>
 						</div>
 					</div>
 				</div>
 
 				{/* Media */}
-				<div className="space-y-6">
+				<div className="space-y-6 glass-surface rounded-2xl p-5 sm:p-6">
 					<h3 className="text-xl font-semibold flex items-center gap-2 text-midnight/90 dark:text-white">
-						<span className="w-1 h-6 bg-blue-400 rounded-none"></span>
+						<span className="w-1 h-6 bg-blue-400 rounded-xl"></span>
 						{t('media')}
 					</h3>
 
@@ -1007,7 +1016,7 @@ export default function UploadView() {
 								<label className="text-sm font-medium text-midnight/80 dark:text-white">Album Tracks</label>
 								<div className="space-y-4">
 									{albumTracks.map((track, idx) => (
-										<div key={track.id} className="p-4 bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 flex flex-col md:flex-row gap-4 items-center justify-between">
+										<div key={track.id} className="p-4 bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-xl flex flex-col md:flex-row gap-4 items-center justify-between">
 											<div className="flex-1 space-y-2 w-full">
 												<label className="text-xs font-semibold text-midnight/60 dark:text-white/90">Track {idx + 1} Title</label>
 												<input
@@ -1015,14 +1024,14 @@ export default function UploadView() {
 													placeholder="Track Title"
 													value={track.title}
 													onChange={(e) => updateAlbumTrack(idx, 'title', e.target.value)}
-													className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-3 py-2 text-sm text-midnight dark:text-white focus:outline-none focus:border-cyber-pink"
+													className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-xl px-3 py-2 text-sm text-midnight dark:text-white focus:outline-none focus:border-cyber-pink"
 													required
 												/>
 											</div>
 											<div className="flex-1 space-y-2 w-full">
 												<label className="text-xs font-semibold text-midnight/60 dark:text-white/90">Audio File</label>
 												<div className="flex items-center gap-2">
-													<label className="cursor-pointer bg-midnight/10 dark:bg-white/10 hover:bg-white/20 text-midnight dark:text-white px-3 py-2 rounded-none text-xs font-medium transition-colors">
+													<label className="cursor-pointer bg-midnight/10 dark:bg-white/10 hover:bg-white/20 text-midnight dark:text-white px-3 py-2 rounded-xl text-xs font-medium transition-colors">
 														{track.file ? "Change" : "Choose File"}
 														<input
 															type="file"
@@ -1049,13 +1058,14 @@ export default function UploadView() {
 											</button>
 										</div>
 									))}
-									<button
+									<Button
 										type="button"
+										variant="outline"
 										onClick={addAlbumTrack}
-										className="w-full py-3 bg-midnight/10 dark:bg-white/10 hover:bg-midnight/20 text-midnight dark:text-white text-sm font-medium transition-colors border border-dashed border-midnight/20 dark:border-white/20 flex items-center justify-center gap-1.5"
+										className="w-full h-auto py-3 border-dashed border-midnight/20 dark:border-white/20 bg-midnight/5 dark:bg-white/5 hover:bg-midnight/10 dark:hover:bg-white/10 text-midnight dark:text-white rounded-xl"
 									>
 										<IconPlus size={16} /> Add Track
-									</button>
+									</Button>
 								</div>
 							</div>
 						) : (
@@ -1101,7 +1111,7 @@ export default function UploadView() {
 												alt="Preview"
 												className="w-full h-full object-cover opacity-50 blur-sm"
 											/>
-											<div className="absolute inset-0 bg-black/40"></div>
+											<div className="absolute inset-0 bg-midnight/40"></div>
 										</div>
 										<div className="relative z-10 flex flex-col items-center">
 											<img
@@ -1138,19 +1148,19 @@ export default function UploadView() {
 				</div>
 
 				{/* Collaborators */}
-				<div className="space-y-6">
-					<div className="flex items-center justify-between">
+				<div className="space-y-6 glass-surface rounded-2xl p-5 sm:p-6">
+					<div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
 						<div>
-							<h3 className="text-xl font-semibold flex items-center gap-2 text-midnight/90 dark:text-white">
-								<span className="w-1 h-6 bg-green-400 rounded-none"></span>
+							<h3 className="text-lg sm:text-xl font-semibold flex items-center gap-2 text-midnight/90 dark:text-white">
+								<span className="w-1 h-5 sm:h-6 bg-lavender rounded-xl"></span>
 								{t('collaborators')}
 							</h3>
-							<p className="text-[10px] text-midnight/70 dark:text-white/70 mt-1 font-medium">Configure collaborator payment addresses for instant sales payouts on Cardano.</p>
+							<p className="text-xs text-midnight/70 dark:text-white/70 mt-1 font-medium leading-relaxed">Configure collaborator payment addresses for instant sales payouts on Cardano.</p>
 						</div>
 						<button
 							type="button"
 							onClick={addCollaborator}
-							className="text-sm text-green-400 hover:text-green-300 bg-green-400/10 hover:bg-green-400/20 px-3 py-1.5 rounded-none flex items-center gap-1.5 transition-colors font-medium"
+							className="text-sm text-midnight dark:text-white bg-lavender hover:bg-lavender/90 px-3 py-1.5 rounded-xl flex items-center justify-center gap-1.5 transition-colors font-semibold whitespace-nowrap shrink-0"
 						>
 							<IconPlus size={16} />
 							{t('addCollaborator')}
@@ -1159,56 +1169,66 @@ export default function UploadView() {
 
 					<div className="space-y-3">
 						{/* Uploader Share (Read-only) */}
-						<div className="flex gap-3 items-start p-3 bg-purple-400/5 border border-purple-400/20 rounded-none mb-4">
-							<div className="flex-1 flex items-center gap-2">
-								<div className="w-8 h-8 rounded-full bg-purple-400/20 flex items-center justify-center text-purple-400 uppercase font-bold text-xs">Me</div>
-								<div>
+						<div className="flex flex-col sm:flex-row gap-3 sm:items-start p-3 bg-lavender/5 border border-lavender/20 rounded-xl mb-4">
+							<div className="flex-1 flex items-center gap-2 min-w-0">
+								<div className="w-8 h-8 rounded-full bg-lavender/20 flex items-center justify-center text-lavender uppercase font-bold text-xs shrink-0">Me</div>
+								<div className="min-w-0">
 									<p className="text-sm font-medium text-midnight/90 dark:text-white">You (Uploader)</p>
-									<p className="text-[10px] text-midnight/70 dark:text-white/70 font-mono truncate">{cardanoAddress || 'No Cardano wallet connected'}</p>
+									<p className="text-[10px] text-midnight/70 dark:text-white/70 font-mono truncate" title={cardanoAddress || undefined}>
+											{cardanoAddress ? formatAddress(cardanoAddress) : 'No Cardano wallet connected'}
+										</p>
 								</div>
 							</div>
-							<div className="w-28 relative">
-								<div className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 text-midnight dark:text-white text-sm text-center font-bold">
-									{Math.max(0, 100 - collaborators.reduce((sum, c) => sum + (Number(c.split) || 0), 0))}
+							<div className="flex gap-3 sm:gap-0 items-center sm:items-start">
+								<div className="w-full sm:w-28 relative">
+									<div className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-xl px-4 py-3 text-midnight dark:text-white text-sm text-center font-bold">
+										{Math.max(0, 100 - collaborators.reduce((sum, c) => sum + (Number(c.split) || 0), 0))}
+									</div>
+									<div className="absolute right-3 top-1/2 -translate-y-1/2 text-midnight/70 dark:text-white/70 text-xs font-bold">%</div>
 								</div>
-								<div className="absolute right-3 top-1/2 -translate-y-1/2 text-midnight/70 dark:text-white/70 text-xs font-bold">%</div>
+								<div className="hidden sm:block w-[44px]"></div>
 							</div>
-							<div className="w-[44px]"></div>
 						</div>
 
 						{collaborators.map((collaborator, index) => (
-							<div key={index} className="flex gap-3 items-start animate-fade-in group">
-								<div className="flex-1">
+							<div
+								key={index}
+								className="flex gap-2 sm:gap-3 items-center p-2 sm:p-3 bg-midnight/[0.03] dark:bg-white/[0.03] border border-midnight/10 dark:border-white/10 rounded-xl animate-fade-in group"
+							>
+								<div className="flex-1 min-w-0">
 									<input
 										type="text"
 										value={collaborator.address}
 										onChange={(e) => updateCollaborator(index, 'address', e.target.value)}
-										placeholder="Cardano wallet address (addr1...)"
-										className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 text-midnight dark:text-white text-sm focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400/50 transition-all font-mono"
+										placeholder="addr1..."
+										title={typeof collaborator.address === 'string' ? collaborator.address : undefined}
+										className="w-full bg-transparent border-0 px-2 py-2 text-midnight dark:text-white text-sm font-mono placeholder:text-midnight/40 dark:placeholder:text-white/40 focus:ring-0 focus:outline-none truncate"
 									/>
 								</div>
-								<div className="w-28 relative">
+								<div className="w-20 sm:w-24 relative shrink-0">
 									<input
 										type="number"
+										min={0}
+										max={100}
 										value={collaborator.split}
 										onChange={(e) => updateCollaborator(index, 'split', e.target.value)}
-										placeholder="Split %"
-										className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none px-4 py-3 text-midnight dark:text-white text-sm focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400/50 transition-all text-center"
+										placeholder="%"
+										className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-lg px-2 py-2 text-midnight dark:text-white text-sm text-center focus:border-lavender focus:ring-1 focus:ring-lavender/50 transition-all"
 									/>
-									<div className="absolute right-3 top-1/2 -translate-y-1/2 text-midnight/70 dark:text-white/70 text-xs font-bold">%</div>
+									<div className="absolute right-2 top-1/2 -translate-y-1/2 text-midnight/50 dark:text-white/50 text-xs font-bold">%</div>
 								</div>
 								<button
 									type="button"
 									onClick={() => removeCollaborator(index)}
-									className="p-3 text-midnight/50 dark:text-white/20 hover:text-red-400 hover:bg-red-400/10 rounded-none transition-colors"
+									className="p-2 text-midnight/40 dark:text-white/30 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors shrink-0"
 									aria-label={t('remove')}
 								>
-									<IconTrash size={20} />
+									<IconTrash size={18} />
 								</button>
 							</div>
 						))}
 						{collaborators.length === 0 && (
-							<div className="text-center py-8 border border-white/5 rounded-none bg-midnight/[0.02] dark:bg-white/[0.02]">
+							<div className="text-center py-8 border border-midnight/5 dark:border-white/5 rounded-xl bg-midnight/[0.02] dark:bg-white/[0.02]">
 								<p className="text-sm text-midnight/70 dark:text-white/70 italic">{t('collaboratorsHint')}</p>
 							</div>
 						)}
@@ -1217,52 +1237,41 @@ export default function UploadView() {
 
 				{/* Status & Tracking */}
 				{publishedSongId !== null && (
-					<div className="bg-midnight/[0.02] dark:bg-white/[0.02] border border-midnight/10 dark:border-white/10 p-4 space-y-3">
+					<div className="glass-surface p-5 space-y-3">
 						<div className="flex items-center justify-between text-xs">
 							<span className="text-midnight/70 dark:text-white/70 uppercase tracking-wider font-bold">Catalog Status</span>
 						</div>
 						<div className="flex items-center justify-between">
 							<span className="text-sm text-midnight/80 dark:text-white">Song ID: {publishedSongId.toString()}</span>
-							<span className="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-none font-bold">PUBLISHED</span>
+							<span className="text-[10px] bg-emerald-500/20 text-emerald-500 px-2 py-0.5 rounded-xl font-bold">PUBLISHED</span>
 						</div>
 					</div>
 				)}
 
 				{/* Insufficient Balance Warning */}
 				{cardanoAddress && adaBalance !== null && adaBalance < 2000000n && (
-					<div className="bg-red-500/10 border border-red-500/30 p-4 text-red-400 text-xs space-y-2">
+					<div className="glass-surface border-red-500/30 p-5 text-red-700 dark:text-red-400 text-xs space-y-3">
 						<p className="font-bold uppercase tracking-wider">⚠️ INSUFFICIENT WALLET BALANCE</p>
-						<p>Your wallet address has less than 2 ADA ({ (Number(adaBalance) / 1000000).toFixed(2) } ADA). You need at least 2 ADA to cover minting transaction fees and the minimum UTxO storage deposit on the Cardano Preprod network.</p>
-						<p>You can request free test ADA using the <a href="https://docs.cardano.org/cardano-testnet/tools/faucet/" target="_blank" rel="noopener noreferrer" className="underline font-bold text-white hover:text-cyber-pink">Cardano Preprod Faucet</a>.</p>
+						<p>Your wallet address has less than 2 ADA ({ (Number(adaBalance) / 1000000).toFixed(2) } ADA). You need at least 2 ADA to cover minting transaction fees and the minimum UTxO storage deposit on the Cardano network.</p>
 					</div>
 				)}
 
 				{/* Attestation Checkbox */}
 				{publishedSongId === null && (
-					<div className="flex items-start gap-3 p-4 bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-none">
-						<input
-							type="checkbox"
-							id="attestation"
-							checked={attested}
-							onChange={(e) => setAttested(e.target.checked)}
-							className="mt-1 h-4 w-4 rounded-none border-midnight/20 dark:border-white/20 text-cyber-pink focus:ring-cyber-pink bg-transparent cursor-pointer"
-						/>
-						<label htmlFor="attestation" className="text-sm font-medium text-midnight/80 dark:text-white cursor-pointer select-none">
-							I own or have licensed all content I am minting, and agree to the Terms of Service.
-						</label>
-					</div>
-				)}
-
-				{/* Action Bar */}
-				<div className="pt-8 flex flex-col gap-4">
-					{publishedSongId !== null ? (
-						<div className="flex gap-4">
-							<div className="flex-1 bg-[#1DB954]/10 border border-[#1DB954] text-[#1DB954] font-medium py-4 px-6 rounded-none flex items-center justify-center gap-2 cursor-default">
-								<IconCheck size={20} />
-								PUBLISHED & READY ON-CHAIN
-							</div>
+					<div className="space-y-6">
+						<div className="flex items-start gap-3 p-4 glass-surface rounded-xl">
+							<input
+								type="checkbox"
+								id="attestation"
+								checked={attested}
+								onChange={(e) => setAttested(e.target.checked)}
+								className="mt-1 h-4 w-4 rounded-xl border-midnight/20 dark:border-white/20 text-pink-600 dark:text-cyber-pink focus:ring-cyber-pink bg-transparent cursor-pointer"
+							/>
+							<label htmlFor="attestation" className="text-sm font-medium text-midnight/80 dark:text-white cursor-pointer select-none">
+								I own or have licensed all content I am minting, and agree to the Terms of Service.
+							</label>
 						</div>
-					) : (
+
 						<button
 							type="submit"
 							disabled={
@@ -1273,11 +1282,11 @@ export default function UploadView() {
 								!cardanoAddress ||
 								!attested
 							}
-							className="w-full bg-[#B794F4] hover:bg-[#A080E0] text-black font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-2 transition-all transform active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed group text-xs uppercase tracking-widest"
+							className="w-full bg-cyber-pink hover:bg-cyber-pink/90 text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-2 transition-all transform active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed group text-sm"
 						>
 							{isUploading ? (
 								<>
-									<div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+									<IconLoader2 size={20} className="animate-spin" />
 									Publishing...
 								</>
 							) : (
@@ -1287,14 +1296,14 @@ export default function UploadView() {
 								</>
 							)}
 						</button>
-					)}
-				</div>
+					</div>
+				)}
 			</form>
 
 			{/* Real-Time Aesthetic Angular Matte Progress Modal */}
 			{isUploading && (
-				<div className="fixed inset-0 z-[999] w-screen h-screen flex items-center justify-center p-4 bg-transparent backdrop-blur-xl md:backdrop-blur-2xl animate-fade-in">
-					<div className="w-full max-w-md bg-[#FAF9F6] dark:bg-[#141419] border border-midnight/20 dark:border-white/20 rounded-none p-6 shadow-2xl space-y-6">
+				<div className="fixed inset-0 z-50 w-screen h-screen flex items-center justify-center p-4 bg-transparent backdrop-blur-xl md:backdrop-blur-2xl animate-fade-in">
+					<div className="w-full max-w-md glass-surface p-6 space-y-6">
 						{/* Top Status Header */}
 						<div className="flex items-start justify-between gap-4">
 							<div className="space-y-1">
@@ -1311,7 +1320,7 @@ export default function UploadView() {
 							</div>
 
 							{/* Subtle Elapsed Timer Badge */}
-							<div className="flex items-center gap-1 text-[11px] font-mono text-midnight/60 dark:text-white/60 bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 px-2 py-1 rounded-none shrink-0" title="Elapsed publishing time">
+							<div className="flex items-center gap-1 text-[11px] font-mono text-midnight/60 dark:text-white/60 bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 px-2 py-1 rounded-xl shrink-0" title="Elapsed publishing time">
 								<IconClock size={13} className="shrink-0 text-midnight/40 dark:text-white/40" />
 								<span>{formatElapsed(elapsedSeconds)}</span>
 							</div>
@@ -1326,28 +1335,28 @@ export default function UploadView() {
 							</div>
 
 							{/* 4-Color Segmented Angular Progress Bar (Matte Finish) */}
-							<div className="w-full bg-midnight/10 dark:bg-white/10 h-3 rounded-none overflow-hidden flex gap-1 p-0.5 border border-midnight/15 dark:border-white/15">
-								{/* Segment 1: Media IPFS (Muted Pink #D946EF) */}
+							<div className="w-full bg-midnight/10 dark:bg-white/10 h-3 rounded-full overflow-hidden flex gap-1 p-0.5 border border-midnight/15 dark:border-white/15">
+								{/* Segment 1: Media IPFS (fuchsia-500) */}
 								<div 
-									className="h-full rounded-none transition-all duration-150 ease-linear bg-[#D946EF]" 
+									className="h-full rounded-full transition-all duration-150 ease-linear bg-fuchsia-500" 
 									style={{ width: `${displaySeg1}%` }} 
 									title="1. Media IPFS Upload"
 								/>
-								{/* Segment 2: Metadata (Muted Purple #A855F7) */}
+								{/* Segment 2: Metadata (purple-500) */}
 								<div 
-									className="h-full rounded-none transition-all duration-150 ease-linear bg-[#A855F7]" 
+									className="h-full rounded-full transition-all duration-150 ease-linear bg-purple-500" 
 									style={{ width: `${displaySeg2}%` }} 
 									title="2. CIP-60 Metadata"
 								/>
-								{/* Segment 3: Cardano Minting (Muted Blue #3B82F6) */}
+								{/* Segment 3: Cardano Minting (blue-500) */}
 								<div 
-									className="h-full rounded-none transition-all duration-150 ease-linear bg-[#3B82F6]" 
+									className="h-full rounded-full transition-all duration-150 ease-linear bg-blue-500" 
 									style={{ width: `${displaySeg3}%` }} 
 									title="3. On-Chain Minting"
 								/>
-								{/* Segment 4: Catalog Index (Muted Emerald #10B981) */}
+								{/* Segment 4: Catalog Index (emerald-500) */}
 								<div 
-									className="h-full rounded-none transition-all duration-150 ease-linear bg-[#10B981]" 
+									className="h-full rounded-full transition-all duration-150 ease-linear bg-emerald-500" 
 									style={{ width: `${displaySeg4}%` }} 
 									title="4. Catalog Indexing"
 								/>
@@ -1355,12 +1364,12 @@ export default function UploadView() {
 						</div>
 
 						{/* 4 Steps Checklist */}
-						<div className="space-y-3 pt-3 border-t border-midnight/10 dark:border-white/10 text-xs">
+						<div className="space-y-3 pt-3 border-t border-midnight/[0.06] dark:border-white/[0.06] text-xs">
 							{[
-								{ title: "1. Media IPFS Upload", color: "bg-[#D946EF]" },
-								{ title: "2. CIP-60 Metadata Generation", color: "bg-[#A855F7]" },
-								{ title: "3. On-Chain Cardano Minting", color: "bg-[#3B82F6]" },
-								{ title: "4. Catalog Indexing & Finalize", color: "bg-[#10B981]" }
+								{ title: "1. Media IPFS Upload", color: "bg-fuchsia-500" },
+								{ title: "2. CIP-60 Metadata Generation", color: "bg-purple-500" },
+								{ title: "3. On-Chain Cardano Minting", color: "bg-blue-500" },
+								{ title: "4. Catalog Indexing & Finalize", color: "bg-emerald-500" }
 							].map((stepItem, idx) => {
 								const stepNum = idx + 1
 								const isDone = uploadStep > stepNum
@@ -1368,7 +1377,7 @@ export default function UploadView() {
 								return (
 									<div key={idx} className="flex items-center justify-between">
 										<div className="flex items-center gap-2.5">
-											<span className={cn("w-2.5 h-2.5 rounded-none shrink-0", stepItem.color)} />
+											<span className={cn("w-2.5 h-2.5 rounded-full shrink-0", stepItem.color)} />
 											<span className={cn(
 												"font-medium transition-colors",
 												isCurrent ? "text-midnight dark:text-white font-bold" : isDone ? "text-midnight/50 dark:text-white/50" : "text-midnight/30 dark:text-white/30"
@@ -1377,7 +1386,7 @@ export default function UploadView() {
 											</span>
 										</div>
 										{isDone ? (
-											<IconCheck size={16} className="text-[#10B981] shrink-0" />
+											<IconCheck size={16} className="text-emerald-500 shrink-0" />
 										) : isCurrent ? (
 											<IconLoader2 size={16} className="animate-spin text-purple-400 shrink-0" />
 										) : (

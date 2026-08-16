@@ -34,7 +34,8 @@
     "connectWallet": "지갑 연결",
     "connectToView": "지갑을 연결하여 라이브러리 보기",
     "noSongs": "노래를 찾을 수 없습니다",
-    "noSongsDesc": "아직 소유한 노래가 없습니다. 마켓플레이스에서 음악을 찾아보세요!"
+    "noSongsDesc": "아직 소유한 노래가 없습니다. 마켓플레이스에서 음악을 찾아보세요!",
+    "discoverMusic": "음악 둘러보기"
   },
   "search": {
     "title": "검색",
@@ -178,5 +179,13 @@
     "previousTrack": "이전 트랙",
     "nextTrack": "다음 트랙",
     "play": "{title} 재생"
+  },
+  "onboarding": {
+    "title": "시작하기",
+    "stepConnect": "지갑 연결하기",
+    "stepVerify": "서명 확인하기",
+    "stepCollect": "첫 트랙 수집하기",
+    "dismiss": "닫기",
+    "nudgeCollect": "트랙의 다이아몬드를 눌러 수집하고 음악의 일부를 소유하세요."
   }
 }
