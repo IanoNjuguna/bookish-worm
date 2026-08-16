@@ -10,11 +10,13 @@ import '../globals.css'
 import { Providers } from "@/components/Providers"
 import { AudioProvider } from "@/components/AudioProvider"
 import { SpeedInsights } from "@vercel/speed-insights/next"
-import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/ThemeProvider"
+import { ConsentAwareAnalytics } from "@/components/ConsentAwareAnalytics"
+import { CookieConsentBanner } from "@/components/CookieConsent"
 import { DynamicFavicon } from "@/components/DynamicFavicon"
 import { Toaster } from "@/components/ui/sonner"
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt"
+import VantaBackground from "@/components/VantaBackground"
 
 const chivo = localFont({
 	src: [
@@ -58,9 +60,9 @@ const notoSansKr = localFont({
 })
 
 export const metadata: Metadata = {
-	metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
-	title: 'Doba | Release and collect music records as digital assets',
-	description: 'Doba is a distribution service for artists to release music and manage their careers.',
+	metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://app.doba.world'),
+	title: 'pre-drop your music on doba | for artists and super fans',
+	description: 'Doba lets artists release music as collectible song tokens. Fans collect, stream for free, and support the artists they love — before the streaming platforms.',
 	manifest: '/manifest.json',
 	appleWebApp: {
 		capable: true,
@@ -81,9 +83,11 @@ export const metadata: Metadata = {
 		shortcut: '/doba.ico',
 	},
 	openGraph: {
+		siteName: 'doba',
+		url: '/',
 		images: [
 			{
-				url: '/doba-banner.png',
+				url: '/doba-og.png',
 				width: 1200,
 				height: 630,
 				alt: 'Preview',
@@ -92,7 +96,8 @@ export const metadata: Metadata = {
 	},
 	twitter: {
 		card: 'summary_large_image',
-		images: ['/doba-banner.png'],
+		site: '@doba_DAO',
+		images: ['/doba-og.png'],
 	},
 	other: {
 		'talentapp:project_verification': '44388cc20c53b76e658fd42a0679e234c22e2f97278196bf75bfc12e67b05bcaf81b5726868e4e6582739e7aa4395fde04629e0d2c409431da28f053f2ff59c6',
@@ -134,6 +139,7 @@ export default async function LocaleLayout({ children, params }: Props) {
 					<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 						<Providers>
 							<AudioProvider>
+								<VantaBackground />
 								{children}
 							</AudioProvider>
 						</Providers>
@@ -141,9 +147,10 @@ export default async function LocaleLayout({ children, params }: Props) {
 				</NextIntlClientProvider>
 				<DynamicFavicon />
 				<PWAInstallPrompt />
+				<CookieConsentBanner />
 				<Toaster position="bottom-right" closeButton />
 				<SpeedInsights />
-				<Analytics />
+				<ConsentAwareAnalytics />
 			</body>
 		</html>
 	)
