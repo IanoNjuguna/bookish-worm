@@ -18,9 +18,9 @@ export default function AssetsDashboard() {
       <div className="flex justify-start">
         <Link 
           href="/profile"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-midnight/55 dark:text-white/45 hover:text-[#FF1F8A] dark:hover:text-[#FF1F8A] transition-colors group select-none"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-midnight/55 dark:text-white/45 hover:text-cyber-pink dark:hover:text-cyber-pink transition-colors group select-none"
         >
-          <IconCornerDownLeft size={14} className="text-midnight/40 dark:text-white/35 group-hover:text-[#FF1F8A] dark:group-hover:text-[#FF1F8A] transition-colors" />
+          <IconCornerDownLeft size={14} className="text-midnight/40 dark:text-white/35 group-hover:text-cyber-pink dark:group-hover:text-cyber-pink transition-colors" />
           <span>{tNav('profile')}</span>
         </Link>
       </div>
