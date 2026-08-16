@@ -5,7 +5,7 @@ import {
 	LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 	BarChart, Bar, Cell
 } from 'recharts'
-import { IconMusic, IconUsers, IconTrendingUp, IconHeadphones } from '@tabler/icons-react'
+import { IconMusic, IconUsers, IconTrendingUp, IconHeadphones, IconLoader2 } from '@tabler/icons-react'
 import { useAudio } from '@/components/AudioProvider'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
@@ -70,7 +70,7 @@ export default function AnalyticsView() {
 	if (loading) {
 		return (
 			<div className="flex flex-col items-center justify-center p-12 md:p-24 space-y-4">
-				<div className="w-8 h-8 border-2 border-[#FF1F8A] border-t-transparent rounded-full animate-spin" />
+				<IconLoader2 size={32} className="animate-spin text-pink-600 dark:text-cyber-pink" />
 				<p className="text-midnight/60 dark:text-white/50 italic text-sm">Aggregating artist data...</p>
 			</div>
 		)
@@ -93,13 +93,13 @@ export default function AnalyticsView() {
 				<MetricCard
 					label="Total Plays"
 					value={data.totalPlays.toLocaleString()}
-					icon={<IconHeadphones className="text-cyber-pink" size={24} />}
+					icon={<IconHeadphones className="text-pink-600 dark:text-cyber-pink" size={24} />}
 					subtext="> 1 minute streams"
 				/>
 				<MetricCard
 					label="Unique Listeners"
 					value={data.uniqueListeners.toLocaleString()}
-					icon={<IconUsers className="text-[#B794F4]" size={24} />}
+					icon={<IconUsers className="text-lavender" size={24} />}
 					subtext="Audience reach"
 				/>
 				<MetricCard
@@ -120,9 +120,9 @@ export default function AnalyticsView() {
 			<div id="analytics-charts-row" className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 				{/* Plays Over Time */}
 				<div className="bg-midnight/[0.02] dark:bg-white/[0.02] border border-midnight/[0.08] dark:border-white/[0.08] p-6 rounded-2xl shadow-xl relative overflow-hidden group">
-					<div className="absolute top-0 right-0 w-16 h-16 bg-[#FF1F8A]/5 -mr-8 -mt-8 rotate-45 pointer-events-none" />
+					<div className="absolute top-0 right-0 w-16 h-16 bg-cyber-pink/5 -mr-8 -mt-8 rotate-45 pointer-events-none" />
 					<h3 className="text-lg font-bold mb-6 flex items-center gap-2 uppercase tracking-tighter">
-						<IconTrendingUp size={20} className="text-[#FF1F8A]" />
+						<IconTrendingUp size={20} className="text-pink-600 dark:text-cyber-pink" />
 						Streaming Activity
 					</h3>
 					<div className="h-[250px] sm:h-[300px] w-full">
@@ -157,9 +157,9 @@ export default function AnalyticsView() {
 
 				{/* Top Tracks */}
 				<div className="bg-midnight/[0.02] dark:bg-white/[0.02] border border-midnight/[0.08] dark:border-white/[0.08] p-6 rounded-2xl shadow-xl text-midnight dark:text-white relative overflow-hidden group">
-					<div className="absolute top-0 right-0 w-16 h-16 bg-[#B794F4]/5 -mr-8 -mt-8 rotate-45 pointer-events-none" />
+					<div className="absolute top-0 right-0 w-16 h-16 bg-lavender/5 -mr-8 -mt-8 rotate-45 pointer-events-none" />
 					<h3 className="text-lg font-bold mb-6 flex items-center gap-2 uppercase tracking-tighter">
-						<IconMusic size={20} className="text-[#B794F4]" />
+						<IconMusic size={20} className="text-lavender" />
 						Top Performing Tracks
 					</h3>
 					<div className="space-y-4">
@@ -169,15 +169,15 @@ export default function AnalyticsView() {
 									<div className="flex items-center gap-3 sm:gap-4 min-w-0">
 										<span className="text-midnight/70 dark:text-white/30 font-bold italic w-4 flex-shrink-0 text-xs sm:text-sm">{idx + 1}</span>
 										<div className="min-w-0">
-											<p className="font-semibold text-xs sm:text-sm group-hover:text-cyber-pink transition-colors truncate">{track.name}</p>
+											<p className="font-semibold text-xs sm:text-sm group-hover:text-pink-600 dark:group-hover:text-cyber-pink transition-colors truncate">{track.name}</p>
 											<p className="text-[9px] sm:text-[10px] text-midnight/60 dark:text-white/50 uppercase tracking-widest truncate">ID #{track.tokenId}</p>
 										</div>
 									</div>
 									<div className="text-right flex-shrink-0 ml-4">
-										<p className="font-bold text-[#B794F4] text-xs sm:text-sm font-mono whitespace-nowrap">{track.plays} plays</p>
+										<p className="font-bold text-lavender text-xs sm:text-sm font-mono whitespace-nowrap">{track.plays} plays</p>
 										<div className="h-1 bg-midnight/10 dark:bg-white/10 w-12 sm:w-20 rounded-full mt-1 overflow-hidden">
 											<div
-												className="h-full bg-cyber-pink rounded-full"
+												className="h-full bg-pink-600 dark:bg-cyber-pink rounded-full"
 												style={{ width: `${(track.plays / (data.topTracks[0]?.plays || 1)) * 100}%` }}
 											/>
 										</div>
@@ -198,9 +198,9 @@ export default function AnalyticsView() {
 
 function MetricCard({ label, value, icon, subtext }: { label: string; value: string; icon: React.ReactNode; subtext: string }) {
 	return (
-		<div className="bg-midnight/[0.02] dark:bg-white/[0.02] border border-midnight/[0.08] dark:border-white/[0.08] p-6 rounded-2xl shadow-lg hover:border-[#B794F4]/50 transition-all group relative overflow-hidden">
+		<div className="bg-midnight/[0.02] dark:bg-white/[0.02] border border-midnight/[0.08] dark:border-white/[0.08] p-6 rounded-2xl shadow-lg hover:border-lavender/50 transition-all group relative overflow-hidden">
 			{/* Geometric Accent */}
-			<div className="absolute top-0 left-0 w-1 h-full bg-[#B794F4]/0 group-hover:bg-[#B794F4]/50 transition-all" />
+			<div className="absolute top-0 left-0 w-1 h-full bg-lavender/0 group-hover:bg-lavender/50 transition-all" />
 			<div className="absolute top-0 right-0 w-8 h-8 bg-midnight/5 dark:bg-white/5 -mr-4 -mt-4 rotate-45 transition-transform group-hover:scale-110" />
 
 			<div className="flex items-center justify-between mb-4">

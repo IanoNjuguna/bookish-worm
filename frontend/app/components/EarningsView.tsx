@@ -2,7 +2,7 @@
 
 import { logger } from '@/lib/logger'
 import { useEffect, useState } from 'react'
-import { IconTrendingUp, IconCurrencyDollar as DollarSign, IconExternalLink, IconMusic } from '@tabler/icons-react'
+import { IconTrendingUp, IconCurrencyDollar as DollarSign, IconExternalLink, IconMusic, IconLoader2 } from '@tabler/icons-react'
 import { useTranslations } from 'next-intl'
 import { useCardano } from '@/components/Providers'
 import { useAudio } from '@/components/AudioProvider'
@@ -153,8 +153,8 @@ export default function EarningsView() {
 					<h2 className="text-2xl font-bold mb-2">{t('title') || 'Earnings & Splits'}</h2>
 					<p className="text-midnight/60 dark:text-white/60">{t('subtitle') || 'View splits and track your Cardano royalties.'}</p>
 				</div>
-				<div className="border border-midnight/[0.08] dark:border-white/[0.08] rounded-2xl p-12 text-center bg-[#FAF9F6] dark:bg-[#0D0D12]/60 shadow-xl">
-					<div className="w-16 h-16 rounded-2xl mx-auto mb-6 bg-cyber-pink/10 border border-cyber-pink/20 flex items-center justify-center text-cyber-pink clip-diamond">
+				<div className="border border-midnight/[0.08] dark:border-white/[0.08] rounded-2xl p-12 text-center bg-background dark:bg-midnight/60 shadow-xl">
+					<div className="w-16 h-16 rounded-2xl mx-auto mb-6 bg-cyber-pink/10 border border-cyber-pink/20 flex items-center justify-center text-cyber-pink rounded-md">
 						<DollarSign size={32} />
 					</div>
 					<h3 className="text-xl font-bold mb-2">{t('signInToView') || 'Connect Your Wallet'}</h3>
@@ -173,7 +173,7 @@ export default function EarningsView() {
 				</div>
 				<button
 					onClick={fetchEarnings}
-					className="text-xs text-[#B794F4] hover:underline"
+					className="text-xs text-lavender hover:underline"
 					disabled={loading}
 				>
 					{loading ? 'Refreshing...' : 'Refresh Data'}
@@ -182,18 +182,18 @@ export default function EarningsView() {
 
 			<div id="earnings-metrics-grid" className="grid grid-cols-1 sm:grid-cols-3 gap-6">
 				{/* Lifetime Earnings */}
-				<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-6 bg-[#FAF9F6] dark:bg-[#0D0D12]/60 relative overflow-hidden group rounded-2xl shadow-lg">
-					<div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-cyber-pink to-transparent" />
+				<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-6 bg-background dark:bg-midnight/60 relative overflow-hidden group rounded-2xl shadow-lg">
+					<div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-pink-600 dark:from-cyber-pink to-transparent" />
 					<div className="flex items-center justify-between mb-4">
 						<h3 className="text-midnight/60 dark:text-white/60 text-xs uppercase tracking-wider font-bold">Lifetime Sales</h3>
-						<IconTrendingUp size={16} className="text-cyber-pink animate-pulse" />
+						<IconTrendingUp size={16} className="text-pink-600 dark:text-cyber-pink animate-pulse" />
 					</div>
 					<p className="text-3xl font-mono font-bold text-midnight dark:text-white">{lifetimeEarnings} <span className="text-sm font-sans font-normal text-midnight/50 dark:text-white/50">ADA</span></p>
 					<p className="text-midnight/70 dark:text-white/40 text-[10px] mt-2 uppercase tracking-widest font-bold">Calculated from sales splits</p>
 				</div>
 
 				{/* Available ADA */}
-				<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-6 bg-[#FAF9F6] dark:bg-[#0D0D12]/60 relative overflow-hidden group rounded-2xl shadow-lg">
+				<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-6 bg-background dark:bg-midnight/60 relative overflow-hidden group rounded-2xl shadow-lg">
 					<div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-lavender to-transparent" />
 					<div className="flex items-center justify-between mb-4">
 						<h3 className="text-midnight/60 dark:text-white/60 text-xs uppercase tracking-wider font-bold">Wallet Balance</h3>
@@ -204,18 +204,18 @@ export default function EarningsView() {
 				</div>
 
 				{/* Payout System Explanation */}
-				<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-6 bg-[#FAF9F6] dark:bg-[#0D0D12]/40 flex flex-col justify-center rounded-2xl shadow-lg">
-					<h4 className="text-xs uppercase tracking-wider font-bold text-[#B794F4] mb-1">Instant Payouts</h4>
+				<div className="border border-midnight/[0.08] dark:border-white/[0.08] p-6 bg-background dark:bg-midnight/40 flex flex-col justify-center rounded-2xl shadow-lg">
+					<h4 className="text-xs uppercase tracking-wider font-bold text-lavender mb-1">Instant Payouts</h4>
 					<p className="text-xs text-midnight/50 dark:text-white/50 leading-relaxed">
 						Payouts are executed instantly during the purchase transaction. There are no claim queues or extra gas fees to claim your splits!
 					</p>
 				</div>
 			</div>
 
-			<div id="earnings-splits-list" className="border border-midnight/[0.08] dark:border-white/[0.08] overflow-hidden bg-[#FAF9F6] dark:bg-[#0D0D12]/60 rounded-2xl shadow-xl">
+			<div id="earnings-splits-list" className="border border-midnight/[0.08] dark:border-white/[0.08] overflow-hidden bg-background dark:bg-midnight/60 rounded-2xl shadow-xl">
 				<div className="p-6 border-b border-midnight/[0.08] dark:border-white/[0.08] flex justify-between items-center bg-white/[0.01]">
 					<h3 className="font-bold text-sm uppercase tracking-wider flex items-center gap-2">
-						<span className="w-1 h-4 bg-cyber-pink rounded-full"></span>
+						<span className="w-1 h-4 bg-pink-600 dark:bg-cyber-pink rounded-full"></span>
 						Collaborator Splits
 					</h3>
 					<span className="text-[10px] text-midnight/70 dark:text-white/40 uppercase font-mono">Real-Time Split List</span>
@@ -224,7 +224,7 @@ export default function EarningsView() {
 				<div className="divide-y divide-white/[0.08]">
 					{loading && royaltyTracks.length === 0 ? (
 						<div className="p-12 text-center">
-							<div className="w-8 h-8 border-2 border-[#FF1F8A] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+							<IconLoader2 size={32} className="animate-spin text-pink-600 dark:text-cyber-pink mx-auto mb-4" />
 							<p className="text-midnight/70 dark:text-white/40 text-sm italic">Querying collaborator splits...</p>
 						</div>
 					) : royaltyTracks.length > 0 ? (
@@ -247,18 +247,18 @@ export default function EarningsView() {
 									<div className="min-w-0 flex-1">
 										<p className="font-bold text-midnight dark:text-white flex items-center gap-2 truncate">
 											{entry.track}
-											<span className="text-[10px] font-mono bg-midnight/5 dark:bg-white/5 px-1.5 py-0.5 text-midnight/70 dark:text-white/40 rounded-none">ID #{entry.tokenId}</span>
+											<span className="text-[10px] font-mono bg-midnight/5 dark:bg-white/5 px-1.5 py-0.5 text-midnight/70 dark:text-white/40 rounded-md">ID #{entry.tokenId}</span>
 										</p>
 										<p className="text-xs text-midnight/70 dark:text-white/40 truncate flex items-center gap-1 font-mono">
 											Uploader: {entry.uploaderAddress.slice(0, 12)}...{entry.uploaderAddress.slice(-8)}
-											<a href={`${EXPLORER_URL}/address/${entry.uploaderAddress}`} target="_blank" className="hover:text-[#B794F4] transition-colors" title="View on CardanoScan">
+											<a href={`${EXPLORER_URL}/address/${entry.uploaderAddress}`} target="_blank" className="hover:text-lavender transition-colors" title="View on CardanoScan">
 												<IconExternalLink size={10} />
 											</a>
 										</p>
 									</div>
 								</div>
 								<div className="text-right flex-shrink-0">
-									<p className="font-bold font-mono text-[#FF1F8A]">{entry.myEarnings} ADA</p>
+									<p className="font-bold font-mono text-pink-600 dark:text-cyber-pink">{entry.myEarnings} ADA</p>
 									<p className="text-xs text-midnight/70 dark:text-white/40 font-bold">{entry.shares}% Share • {entry.mintCount} Sales</p>
 								</div>
 							</div>

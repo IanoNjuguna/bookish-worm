@@ -5,6 +5,7 @@ import { IconEye, IconMusic, IconMicrophone, IconPlayerPause, IconPlayerPlay, Ic
 import { DobaVisualizer } from '@/components/icons/DobaVisualizer'
 import { useTranslations } from 'next-intl'
 import { useAudio } from './AudioProvider'
+import { Link } from '@/i18n/navigation'
 
 interface Track {
   id?: number
@@ -87,7 +88,7 @@ export default function MyStudioGrid({ address, onPlay, currentTrackId, isPlayin
     return (
       <div className="space-y-4">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-14 glass animate-pulse rounded-none" />
+          <div key={i} className="h-14 glass animate-pulse rounded-xl" />
         ))}
       </div>
     )
@@ -99,6 +100,12 @@ export default function MyStudioGrid({ address, onPlay, currentTrackId, isPlayin
         <IconMusic className="w-12 h-12 mx-auto mb-4 text-midnight/50 dark:text-white/20" />
         <h3 className="text-xl font-semibold mb-2">{t('noSongs')}</h3>
         <p className="text-midnight/70 dark:text-white/40 italic text-sm">{t('noSongsDesc') || "You don't own any songs yet. Head to the marketplace to discover music!"}</p>
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 mt-6 bg-cyber-pink hover:bg-cyber-pink/90 text-white font-bold text-xs uppercase tracking-widest px-5 py-3 rounded-xl transition-all"
+        >
+          {t('discoverMusic') || 'Discover Music'}
+        </Link>
       </div>
     )
   }
@@ -140,7 +147,7 @@ export default function MyStudioGrid({ address, onPlay, currentTrackId, isPlayin
                     url: track.streaming_url || track.audio_url.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/'),
                     collaborators: 0,
                   }, ownedTracks)}
-                  className="w-7 h-7 md:w-6 md:h-6 flex items-center justify-center bg-white text-black rounded-full shadow-sm transition-all active:scale-90"
+                  className="w-7 h-7 md:w-6 md:h-6 flex items-center justify-center bg-white text-black rounded-md shadow-sm transition-all active:scale-90"
                 >
                   {isPlaying && currentTrackId === track.token_id ? (
                     <IconPlayerPause size={14} className="fill-black" />
@@ -179,15 +186,15 @@ export default function MyStudioGrid({ address, onPlay, currentTrackId, isPlayin
                   <span className="truncate">{track.name}</span>
                   <div className="flex items-center gap-1 flex-shrink-0">
                     {track.is_owned && (
-                      <IconSquareCheckFilled size={12} className="text-[#1DB954] flex-shrink-0" title="Collected" />
+                      <IconSquareCheckFilled size={12} className="text-emerald-500 flex-shrink-0" title="Collected" />
                     )}
                     {track.max_supply && track.max_supply > 0 && track.minted_count !== undefined && track.minted_count >= track.max_supply && (
-                      <DobaVisualizer size={12} className="text-[#FF1F8A] flex-shrink-0" />
+                      <DobaVisualizer size={12} className="text-pink-600 dark:text-cyber-pink flex-shrink-0" />
                     )}
                   </div>
                 </h4>
                 <p className="text-[9px] md:text-xs text-midnight/50 dark:text-white/50 truncate flex items-center gap-1 font-medium uppercase tracking-wider mt-0.5">
-                  <IconMicrophone size={10} className="text-cyber-pink/50 flex-shrink-0" />
+                  <IconMicrophone size={10} className="text-pink-600/50 dark:text-cyber-pink/50 flex-shrink-0" />
                   <span className="truncate">{track.artist}</span>
                 </p>
               </div>
@@ -199,7 +206,7 @@ export default function MyStudioGrid({ address, onPlay, currentTrackId, isPlayin
 
             {/* Streams */}
             <div className="hidden md:flex items-center text-[10px] text-midnight/60 dark:text-white/60 font-mono">
-              <IconPlayerPlay size={10} className="mr-1 text-cyber-pink/40" />
+              <IconPlayerPlay size={10} className="mr-1 text-pink-600/40 dark:text-cyber-pink/40" />
               {track.play_count || 0}
             </div>
 
@@ -213,7 +220,7 @@ export default function MyStudioGrid({ address, onPlay, currentTrackId, isPlayin
               <Button
                 size="sm"
                 variant="ghost"
-                className="h-9 w-9 md:h-8 md:w-8 p-0 hover:bg-midnight/5 dark:hover:bg-white/5 text-midnight/60 dark:text-white/30 hover:text-midnight dark:hover:text-white rounded-none border border-transparent hover:border-white/5"
+                className="h-9 w-9 md:h-8 md:w-8 p-0 hover:bg-midnight/5 dark:hover:bg-white/5 text-midnight/60 dark:text-white/30 hover:text-midnight dark:hover:text-white rounded-md border border-transparent hover:border-white/5"
                 onClick={() => handleOpenSidebar(track)}
               >
                 <IconEye size={18} />
