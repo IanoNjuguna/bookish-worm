@@ -9,49 +9,42 @@ const papers = [
     url: "https://press.wz.uw.edu.pl/yars/vol19/iss33/9/",
     source: "Yearbook of Antitrust and Regulatory Studies, 2026",
     relevance:
-      "Documents network effects, ecosystem lock-in, and gatekeeper power in music streaming — the exact dynamic Doba sidesteps by letting artists own the fan relationship.",
-  },
-  {
-    title: "User Engagement and Music Sales on YouTube",
-    url: "https://www.frontiersin.org/article/10.3389/fpsyg.2018.01880/full",
-    source: "Frontiers in Psychology, 2018",
-    relevance:
-      "Empirical evidence that fan-driven engagement (previews, shares, comments) directly lifts music sales — supporting the pre-drop → funnel → streaming boost model.",
+      "Documents network effects, ecosystem lock-in, and gatekeeper power in music streaming. This is the exact dynamic Doba sidesteps by letting artists own the fan relationship.",
   },
   {
     title: "Revenue Sharing at Music Streaming Platforms",
     url: "https://arxiv.org/abs/2310.11861",
     source: "arXiv, 2023",
     relevance:
-      "Models how value flows between platforms, artists, and listeners — a useful frame for Doba’s direct-collect compensation alternative.",
+      "Models how value flows between platforms, artists, and listeners. It provides a useful frame for Doba’s direct-collect compensation alternative.",
   },
   {
     title: "Artists’ Perspective on Fairness in Streaming",
     url: "https://arxiv.org/abs/2106.02415",
     source: "arXiv, 2021",
     relevance:
-      "Shows how recommender systems and platform control shape consumption; Doba gives artists a channel not mediated by those algorithms.",
+      "Shows how recommender systems and platform control shape consumption. Doba gives artists a channel that is not mediated by those algorithms.",
+  },
+  {
+    title: "User Engagement and Music Sales on YouTube",
+    url: "https://www.frontiersin.org/article/10.3389/fpsyg.2018.01880/full",
+    source: "Frontiers in Psychology, 2018",
+    relevance:
+      "Provides empirical evidence that fan-driven engagement directly lifts music sales. This supports the pre-drop to funnel to streaming boost model.",
   },
   {
     title: "Affordance and Item Adoption on Streaming Platforms",
     url: "https://arxiv.org/abs/2109.03538",
     source: "arXiv, 2021",
     relevance:
-      "Compares organic, algorithmic, and editorial access modes; a Doba pre-drop is a new organic access mode for superfans.",
+      "Compares organic, algorithmic, and editorial access modes. A Doba pre-drop is a new organic access mode for superfans.",
   },
   {
     title: "Song Comments and Music Listening Experience",
     url: "https://arxiv.org/abs/2308.04022",
     source: "arXiv, 2023",
     relevance:
-      "Social features around music increase engagement and retention — relevant to building community around pre-drops.",
-  },
-  {
-    title: "Two-Sided Market Network Analysis",
-    url: "https://arxiv.org/abs/2101.09886",
-    source: "arXiv, 2021",
-    relevance:
-      "Analyzes how superusers create network effects in two-sided markets — analogous to how early collectors on Doba signal value to wider audiences.",
+      "Shows that social features around music increase engagement and retention. This is relevant to building community around pre-drops.",
   },
 ];
 

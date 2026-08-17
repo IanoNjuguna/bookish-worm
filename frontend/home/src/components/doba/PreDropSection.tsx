@@ -1,58 +1,89 @@
 import { Link } from "react-router-dom";
-import { IconMusic, IconUsers, IconCoin } from "@tabler/icons-react";
+import dictionary from "@/data/adjectives.json";
 
-const steps = [
-  {
-    icon: IconMusic,
-    title: "Drag and drop to upload your music record",
-    description: "We handle encoding and storage.",
-  },
-  {
-    icon: IconUsers,
-    title: "Set collaborator splits",
-    description: "They are enforced by smart contracts.",
-  },
-  {
-    icon: IconCoin,
-    title: "Earn",
-    description: "Super fans collect your music as NFTs and you get paid (no intermediaries).",
-  },
-];
+interface DictionaryEntry {
+  term: string;
+  pronunciation?: string;
+  partOfSpeech?: string;
+  grammar?: string;
+  register?: string;
+  definition: string;
+  example?: string;
+  etymology?: string;
+}
+
+const entries = (dictionary as DictionaryEntry[]).filter(
+  (entry) => entry.term.toLowerCase() === "pre-drop"
+);
+
+const EntryLine = ({ entry }: { entry: DictionaryEntry }) => (
+  <div>
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-2">
+      <span className="text-xs font-bold uppercase tracking-widest text-cyber-pink">
+        {entry.partOfSpeech}
+      </span>
+      {entry.grammar && (
+        <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400">
+          {entry.grammar}
+        </span>
+      )}
+      {entry.register && (
+        <span className="text-xs text-zinc-500 dark:text-zinc-400">
+          ({entry.register})
+        </span>
+      )}
+    </div>
+    <p className="text-base text-zinc-700 dark:text-zinc-300 leading-relaxed mb-2">
+      <span className="text-cyber-pink font-bold mr-2">1</span>
+      {entry.definition}
+    </p>
+    {entry.example && (
+      <p className="text-xs italic text-zinc-500 dark:text-zinc-500 ml-5 border-l-2 border-cyber-pink/30 pl-3">
+        “{entry.example}”
+      </p>
+    )}
+  </div>
+);
 
 const PreDropSection = () => {
-  return (
-    <section className="pt-32 sm:pt-40 lg:pt-44 pb-20 sm:pb-28 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto text-center">
-      <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground mb-10 tracking-tight">
-        how to pre-drop on doba
-      </h2>
+  const headword = entries[0]?.term ?? "pre-drop";
+  const pronunciation = entries[0]?.pronunciation ?? "/ˌpriːˈdrɒp/";
+  const etymology = entries[0]?.etymology ?? "from pre- + drop";
 
-      <div className="space-y-3.5 sm:space-y-4 mb-10 text-left">
-        {steps.map((step) => (
-          <div
-            key={step.title}
-            className="glass-surface p-4 sm:p-5 rounded-2xl border border-black/10 dark:border-white/5 bg-white/70 dark:bg-glass shadow-sm flex items-start gap-3.5 sm:gap-4"
-          >
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-cyber-pink/10 flex items-center justify-center shrink-0">
-              <step.icon size={18} className="text-cyber-pink" />
-            </div>
-            <div>
-              <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-white mb-0.5">
-                {step.title}
-              </h3>
-              <p className="text-zinc-600 dark:text-zinc-400 text-xs font-medium leading-relaxed">
-                {step.description}
-              </p>
-            </div>
-          </div>
-        ))}
+  return (
+    <section className="pt-28 sm:pt-32 lg:pt-36 pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+      <div className="max-w-3xl mx-auto mb-8">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-2">
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground lowercase">
+            {headword}
+          </h1>
+          <span className="font-mono text-base text-zinc-500 dark:text-zinc-400">
+            {pronunciation}
+          </span>
+        </div>
+
+        <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-5">
+          <span className="font-bold uppercase tracking-wider">Origin</span>{" "}
+          {etymology}
+        </p>
+
+        <div className="h-[1px] rounded-full bg-gradient-to-r from-transparent via-midnight/[0.08] dark:via-white/[0.08] to-transparent mb-5" />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+          {entries.map((entry, index) => (
+            <EntryLine key={index} entry={entry} />
+          ))}
+        </div>
       </div>
 
-      <Link
-        to="/pre-drop"
-        className="inline-flex items-center h-11 px-6 rounded-lg bg-cyber-pink hover:bg-cyber-pink/90 text-black font-bold text-xs uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-95 shadow-md"
-      >
-        what is a pre-drop?
-      </Link>
+      <div className="text-center">
+        <Link
+          to="/pre-drop"
+          className="inline-flex items-center justify-center h-11 px-7 rounded-lg bg-cyber-pink hover:bg-cyber-pink/90 text-black font-bold text-xs uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-95 shadow-md"
+        >
+          Learn more
+        </Link>
+      </div>
     </section>
   );
 };
