@@ -1,12 +1,58 @@
 [
-  "Pre-drop",
-  "Ownership",
-  "Freedom",
-  "Limitless",
-  "Connection",
-  "Sanctuary",
-  "Energy",
-  "Timeless",
-  "Unbounded",
-  "Perspective"
+  {
+    "term": "pre-drop",
+    "pronunciation": "/ˌpriːˈdrɒp/",
+    "partOfSpeech": "noun",
+    "grammar": "[C]",
+    "register": "informal, music",
+    "definition": "a piece of music that is made available before it is officially released on major streaming platforms.",
+    "example": "Artists use a pre-drop on doba world to build momentum with super fans nowadays.",
+    "etymology": "from pre- + drop"
+  },
+  {
+    "term": "pre-drop",
+    "pronunciation": "/ˌpriːˈdrɒp/",
+    "partOfSpeech": "verb",
+    "grammar": "[T]",
+    "register": "informal, music",
+    "definition": "to release a recording in advance of its official distribution.",
+    "example": "She pre-dropped the track on doba world two weeks before the streaming launch.",
+    "etymology": "from pre- + drop"
+  },
+  {
+    "term": "Ownership",
+    "definition": "Fans own a collectible song token that proves early support and unlocks direct access to the artist."
+  },
+  {
+    "term": "Freedom",
+    "definition": "Artists release on their own terms, without gatekeepers, algorithms, or platform waitlists."
+  },
+  {
+    "term": "Limitless",
+    "definition": "No cap on creativity, reach, or the ways music can be shared and collected."
+  },
+  {
+    "term": "Connection",
+    "definition": "A direct line between artists and the fans who care most about the work."
+  },
+  {
+    "term": "Sanctuary",
+    "definition": "A home for music and the communities that form around it."
+  },
+  {
+    "term": "Energy",
+    "definition": "The momentum of a release — from first upload to fan-driven streaming boost."
+  },
+  {
+    "term": "Timeless",
+    "definition": "Collectibles and relationships that outlast any single platform cycle."
+  },
+  {
+    "term": "Unbounded",
+    "definition": "Music and fandom that move freely across borders, formats, and business models."
+  },
+  {
+    "term": "Perspective",
+    "definition": "A new angle on music distribution — owned by artists, supported by fans."
+  }
 ]

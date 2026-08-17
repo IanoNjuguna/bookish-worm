@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { IconUpload, IconHeartHandshake, IconPlayerPlay } from "@tabler/icons-react";
+import { IconUpload, IconHeartHandshake, IconPlayerPlay, IconUsers, IconCoin } from "@tabler/icons-react";
 import Navbar from "@/components/doba/Navbar";
 import Footer from "@/components/doba/Footer";
 import VantaBackground from "@/components/doba/VantaBackground";
@@ -19,6 +19,24 @@ const artists = [
     genre: "Hip-Hop / Afrofusion",
     origin: "Kenya",
     bio: "Red GG blends sharp lyricism with East African rhythms for a pre-drop built for true fans.",
+  },
+];
+
+const howToSteps = [
+  {
+    icon: IconUpload,
+    title: "Drag and drop to upload",
+    description: "We handle encoding and storage so your record is ready to collect.",
+  },
+  {
+    icon: IconUsers,
+    title: "Set collaborator splits",
+    description: "Revenue shares are enforced by smart contracts on Cardano.",
+  },
+  {
+    icon: IconCoin,
+    title: "Earn",
+    description: "Super fans collect your music as song tokens and you get paid directly.",
   },
 ];
 
@@ -119,6 +137,27 @@ export default function PreDrop() {
                   When your track goes live on Spotify, Apple Music, or Deezer, your super fans boost you.
                 </p>
               </div>
+            </div>
+          </section>
+
+          {/* How to pre-drop on Doba */}
+          <section className="mb-16 sm:mb-24">
+            <h2 className="text-2xl sm:text-3xl font-bold text-center text-foreground mb-10">
+              How to pre-drop on doba
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {howToSteps.map((step) => (
+                <div
+                  key={step.title}
+                  className="glass-surface p-6 sm:p-8 rounded-md border border-black/10 dark:border-white/5 bg-black/[0.02] dark:bg-white/5 text-center"
+                >
+                  <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-cyber-pink/10 flex items-center justify-center">
+                    <step.icon size={24} className="text-cyber-pink" />
+                  </div>
+                  <h3 className="text-lg font-bold text-foreground mb-2">{step.title}</h3>
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400">{step.description}</p>
+                </div>
+              ))}
             </div>
           </section>
 
