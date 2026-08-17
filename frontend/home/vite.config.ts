@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig, build, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import fs from "fs";
@@ -28,40 +28,78 @@ const prerenderRoutes = [
   "/privacy",
 ];
 
-// Lightweight prerender plugin using @prerenderer directly. vite-plugin-prerender
-// ships a broken ESM build, so we call the underlying renderer ourselves.
-function dobaPrerenderPlugin(): import("vite").Plugin {
+interface RenderResult {
+  html: string;
+  helmet: {
+    title?: { toString: () => string };
+    meta?: { toString: () => string };
+    link?: { toString: () => string };
+  } | null;
+}
+
+// SSR-based prerender plugin. We render each route with React's renderToString
+// instead of a headless browser, so the build works on Vercel where Chrome
+// system libraries are not available.
+function dobaPrerenderPlugin(): Plugin {
   return {
     name: "doba:prerender",
     apply: "build",
     enforce: "post",
     async closeBundle() {
-      const [{ default: Prerenderer }, { default: PuppeteerRenderer }] = await Promise.all([
-        import("@prerenderer/prerenderer"),
-        import("@prerenderer/renderer-puppeteer"),
-      ]);
-
-      const prerenderer = new Prerenderer({
-        staticDir: outDir,
-        renderer: new PuppeteerRenderer({
-          maxConcurrentRoutes: 4,
-          skipThirdPartyRequests: true,
-        }),
-      });
+      const ssrOutDir = path.resolve(__dirname, ".ssr");
 
       try {
-        await prerenderer.initialize();
-        const renderedRoutes = await prerenderer.renderRoutes(prerenderRoutes);
-        for (const route of renderedRoutes) {
-          const outputPath = path.join(outDir, route.route, "index.html");
+        // Build a tiny SSR bundle for the render entry point.
+        await build({
+          configFile: false,
+          root: __dirname,
+          logLevel: "warn",
+          plugins: [react()],
+          resolve: {
+            alias: {
+              "@": path.resolve(__dirname, "./src"),
+            },
+          },
+          build: {
+            ssr: path.resolve(__dirname, "./src/entry-server.tsx"),
+            outDir: ssrOutDir,
+            emptyOutDir: true,
+            rollupOptions: {
+              output: {
+                entryFileNames: "entry-server.js",
+                format: "esm",
+              },
+            },
+          },
+        });
+
+        const serverPath = path.resolve(ssrOutDir, "entry-server.js");
+        const { render } = await import(serverPath) as { render: (path: string) => RenderResult };
+
+        const template = fs.readFileSync(path.resolve(outDir, "index.html"), "utf-8");
+
+        for (const route of prerenderRoutes) {
+          const { html: body, helmet } = render(route);
+
+          const helmetTitle = helmet?.title?.toString() ?? "";
+          const helmetMeta = helmet?.meta?.toString() ?? "";
+          const helmetLink = helmet?.link?.toString() ?? "";
+
+          let html = template;
+          html = html.replace(/<title>.*?<\/title>/s, helmetTitle);
+          html = html.replace(/<\/head>/, `${helmetMeta}${helmetLink}</head>`);
+          html = html.replace(/<div id="root"><\/div>/, `<div id="root">${body}</div>`);
+
+          const outputPath = path.join(outDir, route, "index.html");
           fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-          fs.writeFileSync(outputPath, route.html.trim());
+          fs.writeFileSync(outputPath, html);
         }
       } catch (err) {
         console.error("[doba:prerender] failed:", err);
         throw err;
       } finally {
-        await prerenderer.destroy();
+        // Clean up the temporary SSR bundle; it is not needed at runtime.
+        fs.rmSync(ssrOutDir, { recursive: true, force: true });
       }
     },
   };
