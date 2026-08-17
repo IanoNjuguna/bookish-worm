@@ -8,7 +8,7 @@ export default function Docs() {
     <>
       <Helmet>
         <title>Docs | pre-drop your music on doba</title>
-        <meta name="description" content="Everything you need to know about using doba, from getting started to smart contract mechanics on Cardano." />
+        <meta name="description" content="Get started on doba with social login, or set up Eternl, Vespr, or Lace. Plus how doba works on Cardano." />
         <meta property="og:title" content="Documentation | Doba" />
         <meta property="og:description" content="Read the doba documentation: wallet setup, smart contracts, and how the platform works." />
         <meta property="og:type" content="website" />
@@ -41,13 +41,74 @@ export default function Docs() {
               To interact with doba:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-2 sm:ml-4 text-sm">
-              <li>Connect a wallet (Import or create a wallet if needed)</li>
-              <li>Fund your wallet with $ADA</li>
+              <li>
+                <strong>Recommended:</strong> Sign up with your email, Discord, or Twitter account — no seed phrase or extension required.
+              </li>
+              <li>Or connect an existing self-custody wallet such as Eternl, Vespr, or Lace.</li>
+              <li>Fund your wallet with $ADA to collect or release music.</li>
             </ul>
           </section>
 
           <section className="glass-surface p-6 sm:p-8 rounded-md border border-black/10 dark:border-white/5 bg-black/[0.02] dark:bg-white/5">
-            <h2 className="text-2xl font-bold text-cyber-pink mb-4">2. Smart Contract Mechanics</h2>
+            <h2 className="text-2xl font-bold text-cyber-pink mb-4">2. Wallet Setup</h2>
+            <p className="mb-4">
+              If you prefer to use your own wallet instead of the one created through social login, set up one of these self-custody wallets:
+            </p>
+
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-bold text-foreground mb-2">
+                  <a href="https://eternl.io" target="_blank" rel="noreferrer" className="text-cyber-pink hover:underline">Eternl</a>{" "}
+                  (browser extension)
+                </h3>
+                <ol className="list-decimal list-inside space-y-1 ml-2 sm:ml-4 text-sm text-zinc-600 dark:text-zinc-300">
+                  <li>Install the Eternl extension from the Chrome Web Store or{" "}<a href="https://eternl.io" target="_blank" rel="noreferrer" className="text-cyber-pink hover:underline">eternl.io</a>.</li>
+                  <li>Open Eternl and select <strong>Create Wallet</strong> (or <strong>Restore</strong> if you already have a seed phrase).</li>
+                  <li>Write down your 24-word recovery phrase and store it somewhere safe and offline.</li>
+                  <li>Set a strong spending password.</li>
+                  <li>Copy your wallet’s receive address.</li>
+                  <li>Buy ADA on an exchange and withdraw it to your receive address.</li>
+                </ol>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-foreground mb-2">
+                  <a href="https://vespr.xyz" target="_blank" rel="noreferrer" className="text-cyber-pink hover:underline">Vespr</a>{" "}
+                  (mobile, desktop & browser)
+                </h3>
+                <ol className="list-decimal list-inside space-y-1 ml-2 sm:ml-4 text-sm text-zinc-600 dark:text-zinc-300">
+                  <li>Download Vespr from the{" "}<a href="https://vespr.xyz" target="_blank" rel="noreferrer" className="text-cyber-pink hover:underline">official site</a>{" "}or your app store.</li>
+                  <li>Tap <strong>Create New Wallet</strong> and follow the onboarding prompts.</li>
+                  <li>Securely back up your recovery phrase.</li>
+                  <li>Enable biometric lock if available.</li>
+                  <li>Copy your Cardano receive address.</li>
+                  <li>Send ADA to that address from an exchange or another wallet.</li>
+                </ol>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-foreground mb-2">
+                  <a href="https://www.lace.io" target="_blank" rel="noreferrer" className="text-cyber-pink hover:underline">Lace</a>{" "}
+                  (browser extension by IOG)
+                </h3>
+                <ol className="list-decimal list-inside space-y-1 ml-2 sm:ml-4 text-sm text-zinc-600 dark:text-zinc-300">
+                  <li>Install Lace from{" "}<a href="https://www.lace.io" target="_blank" rel="noreferrer" className="text-cyber-pink hover:underline">lace.io</a>{" "}or the Chrome Web Store.</li>
+                  <li>Launch the extension and choose <strong>Create Wallet</strong>.</li>
+                  <li>Save your recovery phrase in a secure, offline location.</li>
+                  <li>Set a password.</li>
+                  <li>Open the wallet and copy your receive address.</li>
+                  <li>Fund the wallet with ADA from an exchange.</li>
+                </ol>
+              </div>
+            </div>
+
+            <p className="mt-6 text-sm text-zinc-500 dark:text-zinc-400">
+              <strong>Security note:</strong> Doba will never ask for your recovery phrase or private keys. Store them offline and never share them.
+            </p>
+          </section>
+
+          <section className="glass-surface p-6 sm:p-8 rounded-md border border-black/10 dark:border-white/5 bg-black/[0.02] dark:bg-white/5">
+            <h2 className="text-2xl font-bold text-cyber-pink mb-4">3. Smart Contract Mechanics</h2>
             <p className="mb-4">
               Doba uses smart contracts to enforce:
             </p>

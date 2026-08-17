@@ -33,10 +33,53 @@ export default function HowItWorks() {
         </h1>
 
         <div className="space-y-10 text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">
-          {/* For Fans */}
+          {/* For Artists */}
           <section className="space-y-6">
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">For Artists</h2>
+
+            <div className="space-y-4">
+              <div className="glass-surface p-6 rounded-md border border-black/10 dark:border-white/5 bg-black/[0.02] dark:bg-white/5">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-md bg-lavender text-black flex items-center justify-center text-lg font-extrabold shrink-0">
+                    1
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-foreground mb-1">Connect Wallet</h3>
+                    <p className="text-sm">Sign in with your Cardano wallet to manage releases and receive payouts.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="glass-surface p-6 rounded-md border border-black/10 dark:border-white/5 bg-black/[0.02] dark:bg-white/5">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-md bg-lavender text-black flex items-center justify-center text-lg font-extrabold shrink-0">
+                    2
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-foreground mb-1">Upload & Set Splits</h3>
+                    <p className="text-sm">Upload audio files, artwork, and set automated collaborator revenue splits.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="glass-surface p-6 rounded-md border border-black/10 dark:border-white/5 bg-black/[0.02] dark:bg-white/5">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-md bg-lavender text-black flex items-center justify-center text-lg font-extrabold shrink-0">
+                    3
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-foreground mb-1">Earn Instantly</h3>
+                    <p className="text-sm">Keep 90% of primary sales and earn 5% perpetual secondary royalties paid directly to your wallet.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* For Fans */}
+          <section className="border-t border-black/10 dark:border-white/10 pt-10 space-y-6">
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">For Fans</h2>
-            
+
             <div className="space-y-4">
               <div className="glass-surface p-6 rounded-md border border-black/10 dark:border-white/5 bg-black/[0.02] dark:bg-white/5">
                 <div className="flex items-start gap-4">
@@ -85,49 +128,6 @@ export default function HowItWorks() {
                   <div>
                     <h3 className="text-xl font-bold text-foreground mb-1">Own & Enjoy</h3>
                     <p className="text-sm">Download lossless audio files (WAV/FLAC), listen offline, and hold or trade your music NFTs anytime.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* For Artists */}
-          <section className="border-t border-black/10 dark:border-white/10 pt-10 space-y-6">
-            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">For Artists</h2>
-            
-            <div className="space-y-4">
-              <div className="glass-surface p-6 rounded-md border border-black/10 dark:border-white/5 bg-black/[0.02] dark:bg-white/5">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-md bg-lavender text-black flex items-center justify-center text-lg font-extrabold shrink-0">
-                    1
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-foreground mb-1">Connect Wallet</h3>
-                    <p className="text-sm">Sign in with your Cardano wallet to manage releases and receive payouts.</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="glass-surface p-6 rounded-md border border-black/10 dark:border-white/5 bg-black/[0.02] dark:bg-white/5">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-md bg-lavender text-black flex items-center justify-center text-lg font-extrabold shrink-0">
-                    2
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-foreground mb-1">Upload & Set Splits</h3>
-                    <p className="text-sm">Upload audio files, artwork, and set automated collaborator revenue splits.</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="glass-surface p-6 rounded-md border border-black/10 dark:border-white/5 bg-black/[0.02] dark:bg-white/5">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-md bg-lavender text-black flex items-center justify-center text-lg font-extrabold shrink-0">
-                    3
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-foreground mb-1">Earn Instantly</h3>
-                    <p className="text-sm">Keep 90% of primary sales and earn 5% perpetual secondary royalties paid directly to your wallet.</p>
                   </div>
                 </div>
               </div>

@@ -5,12 +5,32 @@ import VantaBackground from "@/components/doba/VantaBackground";
 
 const faqs = [
   {
-    q: "What wallet do I need to sign in?",
-    a: "You need a compatible wallet seed phrase or an email address."
+    q: "What is a pre-drop?",
+    a: "A pre-drop is a release of music on doba before it is officially distributed on major streaming platforms. Artists build momentum with super fans, and fans collect the track as a song token."
+  },
+  {
+    q: "How do I sign in?",
+    a: "You can sign up with your email, Discord, or Twitter account. If you already have a self-custody wallet, you can connect Eternl, Vespr, or Lace instead."
+  },
+  {
+    q: "Do I need a Cardano wallet?",
+    a: "Not to get started. Social login creates a wallet behind the scenes. If you prefer full self-custody, you can connect your own Cardano wallet at any time."
   },
   {
     q: "How do artists get paid?",
-    a: "Payments are settled instantly in $ADA when a fan purchases a music NFT."
+    a: "Artists keep 90% of primary sales and earn 5% royalties on every secondary resale. Payments settle instantly in ADA through smart contracts."
+  },
+  {
+    q: "What blockchain does doba use?",
+    a: "Doba runs on Cardano. We use native eUTXO smart contracts for deterministic revenue splits and royalty enforcement."
+  },
+  {
+    q: "Can I resell music I collect?",
+    a: "Yes. Every song token can be traded on secondary marketplaces that support Cardano NFTs. The original artist earns a royalty on each resale."
+  },
+  {
+    q: "Is doba free for fans?",
+    a: "Streaming on doba is free. Collecting a song token requires purchasing it in ADA, which supports the artist directly."
   }
 ];
 
@@ -19,7 +39,7 @@ export default function FAQ() {
     <>
       <Helmet>
         <title>FAQ | pre-drop your music on doba</title>
-        <meta name="description" content="Find answers to frequently asked questions about doba wallets, payments, and music NFTs." />
+        <meta name="description" content="Find answers about pre-drops, social login, wallets, payments, and music NFTs on doba." />
         <meta property="og:title" content="FAQ | Doba" />
         <meta property="og:description" content="Answers to common questions about using doba." />
         <meta property="og:type" content="website" />
