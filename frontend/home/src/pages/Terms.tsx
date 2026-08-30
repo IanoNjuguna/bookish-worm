@@ -1,7 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import Navbar from "@/components/doba/Navbar";
-import Footer from "@/components/doba/Footer";
-import VantaBackground from "@/components/doba/VantaBackground";
+import PageLayout from "@/components/doba/PageLayout";
 
 export default function Terms() {
   return (
@@ -21,11 +19,7 @@ export default function Terms() {
         <link rel="canonical" href="https://doba.world/terms" />
       </Helmet>
 
-      <div className="min-h-screen relative overflow-hidden flex flex-col justify-between">
-      <VantaBackground />
-      <Navbar />
-
-      <main className="pt-32 sm:pt-40 pb-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
+      <PageLayout>
 
         <h1 className="text-4xl sm:text-5xl font-black mb-8 text-foreground tracking-tight">
           Terms of Service
@@ -87,10 +81,7 @@ export default function Terms() {
             <p className="text-sm">We may update these Terms of Service from time to time. Continued use of doba after changes constitutes acceptance of the updated terms.</p>
           </section>
         </div>
-      </main>
-
-      <Footer />
-    </div>
+      </PageLayout>
     </>
   );
 }

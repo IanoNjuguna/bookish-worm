@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
-import Navbar from "@/components/doba/Navbar";
-import Footer from "@/components/doba/Footer";
-import VantaBackground from "@/components/doba/VantaBackground";
+import PageLayout from "@/components/doba/PageLayout";
 import { IconDownload, IconArrowUpRight, IconMusic, IconUsers, IconCoin } from "@tabler/icons-react";
 
 
@@ -120,29 +118,24 @@ export default function MediaKit() {
         <link rel="canonical" href="https://doba.world/media-kit" />
       </Helmet>
 
-      <div className="min-h-screen relative overflow-x-hidden flex flex-col justify-between">
-      <VantaBackground />
-      <Navbar />
-
-      {/* Side nav pill (xl screens) */}
-      <nav aria-label="Media kit sections" className="hidden xl:flex fixed right-6 top-1/2 -translate-y-1/2 z-40 flex-col gap-0.5 glass-surface bg-white/80 dark:bg-[#0D0D12]/85 border border-black/10 dark:border-white/15 rounded-2xl p-2 shadow-lg dark:shadow-2xl">
-        {SECTIONS.map(([id, label]) => (
-          <a
-            key={id}
-            href={`#${id}`}
-            aria-current={activeSection === id ? "true" : undefined}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-              activeSection === id
-                ? "text-cyber-pink font-bold bg-cyber-pink/5 dark:bg-cyber-pink/10"
-                : "text-zinc-600 dark:text-zinc-300 hover:text-cyber-pink hover:bg-black/5 dark:hover:bg-white/10"
-            }`}
-          >
-            {label}
-          </a>
-        ))}
-      </nav>
-
-      <main className="pt-32 sm:pt-40 pb-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto w-full space-y-14">
+      <PageLayout maxWidth="5xl" className="space-y-14">
+        {/* Side nav pill (xl screens) */}
+        <nav aria-label="Media kit sections" className="hidden xl:flex fixed right-6 top-1/2 -translate-y-1/2 z-40 flex-col gap-0.5 glass-surface bg-white/80 dark:bg-[#0D0D12]/85 border border-black/10 dark:border-white/15 rounded-2xl p-2 shadow-lg dark:shadow-2xl">
+          {SECTIONS.map(([id, label]) => (
+            <a
+              key={id}
+              href={`#${id}`}
+              aria-current={activeSection === id ? "true" : undefined}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                activeSection === id
+                  ? "text-cyber-pink font-bold bg-cyber-pink/5 dark:bg-cyber-pink/10"
+                  : "text-zinc-600 dark:text-zinc-300 hover:text-cyber-pink hover:bg-black/5 dark:hover:bg-white/10"
+              }`}
+            >
+              {label}
+            </a>
+          ))}
+        </nav>
         {/* Mobile section nav (< xl) */}
         <nav aria-label="Media kit sections" className="xl:hidden sticky top-3 z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 flex gap-1.5 overflow-x-auto no-scrollbar">
           {SECTIONS.map(([id, label]) => (
@@ -474,10 +467,7 @@ export default function MediaKit() {
           or{" "}
           <a href="https://x.com/doba_DAO" target="_blank" rel="noreferrer" className="text-cyber-pink hover:underline font-semibold">X</a>.
         </p>
-      </main>
-
-      <Footer />
-    </div>
+      </PageLayout>
     </>
   );
 }

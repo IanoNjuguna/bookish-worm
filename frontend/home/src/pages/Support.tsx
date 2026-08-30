@@ -1,7 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import Navbar from "@/components/doba/Navbar";
-import Footer from "@/components/doba/Footer";
-import VantaBackground from "@/components/doba/VantaBackground";
+import PageLayout from "@/components/doba/PageLayout";
 
 export default function Support() {
   return (
@@ -21,11 +19,7 @@ export default function Support() {
         <link rel="canonical" href="https://doba.world/support" />
       </Helmet>
 
-      <div className="min-h-screen relative overflow-hidden flex flex-col justify-between">
-      <VantaBackground />
-      <Navbar />
-
-      <main className="pt-32 sm:pt-40 pb-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
+      <PageLayout>
 
         <h1 className="text-4xl sm:text-5xl font-black mb-4 text-foreground tracking-tight">
           Support & Help Center
@@ -43,10 +37,7 @@ export default function Support() {
             </a>
           </section>
         </div>
-      </main>
-
-      <Footer />
-    </div>
+      </PageLayout>
     </>
   );
 }

@@ -1,8 +1,6 @@
 import { Helmet } from "react-helmet-async";
-import Navbar from "@/components/doba/Navbar";
+import PageLayout from "@/components/doba/PageLayout";
 import PreDropSection from "@/components/doba/PreDropSection";
-import Footer from "@/components/doba/Footer";
-import VantaBackground from "@/components/doba/VantaBackground";
 import FullscreenToggle from "@/components/doba/FullscreenToggle";
 
 const Index = () => {
@@ -23,17 +21,9 @@ const Index = () => {
         <link rel="canonical" href="https://doba.world/" />
       </Helmet>
 
-      <div className="min-h-screen selection:bg-cyber-pink/30 relative">
-        <VantaBackground />
-        <FullscreenToggle />
-
-        {/* Content */}
-        <div className="relative z-10">
-          <Navbar />
-          <PreDropSection />
-          <Footer />
-        </div>
-      </div>
+      <PageLayout floating={<FullscreenToggle />}>
+        <PreDropSection />
+      </PageLayout>
     </>
   );
 };
