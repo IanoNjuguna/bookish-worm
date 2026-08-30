@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { ProfileEditor } from '@/components/ProfileEditor'
 import { useTranslations } from 'next-intl'
-import { useAudio } from '@/components/AudioProvider'
+import { useAudio } from '@/components/audio'
 import { Button } from '@/components/ui/button'
 import { IconUser as User } from '@tabler/icons-react'
 import { useCardano } from '@/components/Providers'

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { SendFunds } from '@/components/SendFunds'
 import { useTranslations } from 'next-intl'
-import { useAudio } from '@/components/AudioProvider'
+import { useAudio } from '@/components/audio'
 import { IconCurrencyDollar as DollarSign, IconCornerDownLeft } from '@tabler/icons-react'
 import { Link } from '@/i18n/navigation'
 import PagePanel from '@/components/PagePanel'

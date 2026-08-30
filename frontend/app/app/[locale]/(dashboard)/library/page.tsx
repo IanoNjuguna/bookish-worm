@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import MyStudioGrid from '@/components/MyStudioGrid'
 import { useTranslations } from 'next-intl'
-import { useAudio } from '@/components/AudioProvider'
+import { useAudio } from '@/components/audio'
 import { IconPlaylistAdd as Library } from '@tabler/icons-react'
 
 export default function LibraryDashboard() {

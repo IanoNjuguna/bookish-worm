@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import MarketplaceGrid from '@/components/MarketplaceGrid'
-import { useAudio } from '@/components/AudioProvider'
+import { useAudio } from '@/components/audio'
 
 export default function HomeDashboard() {
   const { playerState, handlePlayTrack, isSidebarOpen } = useAudio()

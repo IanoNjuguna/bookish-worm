@@ -1,9 +1,9 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import UploadView from '@/components/UploadView'
+import UploadView from '@/components/upload'
 import { useTranslations } from 'next-intl'
-import { useAudio } from '@/components/AudioProvider'
+import { useAudio } from '@/components/audio'
 import { Button } from '@/components/ui/button'
 import { IconMusic as Music } from '@tabler/icons-react'
 import PagePanel from '@/components/PagePanel'
