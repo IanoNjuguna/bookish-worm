@@ -1,79 +1,21 @@
-import { logger } from '@/lib/logger'
-import React, { useEffect, useState } from 'react'
-import { IconMusic } from '@tabler/icons-react'
+'use client'
+
+import React from 'react'
 import SongCard from './SongCard'
-import { useAudio } from './AudioProvider'
-
-interface Track {
-	token_id: number
-	name: string
-	artist: string
-	image_url: string
-	audio_url: string
-	streaming_url?: string
-	description?: string
-	genre?: string
-	tx_hash?: string
-	price?: string
-	uploader_address?: string
-}
-
-interface MyUploadsGridProps {
-	address?: string
-	onUploadsLoaded?: (hasUploads: boolean) => void
-}
-
-const API_URL = '/api-backend'
+import { useMyUploadsGrid } from './my-uploads-grid/useMyUploadsGrid'
+import { UploadsSkeleton } from './my-uploads-grid/UploadsSkeleton'
+import { UploadsEmptyState } from './my-uploads-grid/UploadsEmptyState'
+import type { MyUploadsGridProps } from './my-uploads-grid/MyUploadsGrid.types'
 
 export default function MyUploadsGrid({ address, onUploadsLoaded }: MyUploadsGridProps) {
-	const { playerState, handlePlayTrack } = useAudio()
-	const [uploads, setUploads] = useState<Track[]>([])
-	const [loading, setLoading] = useState(true)
-
-	useEffect(() => {
-		const fetchUploads = async () => {
-			if (!address) {
-				setLoading(false)
-				onUploadsLoaded?.(false)
-				return
-			}
-
-			try {
-				const fetchUrl = `${API_URL.replace(/\/$/, '')}/songs?artist=${address}`
-				const res = await fetch(fetchUrl)
-				if (!res.ok) throw new Error('Failed to fetch user uploads')
-				const userTracks: Track[] = await res.json()
-				setUploads(userTracks)
-				onUploadsLoaded?.(userTracks.length > 0)
-			} catch (error) {
-				logger.error('Profile: Error fetching uploads', error)
-				onUploadsLoaded?.(false)
-			} finally {
-				setLoading(false)
-			}
-		}
-
-		fetchUploads()
-	}, [address])
+	const { uploads, loading, playerState, handlePlayTrack } = useMyUploadsGrid({ address, onUploadsLoaded })
 
 	if (loading) {
-		return (
-			<div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-6">
-				{[...Array(6)].map((_, i) => (
-					<div key={i} className="aspect-[3/4] glass animate-pulse rounded-xl" />
-				))}
-			</div>
-		)
+		return <UploadsSkeleton />
 	}
 
 	if (!uploads.length) {
-		return (
-			<div className="glass p-12 text-center rounded-2xl bg-midnight/[0.02] dark:bg-white/[0.02] border border-midnight/[0.08] dark:border-white/[0.08] shadow-xl">
-				<IconMusic className="w-12 h-12 mx-auto mb-4 text-midnight/50 dark:text-white/20" />
-				<h3 className="text-xl font-semibold mb-2">No Uploads Yet</h3>
-				<p className="text-midnight/70 dark:text-white/40 italic text-sm">You haven't published any songs on Doba. Head to the Upload tab to mint your first track!</p>
-			</div>
-		)
+		return <UploadsEmptyState />
 	}
 
 	return (
