@@ -124,7 +124,7 @@ export function useBackendAuth() {
 
 	const login = useCallback(async function loginFn(isRetry = false): Promise<string | null> {
 		if (!isConnected || !effectiveAddress) {
-			toast.error('Please connect your Cardano wallet first')
+			toast.error('Please sign in')
 			return null
 		}
 
@@ -214,8 +214,24 @@ export function useBackendAuth() {
 			toast.success('Successfully authenticated!')
 			return data.accessToken
 		} catch (err: any) {
+			const message = err?.message || err?.toString?.() || ''
+			const lower = message.toLowerCase()
+			const isCancellation =
+				lower.includes('declined') ||
+				lower.includes('cancelled') ||
+				lower.includes('canceled') ||
+				lower.includes('rejected') ||
+				lower.includes('abort')
+
+			if (isCancellation) {
+				console.log('Sign-in cancelled by user')
+				toast.info('You declined to sign in.')
+				setIsLoading(false)
+				return null
+			}
+
 			console.error('Login error:', err)
-			toast.error(err?.message || 'Authentication failed. Please try again.')
+			toast.error(message || 'Authentication failed. Please try again.')
 			setIsLoading(false)
 			return null
 		}
