@@ -1,6 +1,8 @@
 // Minimal onboarding event log — localStorage now, backend seam later.
 // Buffer is capped at 100 events; flushToBackend() is the future handoff point.
 
+import { DISMISS_KEY, SEEN_KEY } from '@/components/onboarding-checklist/OnboardingChecklist.constants'
+
 const KEY = 'doba_onboarding_events'
 
 export type OnboardingEventName =
@@ -49,6 +51,18 @@ export function markCollected() {
       logOnboardingEvent('first_collect_detected')
     }
     window.dispatchEvent(new CustomEvent(COLLECT_EVENT))
+  } catch {
+    // Non-critical
+  }
+}
+
+export function resetOnboarding() {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.removeItem(DISMISS_KEY)
+    localStorage.removeItem(COLLECT_KEY)
+    localStorage.removeItem(SEEN_KEY)
+    window.location.reload()
   } catch {
     // Non-critical
   }
