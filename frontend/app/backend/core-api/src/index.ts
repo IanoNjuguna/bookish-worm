@@ -4,7 +4,7 @@ import { cors } from 'hono/cors'
 import { rateLimiter } from 'hono-rate-limiter'
 import { bodyLimit } from 'hono/body-limit'
 import { z } from 'zod'
-import { getTrack, addTrack, getAllTracks, deleteTrack, deleteAllTracks, getUser, addUser, getTrackCollaborators, addCollaborator, isAdmin, type Track, type RefreshToken, addRefreshToken, getRefreshToken, revokeRefreshToken, revokeRefreshTokenFamily, addMint, getUserMints, addPlay, getAnalytics, getMonthlyBillboard, createAuthNonce, consumeAuthNonce, cleanupExpiredNonces } from './database'
+import { getTrack, addTrack, getAllTracks, deleteTrack, deleteAllTracks, getUser, addUser, getTrackCollaborators, addCollaborator, isAdmin, type Track, type RefreshToken, addRefreshToken, getRefreshToken, revokeRefreshToken, revokeRefreshTokenFamily, addMint, getUserMints, addPlay, getAnalytics, createAuthNonce, consumeAuthNonce, cleanupExpiredNonces } from './database'
 import { verifyOwnershipOnChain, getRemainingFractionsOnChain } from './web3'
 import { verifyWalletSignature, signJWT, verifyJWT, generateRefreshToken, getAccessTokenPayload } from './auth'
 import axios from 'axios'
@@ -541,8 +541,9 @@ app.get('/songs', async (c) => {
   const tracksWithOwnership = await Promise.all(tracks.map(async track => {
     const parentId = track.album_id ? Number(track.album_id) : null
     const isUploader = Boolean(userAddress && track.uploader_address && track.uploader_address.toLowerCase() === userAddress.toLowerCase())
-    const isOwned = isUploader || userMints.includes(track.token_id) || (parentId !== null && userMints.includes(parentId))
-    
+    const isMinted = userMints.includes(track.token_id) || (parentId !== null && userMints.includes(parentId))
+    const isOwned = isUploader || isMinted
+
     let mintCount = track.mint_count || 0
     if (track.splitter) {
       try {
@@ -559,6 +560,7 @@ app.get('/songs', async (c) => {
     return {
       ...resolveTrackAddress(track),
       is_owned: isOwned,
+      is_minted: isMinted,
       mint_count: mintCount
     }
   }))
@@ -653,17 +655,6 @@ app.post('/songs/:id/play', async (c) => {
   } catch (error: any) {
     logger.error(`Failed to record play for track ${id}`, error)
     return c.json({ error: 'Failed to record play' }, 500)
-  }
-})
-
-app.get('/analytics/billboard/:address', async (c) => {
-  const address = c.req.param('address')
-  try {
-    const billboard = await getMonthlyBillboard(address)
-    return c.json(billboard)
-  } catch (error: any) {
-    logger.error(`Failed to fetch billboard for ${address}`, error)
-    return c.json({ error: 'Failed to fetch billboard' }, 500)
   }
 })
 

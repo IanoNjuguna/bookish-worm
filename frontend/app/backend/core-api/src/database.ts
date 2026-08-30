@@ -592,34 +592,4 @@ export async function getAnalytics(artistAddress: string): Promise<any> {
   }
 }
 
-export async function getMonthlyBillboard(artistAddress: string): Promise<Track[]> {
-  // Get all tracks for this artist
-  const tracks = await getAllTracks({ artist: artistAddress })
-  const trackIds = tracks.map(t => t.token_id)
-
-  if (trackIds.length === 0) {
-    return []
-  }
-
-  const idsPlaceholder = trackIds.map(() => '?').join(',')
-
-  // Get top 7 tracks by plays in the last 30 days
-  const billboardRs = await db.execute({
-    sql: `
-      SELECT 
-        t.*,
-        COUNT(p.id) as play_count
-      FROM tracks t
-      LEFT JOIN plays p ON t.token_id = p.track_id AND p.timestamp >= DATE('now', '-30 days')
-      WHERE t.token_id IN (${idsPlaceholder})
-      GROUP BY t.token_id
-      ORDER BY play_count DESC, t.created_at DESC
-      LIMIT 7
-    `,
-    args: trackIds
-  })
-
-  return billboardRs.rows as unknown as Track[]
-}
-
 export default db
