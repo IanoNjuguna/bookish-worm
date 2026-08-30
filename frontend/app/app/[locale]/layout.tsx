@@ -1,6 +1,5 @@
 import React from "react"
 import type { Metadata, Viewport } from 'next'
-import localFont from 'next/font/local'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
@@ -8,56 +7,18 @@ import { routing } from '@/i18n/routing'
 
 import '../globals.css'
 import { Providers } from "@/components/Providers"
-import { AudioProvider } from "@/components/AudioProvider"
+import { AudioProvider } from "@/components/audio"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { ThemeProvider } from "@/components/ThemeProvider"
+import { GradientProvider } from "@/components/GradientProvider"
 import { ConsentAwareAnalytics } from "@/components/ConsentAwareAnalytics"
 import { CookieConsentBanner } from "@/components/CookieConsent"
 import { DynamicFavicon } from "@/components/DynamicFavicon"
 import { Toaster } from "@/components/ui/sonner"
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt"
 import VantaBackground from "@/components/VantaBackground"
-
-const chivo = localFont({
-	src: [
-		{ path: '../../public/fonts/Chivo-Regular.ttf', weight: '400', style: 'normal' },
-		{ path: '../../public/fonts/Chivo-Medium.ttf', weight: '500', style: 'normal' },
-		{ path: '../../public/fonts/Chivo-SemiBold.ttf', weight: '600', style: 'normal' },
-		{ path: '../../public/fonts/Chivo-Bold.ttf', weight: '700', style: 'normal' },
-	],
-	variable: '--font-chivo',
-	display: 'swap',
-})
-
-const ibmPlexMono = localFont({
-	src: [
-		{ path: '../../public/fonts/IBMPlexMono-Regular.ttf', weight: '400', style: 'normal' },
-		{ path: '../../public/fonts/IBMPlexMono-Medium.ttf', weight: '500', style: 'normal' },
-		{ path: '../../public/fonts/IBMPlexMono-SemiBold.ttf', weight: '600', style: 'normal' },
-	],
-	variable: '--font-ibm-plex-mono',
-	display: 'swap',
-})
-
-const spaceMono = localFont({
-	src: [
-		{ path: '../../public/fonts/SpaceMono-Regular.ttf', weight: '400', style: 'normal' },
-		{ path: '../../public/fonts/SpaceMono-Bold.ttf', weight: '700', style: 'normal' },
-	],
-	variable: '--font-space-mono',
-	display: 'swap',
-})
-
-const notoSansKr = localFont({
-	src: [
-		{ path: '../../public/fonts/NotoSansKR-Regular.ttf', weight: '400', style: 'normal' },
-		{ path: '../../public/fonts/NotoSansKR-Medium.ttf', weight: '500', style: 'normal' },
-		{ path: '../../public/fonts/NotoSansKR-Bold.ttf', weight: '700', style: 'normal' },
-	],
-	variable: '--font-noto-sans-kr',
-	display: 'swap',
-	preload: false,
-})
+import { chivo, ibmPlexMono, spaceMono, notoSansKr, RTL_LOCALES } from './layout.constants'
+import type { LocaleLayoutProps } from './layout.types'
 
 export const metadata: Metadata = {
 	metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://app.doba.world'),
@@ -114,12 +75,7 @@ export const viewport: Viewport = {
 	viewportFit: 'cover',
 }
 
-type Props = {
-	children: React.ReactNode
-	params: Promise<{ locale: string }>
-}
-
-export default async function LocaleLayout({ children, params }: Props) {
+export default async function LocaleLayout({ children, params }: LocaleLayoutProps) {
 	const { locale } = await params
 
 	if (!routing.locales.includes(locale as any)) {
@@ -128,19 +84,19 @@ export default async function LocaleLayout({ children, params }: Props) {
 
 	const messages = await getMessages()
 
-	// RTL languages
-	const rtlLocales = ['ar', 'he']
-	const dir = rtlLocales.includes(locale) ? 'rtl' : 'ltr'
+	const dir = RTL_LOCALES.includes(locale) ? 'rtl' : 'ltr'
 
 	return (
 		<html lang={locale} dir={dir} className={`${chivo.variable} ${spaceMono.variable} ${ibmPlexMono.variable} ${notoSansKr.variable}`} suppressHydrationWarning>
 			<body className="font-sans antialiased" suppressHydrationWarning>
 				<NextIntlClientProvider messages={messages}>
-					<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+					<ThemeProvider attribute="class" defaultTheme="dark">
 						<Providers>
 							<AudioProvider>
-								<VantaBackground />
-								{children}
+								<GradientProvider>
+									<VantaBackground />
+									{children}
+								</GradientProvider>
 							</AudioProvider>
 						</Providers>
 					</ThemeProvider>
