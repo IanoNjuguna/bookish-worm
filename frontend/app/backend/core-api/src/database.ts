@@ -45,6 +45,10 @@ async function init() {
     await db.execute('ALTER TABLE tracks ADD COLUMN track_number INTEGER')
   } catch (e) { /* ignore if column already exists */ }
 
+  try {
+    await db.execute('ALTER TABLE users ADD COLUMN artist_mode INTEGER DEFAULT 0')
+  } catch (e) { /* ignore if column already exists */ }
+
   await db.execute(`
     CREATE TABLE IF NOT EXISTS users (
       address TEXT PRIMARY KEY,
@@ -52,6 +56,7 @@ async function init() {
       bio TEXT,
       avatar_url TEXT,
       role TEXT DEFAULT 'user',
+      artist_mode INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `)
@@ -116,6 +121,23 @@ async function init() {
   await db.execute(`CREATE INDEX IF NOT EXISTS idx_mints_track_id ON mints(track_id)`)
   await db.execute(`CREATE INDEX IF NOT EXISTS idx_auth_nonces_expires ON auth_nonces(expires_at)`)
 
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS drafts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_address TEXT NOT NULL,
+      name TEXT,
+      type TEXT NOT NULL,
+      data_json TEXT NOT NULL,
+      audio_hash TEXT,
+      image_hash TEXT,
+      audio_filename TEXT,
+      image_filename TEXT,
+      streaming_url TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `)
+
   // Simple migrations
   const trackColumns = ['price', 'max_supply', 'splitter', 'tx_hash', 'uploader_address', 'uploader_payment_address', 'chain_id', 'streaming_url', 'ticker']
   for (const col of trackColumns) {
@@ -172,6 +194,7 @@ export interface User {
   bio?: string
   avatar_url?: string
   role?: 'admin' | 'user'
+  artist_mode?: boolean | number
 }
 
 export interface Collaborator {
@@ -187,6 +210,32 @@ export interface RefreshToken {
   family: string
   expires_at: number
   revoked: boolean
+}
+
+export interface Draft {
+  id: number
+  user_address: string
+  name?: string
+  type: 'single' | 'album'
+  data_json: string
+  audio_hash?: string
+  image_hash?: string
+  audio_filename?: string
+  image_filename?: string
+  streaming_url?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface DraftInput {
+  name?: string
+  type: 'single' | 'album'
+  data_json: string
+  audio_hash?: string
+  image_hash?: string
+  audio_filename?: string
+  image_filename?: string
+  streaming_url?: string
 }
 
 export async function getTrack(tokenId: number): Promise<Track | null> {
@@ -358,20 +407,22 @@ export async function getUser(address: string): Promise<User | null> {
 export async function addUser(user: User): Promise<void> {
   await db.execute({
     sql: `
-      INSERT INTO users (address, username, bio, avatar_url, role)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO users (address, username, bio, avatar_url, role, artist_mode)
+      VALUES (?, ?, ?, ?, ?, ?)
       ON CONFLICT(address) DO UPDATE SET
         username = excluded.username,
         bio = excluded.bio,
         avatar_url = excluded.avatar_url,
-        role = COALESCE(excluded.role, users.role)
+        role = COALESCE(excluded.role, users.role),
+        artist_mode = COALESCE(excluded.artist_mode, users.artist_mode)
     `,
     args: [
       user.address,
       user.username ?? null,
       user.bio ?? null,
       user.avatar_url ?? null,
-      user.role ?? 'user'
+      user.role ?? 'user',
+      user.artist_mode === true || user.artist_mode === 1 ? 1 : 0
     ]
   })
 }
@@ -590,6 +641,92 @@ export async function getAnalytics(artistAddress: string): Promise<any> {
     playsOverTime,
     topTracks
   }
+}
+
+export async function getDrafts(userAddress: string): Promise<Pick<Draft, 'id' | 'name' | 'type' | 'updated_at'>[]> {
+  const rs = await db.execute({
+    sql: `SELECT id, name, type, updated_at FROM drafts WHERE user_address = ? ORDER BY updated_at DESC`,
+    args: [String(userAddress).toLowerCase()]
+  })
+  return rs.rows.map(row => ({
+    id: Number(row.id),
+    name: row.name ? String(row.name) : undefined,
+    type: String(row.type) as 'single' | 'album',
+    updated_at: String(row.updated_at)
+  }))
+}
+
+export async function getDraft(id: number, userAddress: string): Promise<Draft | null> {
+  const rs = await db.execute({
+    sql: `SELECT * FROM drafts WHERE id = ? AND user_address = ?`,
+    args: [id, String(userAddress).toLowerCase()]
+  })
+  if (!rs.rows[0]) return null
+  const row = rs.rows[0]
+  return {
+    id: Number(row.id),
+    user_address: String(row.user_address),
+    name: row.name ? String(row.name) : undefined,
+    type: String(row.type) as 'single' | 'album',
+    data_json: String(row.data_json),
+    audio_hash: row.audio_hash ? String(row.audio_hash) : undefined,
+    image_hash: row.image_hash ? String(row.image_hash) : undefined,
+    audio_filename: row.audio_filename ? String(row.audio_filename) : undefined,
+    image_filename: row.image_filename ? String(row.image_filename) : undefined,
+    streaming_url: row.streaming_url ? String(row.streaming_url) : undefined,
+    created_at: String(row.created_at),
+    updated_at: String(row.updated_at)
+  }
+}
+
+export async function createDraft(userAddress: string, draft: DraftInput): Promise<number> {
+  const rs = await db.execute({
+    sql: `
+      INSERT INTO drafts (user_address, name, type, data_json, audio_hash, image_hash, audio_filename, image_filename, streaming_url)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `,
+    args: [
+      String(userAddress).toLowerCase(),
+      draft.name ?? null,
+      draft.type,
+      draft.data_json,
+      draft.audio_hash ?? null,
+      draft.image_hash ?? null,
+      draft.audio_filename ?? null,
+      draft.image_filename ?? null,
+      draft.streaming_url ?? null
+    ]
+  })
+  return Number(rs.lastInsertRowid)
+}
+
+export async function updateDraft(id: number, userAddress: string, draft: DraftInput): Promise<void> {
+  await db.execute({
+    sql: `
+      UPDATE drafts
+      SET name = ?, type = ?, data_json = ?, audio_hash = ?, image_hash = ?, audio_filename = ?, image_filename = ?, streaming_url = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ? AND user_address = ?
+    `,
+    args: [
+      draft.name ?? null,
+      draft.type,
+      draft.data_json,
+      draft.audio_hash ?? null,
+      draft.image_hash ?? null,
+      draft.audio_filename ?? null,
+      draft.image_filename ?? null,
+      draft.streaming_url ?? null,
+      id,
+      String(userAddress).toLowerCase()
+    ]
+  })
+}
+
+export async function deleteDraft(id: number, userAddress: string): Promise<void> {
+  await db.execute({
+    sql: `DELETE FROM drafts WHERE id = ? AND user_address = ?`,
+    args: [id, String(userAddress).toLowerCase()]
+  })
 }
 
 export default db

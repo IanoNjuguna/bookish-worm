@@ -36,6 +36,31 @@ const nextConfig = {
         source: '/api-backend/:path*',
         destination: `${targetUrl}/:path*`,
       },
+      // Wallet sub-pages — explicit list so /wallet/profile is no longer routed
+      {
+        source: '/:locale/wallet/assets',
+        destination: '/:locale/assets',
+      },
+      {
+        source: '/wallet/assets',
+        destination: '/assets',
+      },
+      {
+        source: '/:locale/wallet/send-money',
+        destination: '/:locale/send-money',
+      },
+      {
+        source: '/wallet/send-money',
+        destination: '/send-money',
+      },
+      {
+        source: '/:locale/wallet/deposit',
+        destination: '/:locale/deposit',
+      },
+      {
+        source: '/wallet/deposit',
+        destination: '/deposit',
+      },
     ]
   },
   webpack: (config, { isServer }) => {

@@ -4,7 +4,7 @@ import { cors } from 'hono/cors'
 import { rateLimiter } from 'hono-rate-limiter'
 import { bodyLimit } from 'hono/body-limit'
 import { z } from 'zod'
-import { getTrack, addTrack, getAllTracks, deleteTrack, deleteAllTracks, getUser, addUser, getTrackCollaborators, addCollaborator, isAdmin, type Track, type RefreshToken, addRefreshToken, getRefreshToken, revokeRefreshToken, revokeRefreshTokenFamily, addMint, getUserMints, addPlay, getAnalytics, createAuthNonce, consumeAuthNonce, cleanupExpiredNonces } from './database'
+import { getTrack, addTrack, getAllTracks, deleteTrack, deleteAllTracks, getUser, addUser, getTrackCollaborators, addCollaborator, isAdmin, type Track, type RefreshToken, addRefreshToken, getRefreshToken, revokeRefreshToken, revokeRefreshTokenFamily, addMint, getUserMints, addPlay, getAnalytics, createAuthNonce, consumeAuthNonce, cleanupExpiredNonces, getDrafts, getDraft, createDraft, updateDraft, deleteDraft, type DraftInput } from './database'
 import { verifyOwnershipOnChain, getRemainingFractionsOnChain } from './web3'
 import { verifyWalletSignature, signJWT, verifyJWT, generateRefreshToken, getAccessTokenPayload } from './auth'
 import axios from 'axios'
@@ -16,6 +16,7 @@ const app = new Hono()
 // CORS: explicit origin allowlist
 const ALLOWED_ORIGINS = [
   'https://app.doba.world',
+  'https://studio.doba.world',
   'https://doba.world',
   'https://www.doba.world',
   'https://about.doba.world',
@@ -50,34 +51,54 @@ app.notFound((c) => {
 
 const JWT_SECRET = process.env.JWT_SECRET || 'doba-default-secret-change-me'
 
-// Derive cookie settings from environment
 const IS_PRODUCTION = process.env.NODE_ENV === 'production'
-const COOKIE_DOMAIN = IS_PRODUCTION ? '.doba.world' : undefined
+
+function cookieDomainForHost(host: string | undefined): string | undefined {
+  if (!host) return undefined
+  const hostWithoutPort = host.split(':')[0]
+  if (hostWithoutPort.endsWith('.doba.world')) return '.doba.world'
+  return undefined
+}
+
+function shouldSecureCookie(c: any): boolean {
+  const host = c.req.header('host') || ''
+  const hostWithoutPort = host.split(':')[0]
+  const isLocalDev =
+    host.endsWith(':3000') ||
+    host.endsWith(':3001') ||
+    hostWithoutPort === 'localhost'
+  const forwardedProto = c.req.header('x-forwarded-proto')
+  return !isLocalDev && forwardedProto === 'https'
+}
 
 function setRefreshCookie(c: any, token: string) {
   const maxAge = 30 * 24 * 60 * 60 // 30 days in seconds
+  const host = c.req.header('host')
+  const domain = cookieDomainForHost(host)
   const parts = [
     `doba_refresh_token=${token}`,
-    `Path=/auth`,
+    `Path=/`,
     `HttpOnly`,
     `SameSite=Strict`,
     `Max-Age=${maxAge}`,
   ]
-  if (IS_PRODUCTION) parts.push('Secure')
-  if (COOKIE_DOMAIN) parts.push(`Domain=${COOKIE_DOMAIN}`)
+  if (shouldSecureCookie(c)) parts.push('Secure')
+  if (domain) parts.push(`Domain=${domain}`)
   c.header('Set-Cookie', parts.join('; '))
 }
 
 function clearRefreshCookie(c: any) {
+  const host = c.req.header('host')
+  const domain = cookieDomainForHost(host)
   const parts = [
     `doba_refresh_token=`,
-    `Path=/auth`,
+    `Path=/`,
     `HttpOnly`,
     `SameSite=Strict`,
     `Max-Age=0`,
   ]
-  if (IS_PRODUCTION) parts.push('Secure')
-  if (COOKIE_DOMAIN) parts.push(`Domain=${COOKIE_DOMAIN}`)
+  if (shouldSecureCookie(c)) parts.push('Secure')
+  if (domain) parts.push(`Domain=${domain}`)
   c.header('Set-Cookie', parts.join('; '))
 }
 
@@ -299,7 +320,12 @@ app.post('/auth/refresh', async (c) => {
   const cookieMatch = cookieHeader.match(/doba_refresh_token=([^;]+)/)
   const refreshToken = body.refreshToken || (cookieMatch ? cookieMatch[1] : null)
 
-  if (!refreshToken) return c.json({ error: 'Refresh token required' }, 400)
+  logger.debug(`[AUTH REFRESH] host=${c.req.header('host')} hasCookie=${!!cookieMatch} tokenPrefix=${refreshToken ? refreshToken.slice(0, 8) : 'none'}`)
+
+  if (!refreshToken) {
+    logger.warn(`[AUTH REFRESH] No refresh token presented from ${c.req.header('host')}`)
+    return c.json({ error: 'Refresh token required' }, 400)
+  }
 
   const rtRecord = await getRefreshToken(refreshToken)
   if (!rtRecord) {
@@ -320,23 +346,14 @@ app.post('/auth/refresh', async (c) => {
     return c.json({ error: 'Refresh token expired' }, 401)
   }
 
-  // Rotate: revoke only the consumed token (not the whole family)
-  await revokeRefreshToken(rtRecord.token)
-
+  // Re-issue an access token using the existing refresh token.
+  // We intentionally do NOT rotate here so that users stay authenticated
+  // across multiple subdomains/tabs without race-revoking the token family.
   const address = rtRecord.user_address
   const accessToken = await signJWT(getAccessTokenPayload(address), JWT_SECRET)
-  const newRefreshTokenString = generateRefreshToken()
 
-  const newRt: RefreshToken = {
-    token: newRefreshTokenString,
-    user_address: address,
-    family: rtRecord.family,
-    expires_at: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60),
-    revoked: false
-  }
-  await addRefreshToken(newRt)
-
-  setRefreshCookie(c, newRefreshTokenString)
+  // Re-set the cookie to refresh its Max-Age on active use.
+  setRefreshCookie(c, rtRecord.token)
   return c.json({ accessToken, expiresIn: 15 * 60 })
 })
 
@@ -506,66 +523,71 @@ function resolveTrackAddress(track: any): any {
 }
 
 app.get('/songs', async (c) => {
-  const artist = c.req.query('artist')
-  const genre = c.req.query('genre')
-  const search = c.req.query('search')
-  const albumIdStr = c.req.query('album_id')
-  const album_id = albumIdStr && !isNaN(parseInt(albumIdStr)) ? parseInt(albumIdStr) : undefined
-  const limitStr = c.req.query('limit')
-  const limit = limitStr && !isNaN(parseInt(limitStr)) ? parseInt(limitStr) : undefined
-  const offsetStr = c.req.query('offset')
-  const offset = offsetStr && !isNaN(parseInt(offsetStr)) ? parseInt(offsetStr) : undefined
+  try {
+    const artist = c.req.query('artist')
+    const genre = c.req.query('genre')
+    const search = c.req.query('search')
+    const albumIdStr = c.req.query('album_id')
+    const album_id = albumIdStr && !isNaN(parseInt(albumIdStr)) ? parseInt(albumIdStr) : undefined
+    const limitStr = c.req.query('limit')
+    const limit = limitStr && !isNaN(parseInt(limitStr)) ? parseInt(limitStr) : undefined
+    const offsetStr = c.req.query('offset')
+    const offset = offsetStr && !isNaN(parseInt(offsetStr)) ? parseInt(offsetStr) : undefined
 
-  const tracks = await getAllTracks({
-    artist,
-    genre,
-    search,
-    album_id,
-    limit,
-    offset
-  })
+    const tracks = await getAllTracks({
+      artist,
+      genre,
+      search,
+      album_id,
+      limit,
+      offset
+    })
 
-  // Check ownership if user is authenticated
-  let userMints: number[] = []
-  let userAddress: string | null = null
-  const authHeader = c.req.header('Authorization')
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    const token = authHeader.split(' ')[1]
-    const payload = await verifyJWT(token, JWT_SECRET)
-    if (payload && payload.sub) {
-      userAddress = payload.sub as string
-      userMints = await getUserMints(userAddress)
-    }
-  }
-
-  const tracksWithOwnership = await Promise.all(tracks.map(async track => {
-    const parentId = track.album_id ? Number(track.album_id) : null
-    const isUploader = Boolean(userAddress && track.uploader_address && track.uploader_address.toLowerCase() === userAddress.toLowerCase())
-    const isMinted = userMints.includes(track.token_id) || (parentId !== null && userMints.includes(parentId))
-    const isOwned = isUploader || isMinted
-
-    let mintCount = track.mint_count || 0
-    if (track.splitter) {
-      try {
-        const remaining = await getRemainingFractionsOnChain(track.splitter, track.ticker || '', track.token_id)
-        if (remaining !== null) {
-          const maxSupply = Number(track.max_supply || 0)
-          mintCount = Math.max(0, maxSupply - remaining)
-        }
-      } catch (err) {
-        logger.error(`Error fetching remaining fractions for track ${track.token_id} in /songs`, err)
+    // Check ownership if user is authenticated
+    let userMints: number[] = []
+    let userAddress: string | null = null
+    const authHeader = c.req.header('Authorization')
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1]
+      const payload = await verifyJWT(token, JWT_SECRET)
+      if (payload && payload.sub) {
+        userAddress = payload.sub as string
+        userMints = await getUserMints(userAddress)
       }
     }
 
-    return {
-      ...resolveTrackAddress(track),
-      is_owned: isOwned,
-      is_minted: isMinted,
-      mint_count: mintCount
-    }
-  }))
+    const tracksWithOwnership = await Promise.all(tracks.map(async track => {
+      const parentId = track.album_id ? Number(track.album_id) : null
+      const isUploader = Boolean(userAddress && track.uploader_address && track.uploader_address.toLowerCase() === userAddress.toLowerCase())
+      const isMinted = userMints.includes(track.token_id) || (parentId !== null && userMints.includes(parentId))
+      const isOwned = isUploader || isMinted
 
-  return c.json(tracksWithOwnership)
+      let mintCount = track.mint_count || 0
+      if (track.splitter) {
+        try {
+          const remaining = await getRemainingFractionsOnChain(track.splitter, track.ticker || '', track.token_id)
+          if (remaining !== null) {
+            const maxSupply = Number(track.max_supply || 0)
+            mintCount = Math.max(0, maxSupply - remaining)
+          }
+        } catch (err) {
+          logger.error(`Error fetching remaining fractions for track ${track.token_id} in /songs`, err)
+        }
+      }
+
+      return {
+        ...resolveTrackAddress(track),
+        is_owned: isOwned,
+        is_minted: isMinted,
+        mint_count: mintCount
+      }
+    }))
+
+    return c.json(tracksWithOwnership)
+  } catch (err: any) {
+    logger.error(`[API ERROR] /songs?artist=${c.req.query('artist')}`, err)
+    return c.json({ error: 'Failed to fetch songs', message: err?.message || 'Unexpected error' }, 500)
+  }
 })
 
 // Health Check
@@ -668,6 +690,101 @@ app.get('/analytics', authMiddleware, async (c) => {
   } catch (error: any) {
     logger.error(`Failed to fetch analytics for ${artistAddress}`, error)
     return c.json({ error: 'Failed to fetch analytics' }, 500)
+  }
+})
+
+const draftSchema = z.object({
+  name: z.string().optional(),
+  type: z.enum(['single', 'album']),
+  data_json: z.string(),
+  audio_hash: z.string().optional(),
+  image_hash: z.string().optional(),
+  audio_filename: z.string().optional(),
+  image_filename: z.string().optional(),
+  streaming_url: z.string().optional(),
+})
+
+app.get('/drafts', authMiddleware, async (c) => {
+  const payload = c.get('jwtPayload')
+  const userAddress = payload.sub as string
+
+  try {
+    const drafts = await getDrafts(userAddress)
+    return c.json(drafts)
+  } catch (error: any) {
+    logger.error(`Failed to fetch drafts for ${userAddress}`, error)
+    return c.json({ error: 'Failed to fetch drafts' }, 500)
+  }
+})
+
+app.post('/drafts', authMiddleware, async (c) => {
+  const payload = c.get('jwtPayload')
+  const userAddress = payload.sub as string
+
+  try {
+    const body = await c.req.json()
+    const draft = draftSchema.parse(body)
+    const id = await createDraft(userAddress, draft as DraftInput)
+    return c.json({ id }, 201)
+  } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      return c.json({ error: 'Invalid draft data', details: error.errors }, 400)
+    }
+    logger.error(`Failed to create draft for ${userAddress}`, error)
+    return c.json({ error: 'Failed to create draft' }, 500)
+  }
+})
+
+app.get('/drafts/:id', authMiddleware, async (c) => {
+  const payload = c.get('jwtPayload')
+  const userAddress = payload.sub as string
+  const id = parseInt(c.req.param('id'))
+  if (isNaN(id)) return c.json({ error: 'Invalid draft ID' }, 400)
+
+  try {
+    const draft = await getDraft(id, userAddress)
+    if (!draft) return c.json({ error: 'Draft not found' }, 404)
+    return c.json(draft)
+  } catch (error: any) {
+    logger.error(`Failed to fetch draft ${id} for ${userAddress}`, error)
+    return c.json({ error: 'Failed to fetch draft' }, 500)
+  }
+})
+
+app.put('/drafts/:id', authMiddleware, async (c) => {
+  const payload = c.get('jwtPayload')
+  const userAddress = payload.sub as string
+  const id = parseInt(c.req.param('id'))
+  if (isNaN(id)) return c.json({ error: 'Invalid draft ID' }, 400)
+
+  try {
+    const body = await c.req.json()
+    const draft = draftSchema.parse(body)
+    const existing = await getDraft(id, userAddress)
+    if (!existing) return c.json({ error: 'Draft not found' }, 404)
+    await updateDraft(id, userAddress, draft as DraftInput)
+    return c.json({ success: true })
+  } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      return c.json({ error: 'Invalid draft data', details: error.errors }, 400)
+    }
+    logger.error(`Failed to update draft ${id} for ${userAddress}`, error)
+    return c.json({ error: 'Failed to update draft' }, 500)
+  }
+})
+
+app.delete('/drafts/:id', authMiddleware, async (c) => {
+  const payload = c.get('jwtPayload')
+  const userAddress = payload.sub as string
+  const id = parseInt(c.req.param('id'))
+  if (isNaN(id)) return c.json({ error: 'Invalid draft ID' }, 400)
+
+  try {
+    await deleteDraft(id, userAddress)
+    return c.json({ success: true })
+  } catch (error: any) {
+    logger.error(`Failed to delete draft ${id} for ${userAddress}`, error)
+    return c.json({ error: 'Failed to delete draft' }, 500)
   }
 })
 

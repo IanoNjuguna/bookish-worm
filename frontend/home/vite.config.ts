@@ -7,10 +7,7 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-// When building on Vercel, output to standard 'dist'; otherwise output to Go backend domain
-const outDir = process.env.VERCEL
-  ? path.resolve(__dirname, 'dist')
-  : path.resolve(__dirname, '../../backend/internal/domains/home/dist');
+const outDir = path.resolve(__dirname, 'dist');
 
 // Routes to prerender for SEO
 const prerenderRoutes = [
