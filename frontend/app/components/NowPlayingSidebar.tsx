@@ -29,7 +29,7 @@ export default function NowPlayingSidebar({ track, isVisible, onClose }: NowPlay
       className={cn(
         'fixed inset-x-3 top-20 bottom-3 z-[60] lg:static lg:inset-auto flex flex-col overflow-hidden transition-all duration-300 ease-in-out shrink-0 glass-surface rounded-2xl shadow-xl min-h-0',
         isVisible
-          ? 'opacity-100 translate-y-0 lg:translate-x-0 lg:w-80 lg:mt-24 lg:mr-4 lg:mb-28 lg:ml-0'
+          ? 'opacity-100 translate-y-0 lg:translate-x-0 lg:w-80 lg:mt-24 lg:mr-4 lg:mb-32 lg:ml-0'
           : 'opacity-0 pointer-events-none translate-y-6 lg:translate-y-0 lg:translate-x-4 lg:w-0 lg:m-0'
       )}
     >

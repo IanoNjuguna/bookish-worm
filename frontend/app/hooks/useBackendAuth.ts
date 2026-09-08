@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useCardano } from '@/components/Providers'
 import { toast } from 'sonner'
+import { logger } from '@/lib/logger'
 
 const API_URL = '/api-backend'
 const REFRESH_BUFFER_MS = 60_000 // Refresh 1 minute before expiry
@@ -41,6 +42,7 @@ export function useBackendAuth() {
 	// Silent session refresh using HTTP-only refresh token cookie
 	const refreshSession = useCallback(async (): Promise<string | null> => {
 		try {
+			logger.debug('[AUTH] Attempting silent refresh')
 			const res = await fetch(`${API_URL}/auth/refresh`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -48,6 +50,8 @@ export function useBackendAuth() {
 			})
 
 			if (!res.ok) {
+				const errorText = await res.text().catch(() => `status ${res.status}`)
+				logger.warn(`[AUTH] Silent refresh failed: ${errorText}`)
 				localStorage.removeItem('doba_auth_data')
 				setAccessToken(null)
 				setIsAuthenticated(false)
@@ -70,10 +74,13 @@ export function useBackendAuth() {
 				setAccessToken(data.accessToken)
 				setIsAuthenticated(true)
 				scheduleRefresh(authData)
+				logger.debug(`[AUTH] Silent refresh succeeded for ${authData.address}`)
 				return data.accessToken
 			}
+			logger.warn('[AUTH] Silent refresh returned no accessToken')
 			return null
 		} catch (err) {
+			logger.error('[AUTH] Silent refresh error', err)
 			localStorage.removeItem('doba_auth_data')
 			setAccessToken(null)
 			setIsAuthenticated(false)
@@ -81,38 +88,42 @@ export function useBackendAuth() {
 		}
 	}, [effectiveAddress, scheduleRefresh])
 
-	// Silent auth restoration from localStorage on mount & when wallet connects
+	// Silent auth restoration from localStorage on mount & when wallet connects.
+	// Also tries a cookie-backed silent refresh so users stay logged in across subdomains.
 	const [isCheckingAuth, setIsCheckingAuth] = useState(true)
 	useEffect(() => {
+		const finish = () => setIsCheckingAuth(false)
+
+		const applyStoredAuth = (authData: AuthData) => {
+			if (effectiveAddress && authData.address && authData.address.toLowerCase() !== effectiveAddress.toLowerCase()) {
+				localStorage.removeItem('doba_auth_data')
+				setAccessToken(null)
+				setIsAuthenticated(false)
+				finish()
+				return
+			}
+			setAccessToken(authData.accessToken)
+			setIsAuthenticated(true)
+			scheduleRefresh(authData)
+		}
+
 		const stored = localStorage.getItem('doba_auth_data')
 		if (stored) {
 			try {
 				const authData: AuthData = JSON.parse(stored)
 
-				if (effectiveAddress && authData.address && authData.address.toLowerCase() !== effectiveAddress.toLowerCase()) {
-					localStorage.removeItem('doba_auth_data')
-					setAccessToken(null)
-					setIsAuthenticated(false)
-					setIsCheckingAuth(false)
-					return
-				}
-
 				if (authData.expiresAt > Date.now() + REFRESH_BUFFER_MS) {
-					setAccessToken(authData.accessToken)
-					setIsAuthenticated(true)
-					setIsCheckingAuth(false)
-					scheduleRefresh(authData)
-				} else if (authData.expiresAt > Date.now()) {
-					refreshSession().finally(() => setIsCheckingAuth(false))
+					applyStoredAuth(authData)
+					finish()
 				} else {
-					refreshSession().finally(() => setIsCheckingAuth(false))
+					refreshSession().finally(finish)
 				}
 			} catch (e) {
 				localStorage.removeItem('doba_auth_data')
-				setIsCheckingAuth(false)
+				refreshSession().finally(finish)
 			}
 		} else {
-			setIsCheckingAuth(false)
+			refreshSession().finally(finish)
 		}
 	}, [effectiveAddress, refreshSession, scheduleRefresh])
 

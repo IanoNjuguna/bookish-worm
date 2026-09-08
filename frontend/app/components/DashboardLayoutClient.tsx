@@ -44,7 +44,10 @@ export default function DashboardLayoutClient({ children }: { children: ReactNod
 
         {/* Audio Player Footer */}
         {layout.playerState.currentTrack && (
-          <AudioPlayer playerState={layout.playerState} />
+          <AudioPlayer
+            playerState={layout.playerState}
+            desktopSidebarOpen={layout.desktopSidebarOpen}
+          />
         )}
       </div>
     </div>

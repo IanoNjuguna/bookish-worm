@@ -8,9 +8,10 @@ import type { AudioPlayerState } from './AudioPlayer.types'
 
 interface AudioPlayerProps {
   playerState: AudioPlayerState
+  desktopSidebarOpen?: boolean
 }
 
-export function AudioPlayer({ playerState }: AudioPlayerProps) {
+export function AudioPlayer({ playerState, desktopSidebarOpen }: AudioPlayerProps) {
   const player = usePlayerController(playerState)
 
   if (!player.track) return null
@@ -18,8 +19,9 @@ export function AudioPlayer({ playerState }: AudioPlayerProps) {
   return (
     <div
       className={cn(
-        'fixed bottom-3 left-3 right-3 lg:bottom-4 lg:left-6 lg:right-6 z-50 h-auto md:h-[90px] glass-surface bg-midnight/[0.02] dark:bg-white/[0.02] backdrop-blur-2xl shadow-lg pb-[env(safe-area-inset-bottom)] transition-all duration-300',
-        'opacity-100 translate-y-0 pointer-events-auto'
+        'fixed bottom-3 left-3 right-3 lg:bottom-4 lg:right-6 z-50 h-auto md:h-[90px] glass-surface bg-midnight/[0.02] dark:bg-white/[0.02] backdrop-blur-2xl shadow-lg pb-[env(safe-area-inset-bottom)] transition-all duration-300',
+        'opacity-100 translate-y-0 pointer-events-auto',
+        desktopSidebarOpen ? 'lg:left-[272px]' : 'lg:left-6'
       )}
     >
       <audio

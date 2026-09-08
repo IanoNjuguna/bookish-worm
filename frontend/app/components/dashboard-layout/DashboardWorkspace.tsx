@@ -26,7 +26,7 @@ export function DashboardWorkspace({
 
       {/* Content Area */}
       <main className="flex-1 overflow-y-auto outline-none lg:h-full">
-        <div className="pt-20 lg:pt-24 px-6 pb-24 max-w-7xl mx-auto">
+        <div className="pt-20 lg:pt-24 px-6 pb-32 md:pb-36 max-w-6xl mx-auto">
           {children}
         </div>
       </main>

@@ -1,14 +1,12 @@
 'use client'
 
-import { IconEdit, IconHelpCircle, IconNote, IconSettings } from '@tabler/icons-react'
+import { IconHelpCircle, IconNote } from '@tabler/icons-react'
 
 interface ProfileHeaderActionsProps {
-  onEdit: () => void
   onNote: () => void
-  onSettings: () => void
 }
 
-export function ProfileHeaderActions({ onEdit, onNote, onSettings }: ProfileHeaderActionsProps) {
+export function ProfileHeaderActions({ onNote }: ProfileHeaderActionsProps) {
   const base =
     'p-1.5 sm:p-2 text-midnight/50 dark:text-white/50 hover:text-midnight dark:hover:text-white hover:bg-midnight/5 dark:hover:bg-white/10 transition-colors rounded-lg'
 
@@ -25,12 +23,6 @@ export function ProfileHeaderActions({ onEdit, onNote, onSettings }: ProfileHead
       </a>
       <button type="button" onClick={onNote} className={base} title="A note from the founder">
         <IconNote size={16} className="sm:w-[18px] sm:h-[18px]" />
-      </button>
-      <button type="button" onClick={onSettings} className={base} title="Settings">
-        <IconSettings size={16} className="sm:w-[18px] sm:h-[18px]" />
-      </button>
-      <button type="button" onClick={onEdit} className={base} title="Edit Profile">
-        <IconEdit size={16} className="sm:w-[18px] sm:h-[18px]" />
       </button>
     </div>
   )

@@ -1,7 +1,7 @@
 'use client'
 
 import { ProfileHeader } from '../profile/ProfileHeader'
-import { WalletActions } from '../profile/WalletActions'
+import { ProfileActions } from '../profile/ProfileActions'
 import { ProfileUploads } from '../profile/ProfileUploads'
 import { SettingsDialog } from '../profile/SettingsDialog'
 import { FounderNoteDialog } from '../profile/FounderNoteDialog'
@@ -41,13 +41,17 @@ export function ProfileOverview({
         profile={profile}
         address={address}
         activeWalletIcon={activeWalletIcon}
-        onEdit={onEdit}
         onNote={() => dialogs.setIsNoteOpen(true)}
-        onSettings={() => dialogs.setIsSettingsOpen(true)}
         logout={logout}
       />
 
-      <WalletActions artistMode={artistMode} />
+      <ProfileActions
+        onEdit={onEdit}
+        onSettings={() => dialogs.setIsSettingsOpen(true)}
+        artistMode={artistMode}
+        onArtistModeToggle={onArtistModeToggle}
+        logout={logout}
+      />
       {hasUploads !== false && <ProfileUploads address={address} onUploadsLoaded={onUploadsLoaded} />}
 
       <SettingsDialog

@@ -17,11 +17,11 @@ interface WalletActionsProps {
 }
 
 function WalletAction({ href, icon, title, subtitle, shortTitle }: WalletActionProps) {
-  return (
-    <Link
-      href={href}
-      className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-2 sm:gap-3 p-3 sm:p-4 bg-midnight/5 dark:bg-white/5 hover:bg-midnight/10 dark:hover:bg-white/10 border border-midnight/10 dark:border-white/10 hover:border-lavender/50 transition-all duration-200 group rounded-xl"
-    >
+  const isExternal = href.startsWith('http')
+  const className = "flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-2 sm:gap-3 p-3 sm:p-4 bg-midnight/5 dark:bg-white/5 hover:bg-midnight/10 dark:hover:bg-white/10 border border-midnight/10 dark:border-white/10 hover:border-lavender/50 transition-all duration-200 group rounded-xl"
+
+  const content = (
+    <>
       <div className="p-2 sm:p-2.5 bg-cyber-pink text-midnight group-hover:scale-110 transition-transform duration-200 shrink-0 rounded-xl">
         {icon}
       </div>
@@ -32,6 +32,20 @@ function WalletAction({ href, icon, title, subtitle, shortTitle }: WalletActionP
         </div>
         <div className="hidden sm:block text-xs text-midnight/50 dark:text-white/40 mt-0.5">{subtitle}</div>
       </div>
+    </>
+  )
+
+  if (isExternal) {
+    return (
+      <a href={href} className={className}>
+        {content}
+      </a>
+    )
+  }
+
+  return (
+    <Link href={href} className={className}>
+      {content}
     </Link>
   )
 }
@@ -44,21 +58,21 @@ export function WalletActions({ artistMode }: WalletActionsProps) {
       </h4>
       <div id="profile-actions-bar" className="grid grid-cols-3 gap-2 sm:gap-4">
         <WalletAction
-          href="/send-money"
+          href="/wallet/send-money"
           icon={<IconCurrencyDollar size={18} className="sm:w-5 sm:h-5" />}
           title="Send Funds"
           shortTitle="Send"
           subtitle="Transfer ADA or assets"
         />
         <WalletAction
-          href="/deposit"
+          href="/wallet/deposit"
           icon={<IconPlus size={18} className="sm:w-5 sm:h-5" />}
           title="Deposit Funds"
           shortTitle="Deposit"
           subtitle="Add funds to wallet"
         />
         <WalletAction
-          href="/assets"
+          href="/wallet/assets"
           icon={<IconCoins size={18} className="sm:w-5 sm:h-5" />}
           title="View Assets"
           shortTitle="Assets"
@@ -67,21 +81,21 @@ export function WalletActions({ artistMode }: WalletActionsProps) {
         {artistMode && (
           <>
             <WalletAction
-              href="/upload"
+              href="https://studio.doba.world/upload"
               icon={<IconMusic size={18} className="sm:w-5 sm:h-5" />}
               title="Upload Track"
               shortTitle="Upload"
               subtitle="Publish new music"
             />
             <WalletAction
-              href="/earnings"
+              href="https://studio.doba.world/earnings"
               icon={<IconCurrencyDollar size={18} className="sm:w-5 sm:h-5" />}
               title="Earnings"
               shortTitle="Earnings"
               subtitle="Revenue & payouts"
             />
             <WalletAction
-              href="/analytics"
+              href="https://studio.doba.world/analytics"
               icon={<IconChartBar size={18} className="sm:w-5 sm:h-5" />}
               title="Analytics"
               shortTitle="Analytics"

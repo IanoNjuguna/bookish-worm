@@ -29,9 +29,13 @@ export function useMyUploadsGrid({ address, onUploadsLoaded }: MyUploadsGridProp
 			}
 
 			try {
-				const fetchUrl = `${API_URL.replace(/\/$/, '')}/songs?artist=${address}`
+				const fetchUrl = `${API_URL.replace(/\/$/, '')}/songs?artist=${encodeURIComponent(address)}`
 				const res = await fetch(fetchUrl)
-				if (!res.ok) throw new Error('Failed to fetch user uploads')
+				if (!res.ok) {
+					const text = await res.text().catch(() => '')
+					logger.error('Profile: Failed to fetch uploads', { status: res.status, statusText: res.statusText, body: text })
+					throw new Error(`Failed to fetch user uploads (${res.status})`)
+				}
 				const userTracks: Track[] = await res.json()
 				setUploads(userTracks)
 				onUploadsLoaded?.(userTracks.length > 0)

@@ -1,6 +1,7 @@
 'use client'
 
 import ConnectHeader from '@/components/ConnectHeader'
+import { HowItWorks } from './HowItWorks'
 
 interface MobileControlsProps {
   effectiveAddress?: string
@@ -17,6 +18,7 @@ export function MobileControls({
 }: MobileControlsProps) {
   return (
     <div className="lg:hidden flex items-center gap-2">
+      <HowItWorks />
       <ConnectHeader
         address={effectiveAddress || undefined}
         logout={handleLogout}

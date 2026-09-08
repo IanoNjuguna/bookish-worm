@@ -17,7 +17,9 @@
     "connectWallet": "Conecta Tu Billetera",
     "assets": "Activos",
     "sendLabel": "ENVIAR",
-    "depositLabel": "DEPOSITAR"
+    "depositLabel": "DEPOSITAR",
+    "drafts": "Borradores",
+    "howItWorks": "Cómo Funciona"
   },
   "header": {
     "loading": "Cargando...",
@@ -42,6 +44,22 @@
     "subtitle": "Encuentra artistas, canciones y colecciones",
     "comingSoon": "Búsqueda Próximamente",
     "comingSoonDesc": "La funcionalidad de búsqueda avanzada estará disponible pronto"
+  },
+  "studio": {
+    "title": "Studio",
+    "subtitle": "Manage your music, earnings, and insights",
+    "uploadTitle": "Upload",
+    "uploadSubtitle": "Release a new track",
+    "earningsTitle": "Earnings",
+    "earningsSubtitle": "Revenue and payouts",
+    "analyticsTitle": "Analytics",
+    "analyticsSubtitle": "Streams and insights",
+    "recentUploads": "Recent Uploads",
+    "newUpload": "New Upload",
+    "connectWallet": "Connect Your Wallet",
+    "connectToStudio": "Connect your wallet to open your studio",
+    "draftsTitle": "Drafts",
+    "draftsSubtitle": "Continue unfinished releases"
   },
   "upload": {
     "title": "Subir Música",
@@ -110,7 +128,40 @@
     "minting": "Acuñando...",
     "alreadyCollected": "Ya Coleccionado",
     "mintFirstCopy": "Acuñar Tu Primera Copia",
-    "mintingFailed": "Error al acuñar: {error}"
+    "mintingFailed": "Error al acuñar: {error}",
+    "wizard": {
+      "title": "Upload Release",
+      "stepFiles": "Files",
+      "stepDetails": "Details",
+      "stepMonetization": "Monetization",
+      "stepReview": "Review",
+      "back": "Back",
+      "next": "Next",
+      "publish": "Publish",
+      "publishing": "Publishing...",
+      "releaseType": "Release Type",
+      "releaseTypeHint": "Choose between a single track or a multi-track album.",
+      "mediaFiles": "Media Files",
+      "mediaFilesHint": "Upload your audio and cover art. Files upload in the background while you continue.",
+      "summaryTitle": "Title",
+      "summaryArtist": "Artist",
+      "summaryGenre": "Genre",
+      "summaryPrice": "Price",
+      "summarySupply": "Supply",
+      "summaryRoyalty": "Royalty Address",
+      "saving": "Saving...",
+      "saved": "Draft saved"
+    },
+    "drafts": {
+      "title": "Drafts",
+      "subtitle": "Continue working on your releases",
+      "newUpload": "New Upload",
+      "empty": "No drafts yet. Start a new upload to create one.",
+      "untitled": "Untitled draft",
+      "single": "Single",
+      "album": "Album",
+      "continue": "Continue"
+    }
   },
   "earnings": {
     "title": "Tus Ganancias",

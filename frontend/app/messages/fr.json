@@ -17,7 +17,9 @@
     "connectWallet": "Connectez Votre Portefeuille",
     "assets": "Actifs",
     "sendLabel": "ENVOYER",
-    "depositLabel": "DÉPÔT"
+    "depositLabel": "DÉPÔT",
+    "drafts": "Brouillons",
+    "howItWorks": "Comment Ça Marche"
   },
   "header": {
     "loading": "Chargement...",
@@ -43,6 +45,22 @@
     "comingSoon": "Recherche Bientôt Disponible",
     "comingSoonDesc": "La fonctionnalité de recherche avancée sera bientôt disponible"
   },
+  "studio": {
+    "title": "Studio",
+    "subtitle": "Manage your music, earnings, and insights",
+    "uploadTitle": "Upload",
+    "uploadSubtitle": "Release a new track",
+    "earningsTitle": "Earnings",
+    "earningsSubtitle": "Revenue and payouts",
+    "analyticsTitle": "Analytics",
+    "analyticsSubtitle": "Streams and insights",
+    "recentUploads": "Recent Uploads",
+    "newUpload": "New Upload",
+    "connectWallet": "Connect Your Wallet",
+    "connectToStudio": "Connect your wallet to open your studio",
+    "draftsTitle": "Drafts",
+    "draftsSubtitle": "Continue unfinished releases"
+  },
   "upload": {
     "title": "Télécharger de la Musique",
     "subtitle": "Créer et frapper votre propre NFT musical",
@@ -63,8 +81,8 @@
     "details": "Détails du Morceau",
     "trackTitleLabel": "Titre",
     "trackTitlePlaceholder": "Entrez le titre du morceau",
-    "descriptionLabel": "Lyrics",
-    "descriptionPlaceholder": "Décrivez votre morceau...",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Ajoutez une description, des crédits ou des notes...",
     "genreLabel": "Genre",
     "genrePlaceholder": "Sélectionner le genre",
     "releaseDateLabel": "Date de Sortie",
@@ -110,7 +128,40 @@
     "minting": "Frappe en cours...",
     "alreadyCollected": "Déjà Collecté",
     "mintFirstCopy": "Frapper Votre Premier Exemplaire",
-    "mintingFailed": "Échec de l'édition : {error}"
+    "mintingFailed": "Échec de l'édition : {error}",
+    "wizard": {
+      "title": "Upload Release",
+      "stepFiles": "Files",
+      "stepDetails": "Details",
+      "stepMonetization": "Monetization",
+      "stepReview": "Review",
+      "back": "Back",
+      "next": "Next",
+      "publish": "Publish",
+      "publishing": "Publishing...",
+      "releaseType": "Release Type",
+      "releaseTypeHint": "Choose between a single track or a multi-track album.",
+      "mediaFiles": "Media Files",
+      "mediaFilesHint": "Upload your audio and cover art. Files upload in the background while you continue.",
+      "summaryTitle": "Title",
+      "summaryArtist": "Artist",
+      "summaryGenre": "Genre",
+      "summaryPrice": "Price",
+      "summarySupply": "Supply",
+      "summaryRoyalty": "Royalty Address",
+      "saving": "Saving...",
+      "saved": "Draft saved"
+    },
+    "drafts": {
+      "title": "Drafts",
+      "subtitle": "Continue working on your releases",
+      "newUpload": "New Upload",
+      "empty": "No drafts yet. Start a new upload to create one.",
+      "untitled": "Untitled draft",
+      "single": "Single",
+      "album": "Album",
+      "continue": "Continue"
+    }
   },
   "earnings": {
     "title": "Vos Revenus",

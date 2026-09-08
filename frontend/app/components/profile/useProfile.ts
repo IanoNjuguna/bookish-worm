@@ -95,9 +95,11 @@ export function useProfile(address: string): UseProfileReturn {
       })
 
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}))
-        logger.error('Failed to save profile', { status: res.status, error: errorData })
-        throw new Error(errorData.message || 'Failed to save profile')
+        const text = await res.text().catch(() => '')
+        let errorData: any = {}
+        try { errorData = JSON.parse(text) } catch { errorData = { raw: text } }
+        logger.error('Failed to save profile', { status: res.status, statusText: res.statusText, error: errorData })
+        throw new Error(errorData.message || errorData.error || `Failed to save profile (${res.status})`)
       }
       return res
     },

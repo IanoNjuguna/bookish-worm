@@ -9,6 +9,7 @@ import type { SidebarFooterProps } from './SidebarFooter.types'
 export function SidebarFooter({ variant }: SidebarFooterProps) {
   const checklist = useOnboardingChecklist()
   const isDesktop = variant === 'desktop'
+  const isComplete = checklist.doneCount === checklist.steps.length
 
   return (
     <div
@@ -19,10 +20,12 @@ export function SidebarFooter({ variant }: SidebarFooterProps) {
       )}
     >
       {checklist.visible && (
+        <div className={cn('pt-3 pb-3', isDesktop && 'px-1')}>
+          <OnboardingChecklist {...checklist} />
+        </div>
+      )}
+      {isComplete && (
         <>
-          <div className={cn('pt-3 pb-3', isDesktop && 'px-1')}>
-            <OnboardingChecklist {...checklist} />
-          </div>
           <div
             className={cn(
               'border-t',
@@ -31,11 +34,11 @@ export function SidebarFooter({ variant }: SidebarFooterProps) {
                 : 'pt-4 border-transparent'
             )}
           />
+          <div className={cn(isDesktop && 'pl-3 pr-4')}>
+            <Footer />
+          </div>
         </>
       )}
-      <div className={cn(isDesktop && 'pl-3 pr-4')}>
-        <Footer />
-      </div>
     </div>
   )
 }

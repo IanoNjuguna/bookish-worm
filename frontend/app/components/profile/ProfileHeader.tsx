@@ -9,9 +9,7 @@ interface ProfileHeaderProps {
   address: string
   activeWalletIcon: string | null
   walletName?: string | null
-  onEdit: () => void
   onNote: () => void
-  onSettings: () => void
   logout: () => void
 }
 
@@ -19,15 +17,13 @@ export function ProfileHeader({
   profile,
   address,
   activeWalletIcon,
-  onEdit,
   onNote,
-  onSettings,
   logout,
 }: ProfileHeaderProps) {
   return (
     <div className="glass-surface p-6 sm:p-8 rounded-2xl shadow-xl relative">
       <div className="absolute top-4 right-4 sm:top-5 sm:right-6">
-        <ProfileHeaderActions onEdit={onEdit} onNote={onNote} onSettings={onSettings} />
+        <ProfileHeaderActions onNote={onNote} />
       </div>
 
       <div className="flex items-center gap-5 sm:gap-8 pr-14 sm:pr-28">

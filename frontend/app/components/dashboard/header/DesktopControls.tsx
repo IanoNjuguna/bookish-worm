@@ -2,6 +2,7 @@
 
 import ConnectHeader from '@/components/ConnectHeader'
 import { SidebarToggleButton } from './SidebarToggleButton'
+import { HowItWorks } from './HowItWorks'
 
 interface DesktopControlsProps {
   effectiveAddress?: string
@@ -18,6 +19,7 @@ export function DesktopControls({
 }: DesktopControlsProps) {
   return (
     <div className="hidden lg:flex items-center gap-3">
+      <HowItWorks />
       <ConnectHeader
         address={effectiveAddress || undefined}
         logout={handleLogout}
