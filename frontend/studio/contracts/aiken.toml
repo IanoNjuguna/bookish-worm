@@ -1,0 +1,14 @@
+name = "doba/frac"
+version = "0.0.0"
+license = "Apache-2.0"
+description = "Doba Protocol — fractionalized music NFT smart contracts"
+
+[repository]
+user = "doba-protocol"
+project = "frac"
+platform = "github"
+
+[[dependencies]]
+name = "aiken-lang/stdlib"
+version = "v2.1.0"
+source = "github"
