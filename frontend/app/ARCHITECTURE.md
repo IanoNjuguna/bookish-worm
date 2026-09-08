@@ -1,27 +1,12 @@
-# Reverse Proxy Matrix
+# App Architecture
 
-Next.js gives us Server-Side Rendering (SSR) out of the box, which is vital for an asset marketplace because it allows search engines and social platforms to cleanly scrape metadata tags (like OpenGraph token previews, prices, and imagery) from our asset pages.
+`frontend/app` is the fan and wallet Next.js application served at `app.doba.world`.
 
-However, Next.js relies on a persistent running server engine (Node.js) to handle that server-side rendering, we cannot embed a Next.js production app into a Go binary using `go:embed` the same way we did with the `about` subdomain.
+It handles:
+- Fan marketplace routes (home, library, search, track details)
+- Wallet and profile routes (`/wallet`, `/profile`, `/assets`, `/send-money`, `/deposit`)
+- Streaming and audio playback
 
-Here is exactly how this architecture changes and how our Go subdomains will interface with it:
+The artist studio has been extracted into a separate Next.js app at `frontend/studio` and is served at `studio.doba.world`.
 
-1. The server will not directly compile the app files into memory, but rather act as a Reverse Proxy for the `app` microservice.
-
-2. When an inbound request hits `app.doba.world`, the gateway will intercept it, forward the request internally to our running Next.js node application, grab the server-rendered HTML, and return it to the user.
-
-                    ┌─────────────────────────┐
-                    │    User Request         │
-                    └────────────┬────────────┘
-                                 │
-                                 ▼
-                    ┌─────────────────────────┐
-                    │    Go Router /          │
-                    │    Reverse Proxy        │
-                    └─────────────────────────┘
-                                 │
-                                 ▼
-                    ┌─────────────────────────┐
-                    │     Next.js Server      │
-                    │    Running Separately   │
-                    └─────────────────────────┘
+API calls are sent to `/api-backend/*`, which the Next.js app rewrites to the Core API service via `NEXT_PUBLIC_API_URL`.

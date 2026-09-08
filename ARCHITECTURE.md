@@ -2,15 +2,14 @@
 
 Doba utilizes Cardano as the settlement layer and IPFS for decentralized storage of metadata and media files.
 
-The protocol architecture is decoupled into an **API Gateway (Reverse Proxy)** and distinct microservices:
+The protocol architecture is decoupled into distinct off-chain services:
 
-## Off-Chain Microservices & Gateway
+## Off-Chain Services
 
-* **API Gateway / Reverse Proxy (Go):** The primary ingress listener at port `:8080`. Routes incoming HTTP requests based on host headers:
-  - `doba.world` ➔ Reverse proxy to **Home Service** (`HOME_SERVICE_URL`, default `:3001`).
-  - `app.doba.world` ➔ Reverse proxy to **App Microservice** (`APP_SERVICE_URL`, default `:3000`).
-* **Home Microservice (`frontend/home`):** Handles static, landing page, and marketing interactions (`doba.world`).
-* **App Microservice (`frontend/app`):** Next.js powered application handling the Cardano Web3 marketplace, studio portal, and streaming (`app.doba.world`).
+* **Marketing Site (`frontend/home`):** Vite + React SPA handling static, landing page, and marketing interactions (`doba.world`).
+* **App (`frontend/app`):** Next.js application handling the Cardano Web3 marketplace, wallet, and streaming for fans (`app.doba.world`).
+* **Studio (`frontend/studio`):** Standalone Next.js application for artists to upload, manage drafts, view analytics, and track earnings (`studio.doba.world`).
+* **Core API (`frontend/app/backend/core-api`):** Bun API service backing both apps. Each Next.js app rewrites `/api-backend/*` to this service via `NEXT_PUBLIC_API_URL`.
 * **Transaction Construction Pipeline:** A service that securely builds Cardano transactions based on backend states, passing raw unsigned transaction hex payloads back to the client.
 * **Data Indexer:** Indexes the Cardano blockchain to provide an analytics layer.
 
@@ -20,18 +19,18 @@ The protocol architecture is decoupled into an **API Gateway (Reverse Proxy)** a
 
 ```mermaid
 graph TD
-    %% Clients & Gateway
-    Client[Client Browser / Wallet] -->|Public Ingress :8080| Gateway[API Gateway / Go Reverse Proxy]
+    %% Clients
+    Client[Client Browser / Wallet] -->|doba.world| Home
+    Client -->|app.doba.world| App
+    Client -->|studio.doba.world| Studio
 
-    %% Microservices Layer
-    subgraph Microservices [Decoupled Microservices]
-        Home[Home Service - doba.world :3001]
-        App[App Marketplace Service - app.doba.world :3000]
+    %% Services Layer
+    subgraph Services [Off-Chain Services]
+        Home[Home Service - doba.world]
+        App[App Service - app.doba.world]
+        Studio[Studio Service - studio.doba.world]
+        API[Core API Service]
     end
-
-    %% Gateway Routing
-    Gateway -->|doba.world| Home
-    Gateway -->|app.doba.world| App
 
     %% Backend & On-Chain Integrations
     subgraph Backend [Backend Infrastructure]
@@ -44,9 +43,12 @@ graph TD
         Storage[(IPFS Storage)]
     end
 
-    App -->|Upload Media & Build Tx| TxPipe
-    TxPipe -->|Build Unsigned Payload| App
+    App -->|/api-backend/*| API
+    Studio -->|/api-backend/*| API
+    Studio -->|Upload Media & Build Tx| TxPipe
+    TxPipe -->|Build Unsigned Payload| Studio
     App -->|Sign & Submit| Client
+    Studio -->|Sign & Submit| Client
     Client -->|Execute Contract| C69Val
     C69Val -->|Sync State| DB
 ```

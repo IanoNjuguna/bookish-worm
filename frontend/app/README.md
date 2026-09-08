@@ -25,24 +25,23 @@ graph TD
     E <-->|PyCardano| F[Blockfrost / Cardano Network]
 ```
 
-### 1. Frontend Client (`/`)
-The user-facing application.
-- **Framework:** Next.js 14 (App Router)
+### 1. Frontend Client (`frontend/app`)
+The fan and wallet application served at `app.doba.world`.
+- **Framework:** Next.js 16 (App Router)
 - **Interface:** Tailwind CSS + custom Shadcn UI modifications
 - **Web3 Engine:** Lucid Evolution for CIP-30 wallet interactions
 - **Localization:** `next-intl` for multi-language support
 
-### 2. Core API (`/backend/core-api`)
+The artist studio is a separate Next.js app at `frontend/studio` (served at `studio.doba.world`).
+
+### 2. Core API (`frontend/app/backend/core-api`)
 A fast, lightweight data ingestion and session management layer.
 - **Runtime:** Bun
 - **Database:** SQLite (`doba.db`)
 - **Role:** Manages off-chain metadata, persistent user profiles, stream analytics, and cryptographic JWT issuance via native signature validation.
 
-### 3. Transaction Microservice (`/backend/tx-builder`)
-A transaction construction engine.
-- **Runtime:** Python 3.9+ / FastAPI
-- **SDK:** PyCardano
-- **Role:** Receives raw UTXOs, queries the database for accurate royalty distribution splits, and deterministically constructs balanced, unsigned CBOR transactions for client-side signing.
+### 3. Transaction Construction
+Transaction building is handled client-side via Lucid Evolution, with the core API providing pricing and collaborator split data through `/api-backend`.
 
 ---
 

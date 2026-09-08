@@ -26,7 +26,7 @@ If a rule feels needed in two skills, put it in the owning skill and cross-refer
 
 - `frontend/app` — Next.js 16 App Router app (alias `@/*` → `./*`, TypeScript strict, Tailwind v3, bun).
 - `frontend/home` — Vite + React SPA marketing site. **Not Next.js**: no `next/image`, `next/link`, or RSC conventions here.
-- `backend/` — Go backend.
+- `frontend/app/backend/core-api` — Bun API service backing the app.
 
 ## Verification gates
 

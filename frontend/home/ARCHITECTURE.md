@@ -1,27 +1,5 @@
-# Reverse Proxy Matrix
+# Marketing Site
 
-Next.js gives us Server-Side Rendering (SSR) out of the box, which is vital for an asset marketplace because it allows search engines and social platforms to cleanly scrape metadata tags (like OpenGraph token previews, prices, and imagery) from our asset pages.
+`frontend/home` is a Vite + React SPA that powers the public-facing marketing site (`doba.world`).
 
-However, because Next.js relies on a persistent running server engine (Node.js) to handle that server-side rendering, we cannot embed a Next.js production app into a Go binary using `go:embed` the same way we just did with the `about` subdomain.
-
-Here is exactly how this architecture changes and how our Go subdomains will interface with it:
-
-1. The server will not directly compile the app files into memory, but rather act as a Reverse Proxy for the `app` microservice.
-
-2. When an inbound request hits `app.doba.world`, the gateway will intercept it, forward the request internally to our running Next.js node application, grab the server-rendered HTML, and return it to the user.
-
-                    ┌─────────────────────────┐
-                    │    User Request         │
-                    └────────────┬────────────┘
-                                 │
-                                 ▼
-                    ┌─────────────────────────┐
-                    │    Go Router /          │
-                    │    Reverse Proxy        │
-                    └─────────────────────────┘
-                                 │
-                                 ▼
-                    ┌─────────────────────────┐
-                    │     Next.js Server      │
-                    │    Running Separately   │
-                    └─────────────────────────┘
+It is deployed separately from the Next.js app and is not involved in the `app.doba.world` / `studio.doba.world` subdomain routing, which is handled by `frontend/app/proxy.ts`.

@@ -17,7 +17,41 @@ by standard open-source citizenship: be respectful, constructive, and collaborat
 
 Before you start, please read the [`ARCHITECTURE`](ARCHITECTURE.md) doc to understand our technical approach.
 
-### 1. Find Something to Work On
+### 1. Local Development Setup
+
+**Prerequisites:** [Bun](https://bun.sh/) and Node.js.
+
+Install dependencies and start the desired app:
+
+```bash
+# Fan / wallet app (port 3000)
+cd frontend/app
+bun install
+bun dev
+
+# Studio app (port 3001)
+cd frontend/studio
+bun install
+bun dev
+```
+
+#### Testing domains locally
+
+To test `app.doba.world` and `studio.doba.world` locally, map the domains to `127.0.0.1` in `/etc/hosts`:
+
+```text
+127.0.0.1  app.doba.world
+127.0.0.1  studio.doba.world
+```
+
+Then visit:
+
+- `http://app.doba.world:3000` — fan/wallet app
+- `http://studio.doba.world:3001` — studio app (starts at `/`)
+
+Note: profile links to the studio use HTTPS, so clicking them locally will fail unless you temporarily change the studio links to `http://studio.doba.world:3001`.
+
+### 2. Find Something to Work On
 
 * Look through our **Issues** tab for open tasks.
 * Issues labeled `good first issue` are great jumping-off points for new contributors.
@@ -25,7 +59,7 @@ Before you start, please read the [`ARCHITECTURE`](ARCHITECTURE.md) doc to under
 
 If you're not sure where to start, check out our socials and ask.
 
-### 2. Fork and Clone
+### 3. Fork and Clone
 
 Fork the repository to your own GitHub account, then clone it locally:
 
@@ -34,7 +68,7 @@ git clone [https://github.com/YOUR-USERNAME/doba-protocol.git](https://github.co
 cd doba-protocol
 ```
 
-### 3. Branching
+### 4. Branching
 
 Create a new branch for each feature or fix:
 
@@ -42,7 +76,7 @@ Create a new branch for each feature or fix:
 git checkout -b feature/your-feature-name
 ```
 
-### 4. Commit Messages
+### 5. Commit Messages
 
 Follow conventional commits:
 
@@ -56,7 +90,7 @@ test: adding or correcting tests
 chore: build process or auxiliary tools and libraries
 ```
 
-### 5. Pull Requests
+### 6. Pull Requests
 
 Once your changes are ready, open a PR:
 
@@ -68,7 +102,7 @@ How it was tested.
 Link any related issues.
 Keep PRs focused. Small, incremental PRs are easier to review and merge.
 
-### 6. Testing
+### 7. Testing
 
 All code must pass existing tests and should include new tests if applicable.
 
