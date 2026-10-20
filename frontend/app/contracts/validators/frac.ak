@@ -2,20 +2,26 @@ use aiken/collection/dict
 use aiken/collection/list
 use aiken/crypto.{VerificationKeyHash}
 use cardano/address.{Address, Script, VerificationKey}
-use cardano/assets.{AssetName, PolicyId}
+use cardano/assets.{AssetName, PolicyId, Value}
 use cardano/assets
 use cardano/transaction.{InlineDatum, OutputReference, Transaction, placeholder, Input, Output, NoDatum}
 use frac/okapi as ok
 
 // ─── Minting Policy ───────────────────────────────────────────────────────────
+//
+// Parameters (all baked into the policy id, so every release gets its own):
+//   owner        – creator PKH, must sign every mint/burn
+//   token_name   – CIP-68 base token name; ref/frac names are derived from it
+//   max_supply   – the cap, enforced here at mint time
+//   seed         – output reference spent by the mint. A UTxO can only be spent
+//                  once, so this policy can mint exactly once: the cap is
+//                  structural, not a promise.
+//
+// A release minted under this policy has max_supply fractions, forever.
 
 pub type MintAction {
   action: Int,
   // 1 = Mint, any other = Burn
-  amount: Int,
-  // number of fractional tokens to mint/burn
-  token_name: ByteArray,
-  // base token name (e.g. "FTOIC01")
 }
 
 pub type TokenDatum {
@@ -23,51 +29,64 @@ pub type TokenDatum {
   version: Int,
 }
 
-validator fraction_minting(owner: VerificationKeyHash) {
-  mint(r: MintAction, policy_id: PolicyId, transaction: Transaction) {
-    let Transaction { mint, outputs, .. } = transaction
+/// True if this output carries exactly one reference token with an inline CIP-68 datum.
+fn ref_output_ok(output: Output, policy_id: PolicyId, ref_asset_name: AssetName) -> Bool {
+  if assets.quantity_of(output.value, policy_id, ref_asset_name) == 1 {
+    when output.datum is {
+      InlineDatum(raw) -> {
+        expect _datum: TokenDatum = raw
+        True
+      }
+      _ -> False
+    }
+  } else {
+    False
+  }
+}
 
-    expect [
-      Pair(ref_asset_name, ref_amount), Pair(frac_asset_name, frac_amount),
-    ] =
+validator fraction_minting(
+  owner: VerificationKeyHash,
+  token_name: ByteArray,
+  max_supply: Int,
+  seed: OutputReference,
+) {
+  mint(r: MintAction, policy_id: PolicyId, transaction: Transaction) {
+    let Transaction { mint, outputs, inputs, .. } = transaction
+
+    let token_names = ok.fraction_token_prefix(token_name)
+    expect [ref_asset_name, frac_asset_name] = token_names
+
+    expect [Pair(minted_ref_name, minted_ref_qty), Pair(minted_frac_name, minted_frac_qty)] =
       mint
         |> assets.tokens(policy_id)
         |> dict.to_pairs()
 
-    expect ok.tx_signed_by(transaction, owner)
-
     when r.action is {
       1 -> {
-        expect
+        // one-shot: the seed UTxO must be consumed here, and a UTxO can only be
+        // consumed once, so no second mint of this policy can ever validate
+        let seed_spent = list.any(inputs, fn(i) { i.output_reference == seed })
+        // the cap is a parameter, and the whole supply must be minted at once
+        let amounts_ok =
+          minted_ref_name == ref_asset_name && minted_ref_qty == 1 && minted_frac_name == frac_asset_name && minted_frac_qty == max_supply
+        let ref_output_present =
+          list.any(outputs, fn(o) { ref_output_ok(o, policy_id, ref_asset_name) })
+        let frac_output_present =
           list.any(
             outputs,
-            fn(output) {
-              expect InlineDatum(datum) = output.datum
-              expect _datum: TokenDatum = datum
-              assets.quantity_of(output.value, policy_id, ref_asset_name) == 1
-            },
+            fn(o) { assets.quantity_of(o.value, policy_id, frac_asset_name) == max_supply },
           )
-        expect
-          list.any(
-            outputs,
-            fn(output) {
-              assets.quantity_of(output.value, policy_id, frac_asset_name) == r.amount
-            },
-          )
-        let token_name_list = ok.fraction_token_prefix(r.token_name)
-        let ref_tn_check =
-          ok.compare_token_names(ref_asset_name, list.at(token_name_list, 0))
-        let frac_tn_check =
-          ok.compare_token_names(frac_asset_name, list.at(token_name_list, 1))
-        ref_amount == 1 && frac_amount == r.amount && ref_tn_check && frac_tn_check
+
+        ok.tx_signed_by(transaction, owner) && max_supply > 0 && seed_spent && amounts_ok && ref_output_present && frac_output_present
       }
       _ -> {
-        let token_name_list = ok.fraction_token_prefix(r.token_name)
-        let ref_tn_check =
-          ok.compare_token_names(ref_asset_name, list.at(token_name_list, 0))
-        let frac_tn_check =
-          ok.compare_token_names(frac_asset_name, list.at(token_name_list, 1))
-        ref_amount == -1 && frac_amount == -r.amount && ref_tn_check && frac_tn_check
+        // Burn: never positive, at most the single reference token, never more
+        // than the cap of fractions, and at least something must be burned
+        let burn_amounts_ok =
+          minted_ref_qty <= 0 && minted_ref_qty >= -1 && minted_frac_qty <= 0 && minted_frac_qty >= -max_supply
+        let burns_something = minted_ref_qty < 0 || minted_frac_qty < 0
+
+        ok.tx_signed_by(transaction, owner) && minted_ref_name == ref_asset_name && minted_frac_name == frac_asset_name && burn_amounts_ok && burns_something
       }
     }
   }
@@ -966,3 +985,201 @@ test test_buy_fails_double_satisfaction() {
 
 
 
+
+// ─── MINTING POLICY TESTS ────────────────────────────────────────────────────
+//
+// The cap is structural: the policy id bakes in (base name, max_supply, seed),
+// and the seed UTxO must be consumed by the mint, so a second mint of the same
+// release can never validate.
+
+const mint_base_name: ByteArray = #"46544f49433031" // "FTOIC01"
+const mint_cap: Int = 100
+
+fn mint_seed() -> OutputReference {
+  OutputReference { transaction_id: #"2222", output_index: 0 }
+}
+
+fn mint_ref_name() -> AssetName {
+  #"000643b046544f49433031"
+}
+
+fn mint_frac_name() -> AssetName {
+  #"001bc28046544f49433031"
+}
+
+fn seed_input() -> Input {
+  Input {
+    output_reference: mint_seed(),
+    output: Output {
+      address: get_owner_address(),
+      value: assets.from_lovelace(5_000_000),
+      datum: NoDatum,
+      reference_script: None,
+    },
+  }
+}
+
+fn minted_value(ref_qty: Int, frac_qty: Int) -> Value {
+  assets
+    .zero
+    |> assets.add(mock_policy, mint_ref_name(), ref_qty)
+    |> assets.add(mock_policy, mint_frac_name(), frac_qty)
+}
+
+fn mint_outputs(frac_qty: Int) -> List<Output> {
+  [
+    Output {
+      address: make_distro_address(#"ffff"),
+      value: assets.from_lovelace(2_000_000) |> assets.add(mock_policy, mint_ref_name(), 1),
+      datum: InlineDatum(TokenDatum { metadata: [], version: 1 }),
+      reference_script: None,
+    },
+    Output {
+      address: make_distro_address(#"eeee"),
+      value: assets.from_lovelace(2_000_000) |> assets.add(mock_policy, mint_frac_name(), frac_qty),
+      datum: InlineDatum(DisDatum { price_lovelace: 5_000_000 }),
+      reference_script: None,
+    },
+  ]
+}
+
+fn mint_tx(inputs: List<Input>, mint_value: Value, frac_qty: Int) -> Transaction {
+  Transaction {
+    ..placeholder,
+    inputs: inputs,
+    outputs: mint_outputs(frac_qty),
+    mint: mint_value,
+    extra_signatories: [test_owner_pkh],
+  }
+}
+
+test mint_exact_cap_succeeds() {
+  let tx = mint_tx([seed_input()], minted_value(1, mint_cap), mint_cap)
+  fraction_minting.mint(
+    test_owner_pkh,
+    mint_base_name,
+    mint_cap,
+    mint_seed(),
+    MintAction { action: 1 },
+    mock_policy,
+    tx,
+  )
+}
+
+test mint_fails_without_seed_input() {
+  let other_input = Input {
+    output_reference: OutputReference { transaction_id: #"3333", output_index: 0 },
+    output: Output {
+      address: get_owner_address(),
+      value: assets.from_lovelace(5_000_000),
+      datum: NoDatum,
+      reference_script: None,
+    },
+  }
+  let tx = mint_tx([other_input], minted_value(1, mint_cap), mint_cap)
+  !fraction_minting.mint(
+    test_owner_pkh,
+    mint_base_name,
+    mint_cap,
+    mint_seed(),
+    MintAction { action: 1 },
+    mock_policy,
+    tx,
+  )
+}
+
+test mint_fails_over_cap() {
+  let over = mint_cap + 1
+  let tx = mint_tx([seed_input()], minted_value(1, over), over)
+  !fraction_minting.mint(
+    test_owner_pkh,
+    mint_base_name,
+    mint_cap,
+    mint_seed(),
+    MintAction { action: 1 },
+    mock_policy,
+    tx,
+  )
+}
+
+test mint_fails_under_cap() {
+  let under = mint_cap - 1
+  let tx = mint_tx([seed_input()], minted_value(1, under), under)
+  !fraction_minting.mint(
+    test_owner_pkh,
+    mint_base_name,
+    mint_cap,
+    mint_seed(),
+    MintAction { action: 1 },
+    mock_policy,
+    tx,
+  )
+}
+
+test mint_fails_without_owner_signature() {
+  let tx = Transaction {
+    ..mint_tx([seed_input()], minted_value(1, mint_cap), mint_cap),
+    extra_signatories: [test_buyer_pkh],
+  }
+  !fraction_minting.mint(
+    test_owner_pkh,
+    mint_base_name,
+    mint_cap,
+    mint_seed(),
+    MintAction { action: 1 },
+    mock_policy,
+    tx,
+  )
+}
+
+test mint_fails_when_name_differs_from_param() {
+  // redeemer no longer carries the name; the policy param decides it, so a
+  // mint of a different base name under this policy cannot validate
+  let wrong_name_value =
+    assets
+      .zero
+      |> assets.add(mock_policy, mint_ref_name(), 1)
+      |> assets.add(mock_policy, #"001bc28057524f4e47", mint_cap)
+  let tx = mint_tx([seed_input()], wrong_name_value, mint_cap)
+  !fraction_minting.mint(
+    test_owner_pkh,
+    mint_base_name,
+    mint_cap,
+    mint_seed(),
+    MintAction { action: 1 },
+    mock_policy,
+    tx,
+  )
+}
+
+test burn_ref_and_fractions_succeeds() {
+  let tx = Transaction {
+    ..mint_tx([seed_input()], minted_value(-1, -mint_cap), 0),
+    outputs: [],
+  }
+  fraction_minting.mint(
+    test_owner_pkh,
+    mint_base_name,
+    mint_cap,
+    mint_seed(),
+    MintAction { action: 2 },
+    mock_policy,
+    tx,
+  )
+}
+
+test burn_fails_when_positive() {
+  let tx = Transaction {
+    ..mint_tx([seed_input()], minted_value(-1, mint_cap), 0),
+    outputs: [],
+  }
+  !fraction_minting.mint(
+    test_owner_pkh,
+    mint_base_name,
+    mint_cap,
+    mint_seed(),
+    MintAction { action: 2 },
+    mock_policy,
+    tx,
+  )
+}

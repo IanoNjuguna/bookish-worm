@@ -100,24 +100,28 @@ Controls the minting and burning of both the reference token and the fractional 
 
 * **Parameters:**
   * `owner: VerificationKeyHash` — The public key hash of the creator who has exclusive permission to mint (represented by the `owner` parameter in Aiken).
+  * `token_name: ByteArray` — The base token name of the release (e.g. `"FTOIC01"`). Both CIP-68 names are derived from it.
+  * `max_supply: Int` — The release's cap. Enforced at mint time; the policy can never mint more.
+  * `seed: OutputReference` — An output reference that the mint must consume.
+
+  Because all four are baked into the policy id, **every release has its own policy id**. The `seed` makes the policy one-shot: a UTxO can only be spent once, so the policy can only mint once, which makes the cap structural rather than a promise.
 * **Redeemer (`MintAction`):**
   ```rust
   pub type MintAction {
     action: Int,       // 1 = Mint, any other = Burn
-    amount: Int,       // The number of fractional tokens to mint/burn
-    token_name: ByteArray, // The base token name (e.g. "FTOIC01")
   }
   ```
 * **Validation Logic:**
   * **Minting (`r.action == 1`)**:
     * Verifies that the transaction is signed by the creator (`owner`).
-    * Expects exactly two assets to be minted under the policy ID: one reference token (qty = 1) and one fractional token (qty = `r.amount`).
-    * Verifies that the token names are correctly formed (the reference token prefix matches `100` and the fractional token prefix matches `444` using `ok.fraction_token_prefix`).
-    * Verifies that the reference token is sent to an output containing an inline datum matching `TokenDatum` (metadata).
-    * Verifies that the fractional tokens are sent to another output.
+    * Verifies that the transaction spends the `seed` output reference (one-shot).
+    * Requires `max_supply > 0`, and expects exactly two assets minted under the policy: the reference token with qty `1` and the fractional token with qty exactly `max_supply`. Partial or over-mints fail.
+    * Verifies that both token names match `ok.fraction_token_prefix(token_name)`.
+    * Verifies that the reference token is sent to an output carrying an inline datum matching `TokenDatum` (metadata).
+    * Verifies that the full `max_supply` of fractional tokens is sent to an output.
   * **Burning (`r.action != 1`)**:
     * Verifies that the transaction is signed by the creator (`owner`).
-    * Assures that exactly `1` reference token and `r.amount` fractional tokens are burned (`ref_amount == -1 && frac_amount == -r.amount`).
+    * Requires both amounts to be non-positive: at most `1` reference token and at most `max_supply` fractional tokens, and at least one of them negative.
 
 ---
 
