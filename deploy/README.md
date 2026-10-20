@@ -21,6 +21,29 @@ Access session. Templates live in `deploy/hosts/`:
     deploy.sh             pull artifact, atomic symlink swap, health check, rollback
     tunnel.md             tunnel per host, ingress map, Access application
 
+### Release pipeline
+
+`.github/workflows/release.yml` builds each app and uploads
+`s3://<bucket>/<app>/<sha>.tar.gz`. That file is what `deploy.sh` consumes; the box
+never builds and never holds AWS keys — it reads the bucket with its instance role.
+
+Deploys are a **manual** run of the same workflow (`workflow_dispatch`), because a
+green build is not permission to restart a box. The deploy job sends an SSM command
+that runs `deploy/hosts/release.sh <app>`, which updates the checkout and hands off to
+`deploy.sh` for the symlink swap, health check and rollback.
+
+Repository variables it needs:
+
+    AWS_RELEASE_BUCKET   bookish-worm-releases
+    AWS_REGION           eu-west-1
+    AWS_ROLE_ARN         OIDC role trusted for this repo, s3:PutObject on the bucket
+    ADMIN_INSTANCE_ID    optional; enables the deploy job for admin
+    APP_INSTANCE_ID      optional; enables it for app and studio
+
+Only `admin` is in the matrix today. `app` and `studio` are commented out with a
+reason: they do not emit standalone output yet, and adding them early would fail the
+standalone check on every push to main.
+
 ### Builds do not happen on the boxes
 
 `next build` on a t3.micro swaps and often OOMs. CI builds the standalone bundle and
