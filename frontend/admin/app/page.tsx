@@ -1,18 +1,33 @@
 import { BandOne } from '@/components/band-one';
 import { Conversion, ReleaseList } from '@/components/evidence';
 import { HealthStrip } from '@/components/health-strip';
+import { Heatmap } from '@/components/heatmap';
 import { Levers } from '@/components/levers';
 import { Card, CardLabel, Note } from '@/components/ui/card';
 import { getReleases } from '@/lib/api';
 import { count } from '@/lib/format';
 import { summarize } from '@/lib/metrics';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { getTimeline } from '@/lib/timeline';
+import { summarizeHeatmap } from '@/lib/heatmap';
 
 export const dynamic = 'force-dynamic';
 
+function Stat({ term, value }: { term: string; value: string }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <dt className="text-[11px] uppercase tracking-[0.15em] text-midnight/45 dark:text-white/45">
+        {term}
+      </dt>
+      <dd className="font-mono text-sm tabular-nums text-midnight dark:text-white">{value}</dd>
+    </div>
+  );
+}
+
 export default async function OverviewPage() {
-  const releases = await getReleases();
+  const [releases, timeline] = await Promise.all([getReleases(), getTimeline()]);
   const overview = summarize(releases);
+  const heat = summarizeHeatmap(timeline.days);
 
   return (
     <main className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-6">
@@ -61,12 +76,26 @@ export default async function OverviewPage() {
         <ReleaseList releases={releases} />
       </section>
 
-      <Card className="flex flex-col gap-2">
-        <CardLabel>Take and spend, 12 weeks</CardLabel>
-        <Note>
-          No history table yet: charts read `metrics_daily` once the rollup exists, so
-          this renders an empty state instead of a fake series.
-        </Note>
+      <Card className="flex flex-col gap-4">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <CardLabel>Collects per day, 12 weeks</CardLabel>
+          <Note>EAT days · absence is blank, not zero</Note>
+        </div>
+        {timeline.available ? (
+          <div className="flex flex-wrap items-start justify-between gap-8">
+            <Heatmap days={timeline.days} label="Collects per day over the last twelve weeks" />
+            <dl className="flex gap-8">
+              <Stat term="collects" value={count(heat.total)} />
+              <Stat term="active days" value={count(heat.activeDays)} />
+              <Stat term="busiest" value={heat.busiestWeekday ?? '—'} />
+            </dl>
+          </div>
+        ) : (
+          <Note>
+            core-api does not serve `/admin/timeline` yet, so this renders an empty
+            state instead of a grid of invented squares.
+          </Note>
+        )}
       </Card>
     </main>
   );

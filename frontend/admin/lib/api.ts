@@ -13,6 +13,8 @@ export type Release = {
 
 const API = process.env.CORE_API_URL ?? 'https://app.doba.world/api-backend';
 
+export const apiBase = API;
+
 export async function getReleases(): Promise<Release[]> {
   const res = await fetch(`${API}/songs`, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`core-api returned ${res.status} for /songs`);
