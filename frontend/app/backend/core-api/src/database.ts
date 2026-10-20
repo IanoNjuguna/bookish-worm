@@ -127,6 +127,55 @@ async function init() {
   await db.execute(`CREATE INDEX IF NOT EXISTS idx_mints_track_id ON mints(track_id)`)
   await db.execute(`CREATE INDEX IF NOT EXISTS idx_auth_nonces_expires ON auth_nonces(expires_at)`)
 
+  // --- metrics foundation (#26) ---
+  // Money on the collect, recorded when it happened rather than derived later.
+  // fee_lovelace is what the treasury actually received; price_lovelace is what
+  // the buyer actually paid. Neither may be computed from tracks.price.
+  const mintColumns: [string, string][] = [
+    ['price_lovelace', 'INTEGER'],
+    ['fee_lovelace', 'INTEGER'],
+    ['currency', "TEXT DEFAULT 'ADA'"],
+    ['kind', "TEXT DEFAULT 'primary'"],
+    ['seller', 'TEXT'],
+  ]
+  for (const [name, type] of mintColumns) {
+    try {
+      await db.execute(`ALTER TABLE mints ADD COLUMN ${name} ${type}`)
+    } catch (e) {
+      /* column already exists */
+    }
+  }
+
+  // fee_bps is a per-splitter validator parameter, so the intended rate is
+  // recorded per track; status carries delisting without deleting rows.
+  const trackMetricColumns: [string, string][] = [
+    ['fee_bps', 'INTEGER'],
+    ['status', "TEXT DEFAULT 'published'"],
+  ]
+  for (const [name, type] of trackMetricColumns) {
+    try {
+      await db.execute(`ALTER TABLE tracks ADD COLUMN ${name} ${type}`)
+    } catch (e) {
+      /* column already exists */
+    }
+  }
+
+  // Silent failures need somewhere to land. Three kinds today; the dashboard's
+  // health strip reads only these.
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      kind TEXT NOT NULL,
+      subject TEXT,
+      detail TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `)
+
+  await db.execute(`CREATE INDEX IF NOT EXISTS idx_plays_time ON plays(timestamp)`)
+  await db.execute(`CREATE INDEX IF NOT EXISTS idx_mints_time ON mints(created_at)`)
+  await db.execute(`CREATE INDEX IF NOT EXISTS idx_events_kind_time ON events(kind, created_at)`)
+
   await db.execute(`
     CREATE TABLE IF NOT EXISTS drafts (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -382,15 +431,38 @@ export async function deleteTrack(tokenId: number): Promise<void> {
   })
 }
 
-export async function addMint(mint: { user_address: string; track_id: number; tx_hash?: string }): Promise<void> {
+export async function addMint(mint: {
+  user_address: string
+  track_id: number
+  tx_hash?: string
+  price_lovelace?: number | null
+  fee_lovelace?: number | null
+  currency?: string
+  kind?: string
+  seller?: string | null
+}): Promise<void> {
   await db.execute({
     sql: `
-      INSERT INTO mints (user_address, track_id, tx_hash)
-      VALUES (?, ?, ?)
+      INSERT INTO mints (user_address, track_id, tx_hash, price_lovelace, fee_lovelace, currency, kind, seller)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(user_address, track_id) DO UPDATE SET
-        tx_hash = excluded.tx_hash
+        tx_hash = excluded.tx_hash,
+        price_lovelace = COALESCE(excluded.price_lovelace, mints.price_lovelace),
+        fee_lovelace = COALESCE(excluded.fee_lovelace, mints.fee_lovelace),
+        currency = COALESCE(excluded.currency, mints.currency),
+        kind = COALESCE(excluded.kind, mints.kind),
+        seller = COALESCE(excluded.seller, mints.seller)
     `,
-    args: [String(mint.user_address).toLowerCase(), mint.track_id, mint.tx_hash ?? null]
+    args: [
+      String(mint.user_address).toLowerCase(),
+      mint.track_id,
+      mint.tx_hash ?? null,
+      mint.price_lovelace ?? null,
+      mint.fee_lovelace ?? null,
+      mint.currency ?? 'ADA',
+      mint.kind ?? 'primary',
+      mint.seller ? String(mint.seller).toLowerCase() : null,
+    ]
   })
 }
 
