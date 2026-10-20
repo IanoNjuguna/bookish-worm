@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
-import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react'
+import { IconArrowLeft, IconArrowRight, IconCircleCheck } from '@tabler/icons-react'
 import type { WizardStep } from './UploadWizard.types'
 
 interface WizardFooterProps {
@@ -12,6 +12,8 @@ interface WizardFooterProps {
   isLastStep: boolean
   isUploading: boolean
   draftSaving?: boolean
+  /** True once the release is minted: the publish button must not come back. */
+  published?: boolean
   onNext: () => void
   onBack: () => void
   onPublish: () => void
@@ -24,11 +26,13 @@ export function WizardFooter({
   isLastStep,
   isUploading,
   draftSaving = false,
+  published = false,
   onNext,
   onBack,
   onPublish,
 }: WizardFooterProps) {
   const t = useTranslations('upload.wizard')
+  const tUpload = useTranslations('upload')
 
   return (
     <div className="flex items-center justify-between pt-6 border-t border-midnight/10 dark:border-white/10">
@@ -49,14 +53,21 @@ export function WizardFooter({
       </div>
 
       {isLastStep ? (
-        <Button
-          type="button"
-          onClick={onPublish}
-          disabled={!canGoNext || isUploading}
-          className="bg-cyber-pink hover:bg-cyber-pink/90 text-midnight font-bold px-6 py-2 h-auto rounded-xl transition-all disabled:opacity-50"
-        >
-          {isUploading ? t('publishing') : t('publish')}
-        </Button>
+        published ? (
+          <span className="flex items-center gap-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+            <IconCircleCheck size={18} />
+            {tUpload('uploadSuccess')}
+          </span>
+        ) : (
+          <Button
+            type="button"
+            onClick={onPublish}
+            disabled={!canGoNext || isUploading}
+            className="bg-cyber-pink hover:bg-cyber-pink/90 text-midnight font-bold px-6 py-2 h-auto rounded-xl transition-all disabled:opacity-50"
+          >
+            {isUploading ? t('publishing') : t('publish')}
+          </Button>
+        )
       ) : (
         <Button
           type="button"
