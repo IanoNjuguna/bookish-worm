@@ -17,16 +17,14 @@ jobs:
         working-directory: frontend/app
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: frontend/app/package-lock.json
-      - run: npm ci
+          bun-version: 1
+      - run: bun install --frozen-lockfile
       - name: Design rules (DESIGN.md)
-        run: npm run lint:design
+        run: bun run lint:design
       - name: Build
-        run: npm run build
+        run: bun run build
 
   home:
     name: Home — build
@@ -36,10 +34,8 @@ jobs:
         working-directory: frontend/home
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: frontend/home/package-lock.json
-      - run: npm ci
-      - run: npm run build
+          bun-version: 1
+      - run: bun install --frozen-lockfile
+      - run: bun run build

@@ -3,6 +3,7 @@
 import { Link } from '@/i18n/navigation'
 import { IconDisc, IconArrowRight } from '@tabler/icons-react'
 import PagePanel from '@/components/PagePanel'
+import { Skeleton } from '@/components/ui/skeleton'
 import type { Track } from '@/components/assets/AssetsView.types'
 
 interface WalletRecentNftsProps {
@@ -28,7 +29,7 @@ export function WalletRecentNfts({ nfts, loading }: WalletRecentNftsProps) {
       {loading ? (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="aspect-square rounded-xl bg-midnight/5 dark:bg-white/5 animate-pulse" />
+            <Skeleton key={i} className="aspect-square rounded-xl" />
           ))}
         </div>
       ) : nfts.length === 0 ? (
