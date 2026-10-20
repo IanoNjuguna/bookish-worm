@@ -1,46 +1,16 @@
-import { ImageResponse } from 'next/og'
-import { readFile } from 'fs/promises'
-import { join } from 'path'
-
-export const runtime = 'nodejs'
-export const alt = 'doba track share card'
-export const size = { width: 1200, height: 630 }
-export const contentType = 'image/png'
-
-interface PageProps {
-	params: Promise<{ id: string; locale: string }>
-}
-
-async function getTrack(id: string) {
-	const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://bookish-worm-production.up.railway.app').replace(/\/$/, '')
-	try {
-		const res = await fetch(`${apiUrl}/songs/${id}`, {
-			next: { revalidate: 60 },
-		})
-		if (res.ok) return await res.json()
-	} catch (e) {
-		console.error('OG image: failed to fetch track', e)
-	}
-	return null
-}
-
-export default async function Image({ params }: PageProps) {
-	const { id } = await params
-	const track = await getTrack(id)
-
-	const [chivoBold, chivoRegular] = await Promise.all([
-		readFile(join(process.cwd(), 'public/fonts/Chivo-Bold.ttf')),
-		readFile(join(process.cwd(), 'public/fonts/Chivo-Regular.ttf')),
-	])
-
-	const gateway = process.env.NEXT_PUBLIC_IPFS_GATEWAY || 'https://gateway.pinata.cloud/ipfs/'
-	const cover = track?.image_url ? track.image_url.replace('ipfs://', gateway) : null
-	const title = track?.name || 'Track'
-	const artist = track?.artist || 'Unknown Artist'
-	const price = track?.price || '5'
-
-	return new ImageResponse(
-		(
+/** The 1200x630 share card. JSX lives here so the route handler stays a .ts file. */
+export function TrackCard({
+	cover,
+	title,
+	artist,
+	price,
+}: {
+	cover: string | null
+	title: string
+	artist: string
+	price: string
+}) {
+	return (
 			<div
 				style={{
 					width: '100%',
@@ -169,13 +139,5 @@ export default async function Image({ params }: PageProps) {
 					</div>
 				</div>
 			</div>
-		),
-		{
-			...size,
-			fonts: [
-				{ name: 'Chivo', data: chivoBold, weight: 700, style: 'normal' },
-				{ name: 'Chivo', data: chivoRegular, weight: 400, style: 'normal' },
-			],
-		}
 	)
 }
