@@ -4,7 +4,7 @@ import { cors } from 'hono/cors'
 import { rateLimiter } from 'hono-rate-limiter'
 import { bodyLimit } from 'hono/body-limit'
 import { z } from 'zod'
-import { getTrack, addTrack, getAllTracks, deleteTrack, deleteAllTracks, getUser, addUser, getTrackCollaborators, addCollaborator, isAdmin, type Track, type RefreshToken, addRefreshToken, getRefreshToken, revokeRefreshToken, revokeRefreshTokenFamily, addMint, getUserMints, addPlay, getAnalytics, createAuthNonce, consumeAuthNonce, cleanupExpiredNonces, getDrafts, getDraft, createDraft, updateDraft, deleteDraft, type DraftInput } from './database'
+import { getTrack, addTrack, getAllTracks, deleteTrack, deleteAllTracks, getUser, addUser, getTrackCollaborators, addCollaborator, isAdmin, type Track, type RefreshToken, addRefreshToken, getRefreshToken, revokeRefreshToken, revokeRefreshTokenFamily, addMint, getUserMints, addPlay, getAnalytics, getTimeline, createAuthNonce, consumeAuthNonce, cleanupExpiredNonces, getDrafts, getDraft, createDraft, updateDraft, deleteDraft, type DraftInput } from './database'
 import { verifyOwnershipOnChain, getRemainingFractionsOnChain } from './web3'
 import { verifyWalletSignature, signJWT, verifyJWT, generateRefreshToken, getAccessTokenPayload } from './auth'
 import axios from 'axios'
@@ -694,6 +694,22 @@ app.get('/analytics', authMiddleware, async (c) => {
   } catch (error: any) {
     logger.error(`Failed to fetch analytics for ${artistAddress}`, error)
     return c.json({ error: 'Failed to fetch analytics' }, 500)
+  }
+})
+
+/**
+ * Daily collect and play counts for the admin heatmap and weekly series.
+ * Read-only aggregates, no identities. Public for now because it exposes the same
+ * information `/songs` already does; the admin deploy adds Access in front (#26).
+ */
+app.get('/admin/timeline', async (c) => {
+  const requested = Number(c.req.query('days') ?? 84)
+  try {
+    const timeline = await getTimeline(requested)
+    return c.json({ timezone: 'EAT', days: timeline.length, timeline })
+  } catch (error: any) {
+    logger.error('Failed to build the timeline', error)
+    return c.json({ error: 'Failed to build the timeline' }, 500)
   }
 })
 
