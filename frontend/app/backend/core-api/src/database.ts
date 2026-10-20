@@ -550,6 +550,59 @@ export async function addPlay(trackId: number, listenerAddress?: string): Promis
   })
 }
 
+export type TimelineDay = {
+  /** Calendar day in EAT (UTC+3, no DST), the bucket every dashboard day means. */
+  day: string;
+  collects: number;
+  plays: number;
+};
+
+/**
+ * Daily counts for the heatmap and the weekly series.
+ *
+ * Bucketed in SQL, because `created_at` is SQLite `CURRENT_TIMESTAMP` (UTC, space
+ * separated) and comparing it to an ISO string as text compares 'T' against ' '
+ * and silently drops rows. EAT is a fixed +3 offset, so the shift is arithmetic.
+ */
+export async function getTimeline(days = 84): Promise<TimelineDay[]> {
+  const span = Math.min(Math.max(Math.trunc(days) || 84, 7), 365);
+  const offset = `-${span} days`;
+
+  const [collects, plays] = await Promise.all([
+    db.execute({
+      sql: `SELECT date(created_at, '+3 hours') AS day, COUNT(*) AS n
+            FROM mints WHERE created_at >= datetime('now', ?) GROUP BY day`,
+      args: [offset],
+    }),
+    db.execute({
+      sql: `SELECT date(timestamp, '+3 hours') AS day, COUNT(*) AS n
+            FROM plays WHERE timestamp >= datetime('now', ?) GROUP BY day`,
+      args: [offset],
+    }),
+  ]);
+
+  const byDay = new Map<string, TimelineDay>();
+  const eatToday = new Date(Date.now() + 3 * 3600_000).toISOString().slice(0, 10);
+
+  for (let i = span - 1; i >= 0; i--) {
+    const day = new Date(Date.parse(`${eatToday}T00:00:00Z`) - i * 86_400_000)
+      .toISOString()
+      .slice(0, 10);
+    byDay.set(day, { day, collects: 0, plays: 0 });
+  }
+
+  for (const row of collects.rows as any[]) {
+    const entry = byDay.get(String(row.day));
+    if (entry) entry.collects = Number(row.n);
+  }
+  for (const row of plays.rows as any[]) {
+    const entry = byDay.get(String(row.day));
+    if (entry) entry.plays = Number(row.n);
+  }
+
+  return Array.from(byDay.values());
+}
+
 export async function getAnalytics(artistAddress: string): Promise<any> {
   // Get all tracks for this artist
   const tracks = await getAllTracks({ artist: artistAddress })
