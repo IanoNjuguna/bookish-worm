@@ -4,8 +4,9 @@ import { cors } from 'hono/cors'
 import { rateLimiter } from 'hono-rate-limiter'
 import { bodyLimit } from 'hono/body-limit'
 import { z } from 'zod'
-import { getTrack, addTrack, getAllTracks, deleteTrack, deleteAllTracks, getUser, addUser, getTrackCollaborators, addCollaborator, isAdmin, type Track, type RefreshToken, addRefreshToken, getRefreshToken, revokeRefreshToken, revokeRefreshTokenFamily, addMint, getUserMints, addPlay, getAnalytics, getTimeline, createAuthNonce, consumeAuthNonce, cleanupExpiredNonces, getDrafts, getDraft, createDraft, updateDraft, deleteDraft, type DraftInput } from './database'
+import { getTrack, addTrack, getAllTracks, deleteTrack, deleteAllTracks, getUser, addUser, getTrackCollaborators, addCollaborator, isAdmin, type Track, type RefreshToken, addRefreshToken, getRefreshToken, revokeRefreshToken, revokeRefreshTokenFamily, addMint, setMintAmounts, getUnpricedMints, recordEvent, countEventsSince, getUserMints, addPlay, getAnalytics, getTimeline, createAuthNonce, consumeAuthNonce, cleanupExpiredNonces, getDrafts, getDraft, createDraft, updateDraft, deleteDraft, type DraftInput } from './database'
 import { verifyOwnershipOnChain, getRemainingFractionsOnChain } from './web3'
+import { getCollectAmounts } from './collects'
 import { verifyWalletSignature, signJWT, verifyJWT, generateRefreshToken, getAccessTokenPayload } from './auth'
 import axios from 'axios'
 import FormData from 'form-data'
@@ -886,6 +887,27 @@ app.post('/songs', authMiddleware, async (c) => {
   }
 })
 
+/**
+ * Reads what a collect actually paid, once the mint is on record.
+ *
+ * Failure is recorded as an event and swallowed: a missing price must never fail
+ * a collect the fan already completed on chain. The unpriced row keeps
+ * price_lovelace NULL so the backfill can find it later, which is why NULL and 0
+ * are different values in this schema.
+ */
+async function priceCollect(userAddress: string, trackId: number, txHash?: string | null) {
+  if (!txHash) return
+  try {
+    const amounts = await getCollectAmounts(txHash, userAddress)
+    await setMintAmounts(userAddress, trackId, amounts)
+    if (amounts.feeLovelace === null) {
+      await recordEvent('collect_unpriced', txHash, 'no treasury address configured or no treasury output')
+    }
+  } catch (error: any) {
+    await recordEvent('collect_unpriced', txHash, String(error?.message ?? error))
+  }
+}
+
 app.post('/mints', authMiddleware, async (c) => {
   const { track_id, tx_hash } = await c.req.json()
   const payload = c.get('jwtPayload')
@@ -911,6 +933,7 @@ app.post('/mints', authMiddleware, async (c) => {
 
   try {
     await addMint({ user_address: userAddress, track_id: Number(track_id), tx_hash })
+    await priceCollect(userAddress, Number(track_id), tx_hash)
     return c.json({ success: true })
   } catch (error: any) {
     logger.error('db addMint failed', error)
@@ -935,6 +958,7 @@ app.post('/mints/sync', authMiddleware, async (c) => {
           track_id: Number(m.track_id),
           tx_hash: m.tx_hash ?? null
         })
+        await priceCollect(userAddress, Number(m.track_id), m.tx_hash ?? null)
         verifiedMints.push(m)
       }
     }

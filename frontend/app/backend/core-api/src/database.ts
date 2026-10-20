@@ -466,6 +466,58 @@ export async function addMint(mint: {
   })
 }
 
+export async function setMintAmounts(
+  userAddress: string,
+  trackId: number,
+  amounts: { priceLovelace: number | null; feeLovelace: number | null }
+): Promise<void> {
+  await db.execute({
+    sql: `UPDATE mints SET price_lovelace = ?, fee_lovelace = ?
+          WHERE user_address = ? AND track_id = ?`,
+    args: [
+      amounts.priceLovelace,
+      amounts.feeLovelace,
+      String(userAddress).toLowerCase(),
+      trackId,
+    ]
+  })
+}
+
+/** Rows whose chain money has never been read, for the backfill script. */
+export async function getUnpricedMints(): Promise<
+  { user_address: string; track_id: number; tx_hash: string; created_at: string }[]
+> {
+  const rs = await db.execute(`
+    SELECT user_address, track_id, tx_hash, created_at FROM mints
+    WHERE tx_hash IS NOT NULL AND price_lovelace IS NULL
+    ORDER BY created_at
+  `)
+  return rs.rows as any[]
+}
+
+export type EventKind = 'collect_failed' | 'collect_unpriced' | 'chain_fallback' | 'http_5xx'
+
+/** Append-only. The dashboard's health strip reads only this table. */
+export async function recordEvent(kind: EventKind, subject: string, detail?: string): Promise<void> {
+  try {
+    await db.execute({
+      sql: 'INSERT INTO events (kind, subject, detail) VALUES (?, ?, ?)',
+      args: [kind, subject, detail ?? null]
+    })
+  } catch (error) {
+    // Never let telemetry break the request it is describing.
+    logger.error(`Failed to record event ${kind}`, error)
+  }
+}
+
+export async function countEventsSince(kind: EventKind, sinceDays: number): Promise<number> {
+  const rs = await db.execute({
+    sql: `SELECT COUNT(*) AS n FROM events WHERE kind = ? AND created_at >= datetime('now', ?)`,
+    args: [kind, `-${sinceDays} days`]
+  })
+  return Number((rs.rows[0] as any).n)
+}
+
 export async function getUserMints(userAddress: string): Promise<number[]> {
   const rs = await db.execute({
     sql: 'SELECT track_id FROM mints WHERE user_address = ?',
