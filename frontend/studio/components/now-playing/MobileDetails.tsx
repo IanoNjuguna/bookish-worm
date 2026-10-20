@@ -11,7 +11,7 @@ interface MobileDetailsProps {
 }
 
 export function MobileDetails({ track, uploaderAddress, locale, onClose }: MobileDetailsProps) {
-  const policyId = track.splitter || process.env.NEXT_PUBLIC_MINTING_POLICY_ID
+  const policyId = track.splitter
   const creator = uploaderAddress || track.uploader_address
 
   return (

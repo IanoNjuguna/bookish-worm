@@ -36,6 +36,7 @@ export function useNowPlayingSidebar(track: SidebarTrack | null, onClose: () => 
     uploaderPaymentAddress: sidebarData.uploaderPaymentAddress,
     albumId: sidebarData.albumId,
     ticker: sidebarData.ticker,
+    splitter: sidebarData.splitter,
     hasOwned,
     setHasOwned,
     cardanoAddress,

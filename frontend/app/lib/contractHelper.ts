@@ -24,33 +24,24 @@ export interface TrackMintData {
 	royaltyAddress?: string;
 }
 
+/** UTF-8 string → hex, which is how applyParamsToScript encodes bytearray params. */
+function toHexBytes(value: string): string {
+	const bytes = new TextEncoder().encode(value);
+	return Array.from(bytes)
+		.map((b) => b.toString(16).padStart(2, "0"))
+		.join("");
+}
+
 /**
- * Derives the policy ID, locking address, and distribution address for a given creator address.
+ * Derives the distribution address for a creator. Independent of any minting
+ * policy: one creator has one distribution script for all of their releases.
  */
-export async function getContractAddresses(creatorAddress: string, feeBpsOverride?: bigint) {
-	const { paymentCredentialOf, applyParamsToScript, applyDoubleCborEncoding, mintingPolicyToId, validatorToAddress, getAddressDetails, Constr } = await import("@lucid-evolution/lucid");
+export async function getDistributionAddress(creatorAddress: string, feeBpsOverride?: bigint) {
+	const { paymentCredentialOf, applyParamsToScript, applyDoubleCborEncoding, validatorToAddress, getAddressDetails, Constr } = await import("@lucid-evolution/lucid");
 
 	const ownerPKH = paymentCredentialOf(creatorAddress).hash;
 
-	// 1. Minting Policy
-	const mintValidator = blueprint.validators.find((v: any) => v.title === "frac.fraction_minting.mint");
-	if (!mintValidator) throw new Error("frac.fraction_minting.mint validator not found in blueprint");
-	const mintScript = {
-		type: "PlutusV3" as const,
-		script: applyParamsToScript(applyDoubleCborEncoding(mintValidator.compiledCode), [ownerPKH]),
-	};
-	const mintCS = mintingPolicyToId(mintScript);
-
-	// 2. Locking Validator (keeps reference token)
-	const lockValidator = blueprint.validators.find((v: any) => v.title === "frac.locking.spend");
-	if (!lockValidator) throw new Error("frac.locking.spend validator not found in blueprint");
-	const lockScript = {
-		type: "PlutusV3" as const,
-		script: applyParamsToScript(applyDoubleCborEncoding(lockValidator.compiledCode), [ownerPKH, mintCS]),
-	};
-	const lAddress = validatorToAddress(CARDANO_NETWORK, lockScript);
-
-	// 3. Distribution Validator (keeps fractional tokens for sale)
+	// Distribution Validator (keeps fractional tokens for sale)
 	const distroValidator = blueprint.validators.find((v: any) => v.title === "frac.distribution.spend");
 	if (!distroValidator) throw new Error("frac.distribution.spend validator not found in blueprint");
 
@@ -83,15 +74,56 @@ export async function getContractAddresses(creatorAddress: string, feeBpsOverrid
 	};
 	const dAddress = validatorToAddress(CARDANO_NETWORK, distroScript);
 
-	return {
-		mintScript,
-		mintCS,
-		lockScript,
-		lAddress,
-		distroScript,
-		dAddress,
-		ownerPKH,
+	return { distroScript, dAddress, ownerPKH };
+}
+
+/**
+ * Derives the minting policy for ONE release.
+ *
+ * The policy id bakes in (owner, base token name, max_supply, seed). The seed is
+ * an output reference that the mint must spend, and a UTxO can only be spent
+ * once, so this policy can mint exactly once: the supply cap is on-chain.
+ */
+export async function getMintContracts(
+	creatorAddress: string,
+	tokenNameStr: string,
+	maxSupply: bigint,
+	seedRef: { txHash: string; outputIndex: number }
+) {
+	const { paymentCredentialOf, applyParamsToScript, applyDoubleCborEncoding, mintingPolicyToId, validatorToAddress, Constr, getAddressDetails } = await import("@lucid-evolution/lucid");
+
+	const ownerPKH = paymentCredentialOf(creatorAddress).hash;
+
+	// 1. Minting Policy — parameterised per release
+	const mintValidator = blueprint.validators.find((v: any) => v.title === "frac.fraction_minting.mint");
+	if (!mintValidator) throw new Error("frac.fraction_minting.mint validator not found in blueprint");
+	// OutputReference is Constr 0 [bytes tx_hash, int index]. Lucid serialises a hex
+	// string as bytes, which is how the treasury credential params are passed too.
+	const seedPlutus = new Constr(0, [seedRef.txHash, BigInt(seedRef.outputIndex)]);
+	const mintScript = {
+		type: "PlutusV3" as const,
+		script: applyParamsToScript(applyDoubleCborEncoding(mintValidator.compiledCode), [
+			ownerPKH,
+			toHexBytes(tokenNameStr),
+			maxSupply,
+			seedPlutus
+		]),
 	};
+	const mintCS = mintingPolicyToId(mintScript);
+
+	// 2. Locking Validator (keeps reference token), bound to this release's policy
+	const lockValidator = blueprint.validators.find((v: any) => v.title === "frac.locking.spend");
+	if (!lockValidator) throw new Error("frac.locking.spend validator not found in blueprint");
+	const lockScript = {
+		type: "PlutusV3" as const,
+		script: applyParamsToScript(applyDoubleCborEncoding(lockValidator.compiledCode), [ownerPKH, mintCS]),
+	};
+	const lAddress = validatorToAddress(CARDANO_NETWORK, lockScript);
+
+	// 3. Distribution address for the same creator
+	const { distroScript, dAddress } = await getDistributionAddress(creatorAddress);
+
+	return { mintScript, mintCS, lockScript, lAddress, distroScript, dAddress, ownerPKH };
 }
 
 /**
@@ -169,13 +201,19 @@ export async function buildCIP60MetadataDatum(track: TrackMintData, fallbackAddr
  * Builds and submits a transaction that mints the track assets (1 Ref token, N Fractions),
  * locks the Ref token at the locking validator, and locks the Fractions at the distribution validator.
  */
-export async function mintTrackOnChain(lucid: any, track: TrackMintData): Promise<{ txHash: string; policyId: string }> {
+export async function mintTrackOnChain(lucid: any, track: TrackMintData): Promise<{ txHash: string; policyId: string; supplyCapped: true }> {
 	if (!lucid) throw new Error("Wallet not connected");
 
 	const { Data, Constr, fromText, toUnit } = await import("@lucid-evolution/lucid");
 
+	const maxSupply = BigInt(track.supply);
+	if (maxSupply <= 0n) throw new Error("Supply must be greater than zero: it is the on-chain cap.");
+
 	const creatorAddress = await lucid.wallet().address();
-	const { mintScript, mintCS, lAddress, dAddress, ownerPKH } = await getContractAddresses(creatorAddress);
+
+	// The seed UTxO becomes a policy parameter and is spent by this transaction.
+	// A UTxO can only be spent once, so the policy can mint exactly once.
+	const seedUtxo = await pickSeedUtxo(lucid, creatorAddress);
 
 	// Use custom ticker if provided, otherwise fallback to deterministic token name based on token_id
 	const tokenNameStr = track.ticker
@@ -183,8 +221,15 @@ export async function mintTrackOnChain(lucid: any, track: TrackMintData): Promis
 		: "T" + String(track.token_id).slice(-11);
 	const tokenName = fromText(tokenNameStr);
 
-	// Redeemers
-	const mintRedeemer = Data.to(new Constr(0, [1n, BigInt(track.supply), tokenName]));
+	const { mintScript, mintCS, lAddress, dAddress, ownerPKH } = await getMintContracts(
+		creatorAddress,
+		tokenNameStr,
+		maxSupply,
+		{ txHash: seedUtxo.txHash, outputIndex: seedUtxo.outputIndex }
+	);
+
+	// Redeemer: 1 = mint. Cap and name live in the policy parameters.
+	const mintRedeemer = Data.to(new Constr(0, [1n]));
 
 	// Datums
 	const lDatum = await buildCIP60MetadataDatum(track, creatorAddress);
@@ -197,20 +242,39 @@ export async function mintTrackOnChain(lucid: any, track: TrackMintData): Promis
 
 	const tx = await lucid
 		.newTx()
+		.collectFrom([seedUtxo])
 		.mintAssets({
 			[refUnit]: 1n,
-			[fracUnit]: BigInt(track.supply)
+			[fracUnit]: maxSupply
 		}, mintRedeemer)
 		.attach.MintingPolicy(mintScript)
 		.pay.ToContract(lAddress, { kind: "inline", value: lDatum }, { [refUnit]: 1n })
-		.pay.ToContract(dAddress, { kind: "inline", value: dDatum }, { [fracUnit]: BigInt(track.supply) })
+		.pay.ToContract(dAddress, { kind: "inline", value: dDatum }, { [fracUnit]: maxSupply })
 		.addSignerKey(ownerPKH)
 		.complete();
 
 	const signedTx = await tx.sign.withWallet().complete();
 	const txHash = await signedTx.submit();
 
-	return { txHash, policyId: mintCS };
+	return { txHash, policyId: mintCS, supplyCapped: true };
+}
+
+/**
+ * Picks a wallet UTxO to use as the mint's one-shot seed. It is consumed by the
+ * mint, so it needs enough ADA to cover fees and min-UTxO change.
+ */
+async function pickSeedUtxo(lucid: any, address: string) {
+	const utxos = await lucid.utxosAt(address);
+	const candidates = (utxos || []).filter(
+		(u: any) => BigInt(u.assets?.lovelace || 0) >= 5_000_000n
+	);
+	if (candidates.length === 0) {
+		throw new Error("No wallet UTxO with enough ADA (5 tADA) to seed the mint.");
+	}
+	candidates.sort((a: any, b: any) =>
+		BigInt(b.assets.lovelace) > BigInt(a.assets.lovelace) ? 1 : -1
+	);
+	return candidates[0];
 }
 
 /**
@@ -218,7 +282,7 @@ export async function mintTrackOnChain(lucid: any, track: TrackMintData): Promis
  */
 export async function buyFractionOnChain(
 	lucid: any,
-	track: { token_id: number; uploader_address: string; album_id?: number | null; ticker?: string }
+	track: { token_id: number; uploader_address: string; album_id?: number | null; ticker?: string; splitter?: string }
 ): Promise<string> {
 	if (!lucid) throw new Error("Wallet not connected");
 
@@ -236,8 +300,14 @@ export async function buyFractionOnChain(
 		);
 	}
 
+	// Each release has its own minting policy, so the policy id must come from the
+	// release record: it cannot be derived from the creator address any more.
+	if (!track.splitter) {
+		throw new Error("Missing release policy id (splitter); cannot locate the fraction to buy.");
+	}
+
 	const trackFeeBps = (track.token_id === 1784761978751 || track.ticker === "MERADIL") ? 500n : FEE_BPS;
-	const { dAddress, distroScript, mintCS } = await getContractAddresses(track.uploader_address, trackFeeBps);
+	const { dAddress, distroScript } = await getDistributionAddress(track.uploader_address, trackFeeBps);
 	console.log("[DEBUG buyFractionOnChain] derived dAddress:", dAddress);
 
 	const targetTokenId = track.album_id ? track.album_id : track.token_id;
@@ -245,7 +315,7 @@ export async function buyFractionOnChain(
 		? track.ticker.toUpperCase().replace(/[^A-Z0-9]/g, "")
 		: "T" + String(targetTokenId).slice(-11);
 	const tokenName = fromText(tokenNameStr);
-	const fracUnit = toUnit(mintCS, tokenName, 444);
+	const fracUnit = toUnit(track.splitter, tokenName, 444);
 	console.log("[DEBUG buyFractionOnChain] fracUnit:", fracUnit);
 
 	// Locate UTXOs locked at the distribution script holding the fractional tokens.
@@ -325,7 +395,7 @@ export async function buyFractionOnChain(
  */
 export async function buyAlbumFractionsOnChain(
 	lucid: any,
-	tracksToMint: { token_id: number; uploader_address: string; ticker?: string; price?: string }[]
+	tracksToMint: { token_id: number; uploader_address: string; ticker?: string; price?: string; splitter?: string }[]
 ): Promise<string> {
 	if (!lucid) throw new Error("Wallet not connected");
 
@@ -344,13 +414,17 @@ export async function buyAlbumFractionsOnChain(
 			);
 		}
 
-		const { dAddress, distroScript, mintCS } = await getContractAddresses(track.uploader_address);
+		if (!track.splitter) {
+			throw new Error(`Missing release policy id (splitter) for track ID ${track.token_id}.`);
+		}
+
+		const { dAddress, distroScript } = await getDistributionAddress(track.uploader_address);
 
 		const tokenNameStr = track.ticker
 			? track.ticker.toUpperCase().replace(/[^A-Z0-9]/g, "")
 			: "T" + String(track.token_id).slice(-11);
 		const tokenName = fromText(tokenNameStr);
-		const fracUnit = toUnit(mintCS, tokenName, 444);
+		const fracUnit = toUnit(track.splitter, tokenName, 444);
 
 		let utxos = await lucid.utxosAtWithUnit(dAddress, fracUnit);
 		if (!utxos || utxos.length === 0) {

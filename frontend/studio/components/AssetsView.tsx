@@ -25,7 +25,7 @@ export default function AssetsView() {
   if (!isConnected) return <AssetsConnectPrompt />
 
   const dobaPolicies = new Set<string>(
-    [process.env.NEXT_PUBLIC_MINTING_POLICY_ID, ...ownedNfts.map(t => t.splitter)].filter(
+    ownedNfts.map(t => t.splitter).filter(
       (p): p is string => Boolean(p)
     )
   )

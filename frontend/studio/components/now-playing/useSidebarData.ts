@@ -41,7 +41,7 @@ export function useSidebarData(track: SidebarTrack | null, effectiveAddress?: st
       const res = await fetch(`/api-backend/songs/${tokenId}`)
       if (res.ok) {
         const data = await res.json()
-        setMintData({ minted: Number(data.mint_count || 0), max: Number(data.max_supply || 0) })
+        setMintData({ minted: Number(data.mint_count || 0), max: data.supply_capped ? Number(data.max_supply || 0) : 0 })
         if (data.uploader_address) setUploaderAddress(data.uploader_address)
         if (data.uploader_payment_address) setUploaderPaymentAddress(data.uploader_payment_address)
         if (data.album_id !== undefined) setAlbumId(data.album_id)

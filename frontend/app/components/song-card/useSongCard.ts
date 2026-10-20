@@ -72,6 +72,7 @@ export function useSongCard({
     uploaderAddress,
     albumId,
     ticker,
+    splitter,
   } = useSongOwnership({ tokenId, initialOwned: is_owned, address })
 
   const { isMinting, handleMint } = useMint({
@@ -84,6 +85,7 @@ export function useSongCard({
     uploaderAddress,
     albumId,
     ticker,
+    splitter,
     mintData,
     isAuthenticated,
     login,

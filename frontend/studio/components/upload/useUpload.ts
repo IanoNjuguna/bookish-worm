@@ -545,6 +545,12 @@ export function useUpload(
         setTargetSeg3(35)
         setUploadStatusText('Awaiting wallet signature & submitting on-chain Cardano transaction...')
         toast.loading('Signing and submitting mint transaction on-chain...', { id: mainToast })
+
+        const supplyCount = Number(supply)
+        if (!Number.isInteger(supplyCount) || supplyCount <= 0) {
+          throw new Error('Copies per Release must be a whole number above zero: it is minted as the on-chain supply cap.')
+        }
+
         setIsMinting(true)
         const { txHash, policyId } = await mintTrackOnChain(lucid, {
           token_id: tokenId,
@@ -555,7 +561,7 @@ export function useUpload(
           imageUrl: `ipfs://${currentImageHash}`,
           audioUrl: `ipfs://${currentAudioHash}`,
           price: price || '5',
-          supply: supply || '5000',
+          supply,
           duration: audioDuration,
           isAlbum,
           tracks: isAlbum
@@ -591,7 +597,8 @@ export function useUpload(
               streaming_url: currentStreamingUrl,
               external_url: metadataUri,
               price: price || '5',
-              max_supply: supply || '5000',
+              max_supply: supply,
+              supply_capped: 1,
               uploader_address: effectiveAddress || cardanoAddress,
               uploader_payment_address: cardanoAddress,
               chain_id: 'cardano',
@@ -622,7 +629,8 @@ export function useUpload(
                 streaming_url: t.streamingUrl,
                 external_url: metadataUri,
                 price: price || '5',
-                max_supply: supply || '5000',
+                max_supply: supply,
+                supply_capped: 1,
                 uploader_address: effectiveAddress || cardanoAddress,
                 uploader_payment_address: cardanoAddress,
                 chain_id: 'cardano',
@@ -652,7 +660,8 @@ export function useUpload(
               streaming_url: currentStreamingUrl,
               external_url: metadataUri,
               price: price || '5',
-              max_supply: supply || '5000',
+              max_supply: supply,
+              supply_capped: 1,
               uploader_address: effectiveAddress || cardanoAddress,
               uploader_payment_address: cardanoAddress,
               chain_id: 'cardano',

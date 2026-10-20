@@ -41,7 +41,7 @@ export function usePlayerController(playerState: AudioPlayerState): UsePlayerCon
   const { lucid } = useCardano()
   const queue = useAudioQueue(playerState)
   const { currentTrack, isPlaying, togglePlayPause, setDuration, setCurrentTime, audioRef } = playerState
-  const { hasOwned, mintData, uploaderAddress, albumId, albumName, ticker, setHasOwned } = useTrackDetails(currentTrack, effectiveAddress)
+  const { hasOwned, mintData, uploaderAddress, albumId, albumName, ticker, splitter, setHasOwned } = useTrackDetails(currentTrack, effectiveAddress)
 
   useMediaSession({
     currentTrack,
@@ -58,6 +58,7 @@ export function usePlayerController(playerState: AudioPlayerState): UsePlayerCon
     uploaderAddress,
     albumId,
     ticker,
+    splitter,
     hasOwned,
     setHasOwned,
     lucid,

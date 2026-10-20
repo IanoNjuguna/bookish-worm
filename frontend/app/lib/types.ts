@@ -17,6 +17,7 @@ export interface Track {
   ticker?: string
   mint_count?: number
   max_supply?: number
+  splitter?: string
   created_at?: string
   // Transformed/audio-player aliases used by some callers
   title?: string

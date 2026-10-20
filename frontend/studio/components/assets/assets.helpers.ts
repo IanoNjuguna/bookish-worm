@@ -44,10 +44,10 @@ export async function fetchOnChainPricesAndQuantities(
           }
         }
 
-        if (lucidInstance && track.uploader_address && !track.uploader_address.startsWith('stake')) {
+        if (lucidInstance && track.uploader_address && track.splitter && !track.uploader_address.startsWith('stake')) {
           try {
-            const { getContractAddresses } = await import('@/lib/contractHelper')
-            const { dAddress, mintCS } = await getContractAddresses(track.uploader_address)
+            const { getDistributionAddress } = await import('@/lib/contractHelper')
+            const { dAddress } = await getDistributionAddress(track.uploader_address)
 
             const tokenNameStr = track.ticker
               ? track.ticker.toUpperCase().replace(/[^A-Z0-9]/g, '')
@@ -55,7 +55,7 @@ export async function fetchOnChainPricesAndQuantities(
 
             const { fromText, toUnit } = await import('@lucid-evolution/lucid')
             const tokenName = fromText(tokenNameStr)
-            const fracUnit = toUnit(mintCS, tokenName, 444)
+            const fracUnit = toUnit(track.splitter, tokenName, 444)
 
             const utxos = await lucidInstance.utxosAtWithUnit(dAddress, fracUnit)
             if (utxos && utxos.length > 0 && utxos[0].datum) {

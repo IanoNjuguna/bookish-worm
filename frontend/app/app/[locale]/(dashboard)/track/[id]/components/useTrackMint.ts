@@ -60,7 +60,13 @@ export function useTrackMint({
     try {
       if (!lucid) throw new Error('Cardano wallet not connected or initialized')
       if (mainToast) toast.loading('Creating, signing and submitting transaction...', { id: mainToast })
-      const txHash = await buyFractionOnChain(lucid, { token_id: track.token_id, uploader_address: track.uploader_address })
+      const txHash = await buyFractionOnChain(lucid, {
+        token_id: track.token_id,
+        uploader_address: track.uploader_address,
+        album_id: track.album_id,
+        ticker: track.ticker,
+        splitter: track.splitter,
+      })
       if (mainToast) toast.loading('Confirming transaction on-chain...', { id: mainToast })
       await lucid.awaitTx(txHash)
 

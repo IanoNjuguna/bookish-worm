@@ -38,6 +38,7 @@ export function useSongOwnership({
   const [uploaderAddress, setUploaderAddress] = React.useState<string | null>(null)
   const [albumId, setAlbumId] = React.useState<number | null>(null)
   const [ticker, setTicker] = React.useState<string | null>(null)
+  const [splitter, setSplitter] = React.useState<string | null>(null)
 
   React.useEffect(() => {
     if (initialOwned) {
@@ -61,6 +62,9 @@ export function useSongOwnership({
           if (data.ticker) {
             setTicker(data.ticker)
           }
+          if (data.splitter) {
+            setSplitter(data.splitter)
+          }
         }
       } catch (e) {
         logger.error('useSongOwnership: Error checking ownership', e)
@@ -78,7 +82,7 @@ export function useSongOwnership({
           const data = await res.json()
           setMintData({
             minted: Number(data.mint_count || 0),
-            max: Number(data.max_supply || 0),
+            max: data.supply_capped ? Number(data.max_supply || 0) : 0,
           })
           if (data.uploader_address) {
             setUploaderAddress(data.uploader_address)
@@ -88,6 +92,9 @@ export function useSongOwnership({
           }
           if (data.ticker) {
             setTicker(data.ticker)
+          }
+          if (data.splitter) {
+            setSplitter(data.splitter)
           }
         }
       } catch (err) {
@@ -105,5 +112,6 @@ export function useSongOwnership({
     uploaderAddress,
     albumId,
     ticker,
+    splitter,
   }
 }

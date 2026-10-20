@@ -3,7 +3,7 @@ import { REFERENCE_NFT_ASSET_PREFIX, toHex } from './TrackBlockchainDetails.cons
 import type { ProvenanceAsset, UseBlockchainDetailsReturn } from './TrackBlockchainDetails.types'
 
 export function useBlockchainDetails(track: Track): UseBlockchainDetailsReturn {
-  const policyId = track.splitter || process.env.NEXT_PUBLIC_MINTING_POLICY_ID
+  const policyId = track.splitter
   const provenancePolicyId = track.splitter
 
   let provenance: ProvenanceAsset | null = null

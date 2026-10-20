@@ -14,6 +14,7 @@ export interface UseSidebarMintArgs {
   uploaderPaymentAddress: string | null
   albumId: number | null
   ticker: string | null
+  splitter: string | null
   hasOwned: boolean
   setHasOwned: (value: boolean) => void
   cardanoAddress?: string | null
@@ -36,6 +37,7 @@ export function useSidebarMint({
   uploaderPaymentAddress,
   albumId,
   ticker,
+  splitter,
   hasOwned,
   setHasOwned,
   cardanoAddress,
@@ -88,6 +90,7 @@ export function useSidebarMint({
         uploader_address: creatorAddressForContract as string,
         album_id: albumId,
         ticker: ticker || undefined,
+        splitter: splitter || undefined,
       })
 
       if (mainToast) toast.loading('Confirming transaction on-chain...', { id: mainToast })

@@ -14,6 +14,7 @@ export interface UsePlayerMintArgs {
   uploaderAddress: string | null
   albumId: number | null
   ticker: string | null
+  splitter: string | null
   hasOwned: boolean
   setHasOwned: (value: boolean) => void
   lucid: any
@@ -32,6 +33,7 @@ export function usePlayerMint({
   uploaderAddress,
   albumId,
   ticker,
+  splitter,
   hasOwned,
   setHasOwned,
   lucid,
@@ -71,6 +73,7 @@ export function usePlayerMint({
         uploader_address: targetUploader,
         album_id: albumId,
         ticker: ticker || undefined,
+        splitter: splitter || undefined,
       })
 
       toast.loading(React.createElement(MintLinkToast, { txHash, message: 'Transaction submitted!' }), {

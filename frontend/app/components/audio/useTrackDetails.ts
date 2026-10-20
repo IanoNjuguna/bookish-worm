@@ -11,6 +11,7 @@ export interface UseTrackDetailsReturn {
   albumId: number | null
   albumName: string | null
   ticker: string | null
+  splitter: string | null
   setHasOwned: (value: boolean) => void
 }
 
@@ -24,6 +25,7 @@ export function useTrackDetails(
   const [albumId, setAlbumId] = useState<number | null>(null)
   const [albumName, setAlbumName] = useState<string | null>(null)
   const [ticker, setTicker] = useState<string | null>(null)
+  const [splitter, setSplitter] = useState<string | null>(null)
 
   const fetchTrackDetails = useCallback(async () => {
     if (!currentTrack) return
@@ -50,12 +52,13 @@ export function useTrackDetails(
       setHasOwned(!!data.is_owned)
       setMintData({
         minted: Number(data.mint_count || 0),
-        max: Number(data.max_supply || 0),
+        max: data.supply_capped ? Number(data.max_supply || 0) : 0,
       })
       if (data.uploader_address) setUploaderAddress(data.uploader_address)
       if (data.album_id !== undefined) setAlbumId(data.album_id)
       if (data.album_name) setAlbumName(data.album_name)
       if (data.ticker) setTicker(data.ticker)
+      if (data.splitter) setSplitter(data.splitter)
     } catch (e) {
       logger.error('useTrackDetails: Error fetching track details', e)
     }
@@ -64,6 +67,7 @@ export function useTrackDetails(
   useEffect(() => {
     setAlbumName(null)
     setTicker(null)
+    setSplitter(null)
     setUploaderAddress(null)
     setAlbumId(null)
     setHasOwned(false)
@@ -77,6 +81,7 @@ export function useTrackDetails(
     albumId,
     albumName,
     ticker,
+    splitter,
     setHasOwned,
   }
 }

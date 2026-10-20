@@ -22,6 +22,7 @@ interface MintDependencies {
   uploaderAddress: string | null
   albumId: number | null
   ticker: string | null
+  splitter: string | null
   mintData: { minted: number; max: number }
   isAuthenticated: boolean
   login: () => void
@@ -39,6 +40,7 @@ export function useMint({
   uploaderAddress,
   albumId,
   ticker,
+  splitter,
   mintData,
   isAuthenticated,
   login,
@@ -98,6 +100,7 @@ export function useMint({
               token_id: t.token_id,
               uploader_address: t.uploader_address || targetUploader,
               ticker: t.ticker,
+              splitter: t.splitter,
               price: t.price,
             }))
           )
@@ -107,6 +110,7 @@ export function useMint({
             uploader_address: targetUploader,
             album_id: albumId,
             ticker: ticker || undefined,
+            splitter: splitter || undefined,
           })
         }
 
