@@ -39,3 +39,23 @@ jobs:
           bun-version: 1
       - run: bun install --frozen-lockfile
       - run: bun run build
+
+  admin:
+    name: Admin — typecheck + build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend/admin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1
+      - run: bun install --frozen-lockfile
+      - name: Typecheck
+        run: bunx tsc --noEmit
+      - name: Build
+        run: bun run build
+        env:
+          # the Overview fetches releases at request time; a build must not need production
+          CORE_API_URL: https://app.doba.world/api-backend
