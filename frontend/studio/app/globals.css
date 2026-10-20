@@ -486,3 +486,17 @@
     background: rgba(183, 148, 244, 0.4);
   }
 }
+
+/* Respect the OS motion preference. The player sliders track the pointer 1:1 and
+   need no animation; everything else collapses to a near-instant state change
+   rather than vanishing, so layout and focus do not jump. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
