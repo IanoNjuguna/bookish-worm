@@ -1,0 +1,134 @@
+name: Release
+
+# Builds a standalone bundle per app, uploads it to S3, and optionally deploys it
+# over SSM. Boxes pull from S3 with their instance role, so no host holds build
+# tooling or AWS credentials.
+#
+# Repository configuration:
+#   vars.AWS_RELEASE_BUCKET   e.g. bookish-worm-releases
+#   vars.AWS_REGION           e.g. eu-west-1
+#   vars.AWS_ROLE_ARN         role trusted for GitHub OIDC, s3:PutObject
+#   vars.ADMIN_INSTANCE_ID    optional, enables deploy for admin
+#   vars.APP_INSTANCE_ID      optional, enables deploy for app and studio
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build ${{ matrix.app }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # app and studio join this list at P3, when they gain
+        # `output: 'standalone'`. Adding them before that would fail the
+        # standalone check on every push, which is a red main for no gain.
+        include:
+          - app: admin
+            dir: frontend/admin
+          # - app: app
+          #   dir: frontend/app
+          #   core_api: https://app.doba.world/api-backend
+          # - app: studio
+          #   dir: frontend/studio
+
+    defaults:
+      run:
+        working-directory: ${{ matrix.dir }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bunx tsc --noEmit
+
+      - name: Build
+        run: bun run build
+        env:
+          CORE_API_URL: ${{ matrix.core_api || 'https://app.doba.world/api-backend' }}
+
+      - name: Require standalone output
+        run: |
+          if [ ! -f .next/standalone/server.js ]; then
+            echo "::error::${{ matrix.app }} did not emit .next/standalone/server.js; set output:'standalone'"
+            exit 1
+          fi
+
+      - name: Package release
+        run: |
+          set -euo pipefail
+          release="$RUNNER_TEMP/release"
+          mkdir -p "$release/.next"
+          cp -a .next/standalone/. "$release/"
+          cp -a .next/static "$release/.next/static"
+          if [ -d public ]; then cp -a public "$release/public"; fi
+          tar -czf "$RUNNER_TEMP/${{ matrix.app }}.tar.gz" -C "$release" .
+          du -h "$RUNNER_TEMP/${{ matrix.app }}.tar.gz"
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Upload to S3
+        run: |
+          set -euo pipefail
+          short="${GITHUB_SHA::7}"
+          aws s3 cp "$RUNNER_TEMP/${{ matrix.app }}.tar.gz" \
+            "s3://${{ vars.AWS_RELEASE_BUCKET }}/${{ matrix.app }}/$short.tar.gz" \
+            --only-show-errors
+          echo "released \`${{ matrix.app }}\` at \`$short\`" >> "$GITHUB_STEP_SUMMARY"
+
+  # A successful build is not permission to restart a box, so deploying is a
+  # separate, manual run of this workflow.
+  deploy:
+    name: Deploy ${{ matrix.app }}
+    needs: build
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app: admin
+            instance: ${{ vars.ADMIN_INSTANCE_ID }}
+          - app: app
+            instance: ${{ vars.APP_INSTANCE_ID }}
+          - app: studio
+            instance: ${{ vars.APP_INSTANCE_ID }}
+
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Deploy over SSM
+        if: matrix.instance != ''
+        run: |
+          set -euo pipefail
+          short="${GITHUB_SHA::7}"
+          aws ssm send-command \
+            --instance-ids "${{ matrix.instance }}" \
+            --document-name "AWS-RunShellScript" \
+            --comment "deploy ${{ matrix.app }} $short" \
+            --parameters 'commands=["set -euo pipefail","sudo SHA='"$short"' ARTIFACT_BUCKET='"${{ vars.AWS_RELEASE_BUCKET }}"' /srv/bookish-worm/src/deploy/hosts/release.sh ${{ matrix.app }}"]' \
+            --output text --query 'Command.CommandId'
