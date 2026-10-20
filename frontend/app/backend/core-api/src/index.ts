@@ -563,9 +563,11 @@ app.get('/songs', async (c) => {
       const isOwned = isUploader || isMinted
 
       let mintCount = track.mint_count || 0
+      const supplyCapped = Number(track.supply_capped || 0) === 1
+      let remaining: number | null = null
       if (track.splitter) {
         try {
-          const remaining = await getRemainingFractionsOnChain(track.splitter, track.ticker || '', track.token_id)
+          remaining = await getRemainingFractionsOnChain(track.splitter, track.ticker || '', track.token_id)
           if (remaining !== null) {
             const maxSupply = Number(track.max_supply || 0)
             mintCount = Math.max(0, maxSupply - remaining)
@@ -579,7 +581,9 @@ app.get('/songs', async (c) => {
         ...resolveTrackAddress(track),
         is_owned: isOwned,
         is_minted: isMinted,
-        mint_count: mintCount
+        mint_count: mintCount,
+        supply_capped: supplyCapped,
+        is_sold_out: remaining === 0
       }
     }))
 
@@ -818,9 +822,11 @@ app.get('/songs/:id', async (c) => {
 
   // Get on-chain remaining fractions and calculate collected count
   let mintCount = track.mint_count || 0
+  const supplyCapped = Number(track.supply_capped || 0) === 1
+  let remaining: number | null = null
   if (track.splitter) {
     try {
-      const remaining = await getRemainingFractionsOnChain(track.splitter, track.ticker || '', id)
+      remaining = await getRemainingFractionsOnChain(track.splitter, track.ticker || '', id)
       if (remaining === null) {
         mintCount = 0
       } else {
@@ -832,7 +838,13 @@ app.get('/songs/:id', async (c) => {
     }
   }
 
-  return c.json({ ...resolveTrackAddress(track), is_owned: isOwned, mint_count: mintCount })
+  return c.json({
+    ...resolveTrackAddress(track),
+    is_owned: isOwned,
+    mint_count: mintCount,
+    supply_capped: supplyCapped,
+    is_sold_out: remaining === 0
+  })
 })
 
 

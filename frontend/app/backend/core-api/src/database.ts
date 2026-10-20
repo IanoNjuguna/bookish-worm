@@ -29,6 +29,7 @@ async function init() {
       streaming_url TEXT,
       price TEXT,
       max_supply TEXT,
+      supply_capped INTEGER DEFAULT 0,
       splitter TEXT,
       tx_hash TEXT,
       uploader_address TEXT,
@@ -43,6 +44,11 @@ async function init() {
   } catch (e) { /* ignore if column already exists */ }
   try {
     await db.execute('ALTER TABLE tracks ADD COLUMN track_number INTEGER')
+  } catch (e) { /* ignore if column already exists */ }
+
+  // 0 = the minting policy enforces no cap (legacy releases), 1 = cap is on-chain
+  try {
+    await db.execute('ALTER TABLE tracks ADD COLUMN supply_capped INTEGER DEFAULT 0')
   } catch (e) { /* ignore if column already exists */ }
 
   try {
@@ -178,6 +184,7 @@ export interface Track {
   external_url?: string
   price?: string
   max_supply?: string
+  supply_capped?: number | boolean
   splitter?: string
   tx_hash?: string
   uploader_address?: string
@@ -256,8 +263,8 @@ export async function getTrack(tokenId: number): Promise<Track | null> {
 export async function addTrack(track: Track): Promise<void> {
   await db.execute({
     sql: `
-      INSERT INTO tracks (token_id, name, ticker, description, artist, genre, duration, release_date, image_url, audio_url, streaming_url, external_url, price, max_supply, splitter, tx_hash, uploader_address, uploader_payment_address, chain_id, album_id, track_number)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO tracks (token_id, name, ticker, description, artist, genre, duration, release_date, image_url, audio_url, streaming_url, external_url, price, max_supply, supply_capped, splitter, tx_hash, uploader_address, uploader_payment_address, chain_id, album_id, track_number)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(token_id) DO UPDATE SET
         name = excluded.name,
         ticker = excluded.ticker,
@@ -272,6 +279,7 @@ export async function addTrack(track: Track): Promise<void> {
         external_url = excluded.external_url,
         price = excluded.price,
         max_supply = excluded.max_supply,
+        supply_capped = excluded.supply_capped,
         splitter = excluded.splitter,
         tx_hash = excluded.tx_hash,
         uploader_address = excluded.uploader_address,
@@ -295,6 +303,7 @@ export async function addTrack(track: Track): Promise<void> {
       track.external_url ?? null,
       track.price ?? null,
       track.max_supply ?? null,
+      track.supply_capped ? 1 : 0,
       track.splitter ?? null,
       track.tx_hash ?? null,
       track.uploader_address ?? null,
