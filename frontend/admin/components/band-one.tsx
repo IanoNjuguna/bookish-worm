@@ -2,6 +2,7 @@ import { Card, CardLabel, Figure, Note } from '@/components/ui/card';
 import { ada, count, percent } from '@/lib/format';
 import type { Overview as LocalSummary } from '@/lib/metrics';
 import type { Overview as ChainOverview } from '@/lib/overview';
+import { feeRate as computeFeeRate } from '@/lib/summary';
 
 /**
  * Band 1 is a causal pair: what a fan spends on the left, what we keep on the right,
@@ -21,8 +22,7 @@ export function BandOne({
 }) {
   const money = metrics?.money;
   const fans = metrics?.fans.total ?? summary.collects;
-  const feeRate =
-    money && money.gmvLovelace > 0 ? money.takeLovelace / money.gmvLovelace : null;
+  const feeRate = money ? computeFeeRate(money.takeLovelace, money.gmvLovelace) : null;
 
   return (
     <section className="grid gap-4 lg:grid-cols-[1fr_auto_1fr]">

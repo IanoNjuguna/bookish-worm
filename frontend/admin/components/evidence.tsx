@@ -1,12 +1,15 @@
 import { Card, CardLabel, Note } from '@/components/ui/card';
 import { count, percent } from '@/lib/format';
 import type { Overview } from '@/lib/overview';
+import { conversion } from '@/lib/summary';
 import type { Release } from '@/lib/api';
 
 /** The population behaviour that drives the levers. */
 export function Conversion({ metrics }: { metrics: Overview | null }) {
   const fans = metrics?.fans;
-  const rate = fans && fans.listeners > 0 ? fans.collectors / fans.listeners : null;
+  const rate = fans ? conversion(fans.collectors, fans.listeners) : null;
+  // above 1 the ratio is a windowing artefact, so the note explains instead of the number
+  const inverted = Boolean(fans && fans.listeners > 0 && fans.collectors > fans.listeners);
 
   return (
     <Card className="flex flex-col gap-3">
@@ -19,7 +22,7 @@ export function Conversion({ metrics }: { metrics: Overview | null }) {
               {rate !== null && rate <= 1 ? percent(rate) : '—'}
             </span>
           </p>
-          {rate !== null && rate > 1 ? (
+          {inverted ? (
             <Note>
               More collectors than listeners in this window: some collected before they
               listened, so the ratio would read above 100% and lie

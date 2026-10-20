@@ -68,6 +68,16 @@ Shared stack: Tailwind `darkMode: 'class'`, `tailwindcss-animate`, `cn()` (clsx 
 - **Shared hover elevation:** `.glass-surface-hover` = glass surface + pink glow + border brightening on hover (`transition-all duration-500`).
 - **Z-index:** header `z-50`; mobile menu `z-[60]`; Radix overlays `z-50`. Keep overlays at 50 and menus above at 60; do not introduce new layers above 60.
 
+### Dashboards and data surfaces
+
+Applies to operator surfaces (`frontend/admin`), not to the consumer apps. These are the only sanctioned deviations from the glass system, and they exist because a dense data screen is not an ambient one.
+
+- **Surfaces are solid, not glass.** `bg-card` with a hairline: `border-midnight/[0.06] dark:border-white/[0.06]`. There is no background layer to float over, so a blur reads as noise.
+- **Elevation is inverse by theme.** Light: neutral `shadow-sm` on the card. Dark: no shadow at all, because a soft shadow on `midnight` is invisible; elevation comes from surface lightness plus the hairline. `shadow-pink-glow` / `shadow-card-glow` are consumer affordances and never appear on a data surface.
+- **Status uses four existing meanings, and never invents a token.** pass `emerald-500` solid; failing destructive red solid; stale `red-400` **outline**, since `red-400` is already this system's warning tone; acknowledged `text-lavender` outline; unknown is a muted label with no chip fill. Adding a fifth hue for one screen is drift, and every later surface then has to choose between three reds.
+- **Figures are mono and tabular.** Numbers use `font-mono tabular-nums`; an unreadable value renders `—`, never `0.00`.
+- **Whole-card drill-down.** If the only action is "see more", the card is one link with one focusable element. If a card has an action of its own, it gets a button and stops being a link.
+
 ---
 
 ## 2. Layout & Responsive Architecture

@@ -11,6 +11,8 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { getTimeline } from '@/lib/timeline';
 import { summarizeHeatmap } from '@/lib/heatmap';
 import { getOverview } from '@/lib/overview';
+import { getFans } from '@/lib/fans';
+import { FansList } from '@/components/fans-list';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,10 +28,11 @@ function Stat({ term, value }: { term: string; value: string }) {
 }
 
 export default async function OverviewPage() {
-  const [releases, timeline, metrics] = await Promise.all([
+  const [releases, timeline, metrics, fans] = await Promise.all([
     getReleases(),
     getTimeline(),
     getOverview(),
+    getFans(),
   ]);
   const overview = summarize(releases);
   const heat = summarizeHeatmap(timeline.days);
@@ -71,13 +74,7 @@ export default async function OverviewPage() {
       </section>
 
       <section className="grid gap-4 lg:grid-cols-2">
-        <Card className="flex flex-col gap-3">
-          <CardLabel>Fans by value</CardLabel>
-          <Note>
-            Needs per-collector totals. `/songs` returns aggregates, so there is nothing
-            honest to rank here yet.
-          </Note>
-        </Card>
+        <FansList fans={fans} />
         <ReleaseList releases={releases} />
       </section>
 
