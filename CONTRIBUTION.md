@@ -56,6 +56,7 @@ Note: profile links to the studio use HTTPS, so clicking them locally will fail 
 * Look through our **Issues** tab for open tasks.
 * Issues labeled `good first issue` are great jumping-off points for new contributors.
 * If you want to propose a new feature or fix a bug you found, please **open an issue first** to discuss it with the core team before writing code.
+* The full path every change takes, including what the gates are, is in `.agents/skills/feature-process/SKILL.md`: issue, branch, gates, pull request.
 
 If you're not sure where to start, check out our socials and ask.
 
@@ -64,8 +65,8 @@ If you're not sure where to start, check out our socials and ask.
 Fork the repository to your own GitHub account, then clone it locally:
 
 ```bash
-git clone [https://github.com/YOUR-USERNAME/doba-protocol.git](https://github.com/YOUR-USERNAME/doba-protocol.git)
-cd doba-protocol
+git clone https://github.com/YOUR-USERNAME/bookish-worm.git
+cd bookish-worm
 ```
 
 ### 4. Branching
@@ -104,10 +105,14 @@ Keep PRs focused. Small, incremental PRs are easier to review and merge.
 
 ### 7. Testing
 
-All code must pass existing tests and should include new tests if applicable.
-
-Run tests with:
+All code must pass the type-check gates before a pull request is opened:
 
 ```bash
-pnpm test
+cd frontend/app && bunx tsc --noEmit
+cd frontend/studio && bunx tsc --noEmit
+cd frontend/app/backend/core-api && bunx tsc --noEmit
+cd frontend/home && bunx tsc -b
+cd frontend/app/contracts && aiken check
 ```
+
+`bun run lint` is currently broken repo-wide (no ESLint config) and is not a gate.
