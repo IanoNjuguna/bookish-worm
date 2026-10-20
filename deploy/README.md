@@ -4,7 +4,36 @@ Two services, in this order: **core-api first**, then the admin app. The admin r
 `/admin/*`, so deploying it first gives you a dashboard whose every card says "no
 metrics endpoint".
 
-## 0. Before you deploy: the preflight
+## Where things run (migration target)
+
+    box A  t3.micro   admin.doba.world            admin only, behind Access
+    box B  t3.small   app.doba.world, studio.doba.world
+    box C  t3.micro   api (app.doba.world/api-backend)
+    db     RDS        PostgreSQL, outside every box
+    edge   Cloudflare DNS + Tunnel per host + Access on box A
+
+No box has an inbound security-group rule. Each runs its own `cloudflared` and dials
+out; the only way in is the tunnel, and the admin hostname additionally requires an
+Access session. Templates live in `deploy/hosts/`:
+
+    cloud-init.yaml       Ubuntu 24.04, node 22, bun, cloudflared, swap, ufw deny-in
+    doba-app@.service     one unit per app, MemoryMax, hardening, restart-always
+    deploy.sh             pull artifact, atomic symlink swap, health check, rollback
+    tunnel.md             tunnel per host, ingress map, Access application
+
+### Builds do not happen on the boxes
+
+`next build` on a t3.micro swaps and often OOMs. CI builds the standalone bundle and
+uploads `s3://<bucket>/<app>/<sha>.tar.gz`; `deploy.sh` pulls it with the instance
+role, so no credentials live on a host. `--build` exists for a box with enough RAM.
+
+### Prerequisite in the app repos, before P2
+
+Each Next app needs `output: 'standalone'` in its `next.config`. Without it there is
+no `server.js` to run and `deploy.sh` refuses the release. Not added yet: it changes
+every build, and it belongs in the migration PR, not in a deploy-docs one.
+
+## 1. Before you deploy: the preflight
 
 ```bash
 set -a; . /etc/doba/core-api.env; set +a
