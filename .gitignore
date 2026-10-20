@@ -41,3 +41,6 @@ dist-ssr
 
 # Backup / patch artifacts
 *.orig
+
+# Playwright MCP screenshots and traces
+.playwright-mcp/
