@@ -61,3 +61,17 @@ jobs:
         env:
           # the Overview fetches releases at request time; a build must not need production
           CORE_API_URL: https://app.doba.world/api-backend
+
+  api:
+    name: API — typecheck
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend/app/backend/core-api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1
+      - run: bun install --frozen-lockfile
+      - run: bunx tsc --noEmit

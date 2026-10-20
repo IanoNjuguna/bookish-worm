@@ -748,7 +748,7 @@ app.post('/drafts', authMiddleware, async (c) => {
     return c.json({ id }, 201)
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return c.json({ error: 'Invalid draft data', details: error.errors }, 400)
+      return c.json({ error: 'Invalid draft data', details: error.issues }, 400)
     }
     logger.error(`Failed to create draft for ${userAddress}`, error)
     return c.json({ error: 'Failed to create draft' }, 500)
@@ -786,7 +786,7 @@ app.put('/drafts/:id', authMiddleware, async (c) => {
     return c.json({ success: true })
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return c.json({ error: 'Invalid draft data', details: error.errors }, 400)
+      return c.json({ error: 'Invalid draft data', details: error.issues }, 400)
     }
     logger.error(`Failed to update draft ${id} for ${userAddress}`, error)
     return c.json({ error: 'Failed to update draft' }, 500)
