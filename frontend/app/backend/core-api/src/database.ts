@@ -191,6 +191,8 @@ export interface Track {
   uploader_payment_address?: string
   chain_id?: string
   play_count?: number
+  /** Computed per row by the list queries, not a column on tracks. */
+  mint_count?: number
   album_id?: number
   track_number?: number
 }

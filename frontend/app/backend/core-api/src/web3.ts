@@ -39,7 +39,7 @@ async function koiosGetAddressAssets(address: string): Promise<{ unit: string; q
 		headers: { 'Accept': 'application/json' }
 	})
 	if (!res.ok) throw new Error(`Koios address_assets failed: ${res.status}`)
-	const data: any[] = await res.json()
+	const data = (await res.json()) as any[]
 	// Koios returns [{ address, asset_list: [{ policy_id, asset_name, quantity }] }]
 	const assets: { unit: string; quantity: string }[] = []
 	for (const row of data) {
@@ -55,7 +55,7 @@ async function koiosGetStakeAssets(stakeAddress: string): Promise<{ unit: string
 		headers: { 'Accept': 'application/json' }
 	})
 	if (!res.ok) throw new Error(`Koios account_assets failed: ${res.status}`)
-	const data: any[] = await res.json()
+	const data = (await res.json()) as any[]
 	const assets: { unit: string; quantity: string }[] = []
 	for (const row of data) {
 		for (const a of (row.asset_list || [])) {
@@ -186,7 +186,7 @@ export async function getRemainingFractionsOnChain(policyId: string, ticker: str
 			if (res.status === 404) return null
 			throw new Error(`Koios asset_addresses failed: ${res.status}`)
 		}
-		const holders: any[] = await res.json()
+		const holders = (await res.json()) as any[]
 		if (holders.length === 0) {
 			return null
 		}
@@ -237,7 +237,7 @@ export async function getCollectorsCountOnChain(policyId: string, ticker: string
 			if (res.status === 404) return 0
 			throw new Error(`Koios asset_addresses failed: ${res.status}`)
 		}
-		const holders: any[] = await res.json()
+		const holders = (await res.json()) as any[]
 		const userHolders = holders.filter(h => !h.payment_address?.startsWith('addr_test1w') && !h.payment_address?.startsWith('addr1w'))
 		return userHolders.length
 	} catch (err) {
