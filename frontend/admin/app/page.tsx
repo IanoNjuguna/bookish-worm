@@ -28,12 +28,13 @@ function Stat({ term, value }: { term: string; value: string }) {
 }
 
 export default async function OverviewPage() {
-  const [releases, timeline, metrics, fans] = await Promise.all([
+  const [catalogue, timeline, metrics, fans] = await Promise.all([
     getReleases(),
     getTimeline(),
     getOverview(),
     getFans(),
   ]);
+  const releases = catalogue.releases;
   const overview = summarize(releases);
   const heat = summarizeHeatmap(timeline.days);
 
@@ -58,6 +59,13 @@ export default async function OverviewPage() {
           </span>
         </div>
       </header>
+
+      {!catalogue.available && (
+        <p className="rounded-lg border border-red-400/40 bg-red-400/5 px-3 py-2 text-xs text-red-400">
+          core-api is not answering, so the catalogue figures below are empty rather
+          than zero. The health strip is the honest reading until it returns.
+        </p>
+      )}
 
       <p className="text-xs text-midnight/55 dark:text-white/50">
         {count(overview.releases)} releases · {count(overview.releasedWithCollects)} with
