@@ -1,6 +1,7 @@
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js'
 import { logger } from './lib/logger'
 import { getTrack } from './database'
+import { noteChainFallback } from './telemetry'
 
 // ─── Blockfrost Client ────────────────────────────────────────────────────────
 
@@ -113,6 +114,7 @@ export async function verifyOwnershipOnChain(userAddress: string, tokenId: numbe
 			// Only fall through to Koios on rate-limit (429) or server errors (5xx)
 			if (status === 429 || (status >= 500 && status < 600)) {
 				logger.warn(`[Blockfrost] ${status} error — falling back to Koios for address ${userAddress}`)
+				noteChainFallback('blockfrost', `ownership ${status}`)
 			} else {
 				throw blockfrostErr // Re-throw unexpected errors (e.g. 400 bad address)
 			}
@@ -170,6 +172,7 @@ export async function getRemainingFractionsOnChain(policyId: string, ticker: str
 		}
 		if (status === 429 || (status >= 500 && status < 600)) {
 			logger.warn(`[Blockfrost] ${status} error in getRemainingFractions — falling back to Koios`)
+			noteChainFallback('blockfrost', `remaining ${status}`)
 		} else {
 			logger.error(`Blockfrost getRemainingFractions error:`, blockfrostErr)
 			return null

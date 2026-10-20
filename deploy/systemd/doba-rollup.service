@@ -1,0 +1,18 @@
+[Unit]
+Description=doba metrics rollup (metrics_daily for the trailing days)
+Documentation=https://github.com/IanoNjuguna/bookish-worm/blob/main/frontend/app/backend/core-api/README.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/ubuntu/bookish-worm/frontend/app/backend/core-api
+# The endpoint is idempotent, so a re-run after a missed tick is safe.
+# ADMIN_API_KEY is read from the environment file, never from this unit.
+EnvironmentFile=/etc/doba/core-api.env
+# Three days by default: late writes and clock skew, not just yesterday.
+ExecStart=/usr/bin/curl --fail --silent --show-error \
+  -X POST \
+  -H "X-API-Key: ${ADMIN_API_KEY}" \
+  "http://127.0.0.1:${PORT}/admin/rollup?days=3"
+TimeoutStartSec=120

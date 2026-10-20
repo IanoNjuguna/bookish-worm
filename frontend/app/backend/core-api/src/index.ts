@@ -4,9 +4,10 @@ import { cors } from 'hono/cors'
 import { rateLimiter } from 'hono-rate-limiter'
 import { bodyLimit } from 'hono/body-limit'
 import { z } from 'zod'
-import { getTrack, addTrack, getAllTracks, deleteTrack, deleteAllTracks, getUser, addUser, getTrackCollaborators, addCollaborator, isAdmin, type Track, type RefreshToken, addRefreshToken, getRefreshToken, revokeRefreshToken, revokeRefreshTokenFamily, addMint, setMintAmounts, getUnpricedMints, recordEvent, countEventsSince, getOverview, rollupDays, getUserMints, addPlay, getAnalytics, getTimeline, createAuthNonce, consumeAuthNonce, cleanupExpiredNonces, getDrafts, getDraft, createDraft, updateDraft, deleteDraft, type DraftInput } from './database'
+import { getTrack, addTrack, getAllTracks, deleteTrack, deleteAllTracks, getUser, addUser, getTrackCollaborators, addCollaborator, isAdmin, type Track, type RefreshToken, addRefreshToken, getRefreshToken, revokeRefreshToken, revokeRefreshTokenFamily, addMint, setMintAmounts, getUnpricedMints, recordEvent, countEventsSince, getOverview, rollupDays, getFans, getUserMints, addPlay, getAnalytics, getTimeline, createAuthNonce, consumeAuthNonce, cleanupExpiredNonces, getDrafts, getDraft, createDraft, updateDraft, deleteDraft, type DraftInput } from './database'
 import { verifyOwnershipOnChain, getRemainingFractionsOnChain } from './web3'
 import { getCollectAmounts } from './collects'
+import { noteHttp5xx, noteCollectFailed } from './telemetry'
 import { verifyWalletSignature, signJWT, verifyJWT, generateRefreshToken, getAccessTokenPayload } from './auth'
 import axios from 'axios'
 import FormData from 'form-data'
@@ -157,6 +158,17 @@ app.use('*', async (c, next) => {
     }
   }
   await next()
+})
+
+/**
+ * Counts 5xx responses so the health strip has a source. Registered before the
+ * route table, so it wraps every handler that follows.
+ */
+app.use('*', async (c, next) => {
+  await next()
+  if (c.res.status >= 500) {
+    noteHttp5xx(`${c.req.method} ${c.req.path}`, String(c.res.status))
+  }
 })
 
 const getPinataJwt = () => {
@@ -738,6 +750,18 @@ app.get('/admin/overview', async (c) => {
   }
 })
 
+/** Collectors by value, for the concentration list. */
+app.get('/admin/fans', async (c) => {
+  const days = Number(c.req.query('days') ?? 30)
+  const limit = Number(c.req.query('limit') ?? 8)
+  try {
+    return c.json({ days, fans: await getFans(days, limit) })
+  } catch (error: any) {
+    logger.error('Failed to list fans', error)
+    return c.json({ error: 'Failed to list fans' }, 500)
+  }
+})
+
 /**
  * Rebuilds metrics_daily for the trailing days. Idempotent, so the nightly timer
  * can re-run it after a missed tick without producing different numbers.
@@ -968,6 +992,7 @@ app.post('/mints', authMiddleware, async (c) => {
 
   if (!isVerified) {
     logger.warn(`Unverified mint record attempt for track ${track_id} by ${userAddress}`)
+    noteCollectFailed(String(tx_hash ?? 'no-tx'), `ownership unverified for track ${track_id}`)
     return c.json({ error: 'Forbidden', message: 'Token ownership could not be verified on-chain.' }, 403)
   }
 

@@ -260,6 +260,10 @@ export interface Track {
   play_count?: number
   /** Computed per row by the list queries, not a column on tracks. */
   mint_count?: number
+  /** Intended platform fee in basis points, mirroring the splitter's parameter. */
+  fee_bps?: number | null
+  /** published | delisted. Delisted rows stay visible to admin, never to the catalogue. */
+  status?: string | null
   album_id?: number
   track_number?: number
 }
@@ -330,10 +334,15 @@ export async function getTrack(tokenId: number): Promise<Track | null> {
 }
 
 export async function addTrack(track: Track): Promise<void> {
+  // fee_bps mirrors each splitter's validator parameter; it is recorded so the
+  // dashboard can show intended against realised fee. Defaults to the env value
+  // because the client does not send it yet.
+  const feeBps =
+    track.fee_bps ?? (process.env.DEFAULT_FEE_BPS ? Number(process.env.DEFAULT_FEE_BPS) : null)
   await db.execute({
     sql: `
-      INSERT INTO tracks (token_id, name, ticker, description, artist, genre, duration, release_date, image_url, audio_url, streaming_url, external_url, price, max_supply, supply_capped, splitter, tx_hash, uploader_address, uploader_payment_address, chain_id, album_id, track_number)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO tracks (token_id, name, ticker, description, artist, genre, duration, release_date, image_url, audio_url, streaming_url, external_url, price, max_supply, supply_capped, splitter, tx_hash, uploader_address, uploader_payment_address, chain_id, album_id, track_number, fee_bps)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(token_id) DO UPDATE SET
         name = excluded.name,
         ticker = excluded.ticker,
@@ -355,7 +364,8 @@ export async function addTrack(track: Track): Promise<void> {
         uploader_payment_address = excluded.uploader_payment_address,
         chain_id = excluded.chain_id,
         album_id = excluded.album_id,
-        track_number = excluded.track_number
+        track_number = excluded.track_number,
+        fee_bps = COALESCE(excluded.fee_bps, tracks.fee_bps)
     `,
     args: [
       track.token_id,
@@ -379,12 +389,15 @@ export async function addTrack(track: Track): Promise<void> {
       track.uploader_payment_address ?? null,
       track.chain_id ?? null,
       track.album_id ?? null,
-      track.track_number ?? null
+      track.track_number ?? null,
+      feeBps
     ]
   })
 }
 
 export interface TrackFilters {
+  /** Admin surfaces pass true; the catalogue never does. */
+  includeDelisted?: boolean
   artist?: string
   genre?: string
   search?: string
@@ -394,7 +407,7 @@ export interface TrackFilters {
 }
 
 export async function getAllTracks(filters: TrackFilters = {}): Promise<Track[]> {
-  const { artist, genre, search, limit, offset, album_id } = filters
+  const { artist, genre, search, limit, offset, album_id, includeDelisted } = filters
   const conditions: string[] = []
   const args: any[] = []
 
@@ -417,6 +430,10 @@ export async function getAllTracks(filters: TrackFilters = {}): Promise<Track[]>
   if (album_id !== undefined) {
     conditions.push('album_id = ?')
     args.push(album_id)
+  }
+
+  if (!includeDelisted) {
+    conditions.push("COALESCE(status, 'published') = 'published'")
   }
 
   const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
@@ -526,6 +543,47 @@ export async function recordEvent(kind: EventKind, subject: string, detail?: str
     // Never let telemetry break the request it is describing.
     logger.error(`Failed to record event ${kind}`, error)
   }
+}
+
+export type FanRow = {
+  address: string;
+  collects: number;
+  spendLovelace: number;
+  feeLovelace: number;
+  share: number;
+};
+
+/**
+ * Collectors by value, for the concentration list. Addresses are truncated by the
+ * UI, never here: the admin needs the full string to reconcile against chain.
+ */
+export async function getFans(days = 30, limit = 8): Promise<FanRow[]> {
+  const span = Math.min(Math.max(Math.trunc(days) || 30, 1), 365);
+  const rs = await db.execute({
+    sql: `
+      SELECT user_address AS address,
+             COUNT(*) AS collects,
+             COALESCE(SUM(price_lovelace), 0) AS spend,
+             COALESCE(SUM(fee_lovelace), 0) AS fee
+      FROM mints
+      WHERE created_at >= datetime('now', ?) AND kind = 'primary'
+      GROUP BY user_address
+      ORDER BY SUM(price_lovelace) DESC, COUNT(*) DESC
+      LIMIT ?
+    `,
+    args: [`-${span} days`, Math.min(Math.max(limit, 1), 100)],
+  });
+
+  const rows = rs.rows as any[];
+  const total = rows.reduce((sum, r) => sum + Number(r.spend), 0);
+
+  return rows.map((r) => ({
+    address: String(r.address),
+    collects: Number(r.collects),
+    spendLovelace: Number(r.spend),
+    feeLovelace: Number(r.fee),
+    share: total > 0 ? Number(r.spend) / total : 0,
+  }));
 }
 
 export async function countEventsSince(kind: EventKind, sinceDays: number): Promise<number> {

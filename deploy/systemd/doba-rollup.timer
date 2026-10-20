@@ -1,0 +1,12 @@
+[Unit]
+Description=Run the doba metrics rollup nightly
+
+[Timer]
+# 21:15 UTC is 00:15 EAT, the day boundary the rollup's buckets assume. The zone
+# is explicit so the timer fires correctly whatever the host's local time is.
+OnCalendar=*-*-* 21:15:00 UTC
+Persistent=true
+RandomizedDelaySec=60
+
+[Install]
+WantedBy=timers.target
