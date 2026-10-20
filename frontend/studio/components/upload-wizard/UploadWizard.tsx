@@ -54,6 +54,7 @@ export default function UploadWizard() {
         isLastStep={wizard.isLastStep}
         isUploading={upload.isUploading}
         draftSaving={upload.draftSaving}
+        published={upload.publishedSongId !== null}
         onNext={wizard.nextStep}
         onBack={wizard.prevStep}
         onPublish={handlePublish}
