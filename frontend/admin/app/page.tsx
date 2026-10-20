@@ -10,6 +10,7 @@ import { summarize } from '@/lib/metrics';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { getTimeline } from '@/lib/timeline';
 import { summarizeHeatmap } from '@/lib/heatmap';
+import { getOverview } from '@/lib/overview';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,7 +26,11 @@ function Stat({ term, value }: { term: string; value: string }) {
 }
 
 export default async function OverviewPage() {
-  const [releases, timeline] = await Promise.all([getReleases(), getTimeline()]);
+  const [releases, timeline, metrics] = await Promise.all([
+    getReleases(),
+    getTimeline(),
+    getOverview(),
+  ]);
   const overview = summarize(releases);
   const heat = summarizeHeatmap(timeline.days);
 
@@ -57,12 +62,12 @@ export default async function OverviewPage() {
         collects
       </p>
 
-      <BandOne overview={overview} />
-      <HealthStrip />
+      <BandOne summary={overview} metrics={metrics} />
+      <HealthStrip health={metrics?.health} />
 
       <section className="grid gap-4 lg:grid-cols-2">
         <Levers overview={overview} />
-        <Conversion />
+        <Conversion metrics={metrics} />
       </section>
 
       <section className="grid gap-4 lg:grid-cols-2">

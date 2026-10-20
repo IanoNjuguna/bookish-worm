@@ -8,8 +8,12 @@ export type Timeline = {
 };
 
 export async function getTimeline(span = 84): Promise<Timeline> {
+  const key = process.env.ADMIN_API_KEY;
+  if (!key) return { days: [], available: false };
+
   try {
     const res = await fetch(`${apiBase}/admin/timeline?days=${span}`, {
+      headers: { 'X-API-Key': key },
       next: { revalidate: 300 },
     });
     if (!res.ok) return { days: [], available: false };

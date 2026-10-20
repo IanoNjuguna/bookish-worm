@@ -22,13 +22,18 @@ export function Levers({ overview }: { overview: Overview }) {
       <div className="border-t border-midnight/[0.06] pt-4 dark:border-white/[0.06]">
         <CardLabel>Average price</CardLabel>
         <div className="mt-2 flex items-baseline gap-3">
-          <Figure>
-            {ada(overview.averageCollectAda)}
-            <span className="ml-2 text-base text-midnight/50 dark:text-white/50">ADA</span>
-          </Figure>
+          {overview.pricedReleases === 0 ? (
+            <Figure quiet>—</Figure>
+          ) : (
+            <Figure>
+              {ada(overview.averageCollectAda)}
+              <span className="ml-2 text-base text-midnight/50 dark:text-white/50">ADA</span>
+            </Figure>
+          )}
           <Note>
-            {count(overview.pricedReleases)} of {count(overview.releases)} releases carry a
-            readable price
+            {overview.pricedReleases === 0
+              ? 'no release carries a readable price'
+              : `${count(overview.pricedReleases)} of ${count(overview.releases)} releases priced`}
           </Note>
         </div>
       </div>
