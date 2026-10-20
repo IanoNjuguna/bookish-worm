@@ -16,7 +16,7 @@ change as finished on a subset.
 | --- | --- | --- |
 | Fan app | `cd frontend/app && bunx tsc --noEmit` | AGENTS.md gate. Must stay clean |
 | Artist app | `cd frontend/studio && bunx tsc --noEmit` | Own tsconfig, own `node_modules` |
-| API | `cd frontend/app/backend/core-api && bunx tsc --noEmit` | Separate package. `bun install` there first or every import reads as missing |
+| API | no type gate yet | `core-api` has no `tsconfig.json`, so `tsc` from that directory resolves the fan app's config upward and compiles **zero** backend files (verified: 2,483 files listed, 0 from `src/`). Gate on a boot smoke until the tsconfig lands |
 | Marketing site | `cd frontend/home && bunx tsc -b` | Vite plus two tsconfigs (app and node); `-b` builds both. This project is **not** Next.js |
 | Contracts | `cd frontend/app/contracts && aiken build` and `aiken check` | `check` runs the Aiken tests |
 
