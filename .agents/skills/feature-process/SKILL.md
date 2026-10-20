@@ -70,7 +70,7 @@ Run the checks your change can reach. See `check-compiler-errors` for the detail
 ```bash
 cd frontend/app && bunx tsc --noEmit
 cd frontend/studio && bunx tsc --noEmit
-# core-api has no tsconfig: tsc from there checks the fan app, not src/
+cd frontend/app/backend/core-api && bunx tsc --noEmit
 cd frontend/home && bunx tsc -b
 cd frontend/app/contracts && aiken check     # needs a PTY, see check-compiler-errors
 cd frontend/app && bun run lint:design
