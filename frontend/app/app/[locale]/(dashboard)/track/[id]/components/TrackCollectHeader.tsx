@@ -33,12 +33,16 @@ export function TrackCollectHeader({ track, hasOwned, mintCount, maxSupply }: Tr
       )}
       <div className="text-right">
         <p className="text-[10px] uppercase tracking-wider text-midnight/40 dark:text-white/35 font-bold mb-1">
-          Mints
+          Collected
         </p>
         <div className="text-sm font-mono font-bold flex items-center gap-1.5 justify-end">
           <span className="text-midnight dark:text-white">{mintCount.toLocaleString()}</span>
-          <span className="text-midnight/30 dark:text-white/20">/</span>
-          <span className="text-midnight/60 dark:text-white/50">{maxSupply.toLocaleString()}</span>
+          {maxSupply > 0 && (
+            <>
+              <span className="text-midnight/30 dark:text-white/20">/</span>
+              <span className="text-midnight/60 dark:text-white/50">{maxSupply.toLocaleString()}</span>
+            </>
+          )}
         </div>
       </div>
     </div>

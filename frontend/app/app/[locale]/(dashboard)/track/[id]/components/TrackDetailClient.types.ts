@@ -10,6 +10,8 @@ export interface Track {
   description?: string
   chain_id?: string
   max_supply?: string
+  supply_capped?: boolean
+  is_sold_out?: boolean
   uploader_address?: string
   is_owned?: boolean
   mint_count?: number

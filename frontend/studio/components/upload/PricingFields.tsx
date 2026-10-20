@@ -45,6 +45,7 @@ export default function PricingFields({ price, setPrice, supply, setSupply }: Pr
           className="w-full bg-midnight/5 dark:bg-white/5 border border-midnight/10 dark:border-white/10 rounded-xl px-4 py-3 text-midnight dark:text-white focus:border-lavender focus:ring-1 focus:ring-lavender/50 transition-all placeholder:text-midnight/60 dark:placeholder:text-white/40"
           required
         />
+        <p className="text-xs text-midnight/60 dark:text-white/40">{t('maxSupplyHint')}</p>
       </div>
     </div>
   )

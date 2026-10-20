@@ -64,8 +64,9 @@ export function useTrackDetailPage(initialTrack: Track | null) {
   }
 
   const mintCount = track?.mint_count || 0
-  const maxSupply = track?.max_supply ? parseInt(track.max_supply) : 5000
-  const isSoldOut = maxSupply > 0 && mintCount >= maxSupply
+  // max_supply is only a cap when the minting policy enforces one; legacy releases are uncapped
+  const maxSupply = track?.supply_capped && track.max_supply ? parseInt(track.max_supply) : 0
+  const isSoldOut = track?.is_sold_out ?? (maxSupply > 0 && mintCount >= maxSupply)
 
   return {
     track,
