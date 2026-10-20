@@ -6,6 +6,7 @@ import { Card, CardLabel, Note } from '@/components/ui/card';
 import { getReleases } from '@/lib/api';
 import { count } from '@/lib/format';
 import { summarize } from '@/lib/metrics';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,6 +28,7 @@ export default async function OverviewPage() {
           <span className="rounded-full border border-midnight/[0.08] px-2 py-0.5 font-mono text-[11px] text-midnight/60 dark:border-white/[0.1] dark:text-white/60">
             30d
           </span>
+          <ThemeToggle />
           <span className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.15em] text-emerald-600 dark:text-emerald-400">
             <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
             prod

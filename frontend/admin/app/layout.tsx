@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Chivo, IBM_Plex_Mono } from 'next/font/google';
+import { themeScript } from '@/components/theme-toggle';
 import './globals.css';
 
 const chivo = Chivo({ subsets: ['latin'], variable: '--font-chivo', display: 'swap' });
@@ -17,7 +18,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${chivo.variable} ${ibmPlexMono.variable}`} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`dark ${chivo.variable} ${ibmPlexMono.variable}`}
+      data-theme="dark"
+      suppressHydrationWarning
+    >
+      <head>
+        {/* runs before paint so the first frame is the stored theme, never a flash */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="font-sans">{children}</body>
     </html>
   );
