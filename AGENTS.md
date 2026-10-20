@@ -2,8 +2,9 @@
 
 ## UI code standards (enforced via skills)
 
-This repo has project skills in `.agents/skills/` that govern all UI work. Load and follow them:
+This repo has project skills in `.agents/skills/` that govern all work. Load and follow them:
 
+- **`feature-process`** — for **every** change, before the first line of code: issue, branch, gates, pull request. `main` only moves through a PR. CI here builds `frontend/app` and `frontend/home` only, so a green check is not the gate.
 - **`modular-ui-authoring`** — when **writing new** React/Next.js components, pages, or views. New UI must be modular from the start: typed hooks, `*.types.ts` / `*.constants.ts` files, <80-line component files, RSC-first with `'use client'` on the smallest leaf only.
 - **`modular-ui-refactor`** — when **changing existing** UI structure. Zero behavior changes; public import paths and export styles are contracts; tour-targeted IDs (`#connect-wallet-btn`, `#theme-toggle-btn`, `#library-empty-state`, `#side-nav-library`) are load-bearing.
 - **`design-enforcement`** — for **all** styling. `DESIGN.md` is the single source of truth: semantic tokens only, light/dark class pairs, no raw hex, compose from `components/ui/` via `cn()`.
@@ -19,6 +20,7 @@ This repo has project skills in `.agents/skills/` that govern all UI work. Load 
 
 | Concern | Owning skill |
 | --- | --- |
+| The change workflow: issue, branch, gates, PR | `feature-process` |
 | Structure of **new** UI code | `modular-ui-authoring` |
 | Restructuring **existing** UI, behavior preservation | `modular-ui-refactor` |
 | Styling, tokens, design system | `design-enforcement` (source of truth: `DESIGN.md`) |
