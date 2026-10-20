@@ -4,7 +4,7 @@ import { cors } from 'hono/cors'
 import { rateLimiter } from 'hono-rate-limiter'
 import { bodyLimit } from 'hono/body-limit'
 import { z } from 'zod'
-import { getTrack, addTrack, getAllTracks, deleteTrack, deleteAllTracks, getUser, addUser, getTrackCollaborators, addCollaborator, isAdmin, type Track, type RefreshToken, addRefreshToken, getRefreshToken, revokeRefreshToken, revokeRefreshTokenFamily, addMint, setMintAmounts, getUnpricedMints, recordEvent, countEventsSince, getUserMints, addPlay, getAnalytics, getTimeline, createAuthNonce, consumeAuthNonce, cleanupExpiredNonces, getDrafts, getDraft, createDraft, updateDraft, deleteDraft, type DraftInput } from './database'
+import { getTrack, addTrack, getAllTracks, deleteTrack, deleteAllTracks, getUser, addUser, getTrackCollaborators, addCollaborator, isAdmin, type Track, type RefreshToken, addRefreshToken, getRefreshToken, revokeRefreshToken, revokeRefreshTokenFamily, addMint, setMintAmounts, getUnpricedMints, recordEvent, countEventsSince, getOverview, rollupDays, getUserMints, addPlay, getAnalytics, getTimeline, createAuthNonce, consumeAuthNonce, cleanupExpiredNonces, getDrafts, getDraft, createDraft, updateDraft, deleteDraft, type DraftInput } from './database'
 import { verifyOwnershipOnChain, getRemainingFractionsOnChain } from './web3'
 import { getCollectAmounts } from './collects'
 import { verifyWalletSignature, signJWT, verifyJWT, generateRefreshToken, getAccessTokenPayload } from './auth'
@@ -699,10 +699,23 @@ app.get('/analytics', authMiddleware, async (c) => {
 })
 
 /**
- * Daily collect and play counts for the admin heatmap and weekly series.
- * Read-only aggregates, no identities. Public for now because it exposes the same
- * information `/songs` already does; the admin deploy adds Access in front (#26).
+ * Admin routes are service-to-service: the admin app calls them server-side with
+ * the shared secret, never from a browser. Access sits in front of the app; this
+ * key is what stops the tunnel from being a public metrics API.
  */
+app.use('/admin/*', async (c, next) => {
+  const expected = process.env.ADMIN_API_KEY || process.env.API_SECRET_KEY
+  if (!expected) {
+    logger.error('ADMIN_API_KEY is not set; refusing /admin requests')
+    return c.json({ error: 'Admin API is not configured' }, 503)
+  }
+  if (c.req.header('X-API-Key') !== expected) {
+    return c.json({ error: 'Unauthorized' }, 401)
+  }
+  await next()
+})
+
+/** Daily collect and play counts for the heatmap. */
 app.get('/admin/timeline', async (c) => {
   const requested = Number(c.req.query('days') ?? 84)
   try {
@@ -711,6 +724,33 @@ app.get('/admin/timeline', async (c) => {
   } catch (error: any) {
     logger.error('Failed to build the timeline', error)
     return c.json({ error: 'Failed to build the timeline' }, 500)
+  }
+})
+
+/** The Overview's numbers for one window. Shape is the admin app's contract. */
+app.get('/admin/overview', async (c) => {
+  const days = Number(c.req.query('days') ?? 30)
+  try {
+    return c.json(await getOverview(days))
+  } catch (error: any) {
+    logger.error('Failed to build the overview', error)
+    return c.json({ error: 'Failed to build the overview' }, 500)
+  }
+})
+
+/**
+ * Rebuilds metrics_daily for the trailing days. Idempotent, so the nightly timer
+ * can re-run it after a missed tick without producing different numbers.
+ */
+app.post('/admin/rollup', async (c) => {
+  const days = Number(c.req.query('days') ?? 3)
+  try {
+    const result = await rollupDays(days)
+    logger.info(`Rollup wrote ${result.rows} day(s)`)
+    return c.json(result)
+  } catch (error: any) {
+    logger.error('Rollup failed', error)
+    return c.json({ error: 'Rollup failed' }, 500)
   }
 })
 

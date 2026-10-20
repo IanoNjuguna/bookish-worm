@@ -176,6 +176,24 @@ async function init() {
   await db.execute(`CREATE INDEX IF NOT EXISTS idx_mints_time ON mints(created_at)`)
   await db.execute(`CREATE INDEX IF NOT EXISTS idx_events_kind_time ON events(kind, created_at)`)
 
+  // One row per EAT day. The dashboard's series read this, never raw plays.
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS metrics_daily (
+      day TEXT PRIMARY KEY,
+      collects INTEGER NOT NULL DEFAULT 0,
+      gmv_lovelace INTEGER NOT NULL DEFAULT 0,
+      take_lovelace INTEGER NOT NULL DEFAULT 0,
+      unpriced_collects INTEGER NOT NULL DEFAULT 0,
+      plays INTEGER NOT NULL DEFAULT 0,
+      listeners INTEGER NOT NULL DEFAULT 0,
+      collectors INTEGER NOT NULL DEFAULT 0,
+      failed_collects INTEGER NOT NULL DEFAULT 0,
+      chain_fallbacks INTEGER NOT NULL DEFAULT 0,
+      api_5xx INTEGER NOT NULL DEFAULT 0,
+      refreshed_at DATETIME
+    )
+  `)
+
   await db.execute(`
     CREATE TABLE IF NOT EXISTS drafts (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -683,13 +701,196 @@ export type TimelineDay = {
   plays: number;
 };
 
+export type Overview = {
+  days: number;
+  fans: { collectors: number; listeners: number; total: number; zeroRevenue: number };
+  money: {
+    collects: number;
+    gmvLovelace: number;
+    takeLovelace: number;
+    averagePriceLovelace: number | null;
+    spendPerFanLovelace: number | null;
+    takePerFanLovelace: number | null;
+    medianSpendLovelace: number | null;
+    topFanShare: number | null;
+    unpricedCollects: number;
+  };
+  levers: {
+    collectsPerFan: number | null;
+    releasesWithCollects: number;
+    releases: number;
+  };
+  health: { unpricedCollects: number; collectFailed: number; chainFallbacks: number; api5xx: number };
+};
+
 /**
- * Daily counts for the heatmap and the weekly series.
+ * The Overview's numbers for one window.
  *
- * Bucketed in SQL, because `created_at` is SQLite `CURRENT_TIMESTAMP` (UTC, space
- * separated) and comparing it to an ISO string as text compares 'T' against ' '
- * and silently drops rows. EAT is a fixed +3 offset, so the shift is arithmetic.
+ * Read directly from the tables rather than from `metrics_daily`, because at this
+ * catalogue size a windowed aggregate is a single indexed scan; the rollup exists
+ * for the *series* (heatmap, weekly line), where the cost is per-day not per-window.
+ * The shape of this object is the contract with the admin app.
+ *
+ * Every per-fan figure is computed over the union of listeners and collectors, so
+ * an audience that grows without collecting visibly pulls take per fan down.
  */
+export async function getOverview(days = 30): Promise<Overview> {
+  const span = Math.min(Math.max(Math.trunc(days) || 30, 1), 365);
+  const offset = `-${span} days`;
+
+  const perFan = await db.execute({
+    sql: `
+      WITH window_mints AS (
+        SELECT user_address, price_lovelace, fee_lovelace
+        FROM mints WHERE created_at >= datetime('now', ?) AND kind = 'primary'
+      ),
+      collectors AS (SELECT DISTINCT user_address AS a FROM window_mints),
+      listeners AS (
+        SELECT DISTINCT listener_address AS a FROM plays
+        WHERE listener_address IS NOT NULL AND timestamp >= datetime('now', ?)
+      ),
+      fans AS (SELECT a FROM collectors UNION SELECT a FROM listeners),
+      per_fan AS (
+        SELECT f.a,
+               COALESCE((SELECT SUM(price_lovelace) FROM window_mints m WHERE m.user_address = f.a), 0) AS spend,
+               COALESCE((SELECT SUM(fee_lovelace) FROM window_mints m WHERE m.user_address = f.a), 0) AS fee
+        FROM fans f
+      ),
+      ranked AS (
+        SELECT spend, ROW_NUMBER() OVER (ORDER BY spend) AS rn, COUNT(*) OVER () AS n FROM per_fan
+      )
+      SELECT
+        (SELECT COUNT(*) FROM fans)                                   AS fans,
+        (SELECT COUNT(*) FROM collectors)                              AS collectors,
+        (SELECT COUNT(*) FROM listeners)                               AS listeners,
+        (SELECT COUNT(*) FROM fans WHERE a NOT IN (SELECT a FROM collectors)) AS zero_revenue,
+        (SELECT COUNT(*) FROM window_mints)                            AS collects,
+        (SELECT COALESCE(SUM(price_lovelace), 0) FROM window_mints)    AS gmv,
+        (SELECT COALESCE(SUM(fee_lovelace), 0) FROM window_mints)      AS take,
+        (SELECT COUNT(*) FROM window_mints WHERE price_lovelace IS NULL) AS unpriced,
+        (SELECT AVG(price_lovelace) FROM window_mints WHERE price_lovelace IS NOT NULL) AS avg_price,
+        (SELECT spend FROM ranked WHERE rn = (n + 1) / 2)              AS median_spend,
+        (SELECT MAX(spend) * 1.0 / NULLIF(SUM(spend), 0) FROM per_fan) AS top_share,
+        (SELECT COUNT(DISTINCT track_id) FROM mints WHERE created_at >= datetime('now', ?)) AS releases_with_collects,
+        (SELECT COUNT(*) FROM tracks WHERE COALESCE(status, 'published') = 'published')    AS releases
+    `,
+    args: [offset, offset, offset],
+  });
+
+  const r = perFan.rows[0] as any;
+  const fans = Number(r.fans);
+  const gmv = Number(r.gmv);
+  const take = Number(r.take);
+  const collects = Number(r.collects);
+
+  return {
+    days: span,
+    fans: {
+      collectors: Number(r.collectors),
+      listeners: Number(r.listeners),
+      total: fans,
+      zeroRevenue: Number(r.zero_revenue),
+    },
+    money: {
+      collects,
+      gmvLovelace: gmv,
+      takeLovelace: take,
+      averagePriceLovelace: r.avg_price === null ? null : Number(r.avg_price),
+      spendPerFanLovelace: fans > 0 ? Math.round(gmv / fans) : null,
+      takePerFanLovelace: fans > 0 ? Math.round(take / fans) : null,
+      medianSpendLovelace: r.median_spend === null ? null : Number(r.median_spend),
+      topFanShare: r.top_share === null ? null : Number(r.top_share),
+      unpricedCollects: Number(r.unpriced),
+    },
+    levers: {
+      collectsPerFan: fans > 0 ? collects / fans : null,
+      releasesWithCollects: Number(r.releases_with_collects),
+      releases: Number(r.releases),
+    },
+    health: {
+      unpricedCollects: Number(r.unpriced),
+      collectFailed: await countEventsSince('collect_failed', span),
+      chainFallbacks: await countEventsSince('chain_fallback', span),
+      api5xx: await countEventsSince('http_5xx', span),
+    },
+  };
+}
+
+/**
+ * Rebuild `metrics_daily` for the last `days` days (default 3: late writes, clock
+ * skew, a missed tick). Upsert, so running it twice is a no-op, and bucketed by EAT
+ * day for the same reason the timeline is.
+ */
+export async function rollupDays(days = 3): Promise<{ days: number; rows: number }> {
+  const span = Math.min(Math.max(Math.trunc(days) || 3, 1), 90);
+  let rows = 0;
+
+  for (let i = 0; i < span; i++) {
+    // EAT day label for `i` days ago; the same arithmetic the timeline uses.
+    const day = new Date(Date.now() + 3 * 3600_000 - i * 86_400_000).toISOString().slice(0, 10);
+
+    const rs = await db.execute({
+      sql: `
+        SELECT
+          (SELECT COUNT(*) FROM mints WHERE date(created_at, '+3 hours') = ?) AS collects,
+          (SELECT COALESCE(SUM(price_lovelace), 0) FROM mints WHERE date(created_at, '+3 hours') = ?) AS gmv,
+          (SELECT COALESCE(SUM(fee_lovelace), 0) FROM mints WHERE date(created_at, '+3 hours') = ?) AS take,
+          (SELECT COUNT(*) FROM mints
+             WHERE date(created_at, '+3 hours') = ? AND price_lovelace IS NULL) AS unpriced,
+          (SELECT COUNT(*) FROM plays WHERE date(timestamp, '+3 hours') = ?) AS plays,
+          (SELECT COUNT(DISTINCT listener_address) FROM plays
+             WHERE date(timestamp, '+3 hours') = ? AND listener_address IS NOT NULL) AS listeners,
+          (SELECT COUNT(DISTINCT user_address) FROM mints WHERE date(created_at, '+3 hours') = ?) AS collectors,
+          (SELECT COUNT(*) FROM events
+             WHERE kind = 'collect_failed' AND date(created_at, '+3 hours') = ?) AS failed,
+          (SELECT COUNT(*) FROM events
+             WHERE kind = 'chain_fallback' AND date(created_at, '+3 hours') = ?) AS fallbacks,
+          (SELECT COUNT(*) FROM events
+             WHERE kind = 'http_5xx' AND date(created_at, '+3 hours') = ?) AS api_5xx
+      `,
+      args: [day, day, day, day, day, day, day, day, day, day],
+    });
+
+    const r = rs.rows[0] as any;
+    await db.execute({
+      sql: `
+        INSERT INTO metrics_daily
+          (day, collects, gmv_lovelace, take_lovelace, unpriced_collects, plays, listeners,
+           collectors, failed_collects, chain_fallbacks, api_5xx, refreshed_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT(day) DO UPDATE SET
+          collects = excluded.collects,
+          gmv_lovelace = excluded.gmv_lovelace,
+          take_lovelace = excluded.take_lovelace,
+          unpriced_collects = excluded.unpriced_collects,
+          plays = excluded.plays,
+          listeners = excluded.listeners,
+          collectors = excluded.collectors,
+          failed_collects = excluded.failed_collects,
+          chain_fallbacks = excluded.chain_fallbacks,
+          api_5xx = excluded.api_5xx,
+          refreshed_at = CURRENT_TIMESTAMP
+      `,
+      args: [
+        day,
+        Number(r.collects),
+        Number(r.gmv),
+        Number(r.take),
+        Number(r.unpriced),
+        Number(r.plays),
+        Number(r.listeners),
+        Number(r.collectors),
+        Number(r.failed),
+        Number(r.fallbacks),
+        Number(r.api_5xx),
+      ],
+    });
+    rows += 1;
+  }
+
+  return { days: span, rows };
+}
+
 export async function getTimeline(days = 84): Promise<TimelineDay[]> {
   const span = Math.min(Math.max(Math.trunc(days) || 84, 7), 365);
   const offset = `-${span} days`;
