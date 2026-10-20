@@ -27,6 +27,9 @@ concurrency:
 jobs:
   build:
     name: Build ${{ matrix.app }}
+    # Skips cleanly until the pipeline is configured, so merging this file does not
+    # put a red X on main. Set AWS_ROLE_ARN and the rest and it starts building.
+    if: vars.AWS_ROLE_ARN != ''
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
