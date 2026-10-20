@@ -1,0 +1,101 @@
+#cloud-config
+# bookish-worm host provisioning. Ubuntu 24.04 LTS on EC2.
+#
+# Nothing listens on a public port. Cloudflared dials out; the security group has
+# no inbound rules at all, and SSH is expected over SSM Session Manager.
+#
+# Sizes:
+#   admin         t3.micro    (1 GB)   one Next app
+#   app + studio  t3.small    (2 GB)   two Next apps
+#   core-api      t3.micro    (1 GB)   bun, no Next
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - curl
+  - ca-certificates
+  - gnupg
+  - git
+  - unzip
+  - ufw
+  - fail2ban
+  - unattended-upgrades
+  - jq
+
+users:
+  - name: deploy
+    groups: [sudo]
+    shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    ssh_authorized_keys:
+      # replace before use; SSH is not the primary path, SSM is
+      - ssh-ed25519 AAAA_REPLACE_ME deploy@bookish-worm
+
+write_files:
+  # 4 GB of swap on every box. The admin host runs ~120 MB, but a `next build`
+  # or a bad day with the fan app will touch more than 1 GB of RAM.
+  - path: /etc/sysctl.d/99-swap.conf
+    content: |
+      vm.swappiness=10
+      vm.vfs_cache_pressure=50
+
+  - path: /etc/systemd/journald.conf.d/size.conf
+    content: |
+      [Journal]
+      SystemMaxUse=150M
+      RuntimeMaxUse=50M
+      MaxRetentionSec=2week
+
+  - path: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+
+  # Cloudflared routes by hostname: every app listens on loopback only.
+  - path: /etc/cloudflared/config.yml
+    content: |
+      # Replace TUNNEL_ID and the hostnames for this box, then:
+      #   sudo cloudflared service install <TOKEN>
+      # The token form manages this file itself; this copy documents the shape.
+      tunnel: TUNNEL_ID
+      credentials-file: /etc/cloudflared/TUNNEL_ID.json
+      ingress:
+        - hostname: HOSTNAME
+          service: http://127.0.0.1:APP_PORT
+        - service: http_status:404
+
+runcmd:
+  # --- swap ------------------------------------------------------------------
+  - fallocate -l 4G /swapfile
+  - chmod 600 /swapfile
+  - mkswap /swapfile
+  - swapon /swapfile
+  - grep -q '/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+
+  # --- node 22 ---------------------------------------------------------------
+  - curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+  - apt-get install -y nodejs
+
+  # --- bun -------------------------------------------------------------------
+  - su - deploy -c 'curl -fsSL https://bun.sh/install | bash'
+  - ln -sf /home/deploy/.bun/bin/bun /usr/local/bin/bun
+
+  # --- cloudflared -----------------------------------------------------------
+  - curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg -o /usr/share/keyrings/cloudflare-main.gpg
+  - echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared any main' > /etc/apt/sources.list.d/cloudflared.list
+  - apt-get update && apt-get install -y cloudflared
+
+  # --- firewall: nothing in --------------------------------------------------
+  - ufw default deny incoming
+  - ufw default allow outgoing
+  - ufw --force enable
+
+  # --- app directory ---------------------------------------------------------
+  - mkdir -p /srv/bookish-worm/releases /srv/bookish-worm/shared
+  - chown -R deploy:deploy /srv/bookish-worm
+
+  # --- housekeeping ----------------------------------------------------------
+  - timedatectl set-timezone UTC
+  - systemctl enable --now unattended-upgrades
+  - reboot

@@ -1,0 +1,55 @@
+[Unit]
+Description=doba %i (Next standalone)
+After=network-online.target
+Wants=network-online.target
+Documentation=https://github.com/IanoNjuguna/bookish-worm/blob/main/deploy/README.md
+
+[Service]
+Type=simple
+User=deploy
+Group=deploy
+
+# Releases are swapped atomically by deploy.sh; this is the pointer it moves.
+WorkingDirectory=/srv/bookish-worm/current/%i
+EnvironmentFile=/srv/bookish-worm/shared/%i.env
+Environment=NODE_ENV=production
+Environment=HOSTNAME=127.0.0.1
+
+# Standalone output: `node server.js`, no next CLI, no TS on the host.
+ExecStart=/usr/bin/node server.js
+
+Restart=always
+RestartSec=2
+TimeoutStartSec=30
+KillSignal=SIGTERM
+
+# Port and ceiling are per app, written as a drop-in by deploy.sh:
+#   /etc/systemd/system/doba-<app>.service.d/limits.conf
+# These are only the defaults for a host with a single app.
+Environment=PORT=3100
+MemoryMax=512M
+
+# --- isolation --------------------------------------------------------------
+# This is the line that lets several apps share one box: a leaky app is killed
+# alone instead of taking the host's memory with it.
+MemoryHigh=90%
+TasksMax=256
+
+# --- hardening --------------------------------------------------------------
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/bookish-worm
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+LockPersonality=true
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=doba-%i
+
+[Install]
+WantedBy=multi-user.target
