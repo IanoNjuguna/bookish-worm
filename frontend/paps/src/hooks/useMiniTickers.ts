@@ -1,7 +1,14 @@
 import { useEffect, useState } from 'react';
 import { socket } from '../lib/ws';
 
-export type MiniTicker = { last: number; open: number; pct: number; quoteVolume: number };
+export type MiniTicker = {
+  last: number;
+  open: number;
+  pct: number;
+  high: number;
+  low: number;
+  quoteVolume: number;
+};
 
 type Raw = {
   e: string;
@@ -37,6 +44,8 @@ export function useMiniTickers() {
             last,
             open,
             pct: open ? ((last - open) / open) * 100 : 0,
+            high: Number(r.h),
+            low: Number(r.l),
             quoteVolume: Number(r.q),
           };
         }
