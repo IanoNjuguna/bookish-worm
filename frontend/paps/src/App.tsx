@@ -6,6 +6,7 @@ import { useKlines } from './hooks/useKlines';
 import { useMarkPrice, useTrades } from './hooks/useMarket';
 import { useMiniTickers } from './hooks/useMiniTickers';
 import { useDeck, type DeckCard } from './hooks/useDeck';
+import { useIdentity } from './hooks/useIdentity';
 import { useSparklines } from './hooks/useSparklines';
 import { Sidebar } from './components/Sidebar';
 import { TopBar, type ViewMode } from './components/TopBar';
@@ -21,8 +22,8 @@ import type { Interval } from './lib/constants';
 import type { Side } from './lib/order';
 
 const PRO_MIN_WIDTH = 1024;
-const SWIPE_RISK = 100;
-const SWIPE_LEVERAGE = 10;
+const FALLBACK_RISK = 100;
+const FALLBACK_LEVERAGE = 10;
 const MAX_POSITIONS = 5;
 const DECK_SIZE = 10;
 const UNDO_MS = 2_000;
@@ -43,6 +44,7 @@ export default function App() {
   const [interval, setInterval] = useState<Interval>('15m');
   const [picked, setPicked] = useState('');
   const [mode, setMode] = useState<ViewMode>('pro');
+  const [modeTouched, setModeTouched] = useState(false);
   const [connected, setConnected] = useState(false);
   const [swiped, setSwiped] = useState<string[]>([]);
   const [undo, setUndo] = useState<{ id: string; symbol: string; side: Side } | null>(null);
@@ -60,7 +62,11 @@ export default function App() {
   const trades = useTrades(symbol);
   const { bars, error } = useKlines(symbol, interval);
   const account = usePaperAccount();
-  const deck = useDeck(symbols, mini, DECK_SIZE);
+  const identity = useIdentity();
+  const profile = identity.profile;
+  const swipeRisk = profile.riskUsd || FALLBACK_RISK;
+  const swipeLeverage = profile.leverage || FALLBACK_LEVERAGE;
+  const deck = useDeck(symbols, mini, DECK_SIZE, profile.watchlist);
 
   useEffect(() => {
     socket.connect();
@@ -69,6 +75,11 @@ export default function App() {
     // count, so tearing it down here would only cause a reconnect storm under
     // StrictMode's double mount.
   }, []);
+
+  useEffect(() => {
+    // The profile decides where the app opens, until the trader touches the switcher.
+    if (!modeTouched && modes.includes(profile.defaultView)) setMode(profile.defaultView);
+  }, [profile.defaultView, modeTouched, modes]);
 
   useEffect(() => {
     if (!undo) return;
@@ -94,8 +105,8 @@ export default function App() {
       side,
       kind: 'market',
       price: card.markPrice,
-      size: Math.max(stepFor(card.symbol), SWIPE_RISK / card.markPrice),
-      leverage: SWIPE_LEVERAGE,
+      size: Math.max(stepFor(card.symbol), swipeRisk / card.markPrice),
+      leverage: swipeLeverage,
       mark: card.markPrice,
       step: stepFor(card.symbol),
     });
@@ -103,7 +114,12 @@ export default function App() {
     setUndo({ id, symbol: card.symbol, side });
   };
 
-  const remaining = useMemo(() => deck.filter((c) => !swiped.includes(c.symbol)), [deck, swiped]);
+  const remaining = useMemo(() => {
+    const left = deck.filter((c) => !swiped.includes(c.symbol));
+    // A trader's own markets come first; the rank order is only the default.
+    const watched = left.filter((c) => profile.watchlist.includes(c.symbol));
+    return [...watched, ...left.filter((c) => !profile.watchlist.includes(c.symbol))];
+  }, [deck, swiped, profile.watchlist]);
   const spark = useSparklines(remaining.slice(0, 4).map((c) => c.symbol));
 
   const blotter = (
@@ -130,7 +146,11 @@ export default function App() {
         connected={connected}
         mode={view}
         modes={modes}
-        onMode={setMode}
+        onMode={(m) => {
+          setModeTouched(true);
+          setMode(m);
+        }}
+        identity={identity}
       />
 
       {view === 'swipe' ? (
@@ -139,8 +159,8 @@ export default function App() {
             cards={remaining}
             spark={spark}
             equity={account.equity}
-            risk={SWIPE_RISK}
-            leverage={SWIPE_LEVERAGE}
+            risk={swipeRisk}
+            leverage={swipeLeverage}
             stepFor={stepFor}
             openPositions={account.positions.length}
             maxPositions={MAX_POSITIONS}
@@ -167,6 +187,8 @@ export default function App() {
             interval={interval}
             onInterval={setInterval}
             chartError={error}
+            initialRisk={swipeRisk}
+            initialLeverage={swipeLeverage}
             onPlace={place}
           />
           <div className="mx-auto w-full max-w-[520px] px-3 pb-3">

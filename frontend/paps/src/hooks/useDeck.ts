@@ -20,17 +20,29 @@ export type DeckCard = {
  * swipe deck with dead cards teaches nothing. Funding is fetched per card — it is a
  * public endpoint, no key involved.
  */
-export function useDeck(symbols: SymbolInfo[], tickers: Record<string, MiniTicker>, take = 6) {
+export function useDeck(
+  symbols: SymbolInfo[],
+  tickers: Record<string, MiniTicker>,
+  take = 6,
+  pinned: string[] = [],
+) {
   const [funding, setFunding] = useState<Record<string, number>>({});
 
   const ranked = useMemo(() => {
-    return symbols
+    const rows = symbols
       .map((s) => ({ symbol: s.symbol, t: tickers[s.symbol] }))
-      .filter((r): r is { symbol: string; t: MiniTicker } => Boolean(r.t))
+      .filter((r): r is { symbol: string; t: MiniTicker } => Boolean(r.t));
+
+    // A trader's watchlist is not a suggestion: those markets lead the deck even
+    // when they are not among today's movers.
+    const watched = pinned.filter((p) => rows.some((r) => r.symbol === p));
+    const rest = rows
+      .filter((r) => !watched.includes(r.symbol))
       .sort((a, b) => Math.abs(b.t.pct) - Math.abs(a.t.pct))
-      .slice(0, take)
       .map((r) => r.symbol);
-  }, [symbols, tickers, take]);
+
+    return [...watched, ...rest].slice(0, Math.max(take, watched.length));
+  }, [symbols, tickers, take, pinned]);
 
   const key = ranked.join(',');
 

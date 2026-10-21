@@ -43,6 +43,36 @@ are taken with `X-Cache: MISS` only.
 Testnet carries four markets (ADA, SOL, BTC, ETH) and live quotes, so the terminal can
 be pointed at it with one variable.
 
+## Identity
+
+An address is the identity; a profile is what it remembers.
+
+    CIP-30 wallets     window.cardano, enabled on click, change address read from the
+                       wallet — the same connector doba's other front ends use
+    UTXOS (utxos.dev)  wired as a provider but not bundled; see lib/identity/utxos.ts
+                       for the four-step switch-on. It needs a project id, and its type
+                       graph took tsc from 9s to over five minutes, so it stays out
+                       until there is something to authenticate against
+
+Preferences live in `localStorage` keyed by address, so switching wallets switches
+traders — useful when demoing two accounts:
+
+    risk / swipe   25 · 50 · 100 · 250 · 500
+    leverage       2 · 5 · 10 · 20 · 50
+    opens on       pro · lite · swipe
+    watchlist      markets that lead the deck
+
+Nothing here asks for a signature: connecting identifies, it does not authorise. Orders
+are paper and the wallet cannot be asked to move anything.
+
+## UTXOS, when you turn it on
+
+    bun add @utxos/sdk
+    VITE_UTXOS_PROJECT_ID=...   VITE_NETWORK_ID=1
+
+Then replace the throw in `connectUtxos()` with the four lines in that file. The rest of
+the app already speaks `Identity`.
+
 ## Deploy
 
 Cloudflare Pages, its own project, its own hostname. Nothing here shares a host with
