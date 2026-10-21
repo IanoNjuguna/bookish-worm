@@ -40,6 +40,25 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run build
 
+  paps:
+    name: Paps — typecheck + test + build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend/paps
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1
+      - run: bun install --frozen-lockfile
+      - name: Typecheck
+        run: bunx tsc --noEmit
+      - name: Order book tests
+        run: bun run test
+      - name: Build
+        run: bun run build
+
   admin:
     name: Admin — typecheck + build
     runs-on: ubuntu-latest
