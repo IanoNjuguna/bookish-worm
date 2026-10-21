@@ -27,9 +27,20 @@
     font-feature-settings: 'tnum' 1, 'cv05' 1;
   }
 
+  /* Every numeral is mono, every label is sans. Mixing the two is what makes a
+     dashboard look generated; this is the seam that keeps it a terminal. */
   .num {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
     @apply tabular-nums;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
+    font-feature-settings: 'zero' 1;
+  }
+
+  .chip {
+    @apply px-1.5 py-0.5 text-[10px] uppercase tracking-[0.08em] text-muted transition-colors;
+  }
+  .chip-on {
+    @apply bg-panel-2 text-fg;
   }
 
   ::selection {
