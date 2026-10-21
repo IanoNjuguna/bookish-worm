@@ -34,7 +34,19 @@ type State = {
 };
 
 type Action =
-  | { type: 'place'; symbol: string; side: Side; kind: OrderKind; price: number; size: number; leverage: number; mark: number; step: number }
+  | {
+      type: 'place';
+      symbol: string;
+      side: Side;
+      kind: OrderKind;
+      price: number;
+      size: number;
+      leverage: number;
+      mark: number;
+      step: number;
+      id?: string;
+    }
+  | { type: 'undo'; id: string }
   | { type: 'cancel'; id: string }
   | { type: 'close'; id: string; mark: number };
 
@@ -81,7 +93,7 @@ function reduce(state: State, action: Action): State {
         } else {
           positions = [
             {
-              id: uid(),
+              id: action.id ?? uid(),
               symbol,
               side,
               entry,
@@ -113,6 +125,20 @@ function reduce(state: State, action: Action): State {
       }
 
       return { ...state, orders, positions, equity, fills: [...fills, ...state.fills] };
+    }
+
+    case 'undo': {
+      // A swipe is immediate and reversible for two seconds: the position goes, the
+      // fee goes with it, and any fill it produced is removed from the history.
+      const position = state.positions.find((p) => p.id === action.id);
+      if (!position) return state;
+      const notional = notionalOf(position.entry, position.size);
+      return {
+        ...state,
+        positions: state.positions.filter((p) => p.id !== action.id),
+        equity: state.equity + notional * TAKER_FEE,
+        fills: state.fills.filter((f) => !(f.price === position.entry && f.size === position.size)),
+      };
     }
 
     case 'cancel':
@@ -151,6 +177,7 @@ export function usePaperAccount() {
   const actions = useMemo(
     () => ({
       place: (a: Omit<Action & { type: 'place' }, 'type'>) => dispatch({ type: 'place', ...a }),
+      undo: (id: string) => dispatch({ type: 'undo', id }),
       cancel: (id: string) => dispatch({ type: 'cancel', id }),
       close: (id: string, mark: number) => dispatch({ type: 'close', id, mark }),
     }),

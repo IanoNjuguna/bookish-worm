@@ -4,7 +4,7 @@ import { fundingApr, price, pct, usd } from '../lib/format';
 import { cn } from '../lib/cn';
 import { AgeBadge } from './AgeBadge';
 
-export type ViewMode = 'pro' | 'lite';
+export type ViewMode = 'pro' | 'lite' | 'swipe';
 
 type Props = {
   symbol: string;
@@ -14,6 +14,7 @@ type Props = {
   equity: number;
   connected: boolean;
   mode: ViewMode;
+  modes: ViewMode[];
   onMode: (m: ViewMode) => void;
 };
 
@@ -29,7 +30,7 @@ function Stat({ k, v, tone }: { k: string; v: string; tone?: 'long' | 'short' })
 }
 
 /** Status bar: identity, environment, freshness, and the six numbers that matter. */
-export function TopBar({ symbol, ticker, mark, lastAt, equity, connected, mode, onMode }: Props) {
+export function TopBar({ symbol, ticker, mark, lastAt, equity, connected, mode, modes, onMode }: Props) {
   const next = mark ? Math.max(0, mark.nextFundingTime - Date.now()) : 0;
   const hh = Math.floor(next / 3_600_000);
   const mm = Math.floor((next % 3_600_000) / 60_000);
@@ -79,7 +80,7 @@ export function TopBar({ symbol, ticker, mark, lastAt, equity, connected, mode, 
         <AgeBadge lastAt={lastAt} connected={connected} />
 
         <div className="hidden items-center border border-line sm:flex">
-          {(['pro', 'lite'] as ViewMode[]).map((m) => (
+          {modes.map((m) => (
             <button
               key={m}
               onClick={() => onMode(m)}

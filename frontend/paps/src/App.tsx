@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { symbolInfo, useSymbols } from './hooks/useSymbols';
 import { useTicker } from './hooks/useTicker';
 import { useDepth } from './hooks/useDepth';
 import { useKlines } from './hooks/useKlines';
 import { useMarkPrice, useTrades } from './hooks/useMarket';
 import { useMiniTickers } from './hooks/useMiniTickers';
+import { useDeck, type DeckCard } from './hooks/useDeck';
 import { Sidebar } from './components/Sidebar';
 import { TopBar, type ViewMode } from './components/TopBar';
 import { ChartPanel } from './components/Chart';
@@ -12,11 +13,16 @@ import { BookPanel } from './components/BookPanel';
 import { Ticket } from './components/Ticket';
 import { Blotter } from './components/Blotter';
 import { LiteView } from './components/LiteView';
+import { SwipeDeck } from './components/SwipeDeck';
 import { socket } from './lib/ws';
 import { usePaperAccount } from './lib/store';
 import type { Interval } from './lib/constants';
+import type { Side } from './lib/order';
 
 const PRO_MIN_WIDTH = 1024;
+const SWIPE_RISK = 100;
+const SWIPE_LEVERAGE = 10;
+const UNDO_MS = 2_000;
 
 function useIsWide() {
   const [wide, setWide] = useState(() => window.innerWidth >= PRO_MIN_WIDTH);
@@ -35,10 +41,13 @@ export default function App() {
   const [picked, setPicked] = useState('');
   const [mode, setMode] = useState<ViewMode>('pro');
   const [connected, setConnected] = useState(false);
+  const [swiped, setSwiped] = useState<string[]>([]);
+  const [undo, setUndo] = useState<{ id: string; symbol: string; side: Side } | null>(null);
 
   const wide = useIsWide();
-  // Pro needs four rails; below that width the same engine is presented as Lite.
-  const view: ViewMode = wide ? mode : 'lite';
+  // Pro needs four rails; narrower screens get the two views that actually fit.
+  const modes: ViewMode[] = wide ? ['pro', 'lite', 'swipe'] : ['lite', 'swipe'];
+  const view: ViewMode = modes.includes(mode) ? mode : modes[0];
 
   const { symbols } = useSymbols();
   const mini = useMiniTickers();
@@ -48,6 +57,7 @@ export default function App() {
   const trades = useTrades(symbol);
   const { bars, error } = useKlines(symbol, interval);
   const account = usePaperAccount();
+  const deck = useDeck(symbols, mini);
 
   useEffect(() => {
     socket.connect();
@@ -57,13 +67,40 @@ export default function App() {
     // StrictMode's double mount.
   }, []);
 
+  useEffect(() => {
+    if (!undo) return;
+    const id = window.setTimeout(() => setUndo(null), UNDO_MS);
+    return () => window.clearTimeout(id);
+  }, [undo]);
+
   const info = symbolInfo(symbols, symbol);
   const last = mini[symbol]?.last ?? Number(ticker?.lastPrice ?? 0);
   const markPrice = Number(mark?.markPrice ?? last);
-  const step = Number(info?.filters?.find((f) => f.filterType === 'LOT_SIZE')?.stepSize ?? 1);
 
-  const place = (o: { side: 'LONG' | 'SHORT'; kind: 'limit' | 'market'; price: number; size: number; leverage: number }) =>
-    account.place({ ...o, symbol, mark: markPrice, step });
+  const stepFor = (s: string) =>
+    Number(symbolInfo(symbols, s)?.filters?.find((f) => f.filterType === 'LOT_SIZE')?.stepSize ?? 1);
+
+  const place = (o: { side: Side; kind: 'limit' | 'market'; price: number; size: number; leverage: number }) =>
+    account.place({ ...o, symbol, mark: markPrice, step: stepFor(symbol) });
+
+  const onSwipe = (card: DeckCard, side: Side) => {
+    const id = `swipe-${card.symbol}-${Date.now()}`;
+    account.place({
+      id,
+      symbol: card.symbol,
+      side,
+      kind: 'market',
+      price: card.markPrice,
+      size: Math.max(stepFor(card.symbol), SWIPE_RISK / card.markPrice),
+      leverage: SWIPE_LEVERAGE,
+      mark: card.markPrice,
+      step: stepFor(card.symbol),
+    });
+    setSwiped((prev) => [...prev, card.symbol]);
+    setUndo({ id, symbol: card.symbol, side });
+  };
+
+  const remaining = useMemo(() => deck.filter((c) => !swiped.includes(c.symbol)), [deck, swiped]);
 
   const blotter = (
     <Blotter
@@ -81,17 +118,37 @@ export default function App() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       <TopBar
-        symbol={symbol}
-        ticker={mini[symbol]}
-        mark={mark}
+        symbol={view === 'swipe' ? (remaining[0]?.symbol ?? symbol) : symbol}
+        ticker={mini[view === 'swipe' ? (remaining[0]?.symbol ?? symbol) : symbol]}
+        mark={view === 'swipe' ? null : mark}
         lastAt={lastAt}
         equity={account.equity}
         connected={connected}
         mode={view}
+        modes={modes}
         onMode={setMode}
       />
 
-      {view === 'lite' ? (
+      {view === 'swipe' ? (
+        <div className="mx-auto flex min-h-0 w-full max-w-[560px] flex-1 flex-col border-x border-line">
+          <SwipeDeck
+            cards={remaining}
+            equity={account.equity}
+            risk={SWIPE_RISK}
+            leverage={SWIPE_LEVERAGE}
+            stepFor={stepFor}
+            onSwipe={onSwipe}
+            onPass={(c) => setSwiped((prev) => [...prev, c.symbol])}
+            undo={undo}
+            onUndo={() => {
+              if (!undo) return;
+              account.undo(undo.id);
+              setSwiped((prev) => prev.filter((s) => s !== undo.symbol));
+              setUndo(null);
+            }}
+          />
+        </div>
+      ) : view === 'lite' ? (
         <main className="min-h-0 flex-1 overflow-y-auto">
           <LiteView
             symbol={symbol}
