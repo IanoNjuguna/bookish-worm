@@ -6,6 +6,7 @@ import { useKlines } from './hooks/useKlines';
 import { useMarkPrice, useTrades } from './hooks/useMarket';
 import { useMiniTickers } from './hooks/useMiniTickers';
 import { useDeck, type DeckCard } from './hooks/useDeck';
+import { useSparklines } from './hooks/useSparklines';
 import { Sidebar } from './components/Sidebar';
 import { TopBar, type ViewMode } from './components/TopBar';
 import { ChartPanel } from './components/Chart';
@@ -22,6 +23,8 @@ import type { Side } from './lib/order';
 const PRO_MIN_WIDTH = 1024;
 const SWIPE_RISK = 100;
 const SWIPE_LEVERAGE = 10;
+const MAX_POSITIONS = 5;
+const DECK_SIZE = 10;
 const UNDO_MS = 2_000;
 
 function useIsWide() {
@@ -57,7 +60,7 @@ export default function App() {
   const trades = useTrades(symbol);
   const { bars, error } = useKlines(symbol, interval);
   const account = usePaperAccount();
-  const deck = useDeck(symbols, mini);
+  const deck = useDeck(symbols, mini, DECK_SIZE);
 
   useEffect(() => {
     socket.connect();
@@ -101,6 +104,7 @@ export default function App() {
   };
 
   const remaining = useMemo(() => deck.filter((c) => !swiped.includes(c.symbol)), [deck, swiped]);
+  const spark = useSparklines(remaining.slice(0, 4).map((c) => c.symbol));
 
   const blotter = (
     <Blotter
@@ -133,13 +137,16 @@ export default function App() {
         <div className="mx-auto flex min-h-0 w-full max-w-[560px] flex-1 flex-col border-x border-line">
           <SwipeDeck
             cards={remaining}
+            spark={spark}
             equity={account.equity}
             risk={SWIPE_RISK}
             leverage={SWIPE_LEVERAGE}
             stepFor={stepFor}
+            openPositions={account.positions.length}
+            maxPositions={MAX_POSITIONS}
             onSwipe={onSwipe}
             onPass={(c) => setSwiped((prev) => [...prev, c.symbol])}
-            undo={undo}
+            undo={undo ? { symbol: undo.symbol, side: undo.side } : null}
             onUndo={() => {
               if (!undo) return;
               account.undo(undo.id);
