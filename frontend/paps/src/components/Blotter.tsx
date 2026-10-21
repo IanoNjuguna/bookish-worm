@@ -10,15 +10,28 @@ type Props = {
   fills: Fill[];
   equity: number;
   mark: number;
+  marks: Record<string, number>;
   symbol: string;
-  onClose: (id: string, mark: number) => void;
+  onClose: (id: string, mark: number, fraction?: number) => void;
+  onCloseAll: (mark: number) => void;
   onCancel: (id: string) => void;
 };
 
 type TabKey = 'positions' | 'orders' | 'history' | 'balances';
 
 /** The blotter: what you hold, what is working, what happened, what you have. */
-export function Blotter({ positions, orders, fills, equity, mark, symbol, onClose, onCancel }: Props) {
+export function Blotter({
+  positions,
+  orders,
+  fills,
+  equity,
+  mark,
+  marks,
+  symbol,
+  onClose,
+  onCloseAll,
+  onCancel,
+}: Props) {
   const [tab, setTab] = useState<TabKey>('positions');
   const open = orders.filter((o) => o.status === 'open');
 
@@ -46,7 +59,15 @@ export function Blotter({ positions, orders, fills, equity, mark, symbol, onClos
             {t.n !== undefined && <span className="ml-1 text-muted">({t.n})</span>}
           </button>
         ))}
-        <span className="ml-auto pr-2 text-[10px] text-muted">{symbol}</span>
+        {positions.length > 0 && (
+          <button
+            onClick={() => onCloseAll(mark)}
+            className="ml-auto border border-line px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] text-muted hover:text-fg"
+          >
+            close all
+          </button>
+        )}
+        <span className={cn('pr-2 text-[10px] text-muted', positions.length ? '' : 'ml-auto')}>{symbol}</span>
       </div>
 
       <div className="min-h-0 flex-1 overflow-auto">
@@ -57,7 +78,8 @@ export function Blotter({ positions, orders, fills, equity, mark, symbol, onClos
             </thead>
             <tbody>
               {positions.map((p) => {
-                const up = unrealised(p, mark);
+                const pMark = marks[p.symbol] ?? mark;
+                const up = unrealised(p, pMark);
                 const liq = liquidationPrice(p.side, p.entry, p.margin, p.size);
                 return (
                   <tr key={p.id} className="border-b border-line/50">
@@ -69,20 +91,29 @@ export function Blotter({ positions, orders, fills, equity, mark, symbol, onClos
                     </Td>
                     <Td num>{p.size.toLocaleString('en-US')}</Td>
                     <Td num>{price(p.entry)}</Td>
-                    <Td num>{price(mark)}</Td>
+                    <Td num>{price(pMark)}</Td>
                     <Td num muted>{liq ? price(liq) : '—'}</Td>
                     <Td num>${usd(p.margin)}</Td>
                     <Td num tone={up >= 0 ? 'long' : 'short'}>
                       {up >= 0 ? '+' : '−'}${usd(Math.abs(up))}
                     </Td>
-                    <Td num tone={up >= 0 ? 'long' : 'short'}>{roe(p, mark).toFixed(1)}%</Td>
+                    <Td num tone={up >= 0 ? 'long' : 'short'}>{roe(p, pMark).toFixed(1)}%</Td>
                     <Td>
-                      <button
-                        onClick={() => onClose(p.id, mark)}
-                        className="border border-line px-2 py-0.5 text-[10px] text-muted hover:text-fg"
-                      >
-                        close
-                      </button>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => onClose(p.id, pMark, 0.5)}
+                          className="border border-line px-1.5 py-0.5 text-[10px] text-muted hover:text-fg"
+                          title="close half"
+                        >
+                          ½
+                        </button>
+                        <button
+                          onClick={() => onClose(p.id, pMark, 1)}
+                          className="border border-line px-1.5 py-0.5 text-[10px] text-muted hover:text-fg"
+                        >
+                          close
+                        </button>
+                      </div>
                     </Td>
                   </tr>
                 );
