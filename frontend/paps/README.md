@@ -1,0 +1,55 @@
+# paps
+
+An interactive trading interface for Strike Finance perpetuals on Cardano. Public
+market data is live; orders are paper until an API wallet is connected.
+
+    bun install
+    bun run dev        # http://127.0.0.1:5175
+    bun run build      # dist/
+    bun run test       # order book sync tests
+
+## What is real, and what is not
+
+    market data     real. REST and WebSocket against api.strikefinance.org
+    book, depth     real, built from a snapshot plus deltas
+    ticket, maths   real formulas from Strike's docs, real tick and lot sizes from
+                    exchangeInfo, real 5 bps taker fee
+    orders          paper. Filled locally against the mark, no request is sent
+    liquidation     strike's isolated formula, first-tier maintenance margin, so it
+                    is an estimate and the UI says so
+
+The header badge reads PAPER everywhere, and the ticket repeats it. Nothing in this
+app can move funds.
+
+## Strike API notes
+
+The documented base URL is wrong: `/v2/exchangeInfo` returns 404 on both environments.
+The live prefix is `/price/v2/...`:
+
+    https://api.strikefinance.org/price/v2
+    https://api-v2-testnet.strikefinance.org/price/v2
+
+WebSocket frames may carry several JSON documents separated by newlines. Parsing a
+frame as one document silently drops every message after the first.
+
+`/depth` is cached for five seconds server-side. Anchoring the local book to a cached
+snapshot drops every delta in between, which shows up as a crossed spread; snapshots
+are taken with `X-Cache: MISS` only.
+
+## Environment
+
+    VITE_STRIKE_ENV=mainnet | testnet     defaults to mainnet
+
+Testnet carries four markets (ADA, SOL, BTC, ETH) and live quotes, so the terminal can
+be pointed at it with one variable.
+
+## Deploy
+
+Cloudflare Pages, its own project, its own hostname. Nothing here shares a host with
+doba's app or admin.
+
+    bunx wrangler pages deploy dist --project-name paps
+
+One-time, in the dashboard: create the `paps` Pages project, then add `paps.doba.world`
+as a custom domain. Build output is `dist`, build command `bun run build`, root
+`frontend/paps` if Pages builds it from git rather than from a local deploy.
