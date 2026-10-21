@@ -20,6 +20,9 @@ export function ChartPanel({ bars, interval, onInterval, error }: Props) {
         textColor: '#8c8c8c',
         fontFamily: 'Inter, system-ui, sans-serif',
         fontSize: 11,
+        // The default logo renders as a white box on a dark canvas; a credit line in
+        // the app footer covers the licence instead.
+        attributionLogo: false,
       },
       grid: { vertLines: { color: 'rgba(255,255,255,0.04)' }, horzLines: { color: 'rgba(255,255,255,0.04)' } },
       rightPriceScale: { borderColor: '#1f1f1f', scaleMargins: { top: 0.08, bottom: 0.08 } },
@@ -34,6 +37,8 @@ export function ChartPanel({ bars, interval, onInterval, error }: Props) {
       wickUpColor: '#00b47a',
       wickDownColor: '#f0534e',
       borderVisible: false,
+      priceLineVisible: false,
+      lastValueVisible: true,
     });
 
     chart.current = c;
@@ -52,7 +57,7 @@ export function ChartPanel({ bars, interval, onInterval, error }: Props) {
   }, [bars]);
 
   return (
-    <section className="flex min-h-0 flex-1 flex-col bg-panel">
+    <section className="flex h-full min-h-0 flex-1 flex-col bg-panel">
       <div className="flex items-center gap-0.5 border-b border-line px-1">
         {INTERVALS.map((i) => (
           <button

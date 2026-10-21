@@ -25,23 +25,24 @@ export function Blotter({ positions, orders, fills, equity, mark, symbol, onClos
   const pnl = positions.reduce((n, p) => n + unrealised(p, mark), 0);
   const margin = positions.reduce((n, p) => n + p.margin, 0);
 
-  const tabs: { key: TabKey; label: string; n?: number }[] = [
-    { key: 'positions', label: 'Positions', n: positions.length },
-    { key: 'orders', label: 'Open orders', n: open.length },
-    { key: 'history', label: 'Order history', n: fills.length },
-    { key: 'balances', label: 'Balances' },
+  const tabs: { key: TabKey; label: string; short: string; n?: number }[] = [
+    { key: 'positions', label: 'Positions', short: 'Positions', n: positions.length },
+    { key: 'orders', label: 'Open orders', short: 'Orders', n: open.length },
+    { key: 'history', label: 'Order history', short: 'History', n: fills.length },
+    { key: 'balances', label: 'Balances', short: 'Balance' },
   ];
 
   return (
     <section className="flex h-full min-h-0 flex-col border-t border-line bg-panel">
-      <div className="flex items-center gap-4 border-b border-line px-1">
+      <div className="flex items-center gap-3 overflow-x-auto border-b border-line px-1 scrollbar-none">
         {tabs.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={cn('tab', tab === t.key && 'tab-active')}
+            className={cn('tab whitespace-nowrap', tab === t.key && 'tab-active')}
           >
-            {t.label}
+            <span className="hidden sm:inline">{t.label}</span>
+            <span className="sm:hidden">{t.short}</span>
             {t.n !== undefined && <span className="ml-1 text-muted">({t.n})</span>}
           </button>
         ))}
