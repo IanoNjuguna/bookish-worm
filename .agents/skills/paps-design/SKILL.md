@@ -73,6 +73,25 @@ separate data.
 - **Mobile is Lite with a different arrangement**, not a squeeze of Pro. Ticket
   becomes a bottom sheet; the book and rail collapse behind tabs.
 
+## Swipe deck
+
+Sampled from Tinder (deck mechanics), Plenty of Fish (action row inside the card) and
+Bumble (depth behind an info affordance). Every engaging swipe card is one hero, three
+or four facts, and large decisive actions.
+
+- **One hero per card.** For a market that is the 1m sparkline, drawn inline, with the
+  symbol and price sitting over a gradient at its foot. A card with no hero is a form.
+- **Three chips on the face.** If a fact does not change the decision, it goes in the
+  details drawer, not on the card.
+- **Actions are circles, 48px, under the deck**: undo, pass, short, long. A button bar
+  reads like a form; circles read like a decision.
+- **Depth must be felt**: ticks for the batch, stacked shadows behind the top card.
+  Never show a count of the whole universe — markets are infinite, attention is not.
+- **A swipe is immediate, with two seconds of undo.** The undo is the safety, not the
+  confirm: confirming kills the gesture, and no undo makes it dangerous.
+- **Close the loop**: a cap on open positions, stated on screen, because after ten
+  swipes the bottleneck is capital rather than choice.
+
 ## Interaction
 
 - One click from a book row loads a price into the ticket. Two clicks never needed.
