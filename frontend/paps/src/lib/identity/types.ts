@@ -18,7 +18,7 @@ export type Profile = {
 export const DEFAULT_PROFILE: Profile = {
   handle: '',
   riskUsd: 100,
-  leverage: 10,
+  leverage: 5,
   defaultView: 'swipe',
   watchlist: [],
   liteOrderKind: 'market',

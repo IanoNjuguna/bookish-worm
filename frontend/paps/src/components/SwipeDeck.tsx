@@ -219,8 +219,8 @@ export function SwipeDeck({
 
             {details && (
               <dl className="grid grid-cols-2 gap-2 border-t border-line px-4 py-3 text-[11px]">
-                <Row k="liq. if long" v={liqLong ? price(liqLong) : '—'} tone="short" />
-                <Row k="liq. if short" v={liqShort ? price(liqShort) : '—'} />
+                <Row k="liq. if long" v={withAway(liqLong, top.markPrice)} tone="short" />
+                <Row k="liq. if short" v={withAway(liqShort, top.markPrice)} />
                 <Row k="size" v={`${size.toLocaleString('en-US')} ${top.symbol.split('-')[0]}`} />
                 <Row k="notional" v={`$${usd(risk)}`} />
                 <Row k="margin" v={`$${usd(margin)}`} />
@@ -308,6 +308,13 @@ export function SwipeDeck({
       </div>
     </div>
   );
+}
+
+/** Absolute liquidation plus how far the price has to travel to reach it. */
+function withAway(liq: number, entry: number): string {
+  if (!liq || !entry) return '—';
+  const away = ((liq - entry) / entry) * 100;
+  return `${price(liq)} (${away >= 0 ? '+' : '−'}${Math.abs(away).toFixed(1)}%)`;
 }
 
 function Chip({ children }: { children: React.ReactNode }) {
