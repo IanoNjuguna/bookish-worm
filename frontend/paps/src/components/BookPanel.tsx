@@ -111,7 +111,7 @@ export function BookPanel({ bids, asks, trades, status, nextFundingIn, onPick }:
               {crossing ? 'resyncing' : `spread ${spread ? spread.toFixed(6) : '—'}`}
             </span>
             <span className="num text-[10px] text-muted">
-              {nextFundingIn > 0 ? `${Math.floor(nextFundingIn / 60000)}m` : '—'}
+              {nextFundingIn > 0 ? `funding in ${Math.floor(nextFundingIn / 60000)}m` : '—'}
             </span>
           </div>
 

@@ -58,11 +58,16 @@ export function Sidebar({ symbols, tickers, value, onPick }: Props) {
                 s.symbol === value ? 'bg-panel-2' : 'hover:bg-panel-2/60',
               )}
             >
-              <span className="flex flex-col">
-                <span className={cn('text-[12px]', s.symbol === value ? 'text-fg' : 'text-fg/90')}>
+              <span className="flex items-center gap-1.5">
+                <span
+                  className={cn(
+                    'text-[12px]',
+                    s.symbol === value ? 'text-fg' : 'text-fg/90',
+                  )}
+                >
                   {s.symbol}
                 </span>
-                <span className="text-[10px] text-muted">perp</span>
+                {s.symbol === value && <span className="h-3 w-[2px] bg-brand" />}
               </span>
               <span className="flex flex-col items-end">
                 <span className="num text-[12px]">{t ? price(t.last) : '—'}</span>
