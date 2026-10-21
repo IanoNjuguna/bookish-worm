@@ -19,7 +19,7 @@ import { SwipeDeck } from './components/SwipeDeck';
 import { socket } from './lib/ws';
 import { usePaperAccount } from './lib/store';
 import type { Interval } from './lib/constants';
-import type { Side } from './lib/order';
+import { liquidationPrice, type Side } from './lib/order';
 
 const PRO_MIN_WIDTH = 1024;
 const FALLBACK_RISK = 100;
@@ -90,6 +90,12 @@ export default function App() {
   const info = symbolInfo(symbols, symbol);
   const last = mini[symbol]?.last ?? Number(ticker?.lastPrice ?? 0);
   const markPrice = Number(mark?.markPrice ?? last);
+  const marks = useMemo(() => {
+    const out: Record<string, number> = {};
+    for (const [sym, t] of Object.entries(mini)) out[sym] = t.last;
+    if (mark && Number.isFinite(Number(mark.markPrice))) out[mark.symbol] = Number(mark.markPrice);
+    return out;
+  }, [mini, mark]);
 
   const stepFor = (s: string) =>
     Number(symbolInfo(symbols, s)?.filters?.find((f) => f.filterType === 'LOT_SIZE')?.stepSize ?? 1);
@@ -114,6 +120,18 @@ export default function App() {
     setUndo({ id, symbol: card.symbol, side });
   };
 
+  useEffect(() => {
+    if (!account.positions.length) return;
+    const doomed = account.positions.filter((p) => {
+      const m = marks[p.symbol];
+      if (!m) return false;
+      const liq = liquidationPrice(p.side, p.entry, p.margin, p.size);
+      if (!liq) return false;
+      return p.side === 'LONG' ? m <= liq : m >= liq;
+    });
+    if (doomed.length) account.liquidate(doomed.map((p) => p.id));
+  }, [marks, account.positions]);
+
   const remaining = useMemo(() => {
     const left = deck.filter((c) => !swiped.includes(c.symbol));
     // A trader's own markets come first; the rank order is only the default.
@@ -129,8 +147,10 @@ export default function App() {
       fills={account.fills}
       equity={account.equity}
       mark={markPrice}
+      marks={marks}
       symbol={symbol}
       onClose={account.close}
+      onCloseAll={account.closeAll}
       onCancel={account.cancel}
     />
   );

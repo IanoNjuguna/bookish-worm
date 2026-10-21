@@ -26,7 +26,7 @@ export type Fill = {
   time: number;
 };
 
-type State = {
+export type State = {
   equity: number;
   positions: Position[];
   orders: WorkingOrder[];
@@ -48,10 +48,13 @@ type Action =
     }
   | { type: 'undo'; id: string }
   | { type: 'cancel'; id: string }
-  | { type: 'close'; id: string; mark: number };
+  | { type: 'close'; id: string; mark: number; fraction?: number }
+  | { type: 'closeAll'; mark: number }
+  | { type: 'liquidate'; ids: string[] };
 
 const START_EQUITY = 10_000;
 const TAKER_FEE = 0.0005;
+const LIQUIDATION_FEE = 0.01; // exchangeInfo reports 1%
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
@@ -60,7 +63,7 @@ const uid = () => Math.random().toString(36).slice(2, 10);
  * fill when the mark crosses them. Every fill moves margin and equity, so the blotter
  * is arithmetic rather than decoration.
  */
-function reduce(state: State, action: Action): State {
+export function reduce(state: State, action: Action): State {
   switch (action.type) {
     case 'place': {
       const { symbol, side, kind, price, size, leverage, mark, step } = action;
@@ -151,25 +154,68 @@ function reduce(state: State, action: Action): State {
       const position = state.positions.find((p) => p.id === action.id);
       if (!position) return state;
       const { mark } = action;
+      const fraction = Math.min(1, Math.max(0, action.fraction ?? 1));
+      const closedSize = position.size * fraction;
       const pnl =
         position.side === 'LONG'
-          ? (mark - position.entry) * position.size
-          : (position.entry - mark) * position.size;
-      const fee = notionalOf(mark, position.size) * TAKER_FEE;
+          ? (mark - position.entry) * closedSize
+          : (position.entry - mark) * closedSize;
+      const fee = notionalOf(mark, closedSize) * TAKER_FEE;
+      const remaining = position.size - closedSize;
+
       return {
         ...state,
-        positions: state.positions.filter((p) => p.id !== action.id),
+        positions:
+          remaining <= 0
+            ? state.positions.filter((p) => p.id !== action.id)
+            : state.positions.map((p) =>
+                p.id === action.id
+                  ? { ...p, size: remaining, margin: p.margin * (1 - fraction) }
+                  : p,
+              ),
         equity: state.equity + pnl - fee,
         fills: [
-          { id: uid(), symbol: position.symbol, side: position.side === 'LONG' ? 'SHORT' : 'LONG', price: mark, size: position.size, fee, time: Date.now() },
+          {
+            id: uid(),
+            symbol: position.symbol,
+            side: position.side === 'LONG' ? 'SHORT' : 'LONG',
+            price: mark,
+            size: closedSize,
+            fee,
+            time: Date.now(),
+          },
           ...state.fills,
         ],
       };
+    }
+
+    case 'closeAll': {
+      if (!state.positions.length) return state;
+      return state.positions.reduce(
+        (acc, p) => reduce(acc, { type: 'close', id: p.id, mark: action.mark }),
+        state,
+      );
+    }
+
+    case 'liquidate': {
+      // Liquidation is not a favour: it closes the position at the mark and charges the
+      // venue's 1% liquidation fee, which is what exchangeInfo reports.
+      if (!action.ids.length) return state;
+      return action.ids.reduce((acc, id) => {
+        const position = acc.positions.find((p) => p.id === id);
+        if (!position) return acc;
+        const mark = position.entry;
+        const closed = reduce(acc, { type: 'close', id, mark });
+        const penalty = notionalOf(mark, position.size) * LIQUIDATION_FEE;
+        return { ...closed, equity: closed.equity - penalty };
+      }, state);
     }
   }
 }
 
 export const initial: State = { equity: START_EQUITY, positions: [], orders: [], fills: [] };
+export const TAKER_FEE_BPS = TAKER_FEE;
+export const LIQUIDATION_FEE_RATE = LIQUIDATION_FEE;
 
 export function usePaperAccount() {
   const [state, dispatch] = useReducer(reduce, initial);
@@ -179,7 +225,9 @@ export function usePaperAccount() {
       place: (a: Omit<Action & { type: 'place' }, 'type'>) => dispatch({ type: 'place', ...a }),
       undo: (id: string) => dispatch({ type: 'undo', id }),
       cancel: (id: string) => dispatch({ type: 'cancel', id }),
-      close: (id: string, mark: number) => dispatch({ type: 'close', id, mark }),
+      close: (id: string, mark: number, fraction = 1) => dispatch({ type: 'close', id, mark, fraction }),
+      closeAll: (mark: number) => dispatch({ type: 'closeAll', mark }),
+      liquidate: (ids: string[]) => dispatch({ type: 'liquidate', ids }),
     }),
     [],
   );
