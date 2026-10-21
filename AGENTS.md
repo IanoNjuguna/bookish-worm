@@ -24,6 +24,7 @@ This repo has project skills in `.agents/skills/` that govern all work. Load and
 | Structure of **new** UI code | `modular-ui-authoring` |
 | Restructuring **existing** UI, behavior preservation | `modular-ui-refactor` |
 | Composition of dashboards, overviews and operator screens | `dashboard-ui` |
+| The paps trading terminal: density, numbers, Pro/Lite, mobile | `paps-design` |
 | Styling, tokens, design system | `design-enforcement` (source of truth: `DESIGN.md`) |
 | Motion, gestures, player and sheet feel | `apple-design` |
 | Toasts and transaction progress feedback | `ask-sonner` |
