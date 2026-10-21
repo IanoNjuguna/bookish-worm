@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* OKX-like terminal palette: near-black canvas, one step lighter panels, hairline
+ * borders, and no rounded corners. All of it ours, none of it lifted. */
+@layer base {
+  :root {
+    --background: 0 0% 4%;
+    --panel: 0 0% 7%;
+    --panel-2: 0 0% 9%;
+    --foreground: 0 0% 91%;
+    --muted-foreground: 0 0% 55%;
+    --border: 0 0% 14%;
+    --primary: 45 93% 55%;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-bg text-fg antialiased;
+    font-size: 12px;
+    font-feature-settings: 'tnum' 1, 'cv05' 1;
+  }
+
+  .num {
+    @apply tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.3);
+  }
+
+  input[type='range'] {
+    @apply h-0.5 w-full cursor-pointer appearance-none bg-line;
+  }
+  input[type='range']::-webkit-slider-thumb {
+    @apply h-3 w-3 appearance-none rounded-full bg-fg;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply border border-line bg-panel;
+  }
+  .label {
+    @apply text-[10px] uppercase tracking-[0.08em] text-muted;
+  }
+  .tab {
+    @apply px-3 py-2 text-[12px] text-muted transition-colors hover:text-fg;
+  }
+  .tab-active {
+    @apply border-b-2 border-fg text-fg;
+  }
+  .field {
+    @apply w-full bg-panel-2 px-2.5 py-2 text-right text-[12px] outline-none ring-line focus:ring-1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
