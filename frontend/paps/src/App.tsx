@@ -15,6 +15,7 @@ import { BookPanel } from './components/BookPanel';
 import { Ticket } from './components/Ticket';
 import { Blotter } from './components/Blotter';
 import { LiteView } from './components/LiteView';
+import { MarketSheet } from './components/MarketSheet';
 import { SwipeDeck } from './components/SwipeDeck';
 import { socket } from './lib/ws';
 import { usePaperAccount } from './lib/store';
@@ -45,6 +46,7 @@ export default function App() {
   const [picked, setPicked] = useState('');
   const [mode, setMode] = useState<ViewMode>('pro');
   const [modeTouched, setModeTouched] = useState(false);
+  const [marketsOpen, setMarketsOpen] = useState(false);
   const [connected, setConnected] = useState(false);
   const [swiped, setSwiped] = useState<string[]>([]);
   const [undo, setUndo] = useState<{ id: string; symbol: string; side: Side } | null>(null);
@@ -209,6 +211,7 @@ export default function App() {
             chartError={error}
             initialRisk={swipeRisk}
             initialLeverage={swipeLeverage}
+            onOpenMarkets={() => setMarketsOpen(true)}
             onPlace={place}
           />
           <div className="mx-auto w-full max-w-[520px] px-3 pb-3">
@@ -253,6 +256,19 @@ export default function App() {
           />
         </div>
       )}
+
+      <MarketSheet
+        open={marketsOpen}
+        symbols={symbols}
+        tickers={mini}
+        watchlist={profile.watchlist}
+        value={symbol}
+        onPick={(s) => {
+          setSymbol(s);
+          setPicked('');
+        }}
+        onClose={() => setMarketsOpen(false)}
+      />
     </div>
   );
 }

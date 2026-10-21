@@ -6,6 +6,7 @@ import type { SymbolInfo } from '../lib/types';
 import type { Bar } from '../hooks/useKlines';
 import { ChartPanel } from './Chart';
 import type { Interval } from '../lib/constants';
+import { IconChevronDown } from '@tabler/icons-react';
 
 type Props = {
   symbol: string;
@@ -19,6 +20,7 @@ type Props = {
   chartError: string | null;
   initialRisk?: number;
   initialLeverage?: number;
+  onOpenMarkets: () => void;
   onPlace: (o: { side: Side; kind: 'limit' | 'market'; price: number; size: number; leverage: number }) => void;
 };
 
@@ -42,6 +44,7 @@ export function LiteView({
   chartError,
   initialRisk,
   initialLeverage,
+  onOpenMarkets,
   onPlace,
 }: Props) {
   const [notional, setNotional] = useState(initialRisk ?? 100);
@@ -69,7 +72,13 @@ export function LiteView({
       <section className="border border-line bg-panel">
         <div className="flex items-end justify-between px-3 pb-2 pt-3">
           <div>
-            <div className="text-[10px] uppercase tracking-[0.1em] text-muted">{symbol}</div>
+            <button
+              onClick={onOpenMarkets}
+              className="flex items-center gap-1 text-[10px] uppercase tracking-[0.1em] text-muted hover:text-fg"
+            >
+              {symbol}
+              <IconChevronDown size={11} />
+            </button>
             <div className="num mt-1 text-[30px] leading-none">{mark ? price(mark) : '—'}</div>
           </div>
           <div className="num text-[12px]">
