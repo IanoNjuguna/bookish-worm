@@ -3,7 +3,7 @@ import { symbolInfo, useSymbols } from './hooks/useSymbols';
 import { useTicker } from './hooks/useTicker';
 import { useDepth } from './hooks/useDepth';
 import { useKlines } from './hooks/useKlines';
-import { useMarkPrice } from './hooks/useMarket';
+import { useMarkPrice, useTrades } from './hooks/useMarket';
 import { useMiniTickers } from './hooks/useMiniTickers';
 import { Sidebar } from './components/Sidebar';
 import { TopBar } from './components/TopBar';
@@ -26,6 +26,7 @@ export default function App() {
   const { ticker } = useTicker(symbol);
   const mark = useMarkPrice(symbol);
   const book = useDepth(symbol);
+  const trades = useTrades(symbol);
   const { bars, error } = useKlines(symbol, interval);
   const account = usePaperAccount();
 
@@ -76,8 +77,8 @@ export default function App() {
           <BookPanel
             bids={book.bids}
             asks={book.asks}
+            trades={trades}
             status={book.status}
-            funding={Number(mark?.lastFundingRate ?? 0)}
             nextFundingIn={mark ? Math.max(0, mark.nextFundingTime - Date.now()) : 0}
             onPick={setPicked}
           />
