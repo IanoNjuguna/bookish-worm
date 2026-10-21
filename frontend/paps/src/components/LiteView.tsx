@@ -17,6 +17,8 @@ type Props = {
   interval: Interval;
   onInterval: (i: Interval) => void;
   chartError: string | null;
+  initialRisk?: number;
+  initialLeverage?: number;
   onPlace: (o: { side: Side; kind: 'limit' | 'market'; price: number; size: number; leverage: number }) => void;
 };
 
@@ -38,10 +40,12 @@ export function LiteView({
   interval,
   onInterval,
   chartError,
+  initialRisk,
+  initialLeverage,
   onPlace,
 }: Props) {
-  const [notional, setNotional] = useState(100);
-  const [leverage, setLeverage] = useState(10);
+  const [notional, setNotional] = useState(initialRisk ?? 100);
+  const [leverage, setLeverage] = useState(initialLeverage ?? 10);
   const [side, setSide] = useState<Side>('LONG');
 
   const filters = useMemo(() => {

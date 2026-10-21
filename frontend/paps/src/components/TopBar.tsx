@@ -3,6 +3,8 @@ import type { MiniTicker } from '../hooks/useMiniTickers';
 import { fundingApr, price, pct, usd } from '../lib/format';
 import { cn } from '../lib/cn';
 import { AgeBadge } from './AgeBadge';
+import { IdentityMenu } from './IdentityMenu';
+import type { useIdentity } from '../hooks/useIdentity';
 
 export type ViewMode = 'pro' | 'lite' | 'swipe';
 
@@ -15,6 +17,7 @@ type Props = {
   connected: boolean;
   mode: ViewMode;
   modes: ViewMode[];
+  identity: ReturnType<typeof useIdentity>;
   onMode: (m: ViewMode) => void;
 };
 
@@ -30,14 +33,25 @@ function Stat({ k, v, tone }: { k: string; v: string; tone?: 'long' | 'short' })
 }
 
 /** Status bar: identity, environment, freshness, and the six numbers that matter. */
-export function TopBar({ symbol, ticker, mark, lastAt, equity, connected, mode, modes, onMode }: Props) {
+export function TopBar({
+  symbol,
+  ticker,
+  mark,
+  lastAt,
+  equity,
+  connected,
+  mode,
+  modes,
+  onMode,
+  identity,
+}: Props) {
   const next = mark ? Math.max(0, mark.nextFundingTime - Date.now()) : 0;
   const hh = Math.floor(next / 3_600_000);
   const mm = Math.floor((next % 3_600_000) / 60_000);
 
   return (
-    <header className="flex h-12 shrink-0 items-center gap-2 overflow-hidden border-b border-line bg-panel px-2 sm:gap-3 sm:px-3">
-      <div className="flex items-center gap-2">
+    <header className="flex h-12 shrink-0 items-center gap-2 border-b border-line bg-panel px-2 sm:gap-3 sm:px-3">
+      <div className="flex shrink-0 items-center gap-2">
         <span className="text-[15px] font-bold tracking-tight">
           paps<span className="text-brand">.</span>
         </span>
@@ -46,14 +60,19 @@ export function TopBar({ symbol, ticker, mark, lastAt, equity, connected, mode, 
         </span>
       </div>
 
-      <div className="flex shrink-0 items-baseline gap-2 border-l border-line pl-2 sm:pl-3">
+      <div className="flex min-w-0 shrink items-baseline gap-2 border-l border-line pl-2 sm:pl-3">
         <span className="text-[13px] font-semibold whitespace-nowrap">{symbol}</span>
         <span className="hidden text-[10px] uppercase tracking-[0.1em] text-muted sm:inline">perp</span>
       </div>
 
-      <div className="flex items-baseline gap-2">
+      <div className="flex min-w-0 items-baseline gap-2">
         <span className="num text-[15px]">{ticker ? price(ticker.last) : '—'}</span>
-        <span className={cn('num text-[11px]', (ticker?.pct ?? 0) >= 0 ? 'text-long' : 'text-short')}>
+        <span
+          className={cn(
+            'num hidden text-[11px] sm:inline',
+            (ticker?.pct ?? 0) >= 0 ? 'text-long' : 'text-short',
+          )}
+        >
           {ticker ? pct(ticker.pct) : '—'}
         </span>
       </div>
@@ -69,7 +88,7 @@ export function TopBar({ symbol, ticker, mark, lastAt, equity, connected, mode, 
         <Stat k="next funding" v={mark ? `${hh}h ${usd(mm, 0)}m` : '—'} />
       </div>
 
-      <div className="ml-auto flex items-center gap-2">
+      <div className="ml-auto flex shrink-0 items-center gap-2">
         <div className="hidden flex-col items-end leading-tight sm:flex">
           <span className="text-[10px] text-muted">
             paper equity <span className="text-muted/70">· simulated</span>
@@ -77,7 +96,11 @@ export function TopBar({ symbol, ticker, mark, lastAt, equity, connected, mode, 
           <span className="num text-[12px]">${usd(equity)}</span>
         </div>
 
-        <AgeBadge lastAt={lastAt} connected={connected} />
+        <span className="hidden sm:inline-flex">
+          <AgeBadge lastAt={lastAt} connected={connected} />
+        </span>
+
+        <IdentityMenu identity={identity} />
 
         <div className="hidden items-center border border-line sm:flex">
           {modes.map((m) => (
