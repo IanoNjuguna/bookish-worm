@@ -14,6 +14,9 @@ export function useMarkPrice(symbol: string) {
   });
 
   useEffect(() => {
+    // Drop the previous market's mark immediately: a stale price under a new symbol is
+    // the worst kind of wrong, because it looks live.
+    setState({ mark: null, lastAt: 0 });
     socket.connect();
     socket.subscribe('markPrice', symbol);
     const off = socket.on('markPrice', (msg) => {
