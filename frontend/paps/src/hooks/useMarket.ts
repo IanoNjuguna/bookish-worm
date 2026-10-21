@@ -8,7 +8,10 @@ import { get } from '../lib/api';
  * is streamed rather than polled: a stale mark makes the liquidation price lie.
  */
 export function useMarkPrice(symbol: string) {
-  const [mark, setMark] = useState<MarkPrice | null>(null);
+  const [state, setState] = useState<{ mark: MarkPrice | null; lastAt: number }>({
+    mark: null,
+    lastAt: 0,
+  });
 
   useEffect(() => {
     socket.connect();
@@ -24,14 +27,17 @@ export function useMarkPrice(symbol: string) {
         T: number;
       };
       if (m.e !== 'markPriceUpdate' || m.s !== symbol) return;
-      setMark({
-        symbol: m.s,
-        markPrice: m.p,
-        indexPrice: m.i,
-        estimatedSettlePrice: m.P,
-        lastFundingRate: m.r,
-        nextFundingTime: m.T,
-        time: Date.now(),
+      setState({
+        mark: {
+          symbol: m.s,
+          markPrice: m.p,
+          indexPrice: m.i,
+          estimatedSettlePrice: m.P,
+          lastFundingRate: m.r,
+          nextFundingTime: m.T,
+          time: Date.now(),
+        },
+        lastAt: Date.now(),
       });
     });
     return () => {
@@ -40,7 +46,7 @@ export function useMarkPrice(symbol: string) {
     };
   }, [symbol]);
 
-  return mark;
+  return state;
 }
 
 export function useTrades(symbol: string, limit = 18) {

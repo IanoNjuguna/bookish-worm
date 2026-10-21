@@ -2,13 +2,19 @@ import type { MarkPrice } from '../lib/types';
 import type { MiniTicker } from '../hooks/useMiniTickers';
 import { fundingApr, price, pct, usd } from '../lib/format';
 import { cn } from '../lib/cn';
+import { AgeBadge } from './AgeBadge';
+
+export type ViewMode = 'pro' | 'lite';
 
 type Props = {
   symbol: string;
   ticker?: MiniTicker;
   mark: MarkPrice | null;
+  lastAt: number;
   equity: number;
   connected: boolean;
+  mode: ViewMode;
+  onMode: (m: ViewMode) => void;
 };
 
 function Stat({ k, v, tone }: { k: string; v: string; tone?: 'long' | 'short' }) {
@@ -22,14 +28,14 @@ function Stat({ k, v, tone }: { k: string; v: string; tone?: 'long' | 'short' })
   );
 }
 
-/** Header: identity, environment, and the six numbers a trader checks first. */
-export function TopBar({ symbol, ticker, mark, equity, connected }: Props) {
+/** Status bar: identity, environment, freshness, and the six numbers that matter. */
+export function TopBar({ symbol, ticker, mark, lastAt, equity, connected, mode, onMode }: Props) {
   const next = mark ? Math.max(0, mark.nextFundingTime - Date.now()) : 0;
   const hh = Math.floor(next / 3_600_000);
   const mm = Math.floor((next % 3_600_000) / 60_000);
 
   return (
-    <header className="flex h-12 shrink-0 items-center gap-4 border-b border-line bg-panel px-3">
+    <header className="flex h-12 shrink-0 items-center gap-2 overflow-hidden border-b border-line bg-panel px-2 sm:gap-3 sm:px-3">
       <div className="flex items-center gap-2">
         <span className="text-[15px] font-bold tracking-tight">
           paps<span className="text-brand">.</span>
@@ -39,19 +45,19 @@ export function TopBar({ symbol, ticker, mark, equity, connected }: Props) {
         </span>
       </div>
 
-      <div className="flex items-baseline gap-2 border-l border-line pl-4">
-        <span className="text-[14px] font-semibold">{symbol}</span>
-        <span className="text-[10px] uppercase tracking-[0.1em] text-muted">perpetual</span>
+      <div className="flex shrink-0 items-baseline gap-2 border-l border-line pl-2 sm:pl-3">
+        <span className="text-[13px] font-semibold whitespace-nowrap">{symbol}</span>
+        <span className="hidden text-[10px] uppercase tracking-[0.1em] text-muted sm:inline">perp</span>
       </div>
 
       <div className="flex items-baseline gap-2">
-        <span className="num text-[16px]">{ticker ? price(ticker.last) : '—'}</span>
+        <span className="num text-[15px]">{ticker ? price(ticker.last) : '—'}</span>
         <span className={cn('num text-[11px]', (ticker?.pct ?? 0) >= 0 ? 'text-long' : 'text-short')}>
           {ticker ? pct(ticker.pct) : '—'}
         </span>
       </div>
 
-      <div className="hidden items-center gap-5 lg:flex">
+      <div className="hidden items-center gap-5 xl:flex">
         <Stat k="mark" v={mark ? price(mark.markPrice) : '—'} />
         <Stat k="index" v={mark ? price(mark.indexPrice) : '—'} />
         <Stat
@@ -60,19 +66,31 @@ export function TopBar({ symbol, ticker, mark, equity, connected }: Props) {
           tone={mark ? (Number(mark.lastFundingRate) >= 0 ? 'long' : 'short') : undefined}
         />
         <Stat k="next funding" v={mark ? `${hh}h ${usd(mm, 0)}m` : '—'} />
-        <Stat k="24h vol" v={ticker ? `$${(ticker.quoteVolume / 1e6).toFixed(2)}M` : '—'} />
       </div>
 
-      <div className="ml-auto flex items-center gap-3">
-        <div className="flex flex-col items-end leading-tight">
-          <span className="text-[10px] text-muted">paper equity</span>
+      <div className="ml-auto flex items-center gap-2">
+        <div className="hidden flex-col items-end leading-tight sm:flex">
+          <span className="text-[10px] text-muted">
+            paper equity <span className="text-muted/70">· simulated</span>
+          </span>
           <span className="num text-[12px]">${usd(equity)}</span>
         </div>
-        <div className="flex items-center gap-1.5 border border-line px-2 py-1">
-          <span className={cn('h-1.5 w-1.5 rounded-full', connected ? 'bg-long' : 'bg-short')} />
-          <span className="text-[10px] uppercase tracking-[0.1em] text-muted">
-            {connected ? 'live' : 'offline'}
-          </span>
+
+        <AgeBadge lastAt={lastAt} connected={connected} />
+
+        <div className="hidden items-center border border-line sm:flex">
+          {(['pro', 'lite'] as ViewMode[]).map((m) => (
+            <button
+              key={m}
+              onClick={() => onMode(m)}
+              className={cn(
+                'px-2 py-1 text-[10px] uppercase tracking-[0.08em] transition-colors',
+                m === mode ? 'bg-panel-2 text-fg' : 'text-muted hover:text-fg',
+              )}
+            >
+              {m}
+            </button>
+          ))}
         </div>
       </div>
     </header>
