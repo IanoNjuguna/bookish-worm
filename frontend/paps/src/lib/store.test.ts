@@ -46,3 +46,50 @@ describe('paper account exits', () => {
     expect(s.equity).toBeCloseTo(10_000 - 0.05 - 0.05 - 1, 6);
   });
 });
+
+describe('funding', () => {
+  const long = (): State =>
+    reduce(initial, {
+      type: 'place',
+      symbol: 'ADA-USD',
+      side: 'LONG',
+      kind: 'market',
+      price: 0.25,
+      size: 400,
+      leverage: 5,
+      mark: 0.25,
+      step: 1,
+      id: 'p2',
+    });
+
+  it('charges a long when the rate is positive', () => {
+    const s = reduce(long(), { type: 'fund', symbol: 'ADA-USD', rate: 0.0001, mark: 0.25 });
+    // 400 × 0.25 = 100 notional × 0.0001 = $0.01
+    expect(s.equity).toBeCloseTo(9_999.95 - 0.01, 6);
+    expect(s.positions[0].funding).toBeCloseTo(-0.01, 6);
+  });
+
+  it('pays a short when the rate is positive', () => {
+    const opened = reduce(initial, {
+      type: 'place',
+      symbol: 'ADA-USD',
+      side: 'SHORT',
+      kind: 'market',
+      price: 0.25,
+      size: 400,
+      leverage: 5,
+      mark: 0.25,
+      step: 1,
+      id: 'p3',
+    });
+    const s = reduce(opened, { type: 'fund', symbol: 'ADA-USD', rate: 0.0001, mark: 0.25 });
+    expect(s.positions[0].funding).toBeCloseTo(0.01, 6);
+    expect(s.equity).toBeCloseTo(9_999.95 + 0.01, 6);
+  });
+
+  it('leaves other markets alone', () => {
+    const s = reduce(long(), { type: 'fund', symbol: 'BTC-USD', rate: 0.001, mark: 80_000 });
+    expect(s.equity).toBe(9_999.95);
+    expect(s.positions[0].funding).toBeUndefined();
+  });
+});

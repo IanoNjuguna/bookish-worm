@@ -74,7 +74,7 @@ export function Blotter({
         {tab === 'positions' && (
           <table className="w-full text-[11px]">
             <thead className="sticky top-0 bg-panel text-muted">
-              <Th cols={['Market', 'Side', 'Size', 'Entry', 'Mark', 'Liq.', 'Margin', 'uPnL', 'ROE', '']} />
+              <Th cols={['Market', 'Side', 'Size', 'Entry', 'Mark', 'Liq.', 'Margin', 'uPnL', 'ROE', 'Funding', '']} />
             </thead>
             <tbody>
               {positions.map((p) => {
@@ -98,6 +98,9 @@ export function Blotter({
                       {up >= 0 ? '+' : '−'}${usd(Math.abs(up))}
                     </Td>
                     <Td num tone={up >= 0 ? 'long' : 'short'}>{roe(p, pMark).toFixed(1)}%</Td>
+                    <Td num muted>
+                      {p.funding ? `${p.funding >= 0 ? '+' : '−'}$${usd(Math.abs(p.funding))}` : '—'}
+                    </Td>
                     <Td>
                       <div className="flex items-center gap-1">
                         <button
@@ -118,7 +121,7 @@ export function Blotter({
                   </tr>
                 );
               })}
-              {!positions.length && <Empty cols={10} text="No positions. Open a paper position to see it marked live." />}
+              {!positions.length && <Empty cols={11} text="No positions. Open a paper position to see it marked live." />}
             </tbody>
           </table>
         )}

@@ -57,6 +57,8 @@ export type Position = {
   leverage: number;
   margin: number;
   openedAt: number;
+  /** Cumulative funding paid (negative) or received (positive). */
+  funding?: number;
 };
 
 export const unrealised = (p: Position, mark: number): number =>

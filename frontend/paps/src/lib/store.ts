@@ -59,7 +59,8 @@ type Action =
   | { type: 'close'; id: string; mark: number; fraction?: number }
   | { type: 'closeAll'; mark: number }
   | { type: 'liquidate'; ids: string[] }
-  | { type: 'hydrate'; state: Partial<State> };
+  | { type: 'hydrate'; state: Partial<State> }
+  | { type: 'fund'; symbol: string; rate: number; mark: number };
 
 export const START_EQUITY = 10_000;
 const TAKER_FEE = 0.0005;
@@ -169,6 +170,26 @@ export function reduce(state: State, action: Action): State {
         orders: state.orders.map((o) => (o.id === action.id ? { ...o, status: 'cancelled' } : o)),
       };
 
+    case 'fund': {
+      // Longs pay shorts when the rate is positive, and receive when it is negative.
+      // Charged against equity and recorded on the position, because a perp that never
+      // pays funding is not a perp — it is a free carry.
+      const { symbol, rate, mark } = action;
+      if (!Number.isFinite(rate) || !mark) return state;
+
+      let equity = state.equity;
+      const positions = state.positions.map((p) => {
+        if (p.symbol !== symbol) return p;
+        const notional = Math.abs(p.size) * mark;
+        const flow = (p.side === 'LONG' ? -1 : 1) * notional * rate;
+        equity += flow;
+        return { ...p, funding: (p.funding ?? 0) + flow };
+      });
+
+      if (equity === state.equity) return state;
+      return { ...state, equity, positions };
+    }
+
     case 'close': {
       const position = state.positions.find((p) => p.id === action.id);
       if (!position) return state;
@@ -267,6 +288,7 @@ export function usePaperAccount() {
       closeAll: (mark: number) => dispatch({ type: 'closeAll', mark }),
       liquidate: (ids: string[]) => dispatch({ type: 'liquidate', ids }),
       hydrate: (state: Partial<State>) => dispatch({ type: 'hydrate', state }),
+      fund: (a: { symbol: string; rate: number; mark: number }) => dispatch({ type: 'fund', ...a }),
     }),
     [],
   );
