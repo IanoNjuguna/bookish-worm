@@ -3,6 +3,7 @@ import { cn } from '../lib/cn';
 import { price, usd } from '../lib/format';
 import { bps } from '../lib/strike/fees';
 import { useFeeRate } from '../hooks/useFeeRate';
+import type { TradeApi } from '../hooks/useVenueTrade';
 import { DEFAULT_TIER, liquidationPrice, notionalOf, sizeForNotional, type Side } from '../lib/order';
 import type { SymbolInfo } from '../lib/types';
 import type { Bar } from '../hooks/useKlines';
@@ -25,9 +26,12 @@ type Props = {
   maxLeverage?: number;
   /** A Strike session exists: the numbers on screen are real, the order button is not. */
   session?: boolean;
+  /** Present for a connected account. Absent means the paper engine places the order. */
+  trade?: TradeApi | null;
   onOpenMarkets: () => void;
   onPlace: (o: { side: Side; kind: 'limit' | 'market'; price: number; size: number; leverage: number }) => void;
 };
+
 
 const PRESETS = [25, 50, 100, 250, 500];
 const LEV = [2, 5, 10, 20, 50];
@@ -50,6 +54,7 @@ export function LiteView({
   initialLeverage,
   maxLeverage = 50,
   session = false,
+  trade = null,
   onOpenMarkets,
   onPlace,
 }: Props) {
@@ -171,36 +176,55 @@ export function LiteView({
           </dl>
 
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <button
-              onClick={() => {
-                setSide('LONG');
-                onPlace({ side: 'LONG', kind: 'market', price: mark, size, leverage });
-              }}
-              className="flex flex-col items-center bg-long py-3 text-black transition-opacity hover:opacity-90"
-            >
-              <span className="text-[13px] font-semibold">Long {base}</span>
-              <span className="text-[9px] uppercase tracking-[0.12em] text-black/60">
-                {session ? 'still paper' : 'paper'}
-              </span>
-            </button>
-            <button
-              onClick={() => {
-                setSide('SHORT');
-                onPlace({ side: 'SHORT', kind: 'market', price: mark, size, leverage });
-              }}
-              className="flex flex-col items-center bg-short py-3 text-black transition-opacity hover:opacity-90"
-            >
-              <span className="text-[13px] font-semibold">Short {base}</span>
-              <span className="text-[9px] uppercase tracking-[0.12em] text-black/60">
-                {session ? 'still paper' : 'paper'}
-              </span>
-            </button>
+            {(['LONG', 'SHORT'] as const).map((s) => {
+              const disabled = Boolean(trade && (trade.block || trade.busy));
+              return (
+                <button
+                  key={s}
+                  disabled={disabled}
+                  onClick={() => {
+                    setSide(s);
+                    if (trade) {
+                      // A connected account sends to the venue; the paper engine is not a fallback.
+                      trade.place({ symbol, side: s, kind: 'market', size, price: mark, leverage });
+                      return;
+                    }
+                    onPlace({ side: s, kind: 'market', price: mark, size, leverage });
+                  }}
+                  className={cn(
+                    'flex flex-col items-center py-3 text-black transition-opacity hover:opacity-90',
+                    s === 'LONG' ? 'bg-long' : 'bg-short',
+                    disabled && 'opacity-40',
+                  )}
+                >
+                  <span className="text-[13px] font-semibold">
+                    {s === 'LONG' ? 'Long' : 'Short'} {base}
+                  </span>
+                  <span className="text-[9px] uppercase tracking-[0.12em] text-black/60">
+                    {trade ? (trade.block ? 'paused' : 'live · 2 steps') : session ? 'still paper' : 'paper'}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
+          {trade?.block && (
+            <p className="mt-2 border border-short/40 bg-short/10 px-2 py-1 text-[10px] text-short">
+              {trade.block}
+            </p>
+          )}
+          {trade?.notice && (
+            <p className="mt-2 border border-line bg-panel-2 px-2 py-1 text-[10px] text-muted">
+              {trade.notice}
+            </p>
+          )}
+
           <p className="mt-2 text-[10px] text-muted">
-            {session
-              ? 'Orders are not sent to Strike yet: this fills a paper position at the mark.'
-              : 'Fills at the mark.'}{' '}
+            {trade
+              ? 'Live order on your Strike account: the confirm step shows the fees before it sends.'
+              : session
+                ? 'Orders are not sent to Strike yet: this fills a paper position at the mark.'
+                : 'Fills at the mark.'}{' '}
             {size.toLocaleString('en-US')} {base} of notional ${usd(notionalValue)}. Liquidation is
             first-tier and an estimate.
             {!feeRate.known && ' The venue fee schedule did not load, so 5 bps is an estimate.'}

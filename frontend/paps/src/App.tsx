@@ -8,12 +8,15 @@ import { useDeck, type DeckCard } from './hooks/useDeck';
 import { useSparklines } from './hooks/useSparklines';
 import { useIdentity } from './hooks/useIdentity';
 import { useVenueAccount } from './hooks/useVenueAccount';
+import { useVenueTrade } from './hooks/useVenueTrade';
 import { useVenueMarks } from './hooks/useVenueMarks';
 import { TopBar, type ViewMode } from './components/TopBar';
 import { Blotter } from './components/Blotter';
 import { LiteView } from './components/LiteView';
+import { OrderConfirm } from './components/OrderConfirm';
 import { SwipeDeck } from './components/SwipeDeck';
 import { MarketSheet } from './components/MarketSheet';
+import { marketFilters } from './lib/strike/orders';
 import { socket } from './lib/ws';
 import { START_EQUITY, initial, usePaperAccount } from './lib/store';
 import { isFresh, ledgerOwner, loadLedger, saveLedger } from './lib/ledger';
@@ -62,8 +65,18 @@ export default function App() {
   // A Strike session is a real account. Without one, nothing below changes: the surfaces
   // render the paper ledger exactly as they did before.
   const session = Boolean(identity.identity?.accountId);
-  const venue = useVenueAccount(session);
+  const venueSession = useVenueAccount(session);
+  const venue = venueSession.state;
   const venueMarks = useVenueMarks(venue.data?.positions.map((p) => p.symbol) ?? []);
+
+  // Trading on a real account: two clicks, venue ids, no paper fallback. Null without a session.
+  const trade = useVenueTrade({
+    session,
+    venue,
+    refresh: venueSession.refresh,
+    builderBps: identity.identity?.feeShareBps ?? 100,
+    filtersFor: (s) => marketFilters(symbolInfo(symbols, s)),
+  });
 
   const deck = useDeck(symbols, mini, DECK_SIZE, profile.watchlist, round);
 
@@ -153,6 +166,7 @@ export default function App() {
   const stepFor = (s: string) =>
     Number(symbolInfo(symbols, s)?.filters?.find((f) => f.filterType === 'LOT_SIZE')?.stepSize ?? 1);
 
+  /** The paper path only. A connected account goes through `trade.place`, which is a venue order. */
   const place = (o: { side: Side; kind: 'limit' | 'market'; price: number; size: number; leverage: number }) =>
     account.place({ ...o, symbol, mark: markPrice, step: stepFor(symbol) });
 
@@ -192,6 +206,15 @@ export default function App() {
   const spark = useSparklines(remaining.slice(0, 4).map((c) => c.symbol));
 
   const onSwipe = (card: DeckCard, side: Side) => {
+    const size = Math.max(stepFor(card.symbol), swipeRisk / card.markPrice);
+
+    if (trade) {
+      // A swipe on a real account arms the same confirm the ticket does; it does not fill
+      // anything, and it does not advance the deck until the venue has the order.
+      trade.place({ symbol: card.symbol, side, kind: 'market', size, price: card.markPrice, leverage: swipeLeverage });
+      return;
+    }
+
     const id = `swipe-${card.symbol}-${Date.now()}`;
     account.place({
       id,
@@ -199,7 +222,7 @@ export default function App() {
       side,
       kind: 'market',
       price: card.markPrice,
-      size: Math.max(stepFor(card.symbol), swipeRisk / card.markPrice),
+      size,
       leverage: swipeLeverage,
       mark: card.markPrice,
       step: stepFor(card.symbol),
@@ -231,6 +254,8 @@ export default function App() {
       onCancel={account.cancel}
       venue={session ? venue : null}
       venueMarks={venueMarks}
+      trade={trade}
+      stepFor={stepFor}
     />
   );
 
@@ -328,6 +353,7 @@ export default function App() {
             maxLeverage={tier.maxLeverage}
             onOpenMarkets={() => setMarketsOpen(true)}
             session={session}
+            trade={trade}
             onPlace={place}
           />
           <div className="mx-auto w-full max-w-[520px] px-3 pb-3">
@@ -345,6 +371,8 @@ export default function App() {
         onPick={(s) => setSymbol(s)}
         onClose={() => setMarketsOpen(false)}
       />
+
+      {trade && <OrderConfirm trade={trade} mark={markPrice} />}
     </div>
   );
 }

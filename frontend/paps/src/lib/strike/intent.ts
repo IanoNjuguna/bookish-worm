@@ -1,5 +1,5 @@
 import type { Side } from '../order';
-import { bodyFor, type OrderPlan, type OrderType } from './orders';
+import { bodyFor, type OrderBody, type OrderPlan, type OrderType } from './orders';
 import type { VenueStatus } from './venue-client';
 
 /**
@@ -23,6 +23,11 @@ export type TradeDraft = {
   size: number;
   price: number;
   reduceOnly?: boolean;
+  /**
+   * The leverage the ticket priced this trade at. Not part of the order body and not part of
+   * the intent key: it does not change which order is sent, only the margin behind it.
+   */
+  leverage?: number;
 };
 
 export type PlaceStage = 'idle' | 'confirm' | 'sending' | 'accepted' | 'rejected';

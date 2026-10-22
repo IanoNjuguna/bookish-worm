@@ -4,6 +4,7 @@ import { LEVERAGES } from '../lib/constants';
 import { price, usd } from '../lib/format';
 import { bps } from '../lib/strike/fees';
 import { useFeeRate } from '../hooks/useFeeRate';
+import type { TradeApi } from '../hooks/useVenueTrade';
 import { DEFAULT_TIER, liquidationPrice, notionalOf, sizeForNotional, type Side } from '../lib/order';
 import type { SymbolInfo } from '../lib/types';
 
@@ -15,11 +16,13 @@ type Props = {
   equity: number;
   /** A Strike session exists, so the CTA has to say that it still does not trade. */
   session?: boolean;
+  /** Present for a connected account: the ticket arms a live order instead of a paper one. */
+  trade?: TradeApi | null;
   onPlace: (o: { side: Side; kind: 'limit' | 'market'; price: number; size: number; leverage: number }) => void;
 };
 
 /** OKX-shaped ticket: type tabs, margin mode and leverage above, cost below. */
-export function Ticket({ symbol, info, mark, picked, equity, session = false, onPlace }: Props) {
+export function Ticket({ symbol, info, mark, picked, equity, session = false, trade = null, onPlace }: Props) {
   const [kind, setKind] = useState<'limit' | 'market'>('limit');
   const [priceInput, setPriceInput] = useState('');
   const [notional, setNotional] = useState('500');
@@ -50,8 +53,15 @@ export function Ticket({ symbol, info, mark, picked, equity, session = false, on
     setError(null);
     if (!entry) return setError('waiting for a price');
     if (notionalValue < f.minNotional) return setError(`minimum order $${f.minNotional}`);
+    if (trade) {
+      // A live order is armed, never filled here: the confirm panel is the second click.
+      trade.place({ symbol, side, kind, size, price: entry, leverage });
+      return;
+    }
     onPlace({ side, kind, price: entry, size, leverage });
   };
+
+  const blocked = Boolean(trade && (trade.block || trade.busy));
 
   return (
     <section className="flex w-[292px] shrink-0 flex-col border-l border-line bg-panel">
@@ -62,7 +72,7 @@ export function Ticket({ symbol, info, mark, picked, equity, session = false, on
           </button>
         ))}
         <span className="ml-auto pr-2 text-[10px] uppercase tracking-[0.1em] text-brand">
-          {session ? 'paper · not sent' : 'paper'}
+          {trade ? 'live' : session ? 'paper · not sent' : 'paper'}
         </span>
       </div>
 
@@ -152,25 +162,39 @@ export function Ticket({ symbol, info, mark, picked, equity, session = false, on
         </dl>
 
         {error && <p className="text-[11px] text-short">{error}</p>}
+        {trade?.block && (
+          <p className="border border-short/40 bg-short/10 px-2 py-1 text-[10px] text-short">
+            {trade.block}
+          </p>
+        )}
+        {trade?.notice && <p className="text-[10px] text-muted">{trade.notice}</p>}
       </div>
 
       <div className="mt-auto grid grid-cols-2 gap-1.5 p-3 pt-0">
         <button
           onClick={() => submit('LONG')}
-          className="flex flex-col items-center bg-long py-2 text-black transition-opacity hover:opacity-90"
+          disabled={blocked}
+          className={cn(
+            'flex flex-col items-center bg-long py-2 text-black transition-opacity hover:opacity-90',
+            blocked && 'opacity-40',
+          )}
         >
           <span className="text-[12px] font-semibold">Open long</span>
           <span className="text-[9px] uppercase tracking-[0.12em] text-black/60">
-            {session ? 'still paper' : 'paper'}
+            {trade ? (trade.block ? 'paused' : 'live · 2 steps') : session ? 'still paper' : 'paper'}
           </span>
         </button>
         <button
           onClick={() => submit('SHORT')}
-          className="flex flex-col items-center bg-short py-2 text-black transition-opacity hover:opacity-90"
+          disabled={blocked}
+          className={cn(
+            'flex flex-col items-center bg-short py-2 text-black transition-opacity hover:opacity-90',
+            blocked && 'opacity-40',
+          )}
         >
           <span className="text-[12px] font-semibold">Open short</span>
           <span className="text-[9px] uppercase tracking-[0.12em] text-black/60">
-            {session ? 'still paper' : 'paper'}
+            {trade ? (trade.block ? 'paused' : 'live · 2 steps') : session ? 'still paper' : 'paper'}
           </span>
         </button>
       </div>
