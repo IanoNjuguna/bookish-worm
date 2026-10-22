@@ -2,17 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
-/* OKX-like terminal palette: near-black canvas, one step lighter panels, hairline
- * borders, and no rounded corners. All of it ours, none of it lifted. */
+/* ============================================================================
+ * paps surface tokens — FROZEN. Four decisions. Nothing here is a preference.
+ *
+ * paps is DARK-ONLY BY DESIGN. There is no light theme, no `dark:` variant and
+ * no light/dark parity with the other apps in this monorepo. The surface below
+ * *is* the surface; a second scheme would be a different product.
+ * ============================================================================
+ *
+ * 1. CANVAS WARMTH — warm near-black, never a terminal blue-black.
+ *    Every surface grey carries a ~30° hue bias (the amber axis) at 7-9%
+ *    saturation, so the blacks read as stone and paper rather than as a monitor.
+ *
+ *      canvas   hsl(30 9% 6%)   #110f0e   the page; warm enough to feel printed
+ *      panel    hsl(30 8% 9%)   #191715   one step up: a card sitting on the page
+ *      panel-2  hsl(30 7% 13%)  #23211f   two steps: an input, a chip, a pressed row
+ *      line     hsl(30 8% 19%)  #34302d   the hairline; lighter than every surface it
+ *                                         separates, so a border is a seam, not decor
+ *
+ *    The ladder is deliberately shallow (6 -> 9 -> 13 -> 19) and monotonic:
+ *    elevation is told by light first, so a card is legible before it has a
+ *    visible outline. fg hsl(35 16% 93%) #f0eeea and muted hsl(30 7% 60%)
+ *    #a09992 stay on the same warm axis — a neutral #e8e8e8 beside this black
+ *    reads blue, and that is exactly the tell being removed.
+ *
+ * 2. ONE ACCENT — hsl(214 62% 62%) #6296da.
+ *    A single ink blue. It marks the primary action and progress — the one CTA,
+ *    bar fills, meter and track progress — and nothing else. It may NOT be used
+ *    decoratively: no accent icons, no accent labels, no accent border on a card
+ *    that is not itself the action, no accent as a brand wash.
+ *    Green (--long #00b47a) and red (--short #f0534e) are reserved for direction
+ *    and PnL and are never the accent. Amber is banned outright (warning states
+ *    borrow red; an amber CTA is the casino tell).
+ *    `brand` is a legacy alias of the same accent colour, kept only so existing
+ *    components resolve. New code writes `accent`.
+ *
+ * 3. RADIUS — exactly three, and no other radius values may be introduced.
+ *      card     16px   --radius-card      a deck card, a panel, a sheet
+ *      control  12px   --radius-control   a button, a field, a chip, a segment
+ *      pill     999px  --radius-pill      tab bar, avatar, undo / action circles
+ *    The pre-freeze utility names are aliased onto these three in
+ *    tailwind.config.ts, so a component written before this block does not keep
+ *    a fourth radius alive: rounded-2xl = card (16px, unchanged), rounded-xl and
+ *    rounded-lg and rounded = control (12px; rounded-lg was 8px, the one visible
+ *    change in this freeze), rounded-full = pill (unchanged in appearance).
+ *
+ * 4. TYPE SCALE — exactly five steps, named in the Tailwind fontSize theme.
+ *      text-hero   34px  a hero numeral: account equity, the price a card is about
+ *      text-title  16px  a section title, a symbol in a header
+ *      text-body   12px  the default; every sentence the trader is meant to read
+ *      text-small  11px  a secondary fact, a label sitting beside its value
+ *      text-micro  10px  uppercase micro-labels only, never running copy
+ *    The bottom three are one pixel apart on purpose: this surface is dense
+ *    (rows 19-22px) and below 13px one pixel is the finest legible step. The
+ *    jumps carry the hierarchy: 12 -> 16 is 1.33x, 16 -> 34 is 2.1x.
+ *    Once a named step exists, arbitrary pixel text sizes (text-[13px]) must not
+ *    be introduced. Migrate what is left onto a named step, or argue for a new
+ *    step in this block first — do not improvise one in a component.
+ *    Tailwind's own text-xs .. text-9xl remain addressable only because deleting
+ *    them would turn a mistake into a silent no-op instead of a visible one.
+ *    They are not part of this scale and must not be used.
+ * ========================================================================== */
+
 @layer base {
   :root {
-    --background: 0 0% 4%;
-    --panel: 0 0% 7%;
-    --panel-2: 0 0% 9%;
-    --foreground: 0 0% 91%;
-    --muted-foreground: 0 0% 55%;
-    --border: 0 0% 14%;
-    --primary: 45 93% 55%;
+    /* 1. canvas warmth */
+    --canvas: 30 9% 6%;
+    --panel: 30 8% 9%;
+    --panel-2: 30 7% 13%;
+    --line: 30 8% 19%;
+    --fg: 35 16% 93%;
+    --muted: 30 7% 60%;
+
+    /* 2. one accent, plus the two reserved direction colours */
+    --accent: 214 62% 62%;
+    --long: 0 180 122;
+    --short: 240 83 78;
+
+    /* 3. radius */
+    --radius-card: 16px;
+    --radius-control: 12px;
+    --radius-pill: 999px;
   }
 
   html,
@@ -22,7 +92,9 @@
   }
 
   body {
-    @apply bg-bg text-fg antialiased;
+    @apply bg-canvas text-fg antialiased;
+    /* Matches text-body. Held as a raw value only because the base must inherit
+       `normal` line-height: a 1.45 base would inflate every dense 10-12px row. */
     font-size: 12px;
     font-feature-settings: 'tnum' 1, 'cv05' 1;
   }
@@ -37,14 +109,14 @@
   }
 
   .chip {
-    @apply px-1.5 py-0.5 text-[10px] uppercase tracking-[0.08em] text-muted transition-colors;
+    @apply rounded-pill px-1.5 py-0.5 text-micro uppercase tracking-[0.08em] text-muted transition-colors;
   }
   .chip-on {
     @apply bg-panel-2 text-fg;
   }
 
   ::selection {
-    background: hsl(var(--primary) / 0.3);
+    background: hsl(var(--accent) / 0.3);
   }
 
   input[type='range'] {
@@ -59,7 +131,7 @@
     height: 6px;
   }
   ::-webkit-scrollbar-thumb {
-    background: hsl(var(--border));
+    background: hsl(var(--line));
   }
   ::-webkit-scrollbar-track {
     background: transparent;
@@ -71,16 +143,16 @@
     @apply border border-line bg-panel;
   }
   .label {
-    @apply text-[10px] uppercase tracking-[0.08em] text-muted;
+    @apply text-micro uppercase tracking-[0.08em] text-muted;
   }
   .tab {
-    @apply px-3 py-2 text-[12px] text-muted transition-colors hover:text-fg;
+    @apply px-3 py-2 text-body text-muted transition-colors hover:text-fg;
   }
   .tab-active {
     @apply border-b-2 border-fg text-fg;
   }
   .field {
-    @apply w-full bg-panel-2 px-2.5 py-2 text-right text-[12px] outline-none ring-line focus:ring-1;
+    @apply w-full rounded-control bg-panel-2 px-2.5 py-2 text-right text-body outline-none ring-line focus:ring-1;
   }
 }
 
