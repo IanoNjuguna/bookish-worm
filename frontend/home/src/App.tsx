@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +15,8 @@ import Privacy from "./pages/Privacy.tsx";
 import MediaKit from "./pages/MediaKit.tsx";
 import Research from "./pages/Research.tsx";
 import PreDrop from "./pages/PreDrop.tsx";
+// The paps landing carries GSAP; lazy so the rest of the marketing site never pays for it.
+const Paps = lazy(() => import("./pages/Paps.tsx"));
 import NotFound from "./pages/NotFound.tsx";
 
 const ScrollToTop = () => {
@@ -44,6 +46,14 @@ export const AppRoutes = () => (
       <Route path="/media-kit" element={<MediaKit />} />
       <Route path="/research" element={<Research />} />
       <Route path="/pre-drop" element={<PreDrop />} />
+      <Route
+        path="/paps"
+        element={
+          <Suspense fallback={<div className="min-h-screen bg-[hsl(30_9%_6%)]" />}>
+            <Paps />
+          </Suspense>
+        }
+      />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>

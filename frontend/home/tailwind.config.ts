@@ -20,6 +20,20 @@ export default {
         mono: ['IBM Plex Mono', 'ui-monospace', 'monospace'],
       },
       colors: {
+        // Scoped palette for the paps landing (/paps). paps has its own surface — warm
+        // near-black, one ink-blue accent — and it must not borrow doba's pink, so it
+        // arrives as a namespace rather than being mixed into the base tokens.
+        paps: {
+          canvas: 'hsl(30 9% 6%)',
+          panel: 'hsl(30 8% 9%)',
+          panel2: 'hsl(30 7% 13%)',
+          line: 'hsl(30 8% 19%)',
+          fg: 'hsl(35 16% 93%)',
+          muted: 'hsl(30 7% 60%)',
+          accent: 'hsl(214 62% 62%)',
+          long: 'hsl(158 100% 35%)',
+          short: 'hsl(1 84% 62%)',
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

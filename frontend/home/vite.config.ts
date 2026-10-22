@@ -144,6 +144,11 @@ export default defineConfig({
             if (id.includes('cardano') || id.includes('lucid') || id.includes('sodium')) {
               return 'cardano';
             }
+            // GSAP is only used by the paps landing; keeping it out of `vendor` means the
+            // rest of the marketing site never downloads an animation library it does not run.
+            if (id.includes('gsap')) {
+              return 'gsap';
+            }
             return 'vendor';
           }
         }
