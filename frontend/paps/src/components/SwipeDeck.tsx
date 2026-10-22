@@ -18,6 +18,10 @@ type Props = {
   onPass: (c: DeckCard) => void;
   undo: { symbol: string; side: Side } | null;
   onUndo: () => void;
+  roundLabel: string;
+  round: number;
+  roundStats: { swipes: number; openNow: number; pnl: number };
+  onNextRound: () => void;
 };
 
 type Drag = { x: number; y: number; active: boolean };
@@ -44,6 +48,10 @@ export function SwipeDeck({
   onPass,
   undo,
   onUndo,
+  roundLabel,
+  round,
+  roundStats,
+  onNextRound,
 }: Props) {
   const [drag, setDrag] = useState<Drag>({ x: 0, y: 0, active: false });
   const [flying, setFlying] = useState<'LONG' | 'SHORT' | null>(null);
@@ -90,8 +98,29 @@ export function SwipeDeck({
 
   if (!top) {
     return (
-      <div className="flex h-full items-center justify-center px-6 text-center">
-        <p className="text-[12px] text-muted">Deck empty. Nothing left to swipe in this batch.</p>
+      <div className="flex h-full flex-col items-center justify-center gap-4 px-6">
+        <div className="w-full max-w-[360px] border border-line bg-panel p-4">
+          <div className="text-[10px] uppercase tracking-[0.1em] text-muted">round {round + 1} done</div>
+          <div className="num mt-1 text-[26px] leading-none">
+            {roundStats.pnl >= 0 ? '+' : '−'}${usd(Math.abs(roundStats.pnl))}
+          </div>
+          <div className="mt-3 grid grid-cols-3 gap-2 border-t border-line pt-3 text-[11px]">
+            <Stat k="swipes" v={String(roundStats.swipes)} />
+            <Stat k="open now" v={String(roundStats.openNow)} />
+            <Stat k="equity" v={`$${usd(equity)}`} />
+          </div>
+          <p className="mt-3 border-t border-line pt-2 text-[10px] text-muted">
+            {openPositions} of {maxPositions} positions still open. They carry into the next
+            round, and the next round draws from a different set of markets.
+          </p>
+        </div>
+
+        <button
+          onClick={onNextRound}
+          className="w-full max-w-[360px] border border-brand/50 py-3 text-[12px] font-semibold uppercase tracking-[0.1em] text-brand hover:bg-brand/10"
+        >
+          next round →
+        </button>
       </div>
     );
   }
@@ -121,7 +150,7 @@ export function SwipeDeck({
           ))}
         </div>
         <span className="num text-[10px] text-muted">
-          {cards.length} left · ${usd(risk)} at {leverage}×
+          {roundLabel} · {cards.length} left · ${usd(risk)} at {leverage}×
         </span>
       </div>
 
@@ -315,6 +344,15 @@ function withAway(liq: number, entry: number): string {
   if (!liq || !entry) return '—';
   const away = ((liq - entry) / entry) * 100;
   return `${price(liq)} (${away >= 0 ? '+' : '−'}${Math.abs(away).toFixed(1)}%)`;
+}
+
+function Stat({ k, v }: { k: string; v: string }) {
+  return (
+    <div>
+      <div className="text-[10px] text-muted">{k}</div>
+      <div className="num">{v}</div>
+    </div>
+  );
 }
 
 function Chip({ children }: { children: React.ReactNode }) {

@@ -18,7 +18,7 @@ import { LiteView } from './components/LiteView';
 import { MarketSheet } from './components/MarketSheet';
 import { SwipeDeck } from './components/SwipeDeck';
 import { socket } from './lib/ws';
-import { usePaperAccount } from './lib/store';
+import { START_EQUITY, usePaperAccount } from './lib/store';
 import type { Interval } from './lib/constants';
 import { liquidationPrice, type Side } from './lib/order';
 
@@ -47,6 +47,8 @@ export default function App() {
   const [mode, setMode] = useState<ViewMode>('pro');
   const [modeTouched, setModeTouched] = useState(false);
   const [marketsOpen, setMarketsOpen] = useState(false);
+  const [round, setRound] = useState(0);
+  const [roundStart, setRoundStart] = useState({ equity: START_EQUITY, openBase: 0 });
   const [connected, setConnected] = useState(false);
   const [swiped, setSwiped] = useState<string[]>([]);
   const [undo, setUndo] = useState<{ id: string; symbol: string; side: Side } | null>(null);
@@ -68,7 +70,7 @@ export default function App() {
   const profile = identity.profile;
   const swipeRisk = profile.riskUsd || FALLBACK_RISK;
   const swipeLeverage = profile.leverage || FALLBACK_LEVERAGE;
-  const deck = useDeck(symbols, mini, DECK_SIZE, profile.watchlist);
+  const deck = useDeck(symbols, mini, DECK_SIZE, profile.watchlist, round);
 
   useEffect(() => {
     socket.connect();
@@ -135,11 +137,11 @@ export default function App() {
   }, [marks, account.positions]);
 
   const remaining = useMemo(() => {
-    const left = deck.filter((c) => !swiped.includes(c.symbol));
+    const left = deck.cards.filter((c) => !swiped.includes(c.symbol));
     // A trader's own markets come first; the rank order is only the default.
     const watched = left.filter((c) => profile.watchlist.includes(c.symbol));
     return [...watched, ...left.filter((c) => !profile.watchlist.includes(c.symbol))];
-  }, [deck, swiped, profile.watchlist]);
+  }, [deck.cards, swiped, profile.watchlist]);
   const spark = useSparklines(remaining.slice(0, 4).map((c) => c.symbol));
 
   const blotter = (
@@ -188,6 +190,18 @@ export default function App() {
             maxPositions={MAX_POSITIONS}
             onSwipe={onSwipe}
             onPass={(c) => setSwiped((prev) => [...prev, c.symbol])}
+            roundLabel={deck.label}
+            round={round}
+            roundStats={{
+              swipes: swiped.length,
+              openNow: account.positions.length,
+              pnl: account.equity - roundStart.equity,
+            }}
+            onNextRound={() => {
+              setRound((r) => r + 1);
+              setSwiped([]);
+              setRoundStart({ equity: account.equity, openBase: account.positions.length });
+            }}
             undo={undo ? { symbol: undo.symbol, side: undo.side } : null}
             onUndo={() => {
               if (!undo) return;
