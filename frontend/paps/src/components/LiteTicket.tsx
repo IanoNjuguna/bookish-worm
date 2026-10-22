@@ -3,6 +3,7 @@ import { cn } from '../lib/cn';
 import { price, usd } from '../lib/format';
 import { DEFAULT_TIER, liquidationPrice, notionalOf, sizeForNotional, type Side } from '../lib/order';
 import type { SymbolInfo } from '../lib/types';
+import { IconChevronDown } from '@tabler/icons-react';
 
 type Order = { side: Side; kind: 'limit' | 'market'; price: number; size: number; leverage: number };
 
@@ -19,14 +20,17 @@ type Props = {
   onPlace: (o: Order) => void;
 };
 
-const PRESETS = [25, 50, 100, 250, 500];
+// Three chips, not five: the field and the slider already say the same number twice.
+const PRESETS = [50, 100, 250];
 // The strip contains every tier default, so the selected leverage is always visible.
 const LEV = [2, 3, 5, 10, 20];
 const FEE = 0.0005;
 
 /**
- * The ticket half of the Trade tab: direction, size, leverage, risk, one action.
- * It owns its own sizing so the surface above stays a price page, not a form.
+ * The ticket half of the Trade tab. The face is the decision — direction, amount,
+ * one action. Size, margin, liquidation, fee, funding and leverage are what a
+ * trader needs *after* committing to a size, so they live one tap down in
+ * `showRisk` rather than competing with the CTA.
  */
 export function LiteTicket({
   symbol,
@@ -42,6 +46,8 @@ export function LiteTicket({
   const [notional, setNotional] = useState(initialRisk ?? 100);
   const [leverage, setLeverage] = useState(Math.min(initialLeverage ?? 5, maxLeverage));
   const [side, setSide] = useState<Side>('LONG');
+  /** The one disclosure: collapsed it is a single line, expanded it is the risk panel. */
+  const [showRisk, setShowRisk] = useState(false);
 
   const filters = useMemo(() => {
     const f = info?.filters ?? [];
@@ -59,6 +65,9 @@ export function LiteTicket({
   const fee = notionalValue * FEE;
   const base = symbol.split('-')[0];
   const canPlace = Boolean(mark) && size > 0;
+  // A caller may hand us a leverage that is not a tier default; show it as its own
+  // chip so the current leverage is never the one value missing from the strip.
+  const tiers = LEV.includes(leverage) ? LEV : [...LEV, leverage].sort((a, b) => a - b);
 
   return (
     <section className="rounded-card border border-line bg-panel p-4">
@@ -85,12 +94,6 @@ export function LiteTicket({
         <span className="text-small text-muted">Amount</span>
         <span className="num text-title text-fg">${usd(notional)}</span>
       </div>
-      <div className="mt-1 flex items-baseline justify-between">
-        <span className="text-small text-muted">size</span>
-        <span className="num text-small text-muted">
-          {size ? `${size.toLocaleString('en-US')} ${base}` : '—'}
-        </span>
-      </div>
 
       <input
         type="range"
@@ -103,14 +106,15 @@ export function LiteTicket({
         className="mt-3"
       />
 
-      <div className="mt-2 grid grid-cols-5 gap-1.5">
+      <div className="mt-2 flex gap-1.5">
         {PRESETS.map((p) => (
           <button
             key={p}
             onClick={() => setNotional(p)}
+            aria-pressed={notional === p}
             className={cn(
-              'min-h-[36px] rounded-control text-body transition-colors',
-              notional === p ? 'bg-panel-2 text-fg' : 'text-muted',
+              'min-h-[32px] flex-1 rounded-chip text-body transition-colors',
+              notional === p ? 'bg-panel-2 text-fg' : 'bg-canvas text-muted',
             )}
           >
             ${p}
@@ -118,53 +122,87 @@ export function LiteTicket({
         ))}
       </div>
 
-      <div className="mt-4 flex items-baseline justify-between">
-        <span className="text-small text-muted">Leverage</span>
-        <span className="num text-title text-fg">{leverage}×</span>
-      </div>
-      <div className="mt-2 grid grid-cols-5 gap-1.5">
-        {LEV.map((l) => {
-          const locked = l > maxLeverage;
-          return (
-            <button
-              key={l}
-              disabled={locked}
-              onClick={() => setLeverage(l)}
-              title={locked ? `unlocks at a higher level` : undefined}
-              className={cn(
-                'min-h-[36px] rounded-control text-body transition-colors',
-                leverage === l ? 'bg-panel-2 text-fg' : 'text-muted',
-                locked && 'opacity-30',
-              )}
-            >
-              {l}×
-            </button>
-          );
-        })}
-      </div>
+      {/* One line, always: the two numbers that answer "how much can I lose", then the
+          disclosure. `truncate` keeps it to a single line at 390px whatever the values. */}
+      <button
+        type="button"
+        onClick={() => setShowRisk((v) => !v)}
+        aria-expanded={showRisk}
+        className="mt-3 flex w-full items-center gap-1.5 text-small text-muted transition-colors active:text-fg"
+      >
+        <span className="min-w-0 truncate">
+          Margin <span className="num text-fg">${usd(margin)}</span>
+          <span aria-hidden="true"> · </span>
+          Liq. <span className="num text-short">{liq ? price(liq) : '—'}</span>
+        </span>
+        <span className="ml-auto flex shrink-0 items-center gap-0.5 font-medium text-fg">
+          {showRisk ? 'Hide' : 'Details'}
+          <IconChevronDown
+            size={13}
+            className={cn('text-muted transition-transform', showRisk && 'rotate-180')}
+          />
+        </span>
+      </button>
 
-      <dl className="mt-4 grid grid-cols-3 gap-2 border-t border-line pt-3">
-        <div>
-          <dt className="text-small text-muted">margin</dt>
-          <dd className="num mt-1 text-body">${usd(margin)}</dd>
+      {showRisk ? (
+        <div className="mt-3 rounded-card border border-line bg-canvas p-3">
+          <dl className="grid grid-cols-2 gap-x-3 gap-y-2.5">
+            <div>
+              <dt className="text-small text-muted">size</dt>
+              <dd className="num mt-0.5 text-body">
+                {size ? `${size.toLocaleString('en-US')} ${base}` : '—'}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-small text-muted">margin</dt>
+              <dd className="num mt-0.5 text-body">${usd(margin)}</dd>
+            </div>
+            <div>
+              <dt className="text-small text-muted">liq. {side === 'LONG' ? 'long' : 'short'}</dt>
+              <dd className="num mt-0.5 text-body text-short">{liq ? price(liq) : '—'}</dd>
+            </div>
+            <div>
+              <dt className="text-small text-muted">fee{fundingRate ? ' · funding' : ''}</dt>
+              <dd className="num mt-0.5 text-body">
+                ${usd(fee)}
+                {fundingRate ? (
+                  <span className="ml-1 text-small text-muted">
+                    {fundingRate >= 0 ? '−' : '+'}
+                    {usd(fundingRate * Math.abs(notionalValue))}
+                    {'/\u00a0'}8h
+                  </span>
+                ) : null}
+              </dd>
+            </div>
+          </dl>
+
+          <div className="mt-3 flex items-baseline justify-between border-t border-line pt-3">
+            <span className="text-small text-muted">Leverage</span>
+            <span className="num text-body text-fg">{leverage}×</span>
+          </div>
+          <div className="mt-2 flex gap-1.5">
+            {tiers.map((l) => {
+              const locked = l > maxLeverage;
+              return (
+                <button
+                  key={l}
+                  disabled={locked}
+                  aria-pressed={leverage === l}
+                  onClick={() => setLeverage(l)}
+                  title={locked ? `unlocks at a higher level` : undefined}
+                  className={cn(
+                    'min-h-[32px] flex-1 rounded-chip text-body transition-colors',
+                    leverage === l ? 'bg-panel-2 font-medium text-fg' : 'bg-panel text-muted',
+                    locked && 'cursor-not-allowed opacity-30',
+                  )}
+                >
+                  {l}×
+                </button>
+              );
+            })}
+          </div>
         </div>
-        <div>
-          <dt className="text-small text-muted">liq. {side === 'LONG' ? 'long' : 'short'}</dt>
-          <dd className="num mt-1 text-body text-short">{liq ? price(liq) : '—'}</dd>
-        </div>
-        <div className="text-right">
-          <dt className="text-small text-muted">fee{fundingRate ? ' · funding' : ''}</dt>
-          <dd className="num mt-1 text-body">
-            ${usd(fee)}
-            {fundingRate ? (
-              <span className="ml-1 text-small text-muted">
-                {fundingRate >= 0 ? '−' : '+'}
-                {usd(fundingRate * Math.abs(notionalValue))}{'/\u00a0'}8h
-              </span>
-            ) : null}
-          </dd>
-        </div>
-      </dl>
+      ) : null}
 
       <button
         onClick={() => onPlace({ side, kind: 'market', price: mark, size, leverage })}
@@ -175,7 +213,7 @@ export function LiteTicket({
         <span className="ml-1.5 text-body font-medium opacity-80">· paper</span>
       </button>
 
-      <p className="mt-3 text-body leading-relaxed text-muted">
+      <p className="mt-2.5 text-small leading-relaxed text-muted">
         Fills at the mark. {size.toLocaleString('en-US')} {base} of notional ${usd(notionalValue)}.
         Liquidation is first-tier and an estimate.
       </p>
