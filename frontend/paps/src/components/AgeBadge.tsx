@@ -25,7 +25,7 @@ export function AgeBadge({ lastAt, connected }: { lastAt: number; connected: boo
 
 function Dot({ tone, label }: { tone: 'muted' | 'warn' | 'short'; label: string }) {
   return (
-    <div className="flex items-center gap-1.5 border border-line px-2 py-1">
+    <div className="flex items-center gap-1.5 border border-line px-1.5 py-1 sm:px-2" title={label}>
       <span
         className={cn(
           'h-1.5 w-1.5 rounded-full',
@@ -36,7 +36,7 @@ function Dot({ tone, label }: { tone: 'muted' | 'warn' | 'short'; label: string 
       />
       <span
         className={cn(
-          'num text-[10px] lowercase',
+          'num hidden text-[10px] lowercase sm:inline',
           tone === 'muted' && 'text-muted',
           tone === 'warn' && 'text-short/80',
           tone === 'short' && 'text-short',
