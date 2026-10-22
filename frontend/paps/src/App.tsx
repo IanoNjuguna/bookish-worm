@@ -1,76 +1,67 @@
 import { useEffect, useMemo, useState } from 'react';
 import { symbolInfo, useSymbols } from './hooks/useSymbols';
 import { useTicker } from './hooks/useTicker';
-import { useDepth } from './hooks/useDepth';
 import { useKlines } from './hooks/useKlines';
-import { useMarkPrice, useTrades } from './hooks/useMarket';
+import { useMarkPrice } from './hooks/useMarket';
 import { useMiniTickers } from './hooks/useMiniTickers';
 import { useDeck, type DeckCard } from './hooks/useDeck';
-import { useIdentity } from './hooks/useIdentity';
 import { useSparklines } from './hooks/useSparklines';
-import { Sidebar } from './components/Sidebar';
+import { useIdentity } from './hooks/useIdentity';
 import { TopBar, type ViewMode } from './components/TopBar';
-import { ChartPanel } from './components/Chart';
-import { BookPanel } from './components/BookPanel';
-import { Ticket } from './components/Ticket';
 import { Blotter } from './components/Blotter';
 import { LiteView } from './components/LiteView';
-import { MarketSheet } from './components/MarketSheet';
 import { SwipeDeck } from './components/SwipeDeck';
+import { MarketSheet } from './components/MarketSheet';
 import { socket } from './lib/ws';
 import { START_EQUITY, usePaperAccount } from './lib/store';
-import type { Interval } from './lib/constants';
 import { liquidationPrice, type Side } from './lib/order';
+import {
+  drawdownPct,
+  grade,
+  nextTier,
+  objectiveFor,
+  objectiveMet,
+  tierFor,
+} from './lib/progress';
+import type { Interval } from './lib/constants';
 
-const PRO_MIN_WIDTH = 1024;
 const FALLBACK_RISK = 100;
-const FALLBACK_LEVERAGE = 10;
-const MAX_POSITIONS = 5;
+const FALLBACK_LEVERAGE = 5;
 const DECK_SIZE = 10;
 const UNDO_MS = 2_000;
-
-function useIsWide() {
-  const [wide, setWide] = useState(() => window.innerWidth >= PRO_MIN_WIDTH);
-  useEffect(() => {
-    const mq = window.matchMedia(`(min-width: ${PRO_MIN_WIDTH}px)`);
-    const on = () => setWide(mq.matches);
-    mq.addEventListener('change', on);
-    return () => mq.removeEventListener('change', on);
-  }, []);
-  return wide;
-}
 
 export default function App() {
   const [symbol, setSymbol] = useState('ADA-USD');
   const [interval, setInterval] = useState<Interval>('15m');
-  const [picked, setPicked] = useState('');
-  const [mode, setMode] = useState<ViewMode>('pro');
+  const [mode, setMode] = useState<ViewMode>('swipe');
   const [modeTouched, setModeTouched] = useState(false);
-  const [marketsOpen, setMarketsOpen] = useState(false);
-  const [round, setRound] = useState(0);
-  const [roundStart, setRoundStart] = useState({ equity: START_EQUITY, openBase: 0 });
   const [connected, setConnected] = useState(false);
   const [swiped, setSwiped] = useState<string[]>([]);
   const [undo, setUndo] = useState<{ id: string; symbol: string; side: Side } | null>(null);
+  const [marketsOpen, setMarketsOpen] = useState(false);
+  const [round, setRound] = useState(0);
+  const [roundStart, setRoundStart] = useState({ equity: START_EQUITY });
+  const [roundBase, setRoundBase] = useState({ clean: 0, liq: 0 });
 
-  const wide = useIsWide();
-  // Pro needs four rails; narrower screens get the two views that actually fit.
-  const modes: ViewMode[] = wide ? ['pro', 'lite', 'swipe'] : ['lite', 'swipe'];
-  const view: ViewMode = modes.includes(mode) ? mode : modes[0];
+  // Pro is archived: this is a phone product, so the two views that fit a thumb are
+  // the two views that ship. The components remain in the tree, unused.
+  const modes: ViewMode[] = ['lite', 'swipe'];
 
   const { symbols } = useSymbols();
   const mini = useMiniTickers();
   const { ticker } = useTicker(symbol);
   const { mark, lastAt } = useMarkPrice(symbol);
-  const book = useDepth(symbol);
-  const trades = useTrades(symbol);
   const { bars, error } = useKlines(symbol, interval);
   const account = usePaperAccount();
   const identity = useIdentity();
   const profile = identity.profile;
-  const swipeRisk = profile.riskUsd || FALLBACK_RISK;
-  const swipeLeverage = profile.leverage || FALLBACK_LEVERAGE;
   const deck = useDeck(symbols, mini, DECK_SIZE, profile.watchlist, round);
+
+  const view: ViewMode = modes.includes(mode) ? mode : 'swipe';
+  const tier = tierFor(profile.stats);
+  const swipeRisk = profile.riskUsd || FALLBACK_RISK;
+  // Leverage is capped by tier: more rope only after evidence of discipline.
+  const swipeLeverage = Math.min(profile.leverage || FALLBACK_LEVERAGE, tier.maxLeverage);
 
   useEffect(() => {
     socket.connect();
@@ -81,9 +72,9 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    // The profile decides where the app opens, until the trader touches the switcher.
     if (!modeTouched && modes.includes(profile.defaultView)) setMode(profile.defaultView);
-  }, [profile.defaultView, modeTouched, modes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile.defaultView, modeTouched]);
 
   useEffect(() => {
     if (!undo) return;
@@ -94,6 +85,7 @@ export default function App() {
   const info = symbolInfo(symbols, symbol);
   const last = mini[symbol]?.last ?? Number(ticker?.lastPrice ?? 0);
   const markPrice = Number(mark?.markPrice ?? last);
+
   const marks = useMemo(() => {
     const out: Record<string, number> = {};
     for (const [sym, t] of Object.entries(mini)) out[sym] = t.last;
@@ -106,6 +98,41 @@ export default function App() {
 
   const place = (o: { side: Side; kind: 'limit' | 'market'; price: number; size: number; leverage: number }) =>
     account.place({ ...o, symbol, mark: markPrice, step: stepFor(symbol) });
+
+  // Liquidation is enforced by the venue: a position past its liquidation price is
+  // closed at the mark and charged the fee, exactly like a real one would be.
+  useEffect(() => {
+    if (!account.positions.length) return;
+    const doomed = account.positions.filter((p) => {
+      const m = marks[p.symbol];
+      if (!m) return false;
+      const liq = liquidationPrice(p.side, p.entry, p.margin, p.size);
+      if (!liq) return false;
+      return p.side === 'LONG' ? m <= liq : m >= liq;
+    });
+    if (doomed.length) account.liquidate(doomed.map((p) => p.id));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [marks, account.positions]);
+
+  const minLiqDistance = useMemo(() => {
+    if (!account.positions.length) return 99;
+    return Math.min(
+      ...account.positions.map((p) => {
+        const m = marks[p.symbol] ?? markPrice;
+        const liq = liquidationPrice(p.side, p.entry, p.margin, p.size);
+        if (!liq || !m) return 99;
+        return (Math.abs(m - liq) / m) * 100;
+      }),
+    );
+  }, [account.positions, marks, markPrice]);
+
+  const remaining = useMemo(() => {
+    const left = deck.cards.filter((c) => !swiped.includes(c.symbol));
+    const watched = left.filter((c) => profile.watchlist.includes(c.symbol));
+    return [...watched, ...left.filter((c) => !profile.watchlist.includes(c.symbol))];
+  }, [deck.cards, swiped, profile.watchlist]);
+
+  const spark = useSparklines(remaining.slice(0, 4).map((c) => c.symbol));
 
   const onSwipe = (card: DeckCard, side: Side) => {
     const id = `swipe-${card.symbol}-${Date.now()}`;
@@ -124,25 +151,14 @@ export default function App() {
     setUndo({ id, symbol: card.symbol, side });
   };
 
-  useEffect(() => {
-    if (!account.positions.length) return;
-    const doomed = account.positions.filter((p) => {
-      const m = marks[p.symbol];
-      if (!m) return false;
-      const liq = liquidationPrice(p.side, p.entry, p.margin, p.size);
-      if (!liq) return false;
-      return p.side === 'LONG' ? m <= liq : m >= liq;
-    });
-    if (doomed.length) account.liquidate(doomed.map((p) => p.id));
-  }, [marks, account.positions]);
-
-  const remaining = useMemo(() => {
-    const left = deck.cards.filter((c) => !swiped.includes(c.symbol));
-    // A trader's own markets come first; the rank order is only the default.
-    const watched = left.filter((c) => profile.watchlist.includes(c.symbol));
-    return [...watched, ...left.filter((c) => !profile.watchlist.includes(c.symbol))];
-  }, [deck.cards, swiped, profile.watchlist]);
-  const spark = useSparklines(remaining.slice(0, 4).map((c) => c.symbol));
+  const objective = objectiveFor(round);
+  const outcome = {
+    swipes: swiped.length,
+    closesInProfit: account.stats.cleanCloses - roundBase.clean,
+    liquidations: account.stats.liquidations - roundBase.liq,
+    openNow: account.positions.length,
+    minLiqDistance,
+  };
 
   const blotter = (
     <Blotter
@@ -175,6 +191,7 @@ export default function App() {
           setMode(m);
         }}
         identity={identity}
+        tier={tier}
       />
 
       {view === 'swipe' ? (
@@ -187,7 +204,7 @@ export default function App() {
             leverage={swipeLeverage}
             stepFor={stepFor}
             openPositions={account.positions.length}
-            maxPositions={MAX_POSITIONS}
+            maxPositions={tier.maxPositions}
             onSwipe={onSwipe}
             onPass={(c) => setSwiped((prev) => [...prev, c.symbol])}
             roundLabel={deck.label}
@@ -197,10 +214,33 @@ export default function App() {
               openNow: account.positions.length,
               pnl: account.equity - roundStart.equity,
             }}
+            objective={objective}
+            objectiveMet={objectiveMet(objective, outcome)}
+            session={
+              (round + 1) % 5 === 0
+                ? {
+                    grade: grade(profile.stats, drawdownPct(profile.stats, account.equity)),
+                    drawdown: drawdownPct(profile.stats, account.equity),
+                    tierName: tier.name,
+                    next: nextTier(profile.stats)?.name ?? null,
+                  }
+                : null
+            }
             onNextRound={() => {
+              const met = objectiveMet(objective, outcome);
+              identity.addProgress({
+                rounds: 1,
+                xp: met ? objective.xp : 0,
+                cleanCloses: outcome.closesInProfit,
+                liquidations: outcome.liquidations,
+                best: account.stats.best,
+                worst: account.stats.worst,
+                peak: Math.max(profile.stats.peak, account.equity),
+              });
+              setRoundBase({ clean: account.stats.cleanCloses, liq: account.stats.liquidations });
               setRound((r) => r + 1);
               setSwiped([]);
-              setRoundStart({ equity: account.equity, openBase: account.positions.length });
+              setRoundStart({ equity: account.equity });
             }}
             undo={undo ? { symbol: undo.symbol, side: undo.side } : null}
             onUndo={() => {
@@ -211,7 +251,7 @@ export default function App() {
             }}
           />
         </div>
-      ) : view === 'lite' ? (
+      ) : (
         <main className="min-h-0 flex-1 overflow-y-auto">
           <LiteView
             symbol={symbol}
@@ -225,6 +265,7 @@ export default function App() {
             chartError={error}
             initialRisk={swipeRisk}
             initialLeverage={swipeLeverage}
+            maxLeverage={tier.maxLeverage}
             onOpenMarkets={() => setMarketsOpen(true)}
             onPlace={place}
           />
@@ -232,43 +273,6 @@ export default function App() {
             <div className="h-[196px] shrink-0 border border-line">{blotter}</div>
           </div>
         </main>
-      ) : (
-        <div className="flex min-h-0 flex-1">
-          <Sidebar
-            symbols={symbols}
-            tickers={mini}
-            value={symbol}
-            onPick={(s) => {
-              setSymbol(s);
-              setPicked('');
-            }}
-          />
-
-          <div className="flex min-w-0 flex-1 flex-col">
-            <ChartPanel bars={bars} interval={interval} onInterval={setInterval} error={error} />
-            <div className="h-[214px] shrink-0">{blotter}</div>
-          </div>
-
-          <div className="hidden w-[236px] shrink-0 flex-col xl:flex">
-            <BookPanel
-              bids={book.bids}
-              asks={book.asks}
-              trades={trades}
-              status={book.status}
-              nextFundingIn={mark ? Math.max(0, mark.nextFundingTime - Date.now()) : 0}
-              onPick={setPicked}
-            />
-          </div>
-
-          <Ticket
-            symbol={symbol}
-            info={info}
-            mark={markPrice}
-            picked={picked}
-            equity={account.equity}
-            onPlace={place}
-          />
-        </div>
       )}
 
       <MarketSheet
@@ -277,10 +281,7 @@ export default function App() {
         tickers={mini}
         watchlist={profile.watchlist}
         value={symbol}
-        onPick={(s) => {
-          setSymbol(s);
-          setPicked('');
-        }}
+        onPick={(s) => setSymbol(s)}
         onClose={() => setMarketsOpen(false)}
       />
     </div>

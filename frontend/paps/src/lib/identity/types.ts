@@ -1,5 +1,7 @@
 /** Identity: who is trading, and what they like. Deliberately small. */
 
+import type { Stats } from '../progress';
+
 export type Profile = {
   /** What the trader wants to be called on their own cards. */
   handle: string;
@@ -13,6 +15,8 @@ export type Profile = {
   watchlist: string[];
   /** Mode the ticket uses in Lite (market or limit). */
   liteOrderKind: 'market' | 'limit';
+  /** Progression: earned by how trades end, not by how many. */
+  stats: Stats;
 };
 
 export const DEFAULT_PROFILE: Profile = {
@@ -22,6 +26,7 @@ export const DEFAULT_PROFILE: Profile = {
   defaultView: 'swipe',
   watchlist: [],
   liteOrderKind: 'market',
+  stats: { xp: 0, cleanCloses: 0, liquidations: 0, rounds: 0, best: 0, worst: 0, peak: 10_000 },
 };
 
 export type IdentityProvider = 'cip30' | 'utxos';

@@ -5,6 +5,7 @@ import { cn } from '../lib/cn';
 import { AgeBadge } from './AgeBadge';
 import { IdentityMenu } from './IdentityMenu';
 import type { useIdentity } from '../hooks/useIdentity';
+import type { Tier } from '../lib/progress';
 
 export type ViewMode = 'pro' | 'lite' | 'swipe';
 
@@ -18,6 +19,7 @@ type Props = {
   mode: ViewMode;
   modes: ViewMode[];
   identity: ReturnType<typeof useIdentity>;
+  tier: Tier;
   onMode: (m: ViewMode) => void;
 };
 
@@ -44,6 +46,7 @@ export function TopBar({
   modes,
   onMode,
   identity,
+  tier,
 }: Props) {
   const next = mark ? Math.max(0, mark.nextFundingTime - Date.now()) : 0;
   const hh = Math.floor(next / 3_600_000);
@@ -98,6 +101,12 @@ export function TopBar({
 
         <span className="hidden sm:inline-flex">
           <AgeBadge lastAt={lastAt} connected={connected} />
+        </span>
+
+        <span className="hidden items-center gap-1 border border-line px-1.5 py-1 text-[10px] text-muted sm:flex">
+          <span className="text-fg/80">{tier.name}</span>
+          <span className="num">· {tier.maxLeverage}× max</span>
+          {tier.maxPositions < 5 && <span className="num">· {tier.maxPositions} open</span>}
         </span>
 
         <IdentityMenu identity={identity} />

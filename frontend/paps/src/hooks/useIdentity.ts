@@ -3,6 +3,7 @@ import { availableWallets, connectCip30 } from '../lib/identity/cip30';
 import { connectUtxos, utxosConfigured } from '../lib/identity/utxos';
 import { loadProfile, saveProfile, toggleWatch } from '../lib/identity/profile';
 import { DEFAULT_PROFILE, type Identity, type Profile } from '../lib/identity/types';
+import type { Stats } from '../lib/progress';
 
 const SESSION = 'paps.identity';
 
@@ -87,7 +88,31 @@ export function useIdentity() {
     [identity?.address],
   );
 
+  const addProgress = useCallback(
+    (delta: Partial<Stats> & { xp?: number }) => {
+      setProfile((prev) => {
+        const next = {
+          ...prev,
+          stats: {
+            ...prev.stats,
+            xp: prev.stats.xp + (delta.xp ?? 0),
+            cleanCloses: prev.stats.cleanCloses + (delta.cleanCloses ?? 0),
+            liquidations: prev.stats.liquidations + (delta.liquidations ?? 0),
+            rounds: prev.stats.rounds + (delta.rounds ?? 0),
+            best: Math.max(prev.stats.best, delta.best ?? 0),
+            worst: Math.min(prev.stats.worst, delta.worst ?? 0),
+            peak: Math.max(prev.stats.peak, delta.peak ?? 0),
+          },
+        };
+        saveProfile(identity?.address ?? null, next);
+        return next;
+      });
+    },
+    [identity?.address],
+  );
+
   return {
+    addProgress,
     identity,
     profile,
     error,

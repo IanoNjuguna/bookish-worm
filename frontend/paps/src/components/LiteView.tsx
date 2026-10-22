@@ -20,6 +20,7 @@ type Props = {
   chartError: string | null;
   initialRisk?: number;
   initialLeverage?: number;
+  maxLeverage?: number;
   onOpenMarkets: () => void;
   onPlace: (o: { side: Side; kind: 'limit' | 'market'; price: number; size: number; leverage: number }) => void;
 };
@@ -44,11 +45,12 @@ export function LiteView({
   chartError,
   initialRisk,
   initialLeverage,
+  maxLeverage = 50,
   onOpenMarkets,
   onPlace,
 }: Props) {
   const [notional, setNotional] = useState(initialRisk ?? 100);
-  const [leverage, setLeverage] = useState(initialLeverage ?? 10);
+  const [leverage, setLeverage] = useState(Math.min(initialLeverage ?? 5, maxLeverage));
   const [side, setSide] = useState<Side>('LONG');
 
   const filters = useMemo(() => {
@@ -125,15 +127,24 @@ export function LiteView({
           <div className="mt-3 flex items-center justify-between">
             <span className="text-[11px] text-muted">Leverage</span>
             <div className="flex gap-1">
-              {LEV.map((l) => (
-                <button
-                  key={l}
-                  onClick={() => setLeverage(l)}
-                  className={cn('chip border border-line', leverage === l && 'chip-on')}
-                >
-                  {l}×
-                </button>
-              ))}
+              {LEV.map((l) => {
+                const locked = l > (maxLeverage ?? 50);
+                return (
+                  <button
+                    key={l}
+                    disabled={locked}
+                    onClick={() => setLeverage(l)}
+                    title={locked ? `unlocks at a higher level` : undefined}
+                    className={cn(
+                      'chip border border-line',
+                      leverage === l && 'chip-on',
+                      locked && 'opacity-30',
+                    )}
+                  >
+                    {l}×
+                  </button>
+                );
+              })}
             </div>
           </div>
 
