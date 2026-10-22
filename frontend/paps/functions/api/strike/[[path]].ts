@@ -1,9 +1,11 @@
-import { depsFor, route } from '../../../src/server/pages';
+import { depsFor, route, upstreamPath } from '../../../src/server/pages';
 import { proxyStrike } from '../../../src/server/proxy';
 import { readSessionToken } from '../../../src/server/session';
 
 /**
- * `/api/strike/v2/...` → `https://api.strikefinance.org/v2/...`, signed with the held key.
+ * `/api/strike/positions?symbol=ADA-USD` → `https://api.strikefinance.org/v2/positions?symbol=ADA-USD`,
+ * signed with the held key. Our own URLs drop the venue's `/v2` prefix so it cannot be
+ * doubled into `/v2/v2/...`.
  *
  * The query string is part of what gets signed, so it is forwarded exactly as received
  * rather than rebuilt from params.
@@ -21,7 +23,7 @@ export const onRequest = route(async (ctx) => {
     {
       sessionToken: readSessionToken(ctx.request),
       method,
-      path: `/v2/${segments.join('/')}${url.search}`,
+      path: upstreamPath(segments, url.search),
       body,
     },
   );
