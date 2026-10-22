@@ -1,4 +1,4 @@
-import type { RawAccount, RawFunding, RawOrders, RawPositions, RawTransactions } from './venue';
+import type { RawAccount, RawFunding, RawPositions, RawTransactions } from './venue';
 
 /**
  * Recorded venue payloads, test-only.
@@ -80,27 +80,6 @@ export const positionsFixture: RawPositions = {
     },
   ],
   count: 3,
-};
-
-export const openOrdersFixture: RawOrders = {
-  orders: [
-    {
-      ID: 7314002,
-      ClientOrderID: 'paps-1',
-      AccountID: '8f14e45f-ceea-4c3f-a2e0-1b6f5a2d9b71',
-      Symbol: 'ADA-USD',
-      Side: 'sell',
-      Status: 'open',
-      Type: 'limit',
-      TimeInForce: 'GTC',
-      Size: '300',
-      Filled: '0',
-      Price: '0.1950',
-      ReduceOnly: true,
-      CreateTimestamp: 1792674600000,
-    },
-  ],
-  count: 1,
 };
 
 export const fundingFixture: RawFunding = {

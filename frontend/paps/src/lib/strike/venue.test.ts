@@ -1,20 +1,20 @@
 import { describe, expect, it } from 'vitest';
 import { price, signedUsd } from '../format';
 import { baseFeeTiers, FALLBACK_TAKER } from './fees';
+import { normaliseOrders } from './orders';
 import {
   normaliseAccount,
   normaliseFunding,
-  normaliseOrders,
   normalisePositions,
   normaliseTransactions,
   sideOf,
 } from './venue';
+import { openOrdersFixture } from './order.fixtures';
 import {
   accountFixture,
   documentedFeeTiersFixture,
   feeTiersFixture,
   fundingFixture,
-  openOrdersFixture,
   positionsFixture,
   transactionsFixture,
 } from './venue.fixtures';

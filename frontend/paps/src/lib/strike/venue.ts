@@ -1,4 +1,6 @@
 import type { Side } from '../order';
+import { isReconnect, strikeGet, VenueError } from './http';
+import { readFills, readOpenOrders, type VenueFill, type VenueOrder } from './orders';
 
 /**
  * The venue's user-data routes, read through our signing proxy.
@@ -11,20 +13,13 @@ import type { Side } from '../order';
  * Amounts stay as the strings the venue sent. A position size, an entry price and a
  * funding total are precise decimals, and `Number()` on the way in throws that away for
  * no gain; the display layer formats the string with `lib/format.ts`, which accepts both.
+ *
+ * Orders and fills live in `orders.ts` — they are what the account *does*, not what it
+ * holds — and are re-exported here so a read of the whole account is still one import.
  */
 
-export class VenueError extends Error {
-  constructor(
-    readonly status: number,
-    readonly code: string,
-  ) {
-    super(`strike ${status} ${code}`);
-  }
-}
-
-/** 401 means the session or the API wallet behind it is gone; the fix is to connect again. */
-export const isReconnect = (e: unknown): boolean =>
-  e instanceof VenueError && (e.status === 401 || e.code === 'reconnect');
+/** The transport's error, re-exported: every caller of this module already catches it. */
+export { isReconnect, VenueError };
 
 /* ------------------------------------------------------------------ raw payloads */
 
@@ -65,22 +60,6 @@ export type RawPosition = {
 };
 
 export type RawPositions = { positions?: RawPosition[]; count?: number };
-
-export type RawOrder = {
-  ID?: number;
-  Symbol?: string;
-  Side?: string;
-  Type?: string;
-  Status?: string;
-  Size?: string;
-  Filled?: string;
-  Price?: string;
-  ReduceOnly?: boolean;
-  CreateTimestamp?: number;
-  [key: string]: unknown;
-};
-
-export type RawOrders = { orders?: RawOrder[]; count?: number };
 
 export type RawFundingRow = {
   id?: number;
@@ -141,18 +120,8 @@ export type VenuePosition = {
   openedAt: number;
 };
 
-export type VenueOrder = {
-  id: string;
-  symbol: string;
-  side: Side;
-  type: string;
-  status: string;
-  size: string;
-  filled: string;
-  price: string;
-  reduceOnly: boolean;
-  createdAt: number;
-};
+/** Orders and fills are shaped by `orders.ts`; re-exported so a read needs one import. */
+export type { VenueFill, VenueOrder };
 
 export type VenueFundingRow = {
   id: string;
@@ -178,6 +147,8 @@ export type VenueData = {
   account: VenueAccount;
   positions: VenuePosition[];
   orders: VenueOrder[];
+  /** The venue's executions. The only evidence that anything filled. */
+  fills: VenueFill[];
   funding: VenueFundingRow[];
   transactions: VenueTransactionRow[];
 };
@@ -241,24 +212,6 @@ export const normalisePositions = (raw: RawPositions | RawPosition[]): VenuePosi
     .filter((p) => p.symbol && Number(p.size) !== 0);
 };
 
-export const normaliseOrder = (raw: RawOrder): VenueOrder => ({
-  id: str(raw.ID),
-  symbol: str(raw.Symbol),
-  side: raw.Side === 'sell' ? 'SHORT' : 'LONG',
-  type: str(raw.Type, 'limit'),
-  status: str(raw.Status, 'open'),
-  size: str(raw.Size, '0'),
-  filled: str(raw.Filled, '0'),
-  price: str(raw.Price, '0'),
-  reduceOnly: Boolean(raw.ReduceOnly),
-  createdAt: Number(raw.CreateTimestamp ?? 0),
-});
-
-export const normaliseOrders = (raw: RawOrders | RawOrder[]): VenueOrder[] => {
-  const rows = Array.isArray(raw) ? raw : (raw.orders ?? []);
-  return rows.map(normaliseOrder).filter((o) => o.symbol);
-};
-
 export const normaliseFunding = (raw: RawFunding | RawFundingRow[]): VenueFundingRow[] => {
   const rows = Array.isArray(raw) ? raw : (raw.funding ?? []);
   return rows
@@ -291,30 +244,11 @@ export const normaliseTransactions = (
 
 /* ------------------------------------------------------------------ transport */
 
-const PROXY = '/api/strike';
-
-export async function strikeGet<T>(path: string, signal?: AbortSignal): Promise<T> {
-  const res = await fetch(`${PROXY}/${path}`, {
-    credentials: 'same-origin',
-    headers: { accept: 'application/json' },
-    signal,
-  });
-  if (!res.ok) {
-    // The Worker answers `{ error }` for its own refusals, and so does the venue.
-    const payload = (await res.json().catch(() => ({}))) as { error?: unknown; code?: unknown };
-    throw new VenueError(res.status, String(payload.error ?? payload.code ?? 'http_error'));
-  }
-  return (await res.json()) as T;
-}
-
 export const readAccount = async (signal?: AbortSignal): Promise<VenueAccount> =>
   normaliseAccount(await strikeGet<RawAccount>('account', signal));
 
 export const readPositions = async (signal?: AbortSignal): Promise<VenuePosition[]> =>
   normalisePositions(await strikeGet<RawPositions>('positions', signal));
-
-export const readOpenOrders = async (signal?: AbortSignal): Promise<VenueOrder[]> =>
-  normaliseOrders(await strikeGet<RawOrders>('openOrders', signal));
 
 export const readFunding = async (signal?: AbortSignal): Promise<VenueFundingRow[]> =>
   normaliseFunding(await strikeGet<RawFunding>('history/funding?limit=50', signal));
@@ -322,14 +256,20 @@ export const readFunding = async (signal?: AbortSignal): Promise<VenueFundingRow
 export const readTransactions = async (signal?: AbortSignal): Promise<VenueTransactionRow[]> =>
   normaliseTransactions(await strikeGet<RawTransactions>('history/transaction?limit=50', signal));
 
-/** One read, so a half-refreshed account never renders next to yesterday's positions. */
+/**
+ * One read, so a half-refreshed account never renders next to yesterday's positions.
+ *
+ * Fills are read every time as well: an order that left the working book has to reappear
+ * somewhere, and the fill history is the only place paps is allowed to call it filled.
+ */
 export async function readVenue(signal?: AbortSignal): Promise<VenueData> {
-  const [account, positions, orders, funding, transactions] = await Promise.all([
+  const [account, positions, orders, fills, funding, transactions] = await Promise.all([
     readAccount(signal),
     readPositions(signal),
     readOpenOrders(signal),
+    readFills(signal),
     readFunding(signal),
     readTransactions(signal),
   ]);
-  return { account, positions, orders, funding, transactions };
+  return { account, positions, orders, fills, funding, transactions };
 }
