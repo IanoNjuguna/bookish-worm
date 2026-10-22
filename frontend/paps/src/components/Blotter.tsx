@@ -3,7 +3,9 @@ import { cn } from '../lib/cn';
 import { unrealised, type Position } from '../lib/order';
 import type { Fill, WorkingOrder } from '../lib/store';
 import type { VenueState } from '../lib/strike/venue-client';
+import type { TradeApi } from '../hooks/useVenueTrade';
 import { PaperBalances, PaperHistory, PaperOrders, PaperPositions } from './PaperTables';
+import { VenueFills } from './VenueFills';
 import {
   VenueBalances,
   VenueFunding,
@@ -28,9 +30,13 @@ type Props = {
   venue?: VenueState | null;
   /** A mark per symbol the venue holds, not just the one on screen. */
   venueMarks?: Record<string, number>;
+  /** Present when the session may trade: closes and cancels go to the venue. */
+  trade?: TradeApi | null;
+  /** The market's lot step, so a position too small to halve does not offer a half close. */
+  stepFor?: (symbol: string) => number;
 };
 
-type TabKey = 'positions' | 'orders' | 'history' | 'funding' | 'transactions' | 'balances';
+type TabKey = 'positions' | 'orders' | 'fills' | 'history' | 'funding' | 'transactions' | 'balances';
 
 /**
  * The blotter: what you hold, what is working, what happened, what you have.
@@ -51,6 +57,8 @@ export function Blotter({
   onCancel,
   venue = null,
   venueMarks = {},
+  trade = null,
+  stepFor,
 }: Props) {
   const [tab, setTab] = useState<TabKey>('positions');
   const open = orders.filter((o) => o.status === 'open');
@@ -60,7 +68,13 @@ export function Blotter({
   const tabs: { key: TabKey; label: string; short: string; n?: number }[] = live
     ? [
         { key: 'positions', label: 'Positions', short: 'Positions', n: data?.positions.length ?? 0 },
-        { key: 'orders', label: 'Open orders', short: 'Orders', n: data?.orders.length ?? 0 },
+        {
+          key: 'orders',
+          label: 'Open orders',
+          short: 'Orders',
+          n: (data?.orders.length ?? 0) + (trade?.pending.length ?? 0),
+        },
+        { key: 'fills', label: 'Fills', short: 'Fills', n: data?.fills.length ?? 0 },
         { key: 'funding', label: 'Funding', short: 'Funding', n: data?.funding.length ?? 0 },
         {
           key: 'transactions',
@@ -84,7 +98,9 @@ export function Blotter({
       ? 'reconnect needed'
       : venue?.status === 'stale'
         ? 'stale · read only'
-        : 'strike · read only';
+        : trade
+          ? 'strike · live'
+          : 'strike · read only';
 
   return (
     <section className="flex h-full min-h-0 flex-col border-t border-line bg-panel">
@@ -102,6 +118,15 @@ export function Blotter({
               {t.n !== undefined && <span className="ml-1 text-muted">({t.n})</span>}
             </button>
           ))}
+          {live && trade && !trade.block && (data?.orders.length ?? 0) > 0 && (
+            <button
+              onClick={() => trade.cancelEvery()}
+              title="cancel every open order on this account"
+              className="ml-auto whitespace-nowrap border border-line px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] text-muted hover:text-fg"
+            >
+              cancel all
+            </button>
+          )}
           {!live && positions.length > 0 && (
             <button
               onClick={() => onCloseAll(mark)}
@@ -128,12 +153,34 @@ export function Blotter({
         </div>
       </div>
 
+      {trade?.notice && (
+        <div className="flex items-start justify-between gap-2 border-b border-line bg-panel-2 px-3 py-1">
+          <span className="text-[10px] text-short">{trade.notice}</span>
+          <button
+            onClick={trade.dismissNotice}
+            className="text-[10px] text-muted hover:text-fg"
+            aria-label="dismiss"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       <div className="min-h-0 flex-1 overflow-auto">
         {tab === 'positions' &&
           (showUnavailable ? (
             <VenueUnavailable state={venue as VenueState} />
           ) : live && data ? (
-            <VenuePositions positions={data.positions} marks={venueMarks} />
+            <VenuePositions
+              positions={data.positions}
+              marks={venueMarks}
+              onClose={
+                trade && !trade.block
+                  ? (p, fraction) => trade.close(p, fraction, venueMarks[p.symbol] ?? 0)
+                  : undefined
+              }
+              stepFor={stepFor}
+            />
           ) : (
             <PaperPositions positions={positions} marks={marks} mark={mark} onClose={onClose} />
           ))}
@@ -142,10 +189,16 @@ export function Blotter({
           (showUnavailable ? (
             <VenueUnavailable state={venue as VenueState} />
           ) : live && data ? (
-            <VenueOrders orders={data.orders} />
+            <VenueOrders
+              orders={data.orders}
+              pending={trade?.pending}
+              onCancel={trade && !trade.block ? trade.cancel : undefined}
+            />
           ) : (
             <PaperOrders orders={open} onCancel={onCancel} />
           ))}
+
+        {tab === 'fills' && (data ? <VenueFills fills={data.fills} /> : <VenueUnavailable state={venue as VenueState} />)}
 
         {tab === 'history' && <PaperHistory fills={fills} />}
 
