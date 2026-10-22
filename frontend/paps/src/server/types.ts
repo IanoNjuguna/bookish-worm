@@ -24,7 +24,10 @@ export type ServerEnv = {
   /** Production should set this to `mainnet`; it is not inferred from the client. */
   STRIKE_ENV?: string;
   BUILDER_CODE?: string;
-  /** 0 by default: paps does not take a cut of a user's fees without being told to. */
+  /**
+   * The builder's cut in basis points, on top of Strike's own fee, which the user approves
+   * in the connect consent message. 100 = the 1% paps charges.
+   */
   FEE_SHARE_BPS?: string;
   DB?: D1Like;
 };
