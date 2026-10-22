@@ -16,7 +16,7 @@ const RISK = [25, 50, 100, 250, 500];
  */
 export function IdentityMenu({ identity }: Props) {
   const [open, setOpen] = useState(false);
-  const { identity: me, profile, wallets, error, busy, connect, connectWithUtxos, disconnect, update, utxosConfigured } =
+  const { identity: me, profile, wallets, error, busy, connectStrike, connectWithUtxos, disconnect, update, utxosConfigured } =
     identity;
 
   return (
@@ -48,13 +48,13 @@ export function IdentityMenu({ identity }: Props) {
                     key={w.id}
                     disabled={busy}
                     onClick={async () => {
-                      await connect(w.id);
+                      await connectStrike(w.id);
                       setOpen(false);
                     }}
                     className="flex w-full items-center justify-between px-3 py-2 text-left text-[12px] hover:bg-panel-2"
                   >
                     {w.name}
-                    <span className="text-[10px] text-muted">cip-30</span>
+                    <span className="text-[10px] text-muted">sign in</span>
                   </button>
                 ))
               ) : (
@@ -83,15 +83,24 @@ export function IdentityMenu({ identity }: Props) {
               {error && <p className="border-t border-line px-3 py-2 text-[10px] text-short">{error}</p>}
 
               <p className="border-t border-line px-3 py-2 text-[10px] text-muted">
-                Connecting identifies you. It cannot move funds: orders here are paper.
+                Signing connects your wallet to Strike through the <span className="text-fg/70">paps</span> builder
+                at 0% fee. It cannot move funds, and every order in this app is paper.
               </p>
             </div>
           ) : (
             <div>
               <div className="flex items-center justify-between border-b border-line px-3 py-2">
                 <span className="num text-[11px]">{shortAddress(me.address)}</span>
-                <span className="text-[10px] uppercase tracking-[0.08em] text-muted">{me.wallet}</span>
+                <span className="text-[10px] uppercase tracking-[0.08em] text-muted">
+                  {me.accountId ? 'strike' : me.wallet}
+                </span>
               </div>
+              {me.accountId && (
+                <div className="flex items-center justify-between border-b border-line px-3 py-1.5">
+                  <span className="text-[10px] text-muted">strike account</span>
+                  <span className="num text-[10px]">{me.accountId.slice(0, 14)}…</span>
+                </div>
+              )}
 
               <Field label="handle">
                 <input

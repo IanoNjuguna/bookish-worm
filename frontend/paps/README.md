@@ -29,6 +29,11 @@ The live prefix is `/price/v2/...`:
     https://api.strikefinance.org/price/v2
     https://api-v2-testnet.strikefinance.org/price/v2
 
+Builder routes are the exception to that prefix: the connect flow lives at
+`/auth/builder/request-signature` and `/auth/builder/verify-signature`, and the fee field
+is `fee_share_bps` — sending `max_fee_bps` is rejected as an unknown field, even though
+Strike's own `strike-finance-skills` package documents that name.
+
 WebSocket frames may carry several JSON documents separated by newlines. Parsing a
 frame as one document silently drops every message after the first.
 

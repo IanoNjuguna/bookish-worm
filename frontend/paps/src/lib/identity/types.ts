@@ -37,6 +37,11 @@ export type Identity = {
   address: string;
   /** Wallet name as the user knows it, e.g. "Eternl". */
   wallet: string;
+  /** Present when connected through Strike's builder flow. */
+  accountId?: string;
+  apiWalletId?: string;
+  publicKeyHex?: string;
+  feeShareBps?: number;
 };
 
 export const shortAddress = (address: string, head = 8, tail = 6): string =>
