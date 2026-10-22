@@ -40,20 +40,31 @@ export type ProxyDeps = {
 
 export type ProxyResult = { status: number; body: string; contentType: string };
 
-export async function proxyStrike(
-  deps: ProxyDeps,
-  args: { sessionToken: string | null; method: string; path: string; body?: string },
-): Promise<ProxyResult> {
-  if (!args.sessionToken) throw new HttpError(401, 'no_session');
-  const record = await deps.store.getAccount(await sessionHash(args.sessionToken));
+/**
+ * The one place a session becomes the key that signs for it.
+ *
+ * Every signed call paps makes goes through here, so the three answers a dead session can
+ * get — no cookie, unknown hash, expired API wallet — are decided once rather than
+ * re-litigated per endpoint and drifting apart.
+ */
+export async function signingKey(deps: ProxyDeps, sessionToken: string | null): Promise<string> {
+  if (!sessionToken) throw new HttpError(401, 'no_session');
+  const record = await deps.store.getAccount(await sessionHash(sessionToken));
   if (!record) throw new HttpError(401, 'no_session');
 
   const now = deps.now?.() ?? Date.now();
   // expiresAt of 0 means the venue never told us, which is not the same as expired.
   if (record.expiresAt && record.expiresAt <= now) throw new HttpError(401, 'reconnect');
+  return toHex(await openKey(deps.master, record.sealedKey));
+}
+
+export async function proxyStrike(
+  deps: ProxyDeps,
+  args: { sessionToken: string | null; method: string; path: string; body?: string },
+): Promise<ProxyResult> {
+  const privateKeyHex = await signingKey(deps, args.sessionToken);
   if (!isAllowedPath(args.path)) throw new HttpError(403, 'path_not_allowed');
 
-  const privateKeyHex = toHex(await openKey(deps.master, record.sealedKey));
   const res = await signedCall(deps.strike, {
     privateKeyHex,
     method: args.method,

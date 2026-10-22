@@ -49,6 +49,10 @@ describe('signing proxy', () => {
     expect(isAllowedPath('/v2/order')).toBe(true);
     expect(isAllowedPath('/v2/order/strategy')).toBe(true);
     expect(isAllowedPath('/v2/history/funding')).toBe(true);
+    // The deposit flow is signed like everything else, so the three calls must get through.
+    expect(isAllowedPath('/v2/deposit')).toBe(true);
+    expect(isAllowedPath('/v2/deposit/quote')).toBe(true);
+    expect(isAllowedPath('/v2/deposit/build-tx')).toBe(true);
     expect(isAllowedPath('/v2/withdraw/limits')).toBe(false);
     expect(isAllowedPath('/v2/withdraw')).toBe(false);
     expect(isAllowedPath('/auth/builder/verify-signature')).toBe(false);
