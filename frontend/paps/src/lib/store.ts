@@ -31,6 +31,14 @@ export type State = {
   positions: Position[];
   orders: WorkingOrder[];
   fills: Fill[];
+  /** Behavioural counters. Progress is earned by how trades end, not how many. */
+  stats: {
+    cleanCloses: number;
+    liquidations: number;
+    best: number;
+    worst: number;
+    peak: number;
+  };
 };
 
 type Action =
@@ -163,8 +171,17 @@ export function reduce(state: State, action: Action): State {
       const fee = notionalOf(mark, closedSize) * TAKER_FEE;
       const remaining = position.size - closedSize;
 
+      const stats = {
+        cleanCloses: state.stats.cleanCloses + (pnl > 0 ? 1 : 0),
+        liquidations: state.stats.liquidations,
+        best: Math.max(state.stats.best, pnl),
+        worst: Math.min(state.stats.worst, pnl),
+        peak: Math.max(state.stats.peak, state.equity + pnl - fee),
+      };
+
       return {
         ...state,
+        stats,
         positions:
           remaining <= 0
             ? state.positions.filter((p) => p.id !== action.id)
@@ -207,13 +224,23 @@ export function reduce(state: State, action: Action): State {
         const mark = position.entry;
         const closed = reduce(acc, { type: 'close', id, mark });
         const penalty = notionalOf(mark, position.size) * LIQUIDATION_FEE;
-        return { ...closed, equity: closed.equity - penalty };
+        return {
+          ...closed,
+          equity: closed.equity - penalty,
+          stats: { ...closed.stats, liquidations: closed.stats.liquidations + 1 },
+        };
       }, state);
     }
   }
 }
 
-export const initial: State = { equity: START_EQUITY, positions: [], orders: [], fills: [] };
+export const initial: State = {
+  equity: START_EQUITY,
+  positions: [],
+  orders: [],
+  fills: [],
+  stats: { cleanCloses: 0, liquidations: 0, best: 0, worst: 0, peak: START_EQUITY },
+};
 export const TAKER_FEE_BPS = TAKER_FEE;
 export const LIQUIDATION_FEE_RATE = LIQUIDATION_FEE;
 

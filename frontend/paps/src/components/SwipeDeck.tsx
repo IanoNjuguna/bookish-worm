@@ -4,6 +4,7 @@ import { price, usd } from '../lib/format';
 import { DEFAULT_TIER, liquidationPrice, sizeForNotional, type Side } from '../lib/order';
 import { sparkPath } from '../hooks/useSparklines';
 import type { DeckCard } from '../hooks/useDeck';
+import type { Objective } from '../lib/progress';
 
 type Props = {
   cards: DeckCard[];
@@ -21,6 +22,9 @@ type Props = {
   roundLabel: string;
   round: number;
   roundStats: { swipes: number; openNow: number; pnl: number };
+  objective: Objective;
+  objectiveMet: boolean;
+  session: { grade: string; drawdown: number; tierName: string; next: string | null } | null;
   onNextRound: () => void;
 };
 
@@ -51,6 +55,9 @@ export function SwipeDeck({
   roundLabel,
   round,
   roundStats,
+  objective,
+  objectiveMet,
+  session,
   onNextRound,
 }: Props) {
   const [drag, setDrag] = useState<Drag>({ x: 0, y: 0, active: false });
@@ -109,6 +116,34 @@ export function SwipeDeck({
             <Stat k="open now" v={String(roundStats.openNow)} />
             <Stat k="equity" v={`$${usd(equity)}`} />
           </div>
+          <div className="mt-3 flex items-center gap-2 border-t border-line pt-2 text-[10px]">
+            <span className={cn('h-1.5 w-1.5 rounded-full', objectiveMet ? 'bg-long' : 'bg-fg/25')} />
+            <span className={objectiveMet ? 'text-long' : 'text-muted'}>
+              {objectiveMet ? 'met' : 'missed'}: {objective.label}
+            </span>
+            <span className={cn('num ml-auto', objectiveMet ? 'text-brand' : 'text-muted')}>
+              {objectiveMet ? `+${objective.xp} xp` : '+0 xp'}
+            </span>
+          </div>
+
+          {session && (
+            <div className="mt-3 border-t border-line pt-2">
+              <div className="flex items-baseline justify-between">
+                <span className="text-[10px] uppercase tracking-[0.08em] text-muted">session</span>
+                <span className="text-[10px] text-muted">{session.tierName} tier</span>
+              </div>
+              <div className="mt-1 flex items-end gap-3">
+                <span className="num text-[26px] leading-none">{session.grade}</span>
+                <span className="num text-[11px] text-muted">
+                  {session.drawdown.toFixed(1)}% drawdown
+                </span>
+              </div>
+              {session.next && (
+                <p className="mt-1 text-[10px] text-muted">next tier: {session.next}</p>
+              )}
+            </div>
+          )}
+
           <p className="mt-3 border-t border-line pt-2 text-[10px] text-muted">
             {openPositions} of {maxPositions} positions still open. They carry into the next
             round, and the next round draws from a different set of markets.
@@ -149,9 +184,21 @@ export function SwipeDeck({
             />
           ))}
         </div>
-        <span className="num text-[10px] text-muted">
-          {roundLabel} · {cards.length} left · ${usd(risk)} at {leverage}×
+        <span className="num whitespace-nowrap text-[10px] text-muted">
+          {roundLabel} · {cards.length} left
+          <span className="hidden sm:inline">
+            {' '}
+            · ${usd(risk)} at {leverage}×
+          </span>
         </span>
+      </div>
+
+      <div className="flex items-center gap-2 border-b border-line px-3 py-1.5">
+        <span className={cn('h-1.5 w-1.5 rounded-full', objectiveMet ? 'bg-long' : 'bg-fg/25')} />
+        <span className="text-[10px] text-muted">
+          this round: <span className="text-fg/80">{objective.label}</span>
+        </span>
+        <span className="num ml-auto text-[10px] text-brand">+{objective.xp} xp</span>
       </div>
 
       <div
@@ -320,7 +367,7 @@ export function SwipeDeck({
 
       <div className="flex h-9 shrink-0 items-center justify-between border-t border-line px-3">
         <span className="num text-[10px] text-muted">
-          equity ${usd(equity)} · {openPositions}/{maxPositions} open
+          ${usd(risk)} at {leverage}× · equity ${usd(equity)} · {openPositions}/{maxPositions} open
         </span>
         {full ? (
           <span className="text-[10px] text-short">position cap reached · close one first</span>
