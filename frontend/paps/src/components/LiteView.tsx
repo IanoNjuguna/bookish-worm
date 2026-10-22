@@ -23,6 +23,8 @@ type Props = {
   onOpenMarkets: () => void;
   /** Funding rate for this market, per funding window. */
   fundingRate?: number;
+  /** The venue's margin balance, present only when a Strike session exists. */
+  liveBalance?: string | null;
   onPlace: (o: { side: Side; kind: 'limit' | 'market'; price: number; size: number; leverage: number }) => void;
 };
 
@@ -44,6 +46,7 @@ export function LiteView({
   initialLeverage,
   maxLeverage = 50,
   fundingRate,
+  liveBalance = null,
   onOpenMarkets,
   onPlace,
 }: Props) {
@@ -53,10 +56,17 @@ export function LiteView({
     <div className="mx-auto flex min-h-full w-full max-w-[520px] flex-col gap-4 px-4 pb-4 pt-3">
       {/* Account context, not a hero: the price below is what the eye should land on. */}
       <div className="flex items-baseline justify-between text-small text-muted">
-        <span>
-          Paper equity <span className="num text-body text-fg">${usd(equity)}</span>
-        </span>
-        <span className="text-muted">demo · simulated</span>
+        {liveBalance !== null ? (
+          <span>
+            Account <span className="num text-body text-fg">${usd(liveBalance)}</span>
+          </span>
+        ) : (
+          <span>
+            Demo equity <span className="num text-body text-fg">${usd(equity)}</span>
+          </span>
+        )}
+        {/* The account is real and the order is still simulated: say both, not just one. */}
+        <span className="text-muted">{liveBalance !== null ? 'strike · demo orders' : 'demo · simulated'}</span>
       </div>
 
       <div className="flex items-end justify-between gap-3">

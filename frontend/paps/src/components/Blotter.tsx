@@ -3,7 +3,10 @@ import { cn } from '../lib/cn';
 import { price, usd } from '../lib/format';
 import { liquidationPrice, roe, unrealised, type Position } from '../lib/order';
 import type { Fill, WorkingOrder } from '../lib/store';
+import type { VenueState } from '../lib/strike/venue-client';
 import { PositionCards } from './blotter/PositionCards';
+import { VenueBlotter } from './VenueBlotter';
+import { Empty, Td, Th } from './Table';
 
 type Props = {
   positions: Position[];
@@ -16,6 +19,9 @@ type Props = {
   onClose: (id: string, mark: number, fraction?: number) => void;
   onCloseAll: (mark: number) => void;
   onCancel: (id: string) => void;
+  /** Present when a Strike session exists; the numbers it carries are the venue's. */
+  venue?: VenueState | null;
+  venueMarks?: Record<string, number>;
 };
 
 type TabKey = 'positions' | 'orders' | 'history' | 'balances';
@@ -32,9 +38,15 @@ export function Blotter({
   onClose,
   onCloseAll,
   onCancel,
+  venue = null,
+  venueMarks = {},
 }: Props) {
   const [tab, setTab] = useState<TabKey>('positions');
   const open = orders.filter((o) => o.status === 'open');
+
+  // A session means a real account, and its blotter is not this ledger. Paper rows under a
+  // connected header would be the one lie this surface cannot afford.
+  if (venue) return <VenueBlotter state={venue} marks={venueMarks} />;
 
   const pnl = positions.reduce((n, p) => n + unrealised(p, mark), 0);
   const margin = positions.reduce((n, p) => n + p.margin, 0);
@@ -206,45 +218,3 @@ export function Blotter({
     </section>
   );
 }
-
-const Th = ({ cols }: { cols: string[] }) => (
-  <tr className="border-b border-line">
-    {cols.map((c) => (
-      <th key={c} className="px-3 py-1.5 text-left font-normal first:pl-3">
-        {c}
-      </th>
-    ))}
-  </tr>
-);
-
-const Td = ({
-  children,
-  num,
-  muted,
-  tone,
-}: {
-  children: React.ReactNode;
-  num?: boolean;
-  muted?: boolean;
-  tone?: 'long' | 'short';
-}) => (
-  <td
-    className={cn(
-      'px-3 py-1.5',
-      num && 'num',
-      muted && 'text-muted',
-      tone === 'long' && 'text-long',
-      tone === 'short' && 'text-short',
-    )}
-  >
-    {children}
-  </td>
-);
-
-const Empty = ({ cols, text }: { cols: number; text: string }) => (
-  <tr>
-    <td colSpan={cols} className="px-3 py-6 text-center text-[11px] text-muted">
-      {text}
-    </td>
-  </tr>
-);
