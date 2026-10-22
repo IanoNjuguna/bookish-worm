@@ -241,17 +241,11 @@ export default function App() {
     />
   );
 
-  // On the deck the header follows the card in front of you; everywhere else it follows
-  // the market you selected.
-  const headerSymbol = tab === 'deck' ? (remaining[0]?.symbol ?? symbol) : symbol;
-
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       <TopBar
-        symbol={headerSymbol}
-        ticker={mini[headerSymbol]}
-        lastAt={lastAt}
         connected={connected}
+        lastAt={lastAt}
         identity={identity}
         identityOpen={idOpen}
         onIdentityOpen={setIdOpen}
