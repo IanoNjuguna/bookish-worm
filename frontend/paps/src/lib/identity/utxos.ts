@@ -1,42 +1,55 @@
 import type { Identity } from './types';
 
 /**
- * UTXOS (utxos.dev) wallet-as-a-service: social login → non-custodial Cardano wallet.
+ * UTXOS (utxos.dev) wallet-as-a-service: social login → an embedded, non-custodial
+ * Cardano wallet, with no browser extension.
  *
- * This is the wiring point, deliberately not switched on. `@utxos/sdk` pulls in Mesh
- * and the Spark SDK, and its type graph took the typecheck from 9 seconds to over five
- * minutes; it also does nothing without a project id from the UTXOS dashboard. So the
- * dependency stays out of the bundle until there is something to authenticate against,
- * and until then the button says exactly what is missing instead of failing silently.
+ * This is the one that makes paps usable on a phone: mobile browsers have no CIP-30
+ * extensions, so "Continue with Google" is the difference between a working sign-in and
+ * a dead end. The wallet is Mesh under the hood, which is why `cardano.signData` takes
+ * the same shape as a CIP-30 wallet and the Strike builder flow does not care which one
+ * produced the signature.
  *
- * To turn it on:
- *
- *   1. create a project at utxos.dev/dashboard, allowlist the app origin
- *   2. bun add @utxos/sdk
- *   3. set VITE_UTXOS_PROJECT_ID (and VITE_NETWORK_ID, 1 for mainnet)
- *   4. replace the throw below with:
- *
- *        const { Web3Wallet } = await import('@utxos/sdk');
- *        const wallet = await Web3Wallet.enable({ projectId: PROJECT_ID, networkId: NETWORK_ID });
- *        return {
- *          provider: 'utxos',
- *          address: await wallet.cardano.getChangeAddress(),
- *          wallet: 'utxos.dev',
- *        };
- *
- * The rest of the app already speaks `Identity`, so nothing else changes.
+ * The SDK is heavy (Mesh, Spark) and it costs the typecheck real time; it is imported
+ * dynamically so the bundle only pays for it when someone actually signs in.
  */
 
 const PROJECT_ID = import.meta.env.VITE_UTXOS_PROJECT_ID as string | undefined;
-const NETWORK_ID = Number(import.meta.env.VITE_NETWORK_ID ?? 1);
+const NETWORK_ID = Number(import.meta.env.VITE_NETWORK_ID ?? 1) === 0 ? 0 : 1;
 
 export const utxosConfigured = Boolean(PROJECT_ID);
 
+export type UtxosWallet = {
+  address: string;
+  signData: (message: string) => Promise<string>;
+};
+
+/** Opens the UTXOS window and returns a wallet handle. */
+export async function openUtxos(): Promise<UtxosWallet> {
+  // Import first, validate second, and that order is load-bearing: with the check in
+  // front, a build without the env var makes the condition statically false, Rollup
+  // dead-code-eliminates the import, and the SDK silently disappears from the bundle —
+  // a failure that only shows up when someone taps the button in production.
+  const { Web3Wallet } = await import('@utxos/sdk');
+
+  if (!PROJECT_ID) throw new Error('UTXOS is not configured: set VITE_UTXOS_PROJECT_ID');
+  const wallet = await Web3Wallet.enable({ projectId: PROJECT_ID, networkId: NETWORK_ID });
+  const address = await wallet.cardano.getChangeAddress();
+
+  return {
+    address,
+    signData: async (message: string) => {
+      const hex = Array.from(new TextEncoder().encode(message))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('');
+      const { signature } = await wallet.cardano.signData(address, hex);
+      return signature;
+    },
+  };
+}
+
+/** Identity from the UTXOS wallet alone, without the Strike account step. */
 export async function connectUtxos(): Promise<Identity> {
-  if (!PROJECT_ID) {
-    throw new Error('UTXOS is not configured: set VITE_UTXOS_PROJECT_ID');
-  }
-  throw new Error(
-    `UTXOS project found (network ${NETWORK_ID}) but @utxos/sdk is not bundled yet — see lib/identity/utxos.ts`,
-  );
+  const wallet = await openUtxos();
+  return { provider: 'utxos', address: wallet.address, wallet: 'utxos.dev' };
 }

@@ -50,6 +50,21 @@ be pointed at it with one variable.
 
 ## Identity
 
+Sign-in is one tap on a phone: **Continue with Google** through UTXOS, which creates an
+embedded non-custodial Cardano wallet and signs Strike's consent message from it. A
+browser wallet (CIP-30) stays available for people who already have one.
+
+    VITE_UTXOS_PROJECT_ID   from the utxos.dev dashboard; without it only CIP-30 works
+    VITE_BUILDER_CODE       paps — registered on mainnet, not on testnet
+    fee                     requested at 0 bps: paps never sends an order
+
+Two build notes worth keeping: UTXOS is Mesh underneath and needs node crypto polyfills
+(`vite-plugin-node-polyfills`, crypto/buffer/stream only), and `libsodium-wrappers-sumo`
+ships a broken relative import that is aliased to its CJS build. Both live in
+`vite.config.ts` with the reason inline. The SDK is split into a `wallet` chunk so the
+deck still opens without it.
+
+
 An address is the identity; a profile is what it remembers.
 
     CIP-30 wallets     window.cardano, enabled on click, change address read from the

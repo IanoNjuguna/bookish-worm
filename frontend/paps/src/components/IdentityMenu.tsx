@@ -16,8 +16,18 @@ const RISK = [25, 50, 100, 250, 500];
  */
 export function IdentityMenu({ identity }: Props) {
   const [open, setOpen] = useState(false);
-  const { identity: me, profile, wallets, error, busy, connectStrike, connectWithUtxos, disconnect, update, utxosConfigured } =
-    identity;
+  const {
+    identity: me,
+    profile,
+    wallets,
+    error,
+    busy,
+    connectStrike,
+    connectStrikeUtxos,
+    disconnect,
+    update,
+    utxosConfigured,
+  } = identity;
 
   return (
     <div className="relative">
@@ -42,6 +52,24 @@ export function IdentityMenu({ identity }: Props) {
               <div className="border-b border-line px-3 py-2 text-[10px] uppercase tracking-[0.1em] text-muted">
                 connect a wallet
               </div>
+              {utxosConfigured && (
+                <button
+                  disabled={busy}
+                  onClick={async () => {
+                    await connectStrikeUtxos();
+                    setOpen(false);
+                  }}
+                  className="flex w-full items-center justify-between bg-brand/10 px-3 py-2.5 text-left text-[12px] text-brand hover:bg-brand/20"
+                >
+                  Continue with Google
+                  <span className="text-[10px] uppercase tracking-[0.08em]">utxos</span>
+                </button>
+              )}
+
+              <div className="border-t border-line px-3 py-1.5 text-[9px] uppercase tracking-[0.1em] text-muted">
+                or a browser wallet
+              </div>
+
               {wallets.length ? (
                 wallets.map((w) => (
                   <button
@@ -62,23 +90,6 @@ export function IdentityMenu({ identity }: Props) {
                   No browser wallet found. Install Eternl, Lace or Nami, or use UTXOS below.
                 </p>
               )}
-
-              <button
-                disabled={busy || !utxosConfigured}
-                onClick={async () => {
-                  await connectWithUtxos();
-                  setOpen(false);
-                }}
-                className={cn(
-                  'flex w-full items-center justify-between border-t border-line px-3 py-2 text-left text-[12px]',
-                  utxosConfigured ? 'hover:bg-panel-2' : 'text-muted',
-                )}
-              >
-                utxos.dev
-                <span className="text-[10px] text-muted">
-                  {utxosConfigured ? 'social login' : 'needs project id'}
-                </span>
-              </button>
 
               {error && <p className="border-t border-line px-3 py-2 text-[10px] text-short">{error}</p>}
 
