@@ -8,7 +8,8 @@ import {
   quoteDeposit,
 } from './deposit';
 import { masterKey, sealKey, toBase64, toHex } from './crypto';
-import { memoryStore } from './keystore';
+import { memoryRateLimitStore, memoryStore } from './keystore';
+import { DEFAULT_LIMITS } from './rateLimit';
 import { publicKeyOf } from './sign';
 import { sessionHash } from './session';
 import { HttpError } from './types';
@@ -109,6 +110,10 @@ async function setup(over: Partial<Record<Endpoint, Answer>> = {}) {
       store,
       master: masterKey(MASTER_B64),
       strike: { origin: 'https://api.strikefinance.org', doFetch },
+      // The deposit endpoints sign through `signingKey`, which spends a rate-limit token
+      // before it opens the key. A fresh bucket per test keeps that invisible here.
+      limiter: memoryRateLimitStore(),
+      limits: DEFAULT_LIMITS,
       now: () => NOW,
     },
   };
