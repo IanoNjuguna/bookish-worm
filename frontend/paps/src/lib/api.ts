@@ -18,6 +18,9 @@ const ORIGINS: Record<Env, { rest: string; ws: string }> = {
 
 export const env: Env = (import.meta.env.VITE_STRIKE_ENV as Env) ?? 'mainnet';
 
+/** The bare API origin: fee tiers and the user-data proxy live at the root, not under `/price`. */
+export const ORIGIN = ORIGINS[env].rest;
+
 export const REST = `${ORIGINS[env].rest}/price/v2`;
 export const WS = `${ORIGINS[env].ws}/ws/price`;
 
