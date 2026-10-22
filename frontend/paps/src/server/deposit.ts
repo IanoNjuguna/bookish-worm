@@ -173,14 +173,20 @@ const messageOf = (body: Json): string =>
 /**
  * The venue's deposit failures, as states rather than crashes.
  *
- * 400 means the quote died (`expired_at` passed, or the amount moved), 403 means the
- * request_id belongs to another account, 409 means Strike already has this transaction. All
- * three are things a UI answers — re-quote, or acknowledge — so each gets its own code
- * instead of a generic failure the client has to pattern-match on a message.
+ * 403 means the request_id belongs to another account, 409 means Strike already has this
+ * transaction, and both are things a UI answers rather than crashes on. 400 does not mean
+ * one thing, which is why `stage` is required: a fresh quote cannot have expired, so a 400
+ * from quote is a refused amount (a deposit below the venue's minimum is exactly this). At
+ * build and confirm the quote exists and may have died at the venue even though our own
+ * check passed, so 400 keeps its expiry meaning there.
  */
-function venueError(status: number, body: Json): HttpError {
+function venueError(status: number, body: Json, stage: 'quote' | 'build' | 'confirm'): HttpError {
   const message = messageOf(body) || `deposit failed (${status})`;
-  if (status === 400) return new HttpError(400, 'quote_expired', message);
+  if (status === 400) {
+    return stage === 'quote'
+      ? new HttpError(400, 'amount_rejected', message)
+      : new HttpError(400, 'quote_expired', message);
+  }
   if (status === 401) return new HttpError(401, 'reconnect', message);
   if (status === 403) return new HttpError(403, 'account_mismatch', message);
   if (status === 409) return new HttpError(409, 'already_submitted', message);
@@ -200,7 +206,7 @@ export async function quoteDeposit(
     asset_symbol: 'ADA',
     asset_amount: lovelace,
   });
-  if (!res.ok) throw venueError(res.status, res.body);
+  if (!res.ok) throw venueError(res.status, res.body, 'quote');
 
   const quote = (res.body.quote ?? {}) as Json;
   const requestId = str(res.body.request_id);
@@ -272,7 +278,7 @@ export async function buildDepositTx(
     user_address: userAddress,
     utxos: args.utxos,
   });
-  if (!res.ok) throw venueError(res.status, res.body);
+  if (!res.ok) throw venueError(res.status, res.body, 'build');
 
   const format = str(res.body.format);
   if (format !== 'cardano_cbor') throw malformed(`unexpected transaction format: ${format || 'none'}`);
@@ -306,7 +312,7 @@ export async function confirmDeposit(
     request_id: requestId,
     tx_hash: txHash,
   });
-  if (!res.ok) throw venueError(res.status, res.body);
+  if (!res.ok) throw venueError(res.status, res.body, 'confirm');
 
   return { requestId, txHash, status: str(res.body.status) || 'pending' };
 }
