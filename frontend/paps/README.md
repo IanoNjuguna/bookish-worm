@@ -126,3 +126,45 @@ The signing layer needs three things before the first real connect:
 `MASTER_KEY` seals every stored API wallet key. Losing it means every user reconnects;
 leaking it means every stored key is exposed. It belongs in a password manager, not in
 the repo, and rotating it invalidates all sessions by design.
+
+The deploy itself is `.github/workflows/paps-worker.yml`, on push to `main` and only for
+`frontend/paps/**` — a docs change does not redeploy the app. It runs the Worker smoke test
+below first, and refuses to deploy — saying which piece is missing — unless these are set:
+
+    CLOUDFLARE_API_TOKEN    repo secret. Pages: Edit, D1: Edit.
+    CLOUDFLARE_ACCOUNT_ID   repo variable.
+    PAPS_D1_DATABASE_ID     repo variable. Replaces the placeholder in wrangler.toml at
+                            deploy time, so the id is configured once, not committed.
+    MASTER_KEY              secret on the `paps` Pages project, checked there rather than
+                            copied into GitHub — one copy, one place to leak.
+
+### Verifying the Worker locally
+
+`bunx tsc` and `bunx vitest` drive `src/server` with a fake venue; neither starts a Worker,
+binds D1 or makes an HTTP call. This does, and it is what CI runs:
+
+    bun run build
+    bunx wrangler@4 d1 migrations apply paps-keys --local --persist-to .wrangler/state
+    bash scripts/worker-smoke.sh
+
+Two things about that recipe are load-bearing.
+
+`--persist-to .wrangler/state` on the migration and no `--d1` flag on the boot. Not passing it
+is the trap this test exists for: `wrangler d1 execute --local` and `pages dev --d1 NAME=...`
+resolve different database ids, so the migration reports success and the Worker reads an
+empty database, and every route that touches D1 answers 500. With one state directory and the
+binding taken from `wrangler.toml`, both sides see the same file. `wrangler@4`, not the 3.x
+line, which caps the runtime compatibility date at 2025-02-24 while this Worker asks for
+`2026-10-01`.
+
+The smoke test must fail on a fresh `.wrangler/`. It asserts `/api/session` is 401 without a
+cookie, `/api/connect/start` is 200 with a handle and a venue challenge, a seeded session
+reads back, `/api/strike/withdraw` is 403 `path_not_allowed`, and `/api/strike/positions` is
+signed and answered by Strike rather than by paps. Delete the state and it fails on
+`connect/start` with `no such table: pending_challenges` — that green-to-red is the check
+that the migration landed where the Worker reads it, and it is the one thing a compiler
+cannot tell you.
+
+The connect and proxy assertions talk to the live venue, so they need egress to
+`api.strikefinance.org`. The seeded session's key is thrown away and unknown to Strike: the
+assertion is that the Worker signed and sent the call, not that Strike authorised it.
