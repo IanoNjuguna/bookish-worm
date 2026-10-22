@@ -1,12 +1,17 @@
 import { usd } from '../lib/format';
 import type { Stats, Tier } from '../lib/progress';
 import type { useIdentity } from '../hooks/useIdentity';
-import { IdentityCard } from './you/IdentityCard';
-import { RiskControls } from './you/RiskControls';
+import { ProfileHeader } from './you/ProfileHeader';
+import { StatsGrid } from './you/StatsGrid';
+import { RiskSettings } from './you/RiskSettings';
+import { TierProgress } from './you/TierProgress';
+import { Achievements } from './you/Achievements';
+import { Watchlist } from './you/Watchlist';
+import { AccountActions } from './you/AccountActions';
 
 /**
- * "You" is the only tab that is about the trader rather than the market: what they hold,
- * how they have behaved, and the two dials that decide the next swipe.
+ * "You" is the only tab that is about the trader rather than the market: what they have
+ * done, what they have earned, and the two dials that decide the next swipe.
  */
 export function YouView({
   identity,
@@ -32,7 +37,16 @@ export function YouView({
   const pnl = equity - startEquity;
 
   return (
-    <div className="mx-auto w-full max-w-[520px] space-y-3 px-4 pb-6 pt-4">
+    <div className="mx-auto w-full max-w-[520px] space-y-3 px-4 pb-24 pt-4">
+      <ProfileHeader
+        handle={identity.profile.handle}
+        address={identity.identity?.address ?? null}
+        wallet={identity.identity?.wallet ?? null}
+        tier={tier}
+        onRename={identity.update}
+        onConnect={onOpenIdentity}
+      />
+
       <div className="px-1">
         <p className="text-micro uppercase tracking-[0.1em] text-muted">paper account</p>
         <p className="num text-hero leading-none text-fg">${usd(equity)}</p>
@@ -41,30 +55,21 @@ export function YouView({
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
-        {[
-          { k: 'open', v: String(openPositions) },
-          { k: 'clean closes', v: String(stats.cleanCloses) },
-          { k: 'liquidations', v: String(stats.liquidations) },
-        ].map((s) => (
-          <div key={s.k} className="rounded-xl border border-line bg-panel px-3 py-2.5">
-            <p className="num text-[16px] text-fg">{s.v}</p>
-            <p className="mt-0.5 text-[10px] text-muted">{s.k}</p>
-          </div>
-        ))}
-      </div>
-
-      <RiskControls
+      <RiskSettings
         risk={risk}
         leverage={leverage}
         tier={tier}
         onChange={(patch) => identity.update(patch)}
       />
 
-      <IdentityCard
-        me={identity.identity}
-        onConnect={onOpenIdentity}
-        onDisconnect={identity.disconnect}
+      <StatsGrid stats={stats} />
+      <TierProgress stats={stats} tier={tier} openPositions={openPositions} />
+      <Achievements stats={stats} startEquity={startEquity} />
+      <Watchlist symbols={identity.profile.watchlist} onToggle={identity.watch} />
+      <AccountActions
+        signedIn={Boolean(identity.identity)}
+        onSignOut={identity.disconnect}
+        onReset={identity.reset}
       />
 
       <p className="px-1 pt-1 text-[11px] leading-relaxed text-muted">
