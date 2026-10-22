@@ -45,31 +45,44 @@ export type ProxyDeps = {
 
 export type ProxyResult = { status: number; body: string; contentType: string };
 
-export async function proxyStrike(
+/**
+ * The one place a session becomes the key that signs for it.
+ *
+ * Every signed call paps makes goes through here, so the three answers a dead session can
+ * get — no cookie, unknown hash, expired API wallet — are decided once rather than
+ * re-litigated per endpoint and drifting apart. The rate limit is enforced before the key
+ * is opened, because opening it is what costs a signature.
+ */
+export async function signingKey(
   deps: ProxyDeps,
-  args: { sessionToken: string | null; method: string; path: string; body?: string },
-): Promise<ProxyResult> {
-  if (!args.sessionToken) throw new HttpError(401, 'no_session');
-  const hash = await sessionHash(args.sessionToken);
+  sessionToken: string | null,
+  kind: 'read' | 'write' = 'read',
+): Promise<string> {
+  if (!sessionToken) throw new HttpError(401, 'no_session');
+  const hash = await sessionHash(sessionToken);
   const record = await deps.store.getAccount(hash);
   if (!record) throw new HttpError(401, 'no_session');
 
   const now = deps.now?.() ?? Date.now();
   // expiresAt of 0 means the venue never told us, which is not the same as expired.
   if (record.expiresAt && record.expiresAt <= now) throw new HttpError(401, 'reconnect');
-  if (!isAllowedPath(args.path)) throw new HttpError(403, 'path_not_allowed');
 
-  // Before the key is opened, and before anything reaches the venue: this is the only
-  // place where a request costs a signature, so it is the only place worth counting.
-  const write = isWrite(args.method);
   await enforce({
     store: deps.limiter,
-    key: sessionBucket(hash, write ? 'write' : 'read'),
-    spec: write ? deps.limits.write : deps.limits.read,
+    key: sessionBucket(hash, kind),
+    spec: kind === 'write' ? deps.limits.write : deps.limits.read,
     now,
   });
 
-  const privateKeyHex = toHex(await openKey(deps.master, record.sealedKey));
+  return toHex(await openKey(deps.master, record.sealedKey));
+}
+
+export async function proxyStrike(
+  deps: ProxyDeps,
+  args: { sessionToken: string | null; method: string; path: string; body?: string },
+): Promise<ProxyResult> {
+  if (!isAllowedPath(args.path)) throw new HttpError(403, 'path_not_allowed');
+  const privateKeyHex = await signingKey(deps, args.sessionToken, isWrite(args.method) ? 'write' : 'read');
   const res = await signedCall(deps.strike, {
     privateKeyHex,
     method: args.method,
