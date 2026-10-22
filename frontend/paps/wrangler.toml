@@ -1,3 +1,23 @@
 name = "paps"
 compatibility_date = "2026-10-01"
 pages_build_output_dir = "dist"
+
+# Signed calls run on mainnet, where the key behind them can move a user's money. Nothing
+# here is inferred from the client: a build pointed at testnet while holding mainnet keys
+# fails in the most confusing way available.
+[vars]
+STRIKE_ENV = "mainnet"
+BUILDER_CODE = "paps"
+# 0 bps until charging for trades is a decision rather than a default.
+FEE_SHARE_BPS = "0"
+
+# Create the database once, paste its id here, then apply the schema and seal the secret:
+#   bunx wrangler d1 create paps-keys
+#   bunx wrangler d1 migrations apply paps-keys --remote
+#   bunx wrangler pages secret put MASTER_KEY   # base64 of 32 random bytes
+# MASTER_KEY seals every stored API wallet key; losing it means every user reconnects,
+# leaking it means every stored key is exposed. Keep it in a password manager, not the repo.
+[[d1_databases]]
+binding = "DB"
+database_name = "paps-keys"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
