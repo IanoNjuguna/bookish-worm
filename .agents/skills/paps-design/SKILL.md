@@ -131,3 +131,24 @@ Patterns come from OKX (dual ticket, demo label inside the button, percentage ch
 Binance (bottom status strip, market marquee, fee line under the CTA) and Gemini
 (single-column lite trade), all sampled in Mobbin. Their layouts are reference; their
 marks, fonts and copy are not.
+
+## Layout traps that look like design bugs
+
+Four failures that read as bad taste and are actually CSS, all found by rendering at
+390px rather than by reading the code:
+
+- **A chart or canvas 2px tall.** A percentage height (`h-full`) inside a `min-h-*` parent
+  resolves against `auto`, so it collapses. The wrapper must be a flex column and the
+  child `flex-1`, never `h-full` under a min-height.
+- **A header symbol truncated to one letter.** Flex children shrink in proportion to
+  content until only `truncate` is left. Give the identity chip `hidden sm:inline` for its
+  label — an icon keeps its meaning, a symbol does not — before touching the type size.
+- **A table that is "fine" at 1200px.** Eleven columns at 390px clips mid-word with no
+  affordance saying more exists. Below `sm`, one entity is one card: identity and PnL on
+  the first line, three facts on the second, actions on the third.
+- **`\u00a0` printed as text.** A JSX text node does not interpret escapes; use
+  `{'/\u00a0'}` or `&nbsp;`. This shows up first in a unit label like `/ 8h`.
+
+And one build trap: the dev server and the Tailwind CLI can load different configs, so
+`tailwindcss -i src/index.css` compiles while Vite answers 500 with "the `bg-canvas`
+class does not exist". Name the config explicitly in `postcss.config.js`.
