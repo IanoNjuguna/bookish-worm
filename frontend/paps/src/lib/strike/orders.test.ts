@@ -10,6 +10,7 @@ import {
   newClientOrderId,
   normaliseFills,
   normaliseOrders,
+  PENDING_TTL_MS,
   placeOrder,
   planClose,
   planOrder,
@@ -327,17 +328,31 @@ describe('reconciling an accepted order', () => {
     acceptedAt: 5_000,
   };
 
-  it('keeps a row no read has covered yet', () => {
-    expect(reconcilePending([pending], 4_000, [])).toHaveLength(1);
-  });
+  const keep = (args: Partial<Parameters<typeof reconcilePending>[0]> = {}) =>
+    reconcilePending({ pending: [pending], open: [], fills: [], now: 6_000, ...args });
 
-  it('drops it once a later read is in, whatever that read says', () => {
-    expect(reconcilePending([pending], 5_100, [])).toHaveLength(0);
+  it('keeps the row while the venue has not answered for it yet', () => {
+    expect(keep()).toHaveLength(1);
   });
 
   it('drops it as soon as the venue lists it as working', () => {
-    const open = normaliseOrders(openOrdersFixture);
-    expect(reconcilePending([pending], 4_000, open)).toHaveLength(0);
+    expect(keep({ open: normaliseOrders(openOrdersFixture) })).toHaveLength(0);
+  });
+
+  it('drops it once a fill lands in that market after the send', () => {
+    expect(keep({ fills: normaliseFills(fillsFixture) })).toHaveLength(0);
+  });
+
+  it('ignores a fill that predates the send, and one in another market', () => {
+    const old = { ...normaliseFills(fillsFixture)[0], at: pending.acceptedAt - 60_000 };
+    const elsewhere = { ...normaliseFills(fillsFixture)[0], symbol: 'BTC-USD', at: pending.acceptedAt + 1_000 };
+
+    expect(keep({ fills: [old, elsewhere] })).toHaveLength(1);
+  });
+
+  it('gives up after one poll window, because the venue has had two chances by then', () => {
+    expect(keep({ now: pending.acceptedAt + PENDING_TTL_MS - 1 })).toHaveLength(1);
+    expect(keep({ now: pending.acceptedAt + PENDING_TTL_MS })).toHaveLength(0);
   });
 });
 

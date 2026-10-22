@@ -356,9 +356,12 @@ export function planClose(args: {
 /* ------------------------------------------------------------------ reconciliation */
 
 /**
- * An order we sent and the venue accepted, held only until a read taken *after* the
- * acceptance arrives — or until the venue's own open orders mention it, whichever is first.
- * It is never promoted to a fill here: only `/history/fill` can do that.
+ * An order we sent and the venue accepted, held only as a local echo of the send.
+ *
+ * It is never promoted to a fill here: only `/history/fill` can do that. It survives until
+ * the venue's own read takes the row over (the open orders mention its `client_order_id`),
+ * or until a fill lands in that market after the acceptance — and in any case no longer
+ * than one poll window, because by then the venue has answered twice and its answer wins.
  */
 export type PendingOrder = {
   clientOrderId: string;
@@ -372,13 +375,22 @@ export type PendingOrder = {
   acceptedAt: number;
 };
 
-export function reconcilePending(
-  pending: PendingOrder[],
-  readAt: number,
-  open: VenueOrder[],
-): PendingOrder[] {
-  return pending.filter(
-    (p) =>
-      p.acceptedAt >= readAt && !open.some((o) => o.clientOrderId === p.clientOrderId),
-  );
+/** One poll is 30s; a little longer than that is long enough to hear back. */
+export const PENDING_TTL_MS = 35_000;
+
+export function reconcilePending(args: {
+  pending: PendingOrder[];
+  open: VenueOrder[];
+  fills: VenueFill[];
+  now: number;
+  ttlMs?: number;
+}): PendingOrder[] {
+  const ttl = args.ttlMs ?? PENDING_TTL_MS;
+  return args.pending.filter((p) => {
+    if (args.open.some((o) => o.clientOrderId === p.clientOrderId)) return false;
+    // A fill in this market timestamped after the send is this order or a sibling of it;
+    // either way the venue now has something to say about it.
+    if (args.fills.some((f) => f.symbol === p.symbol && f.at >= p.acceptedAt - 5_000)) return false;
+    return args.now - p.acceptedAt < ttl;
+  });
 }
