@@ -56,6 +56,8 @@ export type Position = {
   size: number;
   leverage: number;
   margin: number;
+  /** Cumulative funding cash flow: negative has been paid, positive received. */
+  funding: number;
   openedAt: number;
 };
 

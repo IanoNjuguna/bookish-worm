@@ -1,4 +1,5 @@
 import { useMemo, useReducer } from 'react';
+import { fundingCashFlow } from './funding';
 import { liquidationPrice, notionalOf, roundTo, type Position, type Side } from './order';
 
 export type OrderKind = 'market' | 'limit';
@@ -50,6 +51,7 @@ type Action =
   | { type: 'cancel'; id: string }
   | { type: 'close'; id: string; mark: number; fraction?: number }
   | { type: 'closeAll'; mark: number }
+  | { type: 'fund'; symbol: string; rate: number; mark: number }
   | { type: 'liquidate'; ids: string[] };
 
 export const START_EQUITY = 10_000;
@@ -103,6 +105,7 @@ export function reduce(state: State, action: Action): State {
               size,
               leverage,
               margin,
+              funding: 0,
               openedAt: Date.now(),
             },
             ...positions,
@@ -197,6 +200,21 @@ export function reduce(state: State, action: Action): State {
       );
     }
 
+    case 'fund': {
+      // Funding settles against the notional marked at the window's close, and only for
+      // positions in that market: the rate belongs to the instrument, not the account.
+      const holds = state.positions.some((p) => p.symbol === action.symbol);
+      if (!holds || !action.rate) return state;
+      let equity = state.equity;
+      const positions = state.positions.map((p) => {
+        if (p.symbol !== action.symbol) return p;
+        const flow = fundingCashFlow(p.side, action.rate, notionalOf(action.mark, p.size));
+        equity += flow;
+        return { ...p, funding: p.funding + flow };
+      });
+      return { ...state, positions, equity };
+    }
+
     case 'liquidate': {
       // Liquidation is not a favour: it closes the position at the mark and charges the
       // venue's 1% liquidation fee, which is what exchangeInfo reports.
@@ -227,6 +245,7 @@ export function usePaperAccount() {
       cancel: (id: string) => dispatch({ type: 'cancel', id }),
       close: (id: string, mark: number, fraction = 1) => dispatch({ type: 'close', id, mark, fraction }),
       closeAll: (mark: number) => dispatch({ type: 'closeAll', mark }),
+      fund: (symbol: string, rate: number, mark: number) => dispatch({ type: 'fund', symbol, rate, mark }),
       liquidate: (ids: string[]) => dispatch({ type: 'liquidate', ids }),
     }),
     [],
