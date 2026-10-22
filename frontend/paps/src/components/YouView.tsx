@@ -23,6 +23,7 @@ export function YouView({
   leverage,
   openPositions,
   onOpenIdentity,
+  onOpenHowItWorks,
 }: {
   identity: ReturnType<typeof useIdentity>;
   equity: number;
@@ -33,6 +34,7 @@ export function YouView({
   leverage: number;
   openPositions: number;
   onOpenIdentity: () => void;
+  onOpenHowItWorks?: () => void;
 }) {
   const pnl = equity - startEquity;
 
@@ -66,6 +68,16 @@ export function YouView({
       <TierProgress stats={stats} tier={tier} openPositions={openPositions} />
       <Achievements stats={stats} startEquity={startEquity} />
       <Watchlist symbols={identity.profile.watchlist} onToggle={identity.watch} />
+
+      {onOpenHowItWorks && (
+        <button
+          onClick={onOpenHowItWorks}
+          className="w-full rounded-card border border-line bg-panel px-4 py-3 text-left text-small text-fg"
+        >
+          how this works
+          <span className="ml-2 text-muted">leverage, liquidation, funding</span>
+        </button>
+      )}
       <AccountActions
         signedIn={Boolean(identity.identity)}
         onSignOut={identity.disconnect}

@@ -13,6 +13,9 @@ import { Blotter } from './components/Blotter';
 import { LiteView } from './components/LiteView';
 import { SwipeDeck } from './components/SwipeDeck';
 import { MarketSheet } from './components/MarketSheet';
+import { Onboarding } from './components/sheets/Onboarding';
+import { HowItWorks } from './components/sheets/HowItWorks';
+import { hasSeenOnboarding } from './lib/onboarding';
 import { TabBar, type Tab } from './components/TabBar';
 import { YouView } from './components/YouView';
 import { socket } from './lib/ws';
@@ -43,6 +46,10 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('deck');
   const [tabTouched, setTabTouched] = useState(false);
   const [idOpen, setIdOpen] = useState(false);
+  // 'onboard' opens once per browser; 'how' is reachable any time from the You tab.
+  const [sheet, setSheet] = useState<'onboard' | 'how' | null>(() =>
+    hasSeenOnboarding() ? null : 'onboard',
+  );
   const [connected, setConnected] = useState(false);
   const [swiped, setSwiped] = useState<string[]>([]);
   const [undo, setUndo] = useState<{ id: string; symbol: string; side: Side } | null>(null);
@@ -355,6 +362,7 @@ export default function App() {
             leverage={swipeLeverage}
             openPositions={account.positions.length}
             onOpenIdentity={() => setIdOpen(true)}
+            onOpenHowItWorks={() => setSheet('how')}
           />
         </main>
       )}
@@ -367,6 +375,13 @@ export default function App() {
         }}
         openPositions={account.positions.length}
       />
+
+      <Onboarding
+        open={sheet === 'onboard'}
+        onClose={() => setSheet(null)}
+        onOpenHowItWorks={() => setSheet('how')}
+      />
+      <HowItWorks open={sheet === 'how'} onClose={() => setSheet(null)} />
 
       <MarketSheet
         open={marketsOpen}
