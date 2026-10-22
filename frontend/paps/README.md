@@ -83,6 +83,8 @@ for a key that can trade an account.
     expiry           every proxied call checks the API wallet expiry and answers
                      401 reconnect rather than failing upstream; Strike revokes the
                      previous wallet on reconnect, so a session is never permanent
+    limits           per-session buckets on the proxy, per-IP on connect, counted in D1;
+                     see Limits below
 
 The browser's half of the flow lives in `lib/identity/builder.ts` and calls
 `/api/connect/start` then `/api/connect/finish`. Signed venue calls go through
@@ -97,6 +99,43 @@ adapter that knows about `context`.
 
     bun run build
     bunx wrangler pages dev dist --d1 DB=paps-keys --binding MASTER_KEY=$(openssl rand -base64 32)
+
+## Limits
+
+A session cookie is a handle on a key that can trade. It is therefore counted, in two
+places, before any signature is made:
+
+    /api/strike/v2/*   per session. Reads and writes are separate buckets
+    /api/connect/*     per client IP, counting both steps of the flow
+
+Reads are looser than writes on purpose. The terminal polls positions, orders and history
+while a ticket is open, so a poll loop must never be able to starve an order, and a closed
+write bucket must not blind the screen. Splitting them also means two sessions never share a
+bucket: one abusive client cannot lock anyone else out.
+
+A bucket holds one minute's allowance and refills continuously over that minute, so a client
+that stops abusing it is back in service without waiting for a fixed window to roll over.
+Over the line the answer is `429` with `retry-after`, and the same number as
+`retryAfterSeconds` in the body, so a client can state a cooldown instead of retrying in a
+loop. Nothing is sent upstream: the limit runs before the key is opened.
+
+    RATE_READ_PER_MIN     240   proxy reads, per session
+    RATE_WRITE_PER_MIN     30   proxy writes, per session
+    RATE_CONNECT_PER_MIN   10   connect calls, per client IP
+
+Those are the defaults in `src/server/rateLimit.ts`, so an environment that sets nothing
+still has a limit. Set them per environment in `wrangler.toml` `[vars]` (or the Pages
+dashboard for the deployed one). A value that is not a positive whole number falls back to
+the default rather than turning the limit off — a typo must not disarm a control.
+
+The counters live in `rate_limit_buckets`, one small row per bucket. This is the point of
+the table: a count held in a Worker isolate is a suggestion, because every new isolate
+starts full and a burst spread across the fleet gets admitted as if nothing had happened.
+Refilling and spending are a single statement against the row, so two isolates racing cannot
+both take the last token. Idle rows are only a timestamp, and can be pruned:
+
+    bunx wrangler d1 execute paps-keys --remote --command \
+      "DELETE FROM rate_limit_buckets WHERE updated_at < (strftime('%s','now') - 3600) * 1000"
 
 ## UTXOS, when you turn it on
 
@@ -122,6 +161,11 @@ The signing layer needs three things before the first real connect:
     bunx wrangler d1 create paps-keys        # paste the id into wrangler.toml
     bunx wrangler d1 migrations apply paps-keys --remote
     bunx wrangler pages secret put MASTER_KEY   # openssl rand -base64 32
+
+`migrations/` holds both tables that matter: `0001` seals the API wallet keys,
+`0002` counts the requests that spend them. An existing deployment needs the same apply to
+pick up `0002`; the limit reads and writes the new table on every proxied call, so a
+deployment that skips it answers 500 rather than signing without a limit.
 
 `MASTER_KEY` seals every stored API wallet key. Losing it means every user reconnects;
 leaking it means every stored key is exposed. It belongs in a password manager, not in
