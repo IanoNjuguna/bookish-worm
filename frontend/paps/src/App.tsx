@@ -8,12 +8,15 @@ import { useDeck, type DeckCard } from './hooks/useDeck';
 import { useSparklines } from './hooks/useSparklines';
 import { useIdentity } from './hooks/useIdentity';
 import { useFunding, useFundingSettlement } from './hooks/useFunding';
-import { TopBar, type ViewMode } from './components/TopBar';
+import { TopBar } from './components/TopBar';
 import { Blotter } from './components/Blotter';
 import { LiteView } from './components/LiteView';
 import { SwipeDeck } from './components/SwipeDeck';
 import { MarketSheet } from './components/MarketSheet';
+import { TabBar, type Tab } from './components/TabBar';
+import { YouView } from './components/YouView';
 import { socket } from './lib/ws';
+import { usd } from './lib/format';
 import { START_EQUITY, initial, usePaperAccount } from './lib/store';
 import { isFresh, ledgerOwner, loadLedger, saveLedger } from './lib/ledger';
 import { liquidationPrice, type Side } from './lib/order';
@@ -31,12 +34,15 @@ const FALLBACK_RISK = 100;
 const FALLBACK_LEVERAGE = 5;
 const DECK_SIZE = 10;
 const UNDO_MS = 2_000;
+/** A stored preference only picks the first screen; the thumb decides every one after. */
+const OPENING_TABS: Record<string, Tab> = { swipe: 'deck', lite: 'trade' };
 
 export default function App() {
   const [symbol, setSymbol] = useState('ADA-USD');
   const [interval, setInterval] = useState<Interval>('15m');
-  const [mode, setMode] = useState<ViewMode>('swipe');
-  const [modeTouched, setModeTouched] = useState(false);
+  const [tab, setTab] = useState<Tab>('deck');
+  const [tabTouched, setTabTouched] = useState(false);
+  const [idOpen, setIdOpen] = useState(false);
   const [connected, setConnected] = useState(false);
   const [swiped, setSwiped] = useState<string[]>([]);
   const [undo, setUndo] = useState<{ id: string; symbol: string; side: Side } | null>(null);
@@ -44,10 +50,6 @@ export default function App() {
   const [round, setRound] = useState(0);
   const [roundStart, setRoundStart] = useState({ equity: START_EQUITY });
   const [roundBase, setRoundBase] = useState({ clean: 0, liq: 0 });
-
-  // Pro is archived: this is a phone product, so the two views that fit a thumb are
-  // the two views that ship. The components remain in the tree, unused.
-  const modes: ViewMode[] = ['lite', 'swipe'];
 
   const { symbols } = useSymbols();
   const mini = useMiniTickers();
@@ -106,7 +108,6 @@ export default function App() {
     return () => window.clearTimeout(id);
   }, [ledgerWho, account.equity, account.positions, account.orders, account.fills, account.stats]);
 
-  const view: ViewMode = modes.includes(mode) ? mode : 'swipe';
   const tier = tierFor(profile.stats);
   const swipeRisk = profile.riskUsd || FALLBACK_RISK;
   // Leverage is capped by tier: more rope only after evidence of discipline.
@@ -121,9 +122,10 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!modeTouched && modes.includes(profile.defaultView)) setMode(profile.defaultView);
+    const opening = OPENING_TABS[profile.defaultView];
+    if (!tabTouched && opening) setTab(opening);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile.defaultView, modeTouched]);
+  }, [profile.defaultView, tabTouched]);
 
   useEffect(() => {
     if (!undo) return;
@@ -232,26 +234,23 @@ export default function App() {
     />
   );
 
+  // On the deck the header follows the card in front of you; everywhere else it follows
+  // the market you selected.
+  const headerSymbol = tab === 'deck' ? (remaining[0]?.symbol ?? symbol) : symbol;
+
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       <TopBar
-        symbol={view === 'swipe' ? (remaining[0]?.symbol ?? symbol) : symbol}
-        ticker={mini[view === 'swipe' ? (remaining[0]?.symbol ?? symbol) : symbol]}
-        mark={view === 'swipe' ? null : mark}
+        symbol={headerSymbol}
+        ticker={mini[headerSymbol]}
         lastAt={lastAt}
-        equity={account.equity}
         connected={connected}
-        mode={view}
-        modes={modes}
-        onMode={(m) => {
-          setModeTouched(true);
-          setMode(m);
-        }}
         identity={identity}
-        tier={tier}
+        identityOpen={idOpen}
+        onIdentityOpen={setIdOpen}
       />
 
-      {view === 'swipe' ? (
+      {tab === 'deck' && (
         <div className="mx-auto flex min-h-0 w-full max-w-[560px] flex-1 flex-col border-x border-line">
           <SwipeDeck
             cards={remaining}
@@ -308,7 +307,9 @@ export default function App() {
             }}
           />
         </div>
-      ) : (
+      )}
+
+      {tab === 'trade' && (
         <main className="min-h-0 flex-1 overflow-y-auto">
           <LiteView
             symbol={symbol}
@@ -327,11 +328,45 @@ export default function App() {
             onOpenMarkets={() => setMarketsOpen(true)}
             onPlace={place}
           />
-          <div className="mx-auto w-full max-w-[520px] px-3 pb-3">
-            <div className="h-[196px] shrink-0 border border-line">{blotter}</div>
+        </main>
+      )}
+
+      {tab === 'positions' && (
+        <main className="min-h-0 flex-1 overflow-y-auto">
+          <div className="mx-auto flex h-full max-w-[520px] flex-col">
+            <div className="flex items-baseline justify-between px-4 pb-2 pt-3">
+              <span className="num text-[13px]">${usd(account.equity)}</span>
+              <span className="text-[11px] text-muted">{account.positions.length} open</span>
+            </div>
+            <div className="min-h-0 flex-1">{blotter}</div>
           </div>
         </main>
       )}
+
+      {tab === 'you' && (
+        <main className="min-h-0 flex-1 overflow-y-auto">
+          <YouView
+            identity={identity}
+            equity={account.equity}
+            startEquity={START_EQUITY}
+            tier={tier}
+            stats={profile.stats}
+            risk={swipeRisk}
+            leverage={swipeLeverage}
+            openPositions={account.positions.length}
+            onOpenIdentity={() => setIdOpen(true)}
+          />
+        </main>
+      )}
+
+      <TabBar
+        tab={tab}
+        onChange={(t) => {
+          setTabTouched(true);
+          setTab(t);
+        }}
+        openPositions={account.positions.length}
+      />
 
       <MarketSheet
         open={marketsOpen}
