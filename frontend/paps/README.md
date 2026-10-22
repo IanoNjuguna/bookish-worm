@@ -48,6 +48,13 @@ are taken with `X-Cache: MISS` only.
 Testnet carries four markets (ADA, SOL, BTC, ETH) and live quotes, so the terminal can
 be pointed at it with one variable.
 
+## Screens
+
+Four tabs, one job each: **Deck** (swipe a market), **Trade** (asset page, ticket in a
+sheet), **Positions** (what is open, and the two ways out), **You** (equity, behaviour,
+risk and leverage). Below `sm` a position is a card; the blotter table is for wide screens.
+The header carries four facts only — symbol, price, 24h change, freshness.
+
 ## Identity
 
 Sign-in is one tap on a phone: **Continue with Google** through UTXOS, which creates an

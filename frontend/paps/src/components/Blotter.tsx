@@ -3,6 +3,7 @@ import { cn } from '../lib/cn';
 import { price, usd } from '../lib/format';
 import { liquidationPrice, roe, unrealised, type Position } from '../lib/order';
 import type { Fill, WorkingOrder } from '../lib/store';
+import { PositionCards } from './blotter/PositionCards';
 
 type Props = {
   positions: Position[];
@@ -72,7 +73,13 @@ export function Blotter({
 
       <div className="min-h-0 flex-1 overflow-auto">
         {tab === 'positions' && (
-          <table className="w-full text-[11px]">
+          <div className="sm:hidden">
+            <PositionCards positions={positions} marks={marks} mark={mark} onClose={onClose} />
+          </div>
+        )}
+
+        {tab === 'positions' && (
+          <table className="hidden w-full text-[11px] sm:table">
             <thead className="sticky top-0 bg-panel text-muted">
               <Th cols={['Market', 'Side', 'Size', 'Entry', 'Mark', 'Liq.', 'Margin', 'uPnL', 'ROE', 'Funding', '']} />
             </thead>

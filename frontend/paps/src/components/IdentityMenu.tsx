@@ -4,7 +4,12 @@ import { cn } from '../lib/cn';
 import { shortAddress, type Identity, type Profile } from '../lib/identity/types';
 import type { useIdentity } from '../hooks/useIdentity';
 
-type Props = { identity: ReturnType<typeof useIdentity> };
+type Props = {
+  identity: ReturnType<typeof useIdentity>;
+  /** Optional: lets another surface (the You tab) open the sheet. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+};
 
 const LEV = [2, 5, 10, 20, 50];
 const RISK = [25, 50, 100, 250, 500];
@@ -14,8 +19,14 @@ const RISK = [25, 50, 100, 250, 500];
  * trader can personalise is here, because a settings page for six fields is a surface
  * nobody opens.
  */
-export function IdentityMenu({ identity }: Props) {
-  const [open, setOpen] = useState(false);
+export function IdentityMenu({ identity, open: openProp, onOpenChange }: Props) {
+  const [openState, setOpenState] = useState(false);
+  const open = openProp ?? openState;
+  const setOpen = (next: boolean | ((v: boolean) => boolean)) => {
+    const value = typeof next === 'function' ? next(open) : next;
+    setOpenState(value);
+    onOpenChange?.(value);
+  };
   const {
     identity: me,
     profile,
@@ -38,11 +49,13 @@ export function IdentityMenu({ identity }: Props) {
           me ? 'border-line text-fg/80 hover:text-fg' : 'border-brand/50 text-brand hover:bg-brand/10',
         )}
       >
-        <IconWallet size={12} />
-        <span className="num normal-case tracking-normal">
+        <IconWallet size={13} />
+        {/* On a phone the chip is an icon: the header has four facts to fit and this is
+            the only element that can lose its label without losing its meaning. */}
+        <span className="num hidden normal-case tracking-normal sm:inline">
           {me ? (profile.handle || shortAddress(me.address)) : 'connect'}
         </span>
-        <IconChevronDown size={11} className={cn('transition-transform', open && 'rotate-180')} />
+        <IconChevronDown size={11} className={cn('hidden transition-transform sm:block', open && 'rotate-180')} />
       </button>
 
       {open && (
