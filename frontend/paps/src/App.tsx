@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { symbolInfo, useSymbols } from './hooks/useSymbols';
 import { useTicker } from './hooks/useTicker';
 import { useKlines } from './hooks/useKlines';
@@ -13,7 +13,8 @@ import { LiteView } from './components/LiteView';
 import { SwipeDeck } from './components/SwipeDeck';
 import { MarketSheet } from './components/MarketSheet';
 import { socket } from './lib/ws';
-import { START_EQUITY, usePaperAccount } from './lib/store';
+import { START_EQUITY, initial, usePaperAccount } from './lib/store';
+import { isFresh, ledgerOwner, loadLedger, saveLedger } from './lib/ledger';
 import { liquidationPrice, type Side } from './lib/order';
 import {
   drawdownPct,
@@ -56,6 +57,53 @@ export default function App() {
   const identity = useIdentity();
   const profile = identity.profile;
   const deck = useDeck(symbols, mini, DECK_SIZE, profile.watchlist, round);
+
+  // The ledger follows the identity: anonymous first, then whichever wallet is connected.
+  const ledgerWho = ledgerOwner(identity.identity?.address ?? null);
+  const hydrated = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (hydrated.current === ledgerWho) return;
+    hydrated.current = ledgerWho;
+
+    const address = identity.identity?.address ?? null;
+    const stored = loadLedger(ledgerWho);
+
+    if (stored) {
+      account.hydrate(stored);
+      return;
+    }
+
+    // Carry a guest run into an address that has no history of its own. Never merge two
+    // ledgers that both contain trades: that would corrupt the stats gating leverage.
+    if (address && isFresh(address)) {
+      const guest = loadLedger('anon');
+      if (guest) {
+        account.hydrate(guest);
+        saveLedger(address, {
+          equity: guest.equity ?? START_EQUITY,
+          positions: guest.positions ?? [],
+          orders: guest.orders ?? [],
+          fills: guest.fills ?? [],
+          stats: guest.stats ?? initial.stats,
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ledgerWho]);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      saveLedger(ledgerWho, {
+        equity: account.equity,
+        positions: account.positions,
+        orders: account.orders,
+        fills: account.fills,
+        stats: account.stats,
+      });
+    }, 150);
+    return () => window.clearTimeout(id);
+  }, [ledgerWho, account.equity, account.positions, account.orders, account.fills, account.stats]);
 
   const view: ViewMode = modes.includes(mode) ? mode : 'swipe';
   const tier = tierFor(profile.stats);
