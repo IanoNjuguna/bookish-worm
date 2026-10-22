@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { availableWallets, connectCip30 } from '../lib/identity/cip30';
-import { connectUtxos, utxosConfigured } from '../lib/identity/utxos';
-import { connectBuilder } from '../lib/identity/builder';
+import { connectUtxos, openUtxos, utxosConfigured } from '../lib/identity/utxos';
+import { connectBuilder, connectBuilderWith } from '../lib/identity/builder';
 import { loadProfile, saveProfile, toggleWatch } from '../lib/identity/profile';
 import { DEFAULT_PROFILE, type Identity, type Profile } from '../lib/identity/types';
 import type { Stats } from '../lib/progress';
@@ -55,6 +55,27 @@ export function useIdentity() {
     setError(null);
     try {
       setIdentity(await connectBuilder(walletId));
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
+  /** Strike sign-in through the UTXOS embedded wallet: one tap, no extension. */
+  const connectStrikeUtxos = useCallback(async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      const wallet = await openUtxos();
+      setIdentity(
+        await connectBuilderWith({
+          address: wallet.address,
+          wallet: 'utxos.dev',
+          provider: 'utxos',
+          signMessage: wallet.signData,
+        }),
+      );
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -136,6 +157,7 @@ export function useIdentity() {
     utxosConfigured,
     connect,
     connectStrike,
+    connectStrikeUtxos,
     connectWithUtxos,
     disconnect,
     update,

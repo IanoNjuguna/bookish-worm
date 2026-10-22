@@ -119,6 +119,42 @@ export const loadApiKey = (address: string): Uint8Array | null => {
  * The whole flow: enable the wallet, mint an API keypair locally, get the challenge,
  * sign it, exchange the signature for an account, keep the private half on the device.
  */
+export type Signer = {
+  address: string;
+  wallet: string;
+  provider: 'cip30' | 'utxos';
+  /** Signs the consent message and returns the signature hex. */
+  signMessage: (message: string) => Promise<string>;
+};
+
+/**
+ * The flow, independent of which wallet produced the signature: mint a keypair locally,
+ * get the consent challenge, sign it, exchange it for an account, keep the private half.
+ */
+export async function connectBuilderWith(signer: Signer): Promise<BuilderIdentity> {
+  const { publicKeyHex, privateKey } = newApiWallet();
+  const challenge = await requestChallenge({ address: signer.address, publicKeyHex });
+  const signature = await signer.signMessage(challenge.message_to_sign);
+
+  const account = await verifySignature({
+    address: signer.address,
+    nonce: challenge.nonce,
+    walletSignature: signature,
+  });
+
+  storeApiKey(signer.address, privateKey);
+
+  return {
+    provider: signer.provider,
+    address: signer.address,
+    wallet: signer.wallet,
+    accountId: account.account_id,
+    apiWalletId: account.api_wallet_id,
+    publicKeyHex,
+    feeShareBps: account.fee_share_bps,
+  };
+}
+
 export async function connectBuilder(walletId: string): Promise<BuilderIdentity> {
   const api = window.cardano?.[walletId];
   if (!api) throw new Error(`${walletId} is not installed`);
@@ -127,29 +163,17 @@ export async function connectBuilder(walletId: string): Promise<BuilderIdentity>
   if (!handle.signData) throw new Error(`${api.name ?? walletId} cannot sign messages`);
 
   const address = await handle.getChangeAddress();
-  const { publicKeyHex, privateKey } = newApiWallet();
-  const challenge = await requestChallenge({ address, publicKeyHex });
 
-  const payloadHex = toHex(new TextEncoder().encode(challenge.message_to_sign));
-  const { signature } = await handle.signData(address, payloadHex);
-
-  const account = await verifySignature({
-    address,
-    nonce: challenge.nonce,
-    walletSignature: signature,
-  });
-
-  storeApiKey(address, privateKey);
-
-  return {
-    provider: 'cip30',
+  return connectBuilderWith({
     address,
     wallet: api.name ?? walletId,
-    accountId: account.account_id,
-    apiWalletId: account.api_wallet_id,
-    publicKeyHex,
-    feeShareBps: account.fee_share_bps,
-  };
+    provider: 'cip30',
+    signMessage: async (message) => {
+      const payloadHex = toHex(new TextEncoder().encode(message));
+      const { signature } = await handle.signData!(address, payloadHex);
+      return signature;
+    },
+  });
 }
 
 export type BuilderIdentity = Identity & {
