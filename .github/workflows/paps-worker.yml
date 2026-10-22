@@ -1,0 +1,99 @@
+name: Paps Worker
+
+# Issue #88. design-build.yml compiles paps; it never boots it, and nothing deployed it.
+#
+#   worker   builds, migrates a temp database, boots `wrangler pages dev` and drives the API
+#            over HTTP. A green check here means a Worker started, bound D1, reached the venue
+#            and signed a proxied call — not that TypeScript compiled.
+#   deploy   main only, behind the worker job, behind a provisioning gate.
+#
+# `paths` is the redeploy filter: paps owns frontend/paps, so a docs or home change does not
+# run this file at all, let alone ship a Worker.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/paps/**'
+      - '.github/workflows/paps-worker.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'frontend/paps/**'
+      - '.github/workflows/paps-worker.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  worker:
+    name: Paps — Worker boot + signing smoke
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend/paps
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1
+      - run: bun install --frozen-lockfile
+      - name: Build
+        run: bun run build
+      - name: Migrate a temp database
+        # --persist-to on both this and the boot below, and no --d1 flag anywhere:
+        # `d1 execute --local` and `pages dev --d1` resolve different database ids, so a
+        # migration can report success while the Worker reads an empty database. One state
+        # directory, read by the Worker through wrangler.toml, is the recipe that works.
+        #
+        # wrangler 4 rather than the 3.x line: 3 caps the runtime compatibility date at
+        # 2025-02-24 and this Worker asks for 2026-10-01.
+        run: bunx wrangler@4 d1 migrations apply paps-keys --local --persist-to .wrangler/state
+      - name: Boot the Worker and assert the API
+        run: bash scripts/worker-smoke.sh
+
+  deploy:
+    name: Paps — deploy
+    # Only main ships, and only if a Worker booted in this run. Nothing else in this repo
+    # deploys paps, so this is also the answer to "what ships the app".
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: worker
+    runs-on: ubuntu-latest
+    concurrency:
+      group: paps-deploy
+      cancel-in-progress: false
+    defaults:
+      run:
+        working-directory: frontend/paps
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      PAPS_D1_DATABASE_ID: ${{ vars.PAPS_D1_DATABASE_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1
+      - name: Refuse to deploy without provisioning
+        # First, and before the install: fails in seconds, before anything is uploaded, and
+        # names which piece is missing: the API token, the account id, the database id, or
+        # MASTER_KEY on the Pages project.
+        run: bash scripts/deploy-preflight.sh
+      - run: bun install --frozen-lockfile
+      - name: Point wrangler.toml at the real database
+        # The id is a repo variable rather than a commit, so the placeholder in wrangler.toml
+        # is what a fresh clone has. Once it is replaced in the repo this step is a no-op.
+        run: |
+          if grep -q 'REPLACE_WITH_D1_DATABASE_ID' wrangler.toml; then
+            sed -i "s/REPLACE_WITH_D1_DATABASE_ID/${PAPS_D1_DATABASE_ID}/" wrangler.toml
+            echo "database_id set from PAPS_D1_DATABASE_ID"
+          else
+            echo "wrangler.toml already names a database id; leaving it alone"
+          fi
+      - name: Build
+        run: bun run build
+      - name: Apply migrations to the real database
+        # Schema first. A wrong id fails here, loudly, before the app is deployed onto it.
+        run: bunx wrangler@4 d1 migrations apply paps-keys --remote
+      - name: Deploy
+        run: bunx wrangler@4 pages deploy dist --project-name paps --branch main
