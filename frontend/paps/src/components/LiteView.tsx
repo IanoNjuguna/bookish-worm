@@ -22,6 +22,8 @@ type Props = {
   initialLeverage?: number;
   maxLeverage?: number;
   onOpenMarkets: () => void;
+  /** Funding rate for this market, per funding window. */
+  fundingRate?: number;
   onPlace: (o: { side: Side; kind: 'limit' | 'market'; price: number; size: number; leverage: number }) => void;
 };
 
@@ -46,6 +48,7 @@ export function LiteView({
   initialRisk,
   initialLeverage,
   maxLeverage = 50,
+  fundingRate,
   onOpenMarkets,
   onPlace,
 }: Props) {
@@ -158,8 +161,16 @@ export function LiteView({
               <dd className="num mt-0.5 text-short">{liq ? price(liq) : '—'}</dd>
             </div>
             <div className="text-right">
-              <dt className="text-[10px] text-muted">fee</dt>
-              <dd className="num mt-0.5">${usd(fee)}</dd>
+              <dt className="text-[10px] text-muted">fee{fundingRate ? ' · funding' : ''}</dt>
+              <dd className="num mt-0.5">
+                ${usd(fee)}
+                {fundingRate ? (
+                  <span className="ml-1 text-muted">
+                    {fundingRate >= 0 ? '−' : '+'}
+                    ${usd(fundingRate * Math.abs(notionalValue))} / 8h
+                  </span>
+                ) : null}
+              </dd>
             </div>
           </dl>
 

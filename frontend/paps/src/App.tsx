@@ -7,6 +7,7 @@ import { useMiniTickers } from './hooks/useMiniTickers';
 import { useDeck, type DeckCard } from './hooks/useDeck';
 import { useSparklines } from './hooks/useSparklines';
 import { useIdentity } from './hooks/useIdentity';
+import { useFunding, useFundingSettlement } from './hooks/useFunding';
 import { TopBar, type ViewMode } from './components/TopBar';
 import { Blotter } from './components/Blotter';
 import { LiteView } from './components/LiteView';
@@ -182,6 +183,14 @@ export default function App() {
 
   const spark = useSparklines(remaining.slice(0, 4).map((c) => c.symbol));
 
+  // Funding for what is actually held, settled once per window.
+  const heldSymbols = useMemo(
+    () => Array.from(new Set(account.positions.map((p) => p.symbol))),
+    [account.positions],
+  );
+  const funding = useFunding(heldSymbols);
+  useFundingSettlement(funding, marks, (symbol, rate, mark) => account.fund({ symbol, rate, mark }));
+
   const onSwipe = (card: DeckCard, side: Side) => {
     const id = `swipe-${card.symbol}-${Date.now()}`;
     account.place({
@@ -314,6 +323,7 @@ export default function App() {
             initialRisk={swipeRisk}
             initialLeverage={swipeLeverage}
             maxLeverage={tier.maxLeverage}
+            fundingRate={mark ? Number(mark.lastFundingRate) : funding[symbol]?.rate}
             onOpenMarkets={() => setMarketsOpen(true)}
             onPlace={place}
           />
