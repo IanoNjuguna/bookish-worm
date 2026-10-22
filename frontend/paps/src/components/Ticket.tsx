@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import { cn } from '../lib/cn';
 import { LEVERAGES } from '../lib/constants';
 import { price, usd } from '../lib/format';
+import { bps } from '../lib/strike/fees';
+import { useFeeRate } from '../hooks/useFeeRate';
 import { DEFAULT_TIER, liquidationPrice, notionalOf, sizeForNotional, type Side } from '../lib/order';
 import type { SymbolInfo } from '../lib/types';
 
@@ -11,13 +13,13 @@ type Props = {
   mark: number;
   picked: string;
   equity: number;
+  /** A Strike session exists, so the CTA has to say that it still does not trade. */
+  session?: boolean;
   onPlace: (o: { side: Side; kind: 'limit' | 'market'; price: number; size: number; leverage: number }) => void;
 };
 
-const TAKER_FEE = 0.0005;
-
 /** OKX-shaped ticket: type tabs, margin mode and leverage above, cost below. */
-export function Ticket({ symbol, info, mark, picked, equity, onPlace }: Props) {
+export function Ticket({ symbol, info, mark, picked, equity, session = false, onPlace }: Props) {
   const [kind, setKind] = useState<'limit' | 'market'>('limit');
   const [priceInput, setPriceInput] = useState('');
   const [notional, setNotional] = useState('500');
@@ -40,7 +42,8 @@ export function Ticket({ symbol, info, mark, picked, equity, onPlace }: Props) {
   const size = sizeForNotional(Number(notional || 0), entry, f.step);
   const notionalValue = notionalOf(entry, size);
   const margin = notionalValue / leverage;
-  const fee = notionalValue * TAKER_FEE;
+  const feeRate = useFeeRate();
+  const fee = notionalValue * feeRate.taker;
   const base = symbol.split('-')[0];
 
   const submit = (side: Side) => {
@@ -58,7 +61,9 @@ export function Ticket({ symbol, info, mark, picked, equity, onPlace }: Props) {
             {k}
           </button>
         ))}
-        <span className="ml-auto pr-2 text-[10px] uppercase tracking-[0.1em] text-brand">paper</span>
+        <span className="ml-auto pr-2 text-[10px] uppercase tracking-[0.1em] text-brand">
+          {session ? 'paper · not sent' : 'paper'}
+        </span>
       </div>
 
       <div className="flex items-center justify-between border-b border-line px-3 py-2">
@@ -140,7 +145,10 @@ export function Ticket({ symbol, info, mark, picked, equity, onPlace }: Props) {
             k="liq. long / short"
             v={`${fmtLiq('LONG', entry, margin, size)} / ${fmtLiq('SHORT', entry, margin, size)}`}
           />
-          <Row k="fee (taker)" v={`$${usd(fee)}`} />
+          <Row
+            k={feeRate.known ? `fee (taker ${bps(feeRate.taker)})` : 'fee (taker, 5 bps fallback)'}
+            v={`$${usd(fee)}`}
+          />
         </dl>
 
         {error && <p className="text-[11px] text-short">{error}</p>}
@@ -149,15 +157,21 @@ export function Ticket({ symbol, info, mark, picked, equity, onPlace }: Props) {
       <div className="mt-auto grid grid-cols-2 gap-1.5 p-3 pt-0">
         <button
           onClick={() => submit('LONG')}
-          className="bg-long py-2.5 text-[12px] font-semibold text-black transition-opacity hover:opacity-90"
+          className="flex flex-col items-center bg-long py-2 text-black transition-opacity hover:opacity-90"
         >
-          Open long
+          <span className="text-[12px] font-semibold">Open long</span>
+          <span className="text-[9px] uppercase tracking-[0.12em] text-black/60">
+            {session ? 'still paper' : 'paper'}
+          </span>
         </button>
         <button
           onClick={() => submit('SHORT')}
-          className="bg-short py-2.5 text-[12px] font-semibold text-black transition-opacity hover:opacity-90"
+          className="flex flex-col items-center bg-short py-2 text-black transition-opacity hover:opacity-90"
         >
-          Open short
+          <span className="text-[12px] font-semibold">Open short</span>
+          <span className="text-[9px] uppercase tracking-[0.12em] text-black/60">
+            {session ? 'still paper' : 'paper'}
+          </span>
         </button>
       </div>
     </section>

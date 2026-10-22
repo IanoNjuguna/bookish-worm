@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { cn } from '../lib/cn';
 import { price, usd } from '../lib/format';
+import { bps } from '../lib/strike/fees';
+import { useFeeRate } from '../hooks/useFeeRate';
 import { DEFAULT_TIER, liquidationPrice, notionalOf, sizeForNotional, type Side } from '../lib/order';
 import type { SymbolInfo } from '../lib/types';
 import type { Bar } from '../hooks/useKlines';
@@ -21,13 +23,14 @@ type Props = {
   initialRisk?: number;
   initialLeverage?: number;
   maxLeverage?: number;
+  /** A Strike session exists: the numbers on screen are real, the order button is not. */
+  session?: boolean;
   onOpenMarkets: () => void;
   onPlace: (o: { side: Side; kind: 'limit' | 'market'; price: number; size: number; leverage: number }) => void;
 };
 
 const PRESETS = [25, 50, 100, 250, 500];
 const LEV = [2, 5, 10, 20, 50];
-const FEE = 0.0005;
 
 /**
  * Lite: one column, two big buttons, and the whole risk of the trade visible before
@@ -46,6 +49,7 @@ export function LiteView({
   initialRisk,
   initialLeverage,
   maxLeverage = 50,
+  session = false,
   onOpenMarkets,
   onPlace,
 }: Props) {
@@ -66,7 +70,8 @@ export function LiteView({
   const notionalValue = notionalOf(mark, size);
   const margin = notionalValue / leverage;
   const liq = mark ? liquidationPrice(side, mark, margin, size, DEFAULT_TIER) : 0;
-  const fee = notionalValue * FEE;
+  const feeRate = useFeeRate();
+  const fee = notionalValue * feeRate.taker;
   const base = symbol.split('-')[0];
 
   return (
@@ -158,7 +163,9 @@ export function LiteView({
               <dd className="num mt-0.5 text-short">{liq ? price(liq) : '—'}</dd>
             </div>
             <div className="text-right">
-              <dt className="text-[10px] text-muted">fee</dt>
+              <dt className="text-[10px] text-muted">
+                {feeRate.known ? `fee · ${bps(feeRate.taker)}` : 'fee · 5 bps fallback'}
+              </dt>
               <dd className="num mt-0.5">${usd(fee)}</dd>
             </div>
           </dl>
@@ -172,7 +179,9 @@ export function LiteView({
               className="flex flex-col items-center bg-long py-3 text-black transition-opacity hover:opacity-90"
             >
               <span className="text-[13px] font-semibold">Long {base}</span>
-              <span className="text-[9px] uppercase tracking-[0.12em] text-black/60">paper</span>
+              <span className="text-[9px] uppercase tracking-[0.12em] text-black/60">
+                {session ? 'still paper' : 'paper'}
+              </span>
             </button>
             <button
               onClick={() => {
@@ -182,13 +191,19 @@ export function LiteView({
               className="flex flex-col items-center bg-short py-3 text-black transition-opacity hover:opacity-90"
             >
               <span className="text-[13px] font-semibold">Short {base}</span>
-              <span className="text-[9px] uppercase tracking-[0.12em] text-black/60">paper</span>
+              <span className="text-[9px] uppercase tracking-[0.12em] text-black/60">
+                {session ? 'still paper' : 'paper'}
+              </span>
             </button>
           </div>
 
           <p className="mt-2 text-[10px] text-muted">
-            Fills at the mark. {size.toLocaleString('en-US')} {base} of notional ${usd(notionalValue)}.
-            Liquidation is first-tier and an estimate.
+            {session
+              ? 'Orders are not sent to Strike yet: this fills a paper position at the mark.'
+              : 'Fills at the mark.'}{' '}
+            {size.toLocaleString('en-US')} {base} of notional ${usd(notionalValue)}. Liquidation is
+            first-tier and an estimate.
+            {!feeRate.known && ' The venue fee schedule did not load, so 5 bps is an estimate.'}
           </p>
         </div>
       </section>
