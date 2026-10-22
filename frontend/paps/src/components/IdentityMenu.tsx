@@ -45,17 +45,17 @@ export function IdentityMenu({ identity, open: openProp, onOpenChange }: Props) 
       <button
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          'flex items-center gap-1.5 border px-2 py-1 text-[10px] uppercase tracking-[0.08em] transition-colors',
-          me ? 'border-line text-fg/80 hover:text-fg' : 'border-brand/50 text-brand hover:bg-brand/10',
+          'flex h-9 items-center gap-1.5 rounded-control border px-3 text-small transition-colors',
+          me ? 'border-line bg-panel text-fg' : 'border-line bg-panel-2 text-fg hover:bg-panel-2/70',
         )}
       >
         <IconWallet size={13} />
         {/* On a phone the chip is an icon: the header has four facts to fit and this is
             the only element that can lose its label without losing its meaning. */}
-        <span className="num hidden normal-case tracking-normal sm:inline">
+        <span className="num normal-case tracking-normal">
           {me ? (profile.handle || shortAddress(me.address)) : 'connect'}
         </span>
-        <IconChevronDown size={11} className={cn('hidden transition-transform sm:block', open && 'rotate-180')} />
+        <IconChevronDown size={12} className={cn('transition-transform', open && 'rotate-180')} />
       </button>
 
       {open && (
@@ -99,8 +99,10 @@ export function IdentityMenu({ identity, open: openProp, onOpenChange }: Props) 
                   </button>
                 ))
               ) : (
-                <p className="px-3 py-3 text-[11px] text-muted">
-                  No browser wallet found. Install Eternl, Lace or Nami, or use UTXOS below.
+                <p className="px-3 py-3 text-small leading-relaxed text-muted">
+                  {utxosConfigured
+                    ? 'No browser wallet found on this device. Install Eternl, Lace or Nami, or use Continue with Google above.'
+                    : 'No browser wallet found on this device. Install Eternl, Lace or Nami, then reload this page.'}
                 </p>
               )}
 

@@ -4,6 +4,9 @@ import { cn } from '../lib/cn';
 /**
  * Data age, not socket state. A green dot that means "the websocket is open" tells a
  * trader everything except the thing they need to know.
+ *
+ * It is a bare dot on the canvas: an indicator does not get a border and a padded box,
+ * because a box around a dot reads as a button that does nothing when tapped.
  */
 export function AgeBadge({ lastAt, connected }: { lastAt: number; connected: boolean }) {
   const [, tick] = useState(0);
@@ -25,7 +28,7 @@ export function AgeBadge({ lastAt, connected }: { lastAt: number; connected: boo
 
 function Dot({ tone, label }: { tone: 'muted' | 'warn' | 'short'; label: string }) {
   return (
-    <div className="flex items-center gap-1.5 border border-line px-1.5 py-1 sm:px-2" title={label}>
+    <div className="flex items-center gap-1.5" title={label} aria-label={label}>
       <span
         className={cn(
           'h-1.5 w-1.5 rounded-full',
@@ -36,7 +39,7 @@ function Dot({ tone, label }: { tone: 'muted' | 'warn' | 'short'; label: string 
       />
       <span
         className={cn(
-          'num hidden text-[10px] lowercase sm:inline',
+          'num hidden text-micro lowercase sm:inline',
           tone === 'muted' && 'text-muted',
           tone === 'warn' && 'text-short/80',
           tone === 'short' && 'text-short',
