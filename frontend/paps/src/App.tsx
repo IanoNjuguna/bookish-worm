@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { symbolInfo, useSymbols } from './hooks/useSymbols';
 import { useTicker } from './hooks/useTicker';
 import { useDepth } from './hooks/useDepth';
 import { useKlines } from './hooks/useKlines';
 import { useMarkPrice, useTrades } from './hooks/useMarket';
+import { useFundingRates } from './hooks/useFundingRates';
 import { useMiniTickers } from './hooks/useMiniTickers';
 import { useDeck, type DeckCard } from './hooks/useDeck';
 import { useIdentity } from './hooks/useIdentity';
@@ -20,6 +21,7 @@ import { SwipeDeck } from './components/SwipeDeck';
 import { socket } from './lib/ws';
 import { START_EQUITY, usePaperAccount } from './lib/store';
 import type { Interval } from './lib/constants';
+import { fundingWindowKey } from './lib/funding';
 import { liquidationPrice, type Side } from './lib/order';
 
 const PRO_MIN_WIDTH = 1024;
@@ -71,6 +73,12 @@ export default function App() {
   const swipeRisk = profile.riskUsd || FALLBACK_RISK;
   const swipeLeverage = profile.leverage || FALLBACK_LEVERAGE;
   const deck = useDeck(symbols, mini, DECK_SIZE, profile.watchlist, round);
+  // Funding is per market, so the rate subscription follows the positions rather than
+  // the chart: a position in a market you are not looking at still pays. The market on
+  // screen joins them, because the ticket has to price a trade before it exists.
+  const heldSymbols = useMemo(() => account.positions.map((p) => p.symbol), [account.positions]);
+  const funding = useFundingRates(useMemo(() => [symbol, ...heldSymbols], [symbol, heldSymbols]));
+  const settled = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     socket.connect();
@@ -135,6 +143,27 @@ export default function App() {
     });
     if (doomed.length) account.liquidate(doomed.map((p) => p.id));
   }, [marks, account.positions]);
+
+  useEffect(() => {
+    if (!account.positions.length) return;
+    const settle = () => {
+      const now = Date.now();
+      for (const p of account.positions) {
+        const f = funding[p.symbol];
+        if (!f || now < f.settleAt) continue;
+        const key = fundingWindowKey(p.symbol, f.settleAt);
+        // One charge per window: a re-render, a repeated mark line or StrictMode's double
+        // mount must not bill the same settlement twice.
+        if (settled.current.has(key)) continue;
+        settled.current.add(key);
+        account.fund(p.symbol, f.rate, marks[p.symbol] ?? p.entry);
+      }
+    };
+    settle();
+    const id = window.setInterval(settle, 1_000);
+    return () => window.clearInterval(id);
+    // `fund` is a stable dispatcher; the positions and the marks are what change.
+  }, [funding, account.positions, marks, account.fund]);
 
   const remaining = useMemo(() => {
     const left = deck.cards.filter((c) => !swiped.includes(c.symbol));
@@ -225,6 +254,7 @@ export default function App() {
             chartError={error}
             initialRisk={swipeRisk}
             initialLeverage={swipeLeverage}
+            fundingRate={funding[symbol]?.rate}
             onOpenMarkets={() => setMarketsOpen(true)}
             onPlace={place}
           />
@@ -266,6 +296,7 @@ export default function App() {
             mark={markPrice}
             picked={picked}
             equity={account.equity}
+            fundingRate={funding[symbol]?.rate}
             onPlace={place}
           />
         </div>

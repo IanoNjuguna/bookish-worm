@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { cn } from '../lib/cn';
 import { LEVERAGES } from '../lib/constants';
-import { price, usd } from '../lib/format';
+import { price, signedUsd, usd } from '../lib/format';
+import { fundingCashFlow } from '../lib/funding';
 import { DEFAULT_TIER, liquidationPrice, notionalOf, sizeForNotional, type Side } from '../lib/order';
 import type { SymbolInfo } from '../lib/types';
 
@@ -11,13 +12,15 @@ type Props = {
   mark: number;
   picked: string;
   equity: number;
+  /** The venue's current rate for this market, as a fraction of notional. */
+  fundingRate?: number;
   onPlace: (o: { side: Side; kind: 'limit' | 'market'; price: number; size: number; leverage: number }) => void;
 };
 
 const TAKER_FEE = 0.0005;
 
 /** OKX-shaped ticket: type tabs, margin mode and leverage above, cost below. */
-export function Ticket({ symbol, info, mark, picked, equity, onPlace }: Props) {
+export function Ticket({ symbol, info, mark, picked, equity, fundingRate, onPlace }: Props) {
   const [kind, setKind] = useState<'limit' | 'market'>('limit');
   const [priceInput, setPriceInput] = useState('');
   const [notional, setNotional] = useState('500');
@@ -42,6 +45,10 @@ export function Ticket({ symbol, info, mark, picked, equity, onPlace }: Props) {
   const margin = notionalValue / leverage;
   const fee = notionalValue * TAKER_FEE;
   const base = symbol.split('-')[0];
+
+  // Funding settles against notional, so the ticket can price it before the order exists.
+  const fundingFor = (side: Side): string =>
+    fundingRate === undefined ? '—' : signedUsd(fundingCashFlow(side, fundingRate, notionalValue));
 
   const submit = (side: Side) => {
     setError(null);
@@ -141,6 +148,8 @@ export function Ticket({ symbol, info, mark, picked, equity, onPlace }: Props) {
             v={`${fmtLiq('LONG', entry, margin, size)} / ${fmtLiq('SHORT', entry, margin, size)}`}
           />
           <Row k="fee (taker)" v={`$${usd(fee)}`} />
+          <Row k="funding long (next)" v={fundingFor('LONG')} />
+          <Row k="funding short (next)" v={fundingFor('SHORT')} />
         </dl>
 
         {error && <p className="text-[11px] text-short">{error}</p>}

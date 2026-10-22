@@ -29,10 +29,14 @@ export const compact = (v: number | string): string => {
 
 export const signed = (v: number, dp = 2): string => `${v >= 0 ? '+' : '−'}${usd(Math.abs(v), dp)}`;
 
+/** Money that carries a direction, which funding always does: it is a credit or a charge. */
+export const signedUsd = (v: number, dp = 2): string =>
+  `${v < 0 ? '−' : '+'}$${usd(Math.abs(v), dp)}`;
+
 export const pct = (v: number, dp = 2): string => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(dp)}%`;
 
 export const clock = (ms: number): string =>
   new Date(ms).toLocaleTimeString('en-GB', { hour12: false });
 
-/** Funding is quoted per 8h but is more readable per year on a screen this dense. */
-export const fundingApr = (rate: number): string => `${(rate * 3 * 365 * 100).toFixed(1)}%`;
+/** Strike settles funding hourly, so the annualised figure multiplies by 24 windows a day. */
+export const fundingApr = (rate: number): string => `${(rate * 24 * 365 * 100).toFixed(1)}%`;

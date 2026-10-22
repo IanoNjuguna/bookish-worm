@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { cn } from '../lib/cn';
-import { price, usd } from '../lib/format';
+import { price, signedUsd, usd } from '../lib/format';
 import { liquidationPrice, roe, unrealised, type Position } from '../lib/order';
 import type { Fill, WorkingOrder } from '../lib/store';
 
@@ -74,7 +74,7 @@ export function Blotter({
         {tab === 'positions' && (
           <table className="w-full text-[11px]">
             <thead className="sticky top-0 bg-panel text-muted">
-              <Th cols={['Market', 'Side', 'Size', 'Entry', 'Mark', 'Liq.', 'Margin', 'uPnL', 'ROE', '']} />
+              <Th cols={['Market', 'Side', 'Size', 'Entry', 'Mark', 'Liq.', 'Margin', 'Funding', 'uPnL', 'ROE', '']} />
             </thead>
             <tbody>
               {positions.map((p) => {
@@ -94,6 +94,13 @@ export function Blotter({
                     <Td num>{price(pMark)}</Td>
                     <Td num muted>{liq ? price(liq) : '—'}</Td>
                     <Td num>${usd(p.margin)}</Td>
+                    <Td
+                      num
+                      muted={!p.funding}
+                      tone={p.funding > 0 ? 'long' : p.funding < 0 ? 'short' : undefined}
+                    >
+                      {p.funding ? signedUsd(p.funding) : '—'}
+                    </Td>
                     <Td num tone={up >= 0 ? 'long' : 'short'}>
                       {up >= 0 ? '+' : '−'}${usd(Math.abs(up))}
                     </Td>
@@ -118,7 +125,7 @@ export function Blotter({
                   </tr>
                 );
               })}
-              {!positions.length && <Empty cols={10} text="No positions. Open a paper position to see it marked live." />}
+              {!positions.length && <Empty cols={11} text="No positions. Open a paper position to see it marked live." />}
             </tbody>
           </table>
         )}

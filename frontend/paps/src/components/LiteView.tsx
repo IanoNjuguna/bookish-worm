@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { cn } from '../lib/cn';
-import { price, usd } from '../lib/format';
+import { price, signedUsd, usd } from '../lib/format';
+import { fundingCashFlow } from '../lib/funding';
 import { DEFAULT_TIER, liquidationPrice, notionalOf, sizeForNotional, type Side } from '../lib/order';
 import type { SymbolInfo } from '../lib/types';
 import type { Bar } from '../hooks/useKlines';
@@ -13,6 +14,8 @@ type Props = {
   info: SymbolInfo | undefined;
   mark: number;
   equity: number;
+  /** The venue's current rate for this market, as a fraction of notional. */
+  fundingRate?: number;
   changePct: number;
   bars: Bar[];
   interval: Interval;
@@ -37,6 +40,7 @@ export function LiteView({
   info,
   mark,
   equity,
+  fundingRate,
   changePct,
   bars,
   interval,
@@ -65,6 +69,8 @@ export function LiteView({
   const margin = notionalValue / leverage;
   const liq = mark ? liquidationPrice(side, mark, margin, size, DEFAULT_TIER) : 0;
   const fee = notionalValue * FEE;
+  // A long and a short do not pay the same funding, so the line follows the chosen side.
+  const funding = fundingRate === undefined ? null : fundingCashFlow(side, fundingRate, notionalValue);
   const base = symbol.split('-')[0];
 
   return (
@@ -137,7 +143,7 @@ export function LiteView({
             </div>
           </div>
 
-          <dl className="mt-3 grid grid-cols-3 gap-2 border-t border-line pt-2 text-[11px]">
+          <dl className="mt-3 grid grid-cols-4 gap-2 border-t border-line pt-2 text-[11px]">
             <div>
               <dt className="text-[10px] text-muted">margin</dt>
               <dd className="num mt-0.5">${usd(margin)}</dd>
@@ -149,6 +155,10 @@ export function LiteView({
             <div className="text-right">
               <dt className="text-[10px] text-muted">fee</dt>
               <dd className="num mt-0.5">${usd(fee)}</dd>
+            </div>
+            <div className="text-right">
+              <dt className="text-[10px] text-muted">funding (next)</dt>
+              <dd className="num mt-0.5">{funding === null ? '—' : signedUsd(funding)}</dd>
             </div>
           </dl>
 
