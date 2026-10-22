@@ -35,7 +35,7 @@ export function depsFor(env: ServerEnv): ConnectDeps {
     master: masterKey(env.MASTER_KEY),
     strike: { origin: originFor(env.STRIKE_ENV) },
     builderCode: env.BUILDER_CODE ?? 'paps',
-    feeShareBps: Number(env.FEE_SHARE_BPS ?? 0),
+    feeShareBps: Number(env.FEE_SHARE_BPS ?? 100),
   };
 }
 

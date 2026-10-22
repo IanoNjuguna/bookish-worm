@@ -8,8 +8,10 @@ pages_build_output_dir = "dist"
 [vars]
 STRIKE_ENV = "mainnet"
 BUILDER_CODE = "paps"
-# 0 bps until charging for trades is a decision rather than a default.
-FEE_SHARE_BPS = "0"
+# The builder's cut, on top of Strike's own trading fee. The user approves this number
+# at connect and sees it in Strike's consent message, so it must match what the builder
+# dashboard is configured to charge rather than being a nice-looking default.
+FEE_SHARE_BPS = "100"
 
 # Create the database once, paste its id here, then apply the schema and seal the secret:
 #   bunx wrangler d1 create paps-keys
