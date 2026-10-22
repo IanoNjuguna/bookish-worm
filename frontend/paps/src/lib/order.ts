@@ -6,10 +6,29 @@
 
 export type Side = 'LONG' | 'SHORT';
 
+/**
+ * Decimals a step implies, read from its own written form: `0.001` is three, `0.5` is one,
+ * `1` is none, and `1e-8` — which is how JavaScript writes a nano-step — is eight.
+ */
+export const decimalsFor = (step: number): number => {
+  const written = String(step);
+  const exponent = written.indexOf('e-');
+  if (exponent >= 0) return Number(written.slice(exponent + 2));
+  const dot = written.indexOf('.');
+  return dot < 0 ? 0 : written.length - dot - 1;
+};
+
+/**
+ * Round to the nearest multiple of `step`.
+ *
+ * The float noise is trimmed at the step's own precision: `3 * 0.1` is
+ * `0.30000000000000004`, and a venue that is asked to parse that will refuse the order.
+ * Derived from the step rather than assumed to be a power of ten, because ticks like `0.5`
+ * and steps like `0.25` are real.
+ */
 export const roundTo = (v: number, step: number): number => {
   if (!step) return v;
-  const dp = Math.max(0, Math.round(-Math.log10(step)));
-  return Number((Math.round(v / step) * step).toFixed(dp));
+  return Number((Math.round(v / step) * step).toFixed(decimalsFor(step)));
 };
 
 export const notionalOf = (price: number, size: number): number => price * Math.abs(size);

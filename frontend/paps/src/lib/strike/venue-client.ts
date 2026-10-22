@@ -66,6 +66,7 @@ export class VenueClient {
   private timer: ReturnType<typeof setTimeout> | null = null;
   private running = false;
   private inFlight = false;
+  private again = false;
 
   constructor(private readonly options: VenueClientOptions) {}
 
@@ -81,11 +82,22 @@ export class VenueClient {
 
   stop(): void {
     this.running = false;
+    this.again = false;
     this.clear();
   }
 
+  /**
+   * Read now. Called on the poll, on focus, and straight after a placement or a cancel —
+   * the last of those cannot wait 30s for a screen to stop lying about a sent order, so a
+   * request that arrives while one is in flight is queued rather than dropped.
+   */
   async refresh(): Promise<void> {
-    if (!this.running || this.inFlight || !shouldPoll(this.state)) return;
+    if (!this.running) return;
+    if (this.inFlight) {
+      this.again = true;
+      return;
+    }
+    if (!shouldPoll(this.state)) return;
     this.inFlight = true;
     this.apply({ type: 'start' });
 
@@ -100,7 +112,12 @@ export class VenueClient {
       });
     } finally {
       this.inFlight = false;
-      this.schedule();
+      if (this.again) {
+        this.again = false;
+        void this.refresh();
+      } else {
+        this.schedule();
+      }
     }
   }
 
