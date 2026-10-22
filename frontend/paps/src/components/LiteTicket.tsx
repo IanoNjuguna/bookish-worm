@@ -4,6 +4,8 @@ import { price, usd } from '../lib/format';
 import { DEFAULT_TIER, liquidationPrice, notionalOf, sizeForNotional, type Side } from '../lib/order';
 import type { SymbolInfo } from '../lib/types';
 import { IconChevronDown } from '@tabler/icons-react';
+import { useFeeRate } from '../hooks/useFeeRate';
+import type { TradeApi } from '../hooks/useVenueTrade';
 
 type Order = { side: Side; kind: 'limit' | 'market'; price: number; size: number; leverage: number };
 
@@ -17,6 +19,8 @@ type Props = {
   maxLeverage: number;
   /** Funding rate for this market, per funding window. */
   fundingRate?: number;
+  /** Present for a connected account: the ticket arms a live order instead of a demo one. */
+  trade?: TradeApi | null;
   onPlace: (o: Order) => void;
 };
 
@@ -24,7 +28,6 @@ type Props = {
 const PRESETS = [50, 100, 250];
 // The strip contains every tier default, so the selected leverage is always visible.
 const LEV = [2, 3, 5, 10, 20];
-const FEE = 0.0005;
 
 /**
  * The ticket half of the Trade tab. The face is the decision — direction, amount,
@@ -41,6 +44,7 @@ export function LiteTicket({
   initialLeverage,
   maxLeverage = 50,
   fundingRate,
+  trade = null,
   onPlace,
 }: Props) {
   const [notional, setNotional] = useState(initialRisk ?? 100);
@@ -62,7 +66,10 @@ export function LiteTicket({
   const notionalValue = notionalOf(mark, size);
   const margin = notionalValue / leverage;
   const liq = mark ? liquidationPrice(side, mark, margin, size, DEFAULT_TIER) : 0;
-  const fee = notionalValue * FEE;
+  // The venue's own taker rate, and a label that admits when it is the fallback.
+  const feeRate = useFeeRate();
+  const fee = notionalValue * feeRate.taker;
+  const blocked = Boolean(trade && (trade.block || trade.busy));
   const base = symbol.split('-')[0];
   const canPlace = Boolean(mark) && size > 0;
   // A caller may hand us a leverage that is not a tier default; show it as its own
@@ -162,7 +169,10 @@ export function LiteTicket({
               <dd className="num mt-0.5 text-body text-short">{liq ? price(liq) : '—'}</dd>
             </div>
             <div>
-              <dt className="text-small text-muted">fee{fundingRate ? ' · funding' : ''}</dt>
+              <dt className="text-small text-muted">
+                fee{fundingRate ? ' · funding' : ''}
+                {feeRate.known ? '' : ' · 5 bps fallback'}
+              </dt>
               <dd className="num mt-0.5 text-body">
                 ${usd(fee)}
                 {fundingRate ? (
@@ -204,18 +214,39 @@ export function LiteTicket({
         </div>
       ) : null}
 
+      {trade?.block && (
+        <p className="mt-3 rounded-control border border-short/40 bg-short/10 px-2.5 py-2 text-small text-short">
+          {trade.block}
+        </p>
+      )}
+      {trade?.notice && (
+        <p className="mt-3 rounded-control border border-line bg-panel-2 px-2.5 py-2 text-small text-muted">
+          {trade.notice}
+        </p>
+      )}
+
       <button
-        onClick={() => onPlace({ side, kind: 'market', price: mark, size, leverage })}
-        disabled={!canPlace}
+        onClick={() =>
+          trade
+            ? trade.place({ symbol, side, kind: 'market', size, price: mark, leverage })
+            : onPlace({ side, kind: 'market', price: mark, size, leverage })
+        }
+        disabled={!canPlace || blocked}
         className="mt-4 flex min-h-[52px] w-full items-center justify-center rounded-control bg-accent text-title font-semibold text-canvas transition-opacity active:opacity-80 disabled:opacity-40"
       >
         Open {side === 'LONG' ? 'long' : 'short'} {base}
-        <span className="ml-1.5 text-body font-medium opacity-80">· demo</span>
+        <span className="ml-1.5 text-body font-medium opacity-80">
+          {trade ? (trade.block ? '· paused' : '· live · 2 steps') : '· demo'}
+        </span>
       </button>
 
       <p className="mt-2.5 text-small leading-relaxed text-muted">
-        Fills at the mark. {size.toLocaleString('en-US')} {base} of notional ${usd(notionalValue)}.
-        Liquidation is first-tier and an estimate.
+        {trade
+          ? 'Live order on your Strike account: the confirm step shows both fees before it sends.'
+          : 'Fills at the mark.'}{' '}
+        {size.toLocaleString('en-US')} {base} of notional ${usd(notionalValue)}. Liquidation is
+        first-tier and an estimate.
+        {!feeRate.known && ' The venue fee schedule did not load, so 5 bps is an estimate.'}
       </p>
     </section>
   );

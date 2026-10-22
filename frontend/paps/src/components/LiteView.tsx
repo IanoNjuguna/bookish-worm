@@ -2,6 +2,7 @@ import { price, usd } from '../lib/format';
 import type { Side } from '../lib/order';
 import type { SymbolInfo } from '../lib/types';
 import type { Bar } from '../hooks/useKlines';
+import type { TradeApi } from '../hooks/useVenueTrade';
 import { ChartPanel } from './Chart';
 import type { Interval } from '../lib/constants';
 import { IconChevronDown } from '@tabler/icons-react';
@@ -25,6 +26,8 @@ type Props = {
   fundingRate?: number;
   /** The venue's margin balance, present only when a Strike session exists. */
   liveBalance?: string | null;
+  /** Present for a connected account: the ticket arms a live order instead of a demo one. */
+  trade?: TradeApi | null;
   onPlace: (o: { side: Side; kind: 'limit' | 'market'; price: number; size: number; leverage: number }) => void;
 };
 
@@ -47,6 +50,7 @@ export function LiteView({
   maxLeverage = 50,
   fundingRate,
   liveBalance = null,
+  trade = null,
   onOpenMarkets,
   onPlace,
 }: Props) {
@@ -110,6 +114,7 @@ export function LiteView({
         initialLeverage={initialLeverage}
         maxLeverage={maxLeverage}
         fundingRate={fundingRate}
+        trade={trade}
         onPlace={onPlace}
       />
     </div>

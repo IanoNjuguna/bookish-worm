@@ -1,7 +1,8 @@
 # paps
 
 An interactive trading interface for Strike Finance perpetuals on Cardano. Public
-market data is live; orders are paper until an API wallet is connected.
+market data is live; orders are demo until an API wallet is connected, and go to Strike
+through the signing proxy after that.
 
     bun install
     bun run dev        # http://127.0.0.1:5175
@@ -13,8 +14,11 @@ market data is live; orders are paper until an API wallet is connected.
     market data     real. REST and WebSocket against api.strikefinance.org
     book, depth     real, built from a snapshot plus deltas
     ticket, maths   real formulas from Strike's docs, real tick and lot sizes from
-                    exchangeInfo, real 5 bps taker fee
-    orders          paper. Filled locally against the mark, no request is sent
+                    exchangeInfo, real taker rate from /v2/fee-tiers with a stated
+                    fallback
+    orders          demo until a session exists: filled locally against the mark, no
+                    request sent. With a session they are venue orders, two clicks, and
+                    the venue's ids come back
     liquidation     strike's isolated formula, first-tier maintenance margin, so it
                     is an estimate and the UI says so
 
@@ -72,7 +76,7 @@ browser wallet (CIP-30) stays available for people who already have one.
 
     VITE_UTXOS_PROJECT_ID   from the utxos.dev dashboard; without it only CIP-30 works
     VITE_BUILDER_CODE       paps — registered on mainnet, not on testnet
-    fee                     requested at 0 bps: paps never sends an order
+    fee                     requested at 0 bps; the builder's cut is taken by Strike
 
 Two build notes worth keeping: UTXOS is Mesh underneath and needs node crypto polyfills
 (`vite-plugin-node-polyfills`, crypto/buffer/stream only), and `libsodium-wrappers-sumo`
@@ -145,10 +149,25 @@ refreshes on a 30s poll and on window focus.
     on 401    the poll stops until connect runs again; it never retries a revoked key
 
 Amounts stay the strings the venue sent and are formatted at the edge, because an entry
-price is not a float. Three labels carry the state and they are deliberately separate: the
-header badge says `live` once a session exists, the Trade strip says `strike · demo
-orders`, and the ticket button still says `demo`, because no order leaves the browser in
-this build. The blotter's own header carries the age of the venue read.
+price is not a float. The header badge says `live` once a session exists and the blotter's
+own header carries the age of that read, so a stale account never pretends to be current.
+
+## Trading on the venue
+
+`hooks/useVenueTrade.ts` is the only path that spends money, and it is two clicks: the
+ticket (or a swipe) arms an intent, `components/OrderConfirm.tsx` shows the symbol, the
+venue's side, the size at the market's step, the notional and both fees, and the second
+click sends it. The rules it enforces:
+
+    one order per intent    the client id is minted once and reused on retry, so a network
+                            failure that actually landed cannot double a position
+    leverage first          a failed setLeverage blocks the placement, because the margin
+                            and liquidation on screen would otherwise be wrong
+    accepted, not filled    an acceptance shows `accepted · seq N` until a read says more;
+                            fills are only ever reported from the venue's /history/fill
+    close and cancel        half or all, never a slice the venue has to guess; every write
+                            asks for a read afterwards instead of assuming the result
+    blocked, with a reason  a stale or reconnecting session turns the CTA off and says why
 
 `lib/strike/fees.ts` parses the public `/v2/fee-tiers` (PascalCase today, camelCase in the
 docs) and reports the 5 bps fallback as unknown when the schedule does not parse, rather

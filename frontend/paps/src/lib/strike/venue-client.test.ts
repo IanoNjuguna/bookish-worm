@@ -7,6 +7,7 @@ const data = (): VenueData => ({
   account: normaliseAccount(accountFixture),
   positions: normalisePositions(positionsFixture),
   orders: [],
+  fills: [],
   funding: [],
   transactions: [],
 });
@@ -41,6 +42,33 @@ describe('venue reads while the venue is healthy', () => {
 
     await vi.advanceTimersByTimeAsync(30_000);
     expect(read).toHaveBeenCalledTimes(2);
+    client.stop();
+  });
+
+  it('runs a refresh asked for mid-flight the moment the one in flight lands', async () => {
+    let release = () => {};
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    let calls = 0;
+    const read = async (): Promise<VenueData> => {
+      calls += 1;
+      if (calls === 1) await gate;
+      return data();
+    };
+
+    const client = new VenueClient({ read, pollMs: 30_000 });
+    client.start();
+    await vi.advanceTimersByTimeAsync(0);
+
+    // An order was just sent: the screen cannot wait 30s to find out what the venue did.
+    void client.refresh();
+    void client.refresh();
+    expect(calls).toBe(1);
+
+    release();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(calls).toBe(2);
     client.stop();
   });
 });

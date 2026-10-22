@@ -12,9 +12,15 @@ import type { VenuePosition } from '../../lib/strike/venue';
 export function VenuePositionCards({
   positions,
   marks,
+  onClose,
+  stepFor,
 }: {
   positions: VenuePosition[];
   marks: Record<string, number>;
+  /** Close on the venue: half or all, never a slice the venue would have to guess at. */
+  onClose?: (position: VenuePosition, fraction: 1 | 0.5) => void;
+  /** The market's lot step, so a position too small to halve does not offer a half. */
+  stepFor?: (symbol: string) => number;
 }) {
   if (!positions.length) {
     return (
@@ -67,18 +73,31 @@ export function VenuePositionCards({
               />
             </div>
 
-            <div className="mt-2.5 flex items-center justify-between border-t border-line/70 pt-2.5">
-              <span className="num text-small text-muted">
-                ${usd(p.isoBalance)} margin · {p.marginMode}
+            <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-line/70 pt-2.5">
+              <span className="num min-w-0 truncate text-small text-muted">
+                ${usd(p.isoBalance)} margin · {p.marginMode} ·{' '}
+                <span className={funding === 0 ? '' : funding > 0 ? 'text-long' : 'text-short'}>
+                  {signedUsd(p.funding)}
+                </span>
               </span>
-              <span
-                className={cn(
-                  'num text-small',
-                  funding === 0 ? 'text-muted' : funding > 0 ? 'text-long' : 'text-short',
-                )}
-              >
-                funding {signedUsd(p.funding)}
-              </span>
+              {onClose && (
+                <div className="flex shrink-0 items-center gap-1.5">
+                  {halvable(p, stepFor) && (
+                    <button
+                      onClick={() => onClose(p, 0.5)}
+                      className="rounded-control border border-line px-2.5 py-1.5 text-small text-muted active:text-fg"
+                    >
+                      ½
+                    </button>
+                  )}
+                  <button
+                    onClick={() => onClose(p, 1)}
+                    className="rounded-control bg-fg px-3 py-1.5 text-small text-canvas"
+                  >
+                    close
+                  </button>
+                </div>
+              )}
             </div>
           </li>
         );
@@ -86,6 +105,10 @@ export function VenuePositionCards({
     </ul>
   );
 }
+
+/** A half close needs the position's size to be worth halving at the market's step. */
+const halvable = (p: VenuePosition, stepFor?: (symbol: string) => number): boolean =>
+  !stepFor || Number(p.absSize) / 2 >= stepFor(p.symbol);
 
 function Fact({ k, v, note }: { k: string; v: string; note?: string }) {
   return (
