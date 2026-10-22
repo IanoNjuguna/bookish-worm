@@ -7,6 +7,8 @@ import { useMiniTickers } from './hooks/useMiniTickers';
 import { useDeck, type DeckCard } from './hooks/useDeck';
 import { useSparklines } from './hooks/useSparklines';
 import { useIdentity } from './hooks/useIdentity';
+import { useVenueAccount } from './hooks/useVenueAccount';
+import { useVenueMarks } from './hooks/useVenueMarks';
 import { TopBar, type ViewMode } from './components/TopBar';
 import { Blotter } from './components/Blotter';
 import { LiteView } from './components/LiteView';
@@ -56,6 +58,13 @@ export default function App() {
   const account = usePaperAccount();
   const identity = useIdentity();
   const profile = identity.profile;
+
+  // A Strike session is a real account. Without one, nothing below changes: the surfaces
+  // render the paper ledger exactly as they did before.
+  const session = Boolean(identity.identity?.accountId);
+  const venue = useVenueAccount(session);
+  const venueMarks = useVenueMarks(venue.data?.positions.map((p) => p.symbol) ?? []);
+
   const deck = useDeck(symbols, mini, DECK_SIZE, profile.watchlist, round);
 
   // The ledger follows the identity: anonymous first, then whichever wallet is connected.
@@ -220,6 +229,8 @@ export default function App() {
       onClose={account.close}
       onCloseAll={account.closeAll}
       onCancel={account.cancel}
+      venue={session ? venue : null}
+      venueMarks={venueMarks}
     />
   );
 
@@ -240,6 +251,7 @@ export default function App() {
         }}
         identity={identity}
         tier={tier}
+        venue={session ? venue : null}
       />
 
       {view === 'swipe' ? (
@@ -315,6 +327,7 @@ export default function App() {
             initialLeverage={swipeLeverage}
             maxLeverage={tier.maxLeverage}
             onOpenMarkets={() => setMarketsOpen(true)}
+            session={session}
             onPlace={place}
           />
           <div className="mx-auto w-full max-w-[520px] px-3 pb-3">

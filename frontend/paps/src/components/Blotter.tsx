@@ -1,8 +1,17 @@
 import { useState } from 'react';
 import { cn } from '../lib/cn';
-import { price, usd } from '../lib/format';
-import { liquidationPrice, roe, unrealised, type Position } from '../lib/order';
+import { unrealised, type Position } from '../lib/order';
 import type { Fill, WorkingOrder } from '../lib/store';
+import type { VenueState } from '../lib/strike/venue-client';
+import { PaperBalances, PaperHistory, PaperOrders, PaperPositions } from './PaperTables';
+import {
+  VenueBalances,
+  VenueFunding,
+  VenueOrders,
+  VenuePositions,
+  VenueTransactions,
+  VenueUnavailable,
+} from './VenueTables';
 
 type Props = {
   positions: Position[];
@@ -15,11 +24,20 @@ type Props = {
   onClose: (id: string, mark: number, fraction?: number) => void;
   onCloseAll: (mark: number) => void;
   onCancel: (id: string) => void;
+  /** Absent with no session: the blotter is the paper ledger, exactly as before. */
+  venue?: VenueState | null;
+  /** A mark per symbol the venue holds, not just the one on screen. */
+  venueMarks?: Record<string, number>;
 };
 
-type TabKey = 'positions' | 'orders' | 'history' | 'balances';
+type TabKey = 'positions' | 'orders' | 'history' | 'funding' | 'transactions' | 'balances';
 
-/** The blotter: what you hold, what is working, what happened, what you have. */
+/**
+ * The blotter: what you hold, what is working, what happened, what you have.
+ *
+ * With a session the rows are the venue's, because showing a local $10,000 equity next to a
+ * real account would be a lie the whole app tells. Without one it is the paper ledger.
+ */
 export function Blotter({
   positions,
   orders,
@@ -31,210 +49,129 @@ export function Blotter({
   onClose,
   onCloseAll,
   onCancel,
+  venue = null,
+  venueMarks = {},
 }: Props) {
   const [tab, setTab] = useState<TabKey>('positions');
   const open = orders.filter((o) => o.status === 'open');
+  const data = venue?.data ?? null;
+  const live = Boolean(venue);
 
-  const pnl = positions.reduce((n, p) => n + unrealised(p, mark), 0);
-  const margin = positions.reduce((n, p) => n + p.margin, 0);
+  const tabs: { key: TabKey; label: string; short: string; n?: number }[] = live
+    ? [
+        { key: 'positions', label: 'Positions', short: 'Positions', n: data?.positions.length ?? 0 },
+        { key: 'orders', label: 'Open orders', short: 'Orders', n: data?.orders.length ?? 0 },
+        { key: 'funding', label: 'Funding', short: 'Funding', n: data?.funding.length ?? 0 },
+        {
+          key: 'transactions',
+          label: 'Transactions',
+          short: 'Txn',
+          n: data?.transactions.length ?? 0,
+        },
+        { key: 'balances', label: 'Balances', short: 'Balance' },
+      ]
+    : [
+        { key: 'positions', label: 'Positions', short: 'Positions', n: positions.length },
+        { key: 'orders', label: 'Open orders', short: 'Orders', n: open.length },
+        { key: 'history', label: 'Order history', short: 'History', n: fills.length },
+        { key: 'balances', label: 'Balances', short: 'Balance' },
+      ];
 
-  const tabs: { key: TabKey; label: string; short: string; n?: number }[] = [
-    { key: 'positions', label: 'Positions', short: 'Positions', n: positions.length },
-    { key: 'orders', label: 'Open orders', short: 'Orders', n: open.length },
-    { key: 'history', label: 'Order history', short: 'History', n: fills.length },
-    { key: 'balances', label: 'Balances', short: 'Balance' },
-  ];
+  const showUnavailable = live && !data;
+  const statusLabel = !live
+    ? ''
+    : venue?.status === 'reconnect'
+      ? 'reconnect needed'
+      : venue?.status === 'stale'
+        ? 'stale · read only'
+        : 'strike · read only';
 
   return (
     <section className="flex h-full min-h-0 flex-col border-t border-line bg-panel">
-      <div className="flex items-center gap-3 overflow-x-auto border-b border-line px-1 scrollbar-none">
-        {tabs.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={cn('tab whitespace-nowrap', tab === t.key && 'tab-active')}
-          >
-            <span className="hidden sm:inline">{t.label}</span>
-            <span className="sm:hidden">{t.short}</span>
-            {t.n !== undefined && <span className="ml-1 text-muted">({t.n})</span>}
-          </button>
-        ))}
-        {positions.length > 0 && (
-          <button
-            onClick={() => onCloseAll(mark)}
-            className="ml-auto border border-line px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] text-muted hover:text-fg"
-          >
-            close all
-          </button>
-        )}
-        <span className={cn('pr-2 text-[10px] text-muted', positions.length ? '' : 'ml-auto')}>{symbol}</span>
+      {/* The tabs scroll; the venue's state and the market do not scroll away with them. */}
+      <div className="flex items-center border-b border-line">
+        <div className="flex min-w-0 flex-1 items-center gap-3 overflow-x-auto px-1 scrollbar-none">
+          {tabs.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              className={cn('tab whitespace-nowrap', tab === t.key && 'tab-active')}
+            >
+              <span className="hidden sm:inline">{t.label}</span>
+              <span className="sm:hidden">{t.short}</span>
+              {t.n !== undefined && <span className="ml-1 text-muted">({t.n})</span>}
+            </button>
+          ))}
+          {!live && positions.length > 0 && (
+            <button
+              onClick={() => onCloseAll(mark)}
+              className="ml-auto whitespace-nowrap border border-line px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] text-muted hover:text-fg"
+            >
+              close all
+            </button>
+          )}
+        </div>
+        <div className="flex shrink-0 items-center gap-2 pr-2">
+          {live && (
+            <span
+              className={cn(
+                'whitespace-nowrap text-[10px] uppercase tracking-[0.08em]',
+                venue?.status === 'stale' || venue?.status === 'reconnect'
+                  ? 'text-short'
+                  : 'text-muted',
+              )}
+            >
+              {statusLabel}
+            </span>
+          )}
+          <span className="text-[10px] text-muted">{symbol}</span>
+        </div>
       </div>
 
       <div className="min-h-0 flex-1 overflow-auto">
-        {tab === 'positions' && (
-          <table className="w-full text-[11px]">
-            <thead className="sticky top-0 bg-panel text-muted">
-              <Th cols={['Market', 'Side', 'Size', 'Entry', 'Mark', 'Liq.', 'Margin', 'uPnL', 'ROE', '']} />
-            </thead>
-            <tbody>
-              {positions.map((p) => {
-                const pMark = marks[p.symbol] ?? mark;
-                const up = unrealised(p, pMark);
-                const liq = liquidationPrice(p.side, p.entry, p.margin, p.size);
-                return (
-                  <tr key={p.id} className="border-b border-line/50">
-                    <Td>{p.symbol}</Td>
-                    <Td>
-                      <span className={cn('px-1.5 py-0.5 text-[10px]', p.side === 'LONG' ? 'bg-long/15 text-long' : 'bg-short/15 text-short')}>
-                        {p.side}
-                      </span>
-                    </Td>
-                    <Td num>{p.size.toLocaleString('en-US')}</Td>
-                    <Td num>{price(p.entry)}</Td>
-                    <Td num>{price(pMark)}</Td>
-                    <Td num muted>{liq ? price(liq) : '—'}</Td>
-                    <Td num>${usd(p.margin)}</Td>
-                    <Td num tone={up >= 0 ? 'long' : 'short'}>
-                      {up >= 0 ? '+' : '−'}${usd(Math.abs(up))}
-                    </Td>
-                    <Td num tone={up >= 0 ? 'long' : 'short'}>{roe(p, pMark).toFixed(1)}%</Td>
-                    <Td>
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => onClose(p.id, pMark, 0.5)}
-                          className="border border-line px-1.5 py-0.5 text-[10px] text-muted hover:text-fg"
-                          title="close half"
-                        >
-                          ½
-                        </button>
-                        <button
-                          onClick={() => onClose(p.id, pMark, 1)}
-                          className="border border-line px-1.5 py-0.5 text-[10px] text-muted hover:text-fg"
-                        >
-                          close
-                        </button>
-                      </div>
-                    </Td>
-                  </tr>
-                );
-              })}
-              {!positions.length && <Empty cols={10} text="No positions. Open a paper position to see it marked live." />}
-            </tbody>
-          </table>
-        )}
+        {tab === 'positions' &&
+          (showUnavailable ? (
+            <VenueUnavailable state={venue as VenueState} />
+          ) : live && data ? (
+            <VenuePositions positions={data.positions} marks={venueMarks} />
+          ) : (
+            <PaperPositions positions={positions} marks={marks} mark={mark} onClose={onClose} />
+          ))}
 
-        {tab === 'orders' && (
-          <table className="w-full text-[11px]">
-            <thead className="sticky top-0 bg-panel text-muted">
-              <Th cols={['Market', 'Side', 'Type', 'Price', 'Size', 'Filled', 'Time', '']} />
-            </thead>
-            <tbody>
-              {open.map((o) => (
-                <tr key={o.id} className="border-b border-line/50">
-                  <Td>{o.symbol}</Td>
-                  <Td tone={o.side === 'LONG' ? 'long' : 'short'}>{o.side}</Td>
-                  <Td muted>{o.kind}</Td>
-                  <Td num>{price(o.price)}</Td>
-                  <Td num>{o.size.toLocaleString('en-US')}</Td>
-                  <Td num muted>0</Td>
-                  <Td num muted>{new Date(o.createdAt).toLocaleTimeString('en-GB', { hour12: false })}</Td>
-                  <Td>
-                    <button
-                      onClick={() => onCancel(o.id)}
-                      className="border border-line px-2 py-0.5 text-[10px] text-muted hover:text-fg"
-                    >
-                      cancel
-                    </button>
-                  </Td>
-                </tr>
-              ))}
-              {!open.length && <Empty cols={8} text="No working orders." />}
-            </tbody>
-          </table>
-        )}
+        {tab === 'orders' &&
+          (showUnavailable ? (
+            <VenueUnavailable state={venue as VenueState} />
+          ) : live && data ? (
+            <VenueOrders orders={data.orders} />
+          ) : (
+            <PaperOrders orders={open} onCancel={onCancel} />
+          ))}
 
-        {tab === 'history' && (
-          <table className="w-full text-[11px]">
-            <thead className="sticky top-0 bg-panel text-muted">
-              <Th cols={['Time', 'Market', 'Side', 'Price', 'Size', 'Fee']} />
-            </thead>
-            <tbody>
-              {fills.map((f) => (
-                <tr key={f.id} className="border-b border-line/50">
-                  <Td num muted>{new Date(f.time).toLocaleTimeString('en-GB', { hour12: false })}</Td>
-                  <Td>{f.symbol}</Td>
-                  <Td tone={f.side === 'LONG' ? 'long' : 'short'}>{f.side}</Td>
-                  <Td num>{price(f.price)}</Td>
-                  <Td num>{f.size.toLocaleString('en-US')}</Td>
-                  <Td num muted>${usd(f.fee)}</Td>
-                </tr>
-              ))}
-              {!fills.length && <Empty cols={6} text="No fills yet." />}
-            </tbody>
-          </table>
-        )}
+        {tab === 'history' && <PaperHistory fills={fills} />}
 
-        {tab === 'balances' && (
-          <table className="w-full text-[11px]">
-            <thead className="sticky top-0 bg-panel text-muted">
-              <Th cols={['Asset', 'Equity', 'Used margin', 'Free', 'uPnL']} />
-            </thead>
-            <tbody>
-              <tr className="border-b border-line/50">
-                <Td>USD (paper)</Td>
-                <Td num>${usd(equity + pnl)}</Td>
-                <Td num>${usd(margin)}</Td>
-                <Td num>${usd(equity + pnl - margin)}</Td>
-                <Td num tone={pnl >= 0 ? 'long' : 'short'}>
-                  {pnl >= 0 ? '+' : '−'}${usd(Math.abs(pnl))}
-                </Td>
-              </tr>
-            </tbody>
-          </table>
-        )}
+        {tab === 'funding' &&
+          (data ? <VenueFunding rows={data.funding} /> : <VenueUnavailable state={venue as VenueState} />)}
+
+        {tab === 'transactions' &&
+          (data ? (
+            <VenueTransactions rows={data.transactions} />
+          ) : (
+            <VenueUnavailable state={venue as VenueState} />
+          ))}
+
+        {tab === 'balances' &&
+          (showUnavailable ? (
+            <VenueUnavailable state={venue as VenueState} />
+          ) : live && data ? (
+            <VenueBalances account={data.account} />
+          ) : (
+            <PaperBalances
+              equity={equity}
+              margin={positions.reduce((n, p) => n + p.margin, 0)}
+              pnl={positions.reduce((n, p) => n + unrealised(p, mark), 0)}
+            />
+          ))}
       </div>
     </section>
   );
 }
-
-const Th = ({ cols }: { cols: string[] }) => (
-  <tr className="border-b border-line">
-    {cols.map((c) => (
-      <th key={c} className="px-3 py-1.5 text-left font-normal first:pl-3">
-        {c}
-      </th>
-    ))}
-  </tr>
-);
-
-const Td = ({
-  children,
-  num,
-  muted,
-  tone,
-}: {
-  children: React.ReactNode;
-  num?: boolean;
-  muted?: boolean;
-  tone?: 'long' | 'short';
-}) => (
-  <td
-    className={cn(
-      'px-3 py-1.5',
-      num && 'num',
-      muted && 'text-muted',
-      tone === 'long' && 'text-long',
-      tone === 'short' && 'text-short',
-    )}
-  >
-    {children}
-  </td>
-);
-
-const Empty = ({ cols, text }: { cols: number; text: string }) => (
-  <tr>
-    <td colSpan={cols} className="px-3 py-6 text-center text-[11px] text-muted">
-      {text}
-    </td>
-  </tr>
-);

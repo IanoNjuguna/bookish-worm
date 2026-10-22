@@ -100,6 +100,26 @@ adapter that knows about `context`.
     bun run build
     bunx wrangler pages dev dist --d1 DB=paps-keys --binding MASTER_KEY=$(openssl rand -base64 32)
 
+## Reading the account
+
+With a session, the blotter and the header stop being paper: `lib/strike/venue.ts` reads
+`account`, `positions`, `openOrders`, `history/funding` and `history/transaction` through
+`/api/strike/<path>` with `credentials: 'same-origin'`, and `hooks/useVenueAccount.ts`
+refreshes on a 30s poll and on window focus.
+
+    status    idle (no session) · loading · live · stale · reconnect
+    on error  the previous numbers stay, with their age, and the age is what turns red
+    on 401    the poll stops until connect runs again; it never retries a revoked key
+
+Amounts are kept as the strings the venue sent and formatted at the edge with
+`lib/format.ts`, because an entry price is not a float. Ordering is still paper: the
+header says `live mainnet`, and the ticket button still says `still paper`, because no
+order leaves the browser in this build.
+
+The base taker rate comes from the public `/v2/fee-tiers` (PascalCase today, camelCase in
+the docs) rather than a hardcoded 5 bps. When the schedule does not parse, the surfaces
+say `5 bps fallback` instead of presenting the fallback as the venue's rate.
+
 ## UTXOS, when you turn it on
 
     bun add @utxos/sdk

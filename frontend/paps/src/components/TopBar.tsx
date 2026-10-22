@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react';
 import type { MarkPrice } from '../lib/types';
 import type { MiniTicker } from '../hooks/useMiniTickers';
+import type { VenueState } from '../lib/strike/venue-client';
 import { fundingApr, price, pct, usd } from '../lib/format';
 import { cn } from '../lib/cn';
 import { AgeBadge } from './AgeBadge';
@@ -20,6 +22,8 @@ type Props = {
   modes: ViewMode[];
   identity: ReturnType<typeof useIdentity>;
   tier: Tier;
+  /** Present when a Strike session exists; the numbers it carries are the venue's. */
+  venue?: VenueState | null;
   onMode: (m: ViewMode) => void;
 };
 
@@ -31,6 +35,37 @@ function Stat({ k, v, tone }: { k: string; v: string; tone?: 'long' | 'short' })
         {v}
       </span>
     </div>
+  );
+}
+
+/**
+ * Age of the venue read, not a green dot. A balance that is four minutes old is still
+ * useful; a balance that pretends to be current is not.
+ */
+function VenueAge({ state }: { state: VenueState }) {
+  const [, tick] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => tick((n) => n + 1), 1_000);
+    return () => clearInterval(id);
+  }, []);
+
+  if (state.status === 'reconnect') {
+    return <span className="text-[9px] lowercase text-short">reconnect needed</span>;
+  }
+  if (!state.lastAt) {
+    return <span className="text-[9px] lowercase text-muted">reading…</span>;
+  }
+
+  const age = Math.max(0, Math.round((Date.now() - state.lastAt) / 1000));
+  const late = state.status === 'stale';
+  const label =
+    age < 1 ? 'just now' : age < 60 ? `${age}s ago` : `${Math.round(age / 60)}m ago`;
+
+  return (
+    <span className={cn('num text-[9px] lowercase', late ? 'text-short' : 'text-muted')}>
+      {late ? `stale · ${label}` : `updated ${label}`}
+    </span>
   );
 }
 
@@ -47,10 +82,15 @@ export function TopBar({
   onMode,
   identity,
   tier,
+  venue = null,
 }: Props) {
   const next = mark ? Math.max(0, mark.nextFundingTime - Date.now()) : 0;
   const hh = Math.floor(next / 3_600_000);
   const mm = Math.floor((next % 3_600_000) / 60_000);
+
+  // A session means the account is real. Paper is only ever claimed when there is none.
+  const live = Boolean(venue);
+  const account = venue?.data?.account ?? null;
 
   return (
     <header className="flex h-12 shrink-0 items-center gap-2 border-b border-line bg-panel px-2 sm:gap-3 sm:px-3">
@@ -59,7 +99,7 @@ export function TopBar({
           paps<span className="text-brand">.</span>
         </span>
         <span className="border border-brand/40 px-1.5 py-0.5 text-[10px] uppercase tracking-[0.1em] text-brand">
-          paper
+          {live ? 'live mainnet' : 'paper'}
         </span>
       </div>
 
@@ -94,9 +134,13 @@ export function TopBar({
       <div className="ml-auto flex shrink-0 items-center gap-2">
         <div className="hidden flex-col items-end leading-tight sm:flex">
           <span className="text-[10px] text-muted">
-            paper equity <span className="text-muted/70">· simulated</span>
+            {live ? 'margin balance' : 'paper equity'}{' '}
+            <span className="text-muted/70">· {live ? 'strike' : 'simulated'}</span>
           </span>
-          <span className="num text-[12px]">${usd(equity)}</span>
+          <span className="num text-[12px]">
+            {live ? (account ? `$${usd(account.marginBalance)}` : '—') : `$${usd(equity)}`}
+          </span>
+          {venue && <VenueAge state={venue} />}
         </div>
 
         <span className="hidden sm:inline-flex">
