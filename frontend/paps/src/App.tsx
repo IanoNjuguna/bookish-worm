@@ -9,6 +9,9 @@ import { useSparklines } from './hooks/useSparklines';
 import { useIdentity } from './hooks/useIdentity';
 import { useVenueAccount } from './hooks/useVenueAccount';
 import { useVenueMarks } from './hooks/useVenueMarks';
+import { useVenueTrade } from './hooks/useVenueTrade';
+import { marketFilters } from './lib/strike/orders';
+import { OrderConfirm } from './components/OrderConfirm';
 import { useFunding, useFundingSettlement } from './hooks/useFunding';
 import { TopBar } from './components/TopBar';
 import { Blotter } from './components/Blotter';
@@ -72,8 +75,18 @@ export default function App() {
   // A Strike session is a real account. Without one nothing below changes: the surfaces
   // keep rendering the paper ledger, and no venue read is ever attempted.
   const session = Boolean(identity.identity?.accountId);
-  const venue = useVenueAccount(session);
+  const venueSession = useVenueAccount(session);
+  const venue = venueSession.state;
   const venueMarks = useVenueMarks(venue.data?.positions.map((p) => p.symbol) ?? []);
+
+  // Trading on a real account: two clicks, venue ids, no paper fallback. Null without a session.
+  const trade = useVenueTrade({
+    session,
+    venue,
+    refresh: venueSession.refresh,
+    builderBps: identity.identity?.feeShareBps ?? 100,
+    filtersFor: (s) => marketFilters(symbolInfo(symbols, s)),
+  });
   const deck = useDeck(symbols, mini, DECK_SIZE, profile.watchlist, round);
 
   // The ledger follows the identity: anonymous first, then whichever wallet is connected.
@@ -209,6 +222,20 @@ export default function App() {
   useFundingSettlement(funding, marks, (symbol, rate, mark) => account.fund({ symbol, rate, mark }));
 
   const onSwipe = (card: DeckCard, side: Side) => {
+    if (trade) {
+      // A swipe on a real account arms the same confirm the ticket does; it fills nothing,
+      // and the deck does not advance until the venue has the order.
+      trade.place({
+        symbol: card.symbol,
+        side,
+        kind: 'market',
+        size: Math.max(stepFor(card.symbol), swipeRisk / card.markPrice),
+        price: card.markPrice,
+        leverage: swipeLeverage,
+      });
+      return;
+    }
+
     const id = `swipe-${card.symbol}-${Date.now()}`;
     account.place({
       id,
@@ -248,6 +275,8 @@ export default function App() {
       onCancel={account.cancel}
       venue={session ? venue : null}
       venueMarks={venueMarks}
+      trade={trade}
+      stepFor={stepFor}
     />
   );
 
@@ -398,6 +427,9 @@ export default function App() {
         onPick={(s) => setSymbol(s)}
         onClose={() => setMarketsOpen(false)}
       />
+
+      {/* The second click: everything the venue is about to be sent, and both fees. */}
+      {trade && <OrderConfirm trade={trade} mark={markPrice} />}
     </div>
   );
 }

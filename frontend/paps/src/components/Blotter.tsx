@@ -4,6 +4,7 @@ import { price, usd } from '../lib/format';
 import { liquidationPrice, roe, unrealised, type Position } from '../lib/order';
 import type { Fill, WorkingOrder } from '../lib/store';
 import type { VenueState } from '../lib/strike/venue-client';
+import type { TradeApi } from '../hooks/useVenueTrade';
 import { PositionCards } from './blotter/PositionCards';
 import { VenueBlotter } from './VenueBlotter';
 import { Empty, Td, Th } from './Table';
@@ -22,6 +23,10 @@ type Props = {
   /** Present when a Strike session exists; the numbers it carries are the venue's. */
   venue?: VenueState | null;
   venueMarks?: Record<string, number>;
+  /** Present for a connected account: cancel, close and the second click all live here. */
+  trade?: TradeApi | null;
+  /** The market's lot step, so the venue blotter does not offer an impossible half close. */
+  stepFor?: (symbol: string) => number;
 };
 
 type TabKey = 'positions' | 'orders' | 'history' | 'balances';
@@ -40,13 +45,15 @@ export function Blotter({
   onCancel,
   venue = null,
   venueMarks = {},
+  trade = null,
+  stepFor,
 }: Props) {
   const [tab, setTab] = useState<TabKey>('positions');
   const open = orders.filter((o) => o.status === 'open');
 
   // A session means a real account, and its blotter is not this ledger. Paper rows under a
   // connected header would be the one lie this surface cannot afford.
-  if (venue) return <VenueBlotter state={venue} marks={venueMarks} />;
+  if (venue) return <VenueBlotter state={venue} marks={venueMarks} trade={trade} stepFor={stepFor} />;
 
   const pnl = positions.reduce((n, p) => n + unrealised(p, mark), 0);
   const margin = positions.reduce((n, p) => n + p.margin, 0);

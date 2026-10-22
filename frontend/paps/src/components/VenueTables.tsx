@@ -1,9 +1,9 @@
 import { clock, pct, price, qty, signedUsd, usd } from '../lib/format';
 import { cn } from '../lib/cn';
+import type { PendingOrder, VenueOrder } from '../lib/strike/orders';
 import type {
   VenueAccount,
   VenueFundingRow,
-  VenueOrder,
   VenuePosition,
   VenueTransactionRow,
 } from '../lib/strike/venue';
@@ -21,21 +21,35 @@ import { Empty, Td, Th } from './Table';
 export function VenuePositions({
   positions,
   marks,
+  onClose,
+  stepFor,
 }: {
   positions: VenuePosition[];
   marks: Record<string, number>;
+  /**
+   * Close here, on the venue. `fraction` is 1 or 0.5 only: half or all, never a slice the
+   * venue would have to guess at. Absent while the session cannot trade.
+   */
+  onClose?: (position: VenuePosition, fraction: 1 | 0.5) => void;
+  /** The market's lot step, so a position too small to halve does not offer a half close. */
+  stepFor?: (symbol: string) => number;
 }) {
+  const cols = ['Market', 'Side', 'Size', 'Entry', 'Mark', 'Liq.', 'uPnL', 'Funding'];
+  if (onClose) cols.push('');
+
   return (
     // Eight columns inside a 520px rail: tight cells so uPnL and Funding stay on screen.
     <table className="hidden w-full text-[11px] sm:table [&_td]:px-2 [&_th]:px-2">
       <thead className="sticky top-0 bg-panel text-muted">
-        <Th cols={['Market', 'Side', 'Size', 'Entry', 'Mark', 'Liq.', 'uPnL', 'Funding']} />
+        <Th cols={cols} />
       </thead>
       <tbody>
         {positions.map((p) => {
           const mark = marks[p.symbol];
           const upnl = Number(p.upnl);
           const funding = Number(p.funding);
+          const step = stepFor?.(p.symbol) ?? 0;
+          const halvable = step > 0 && Number(p.absSize) / 2 >= step;
           return (
             <tr key={p.id} className="border-b border-line/50">
               <Td><span className="whitespace-nowrap">{p.symbol}</span></Td>
@@ -59,22 +73,71 @@ export function VenuePositions({
               <Td num muted tone={funding === 0 ? undefined : funding > 0 ? 'long' : 'short'}>
                 <span className="whitespace-nowrap">{signedUsd(p.funding)}</span>
               </Td>
+              {onClose && (
+                <Td>
+                  <div className="flex justify-end gap-1">
+                    <button
+                      onClick={() => onClose(p, 0.5)}
+                      disabled={!halvable}
+                      title={halvable ? 'close half' : 'too small to halve'}
+                      className={cn(
+                        'border border-line px-1 text-[10px] text-muted hover:text-fg',
+                        !halvable && 'opacity-30',
+                      )}
+                    >
+                      ½
+                    </button>
+                    <button
+                      onClick={() => onClose(p, 1)}
+                      className="border border-line px-1 text-[10px] hover:text-fg"
+                    >
+                      close
+                    </button>
+                  </div>
+                </Td>
+              )}
             </tr>
           );
         })}
-        {!positions.length && <Empty cols={8} text="No open positions on this account." />}
+        {!positions.length && <Empty cols={cols.length} text="No open positions on this account." />}
       </tbody>
     </table>
   );
 }
 
-export function VenueOrders({ orders }: { orders: VenueOrder[] }) {
+export function VenueOrders({
+  orders,
+  pending = [],
+  onCancel,
+}: {
+  orders: VenueOrder[];
+  /** Accepted by the venue, not yet covered by a read: `accepted · seq N`, never "filled". */
+  pending?: PendingOrder[];
+  onCancel?: (order: VenueOrder) => void;
+}) {
+  const cols = ['Market', 'Side', 'Type', 'Price', 'Size', 'Filled', 'Time', 'Status'];
+  if (onCancel) cols.push('');
+  const rows = pending.length + orders.length;
+
   return (
     <table className="hidden w-full text-[11px] sm:table">
       <thead className="sticky top-0 bg-panel text-muted">
-        <Th cols={['Market', 'Side', 'Type', 'Price', 'Size', 'Filled', 'Time', 'Status']} />
+        <Th cols={cols} />
       </thead>
       <tbody>
+        {pending.map((p) => (
+          <tr key={p.clientOrderId} className="border-b border-line/50 bg-panel-2/40">
+            <Td><span className="whitespace-nowrap">{p.symbol}</span></Td>
+            <Td tone={p.side === 'LONG' ? 'long' : 'short'}>{p.side}</Td>
+            <Td muted>{p.type}</Td>
+            <Td num>{p.price ? price(p.price) : '—'}</Td>
+            <Td num>{qty(p.size)}</Td>
+            <Td num muted>—</Td>
+            <Td num muted>{clock(p.acceptedAt)}</Td>
+            <Td muted>accepted · seq {p.sequenceId}</Td>
+            {onCancel ? <Td>{''}</Td> : null}
+          </tr>
+        ))}
         {orders.map((o) => (
           <tr key={o.id} className="border-b border-line/50">
             <Td><span className="whitespace-nowrap">{o.symbol}</span></Td>
@@ -88,9 +151,19 @@ export function VenueOrders({ orders }: { orders: VenueOrder[] }) {
             <Td num muted>{qty(o.filled)}</Td>
             <Td num muted>{o.createdAt ? clock(o.createdAt) : '—'}</Td>
             <Td muted>{o.status}</Td>
+            {onCancel && (
+              <Td>
+                <button
+                  onClick={() => onCancel(o)}
+                  className="whitespace-nowrap border border-line px-1 text-[10px] text-muted hover:text-fg"
+                >
+                  cancel
+                </button>
+              </Td>
+            )}
           </tr>
         ))}
-        {!orders.length && <Empty cols={8} text="No working orders on this account." />}
+        {!rows && <Empty cols={cols.length} text="No working orders on this account." />}
       </tbody>
     </table>
   );
