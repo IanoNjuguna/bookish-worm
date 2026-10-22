@@ -58,7 +58,8 @@ type Action =
   | { type: 'cancel'; id: string }
   | { type: 'close'; id: string; mark: number; fraction?: number }
   | { type: 'closeAll'; mark: number }
-  | { type: 'liquidate'; ids: string[] };
+  | { type: 'liquidate'; ids: string[] }
+  | { type: 'hydrate'; state: Partial<State> };
 
 export const START_EQUITY = 10_000;
 const TAKER_FEE = 0.0005;
@@ -73,6 +74,16 @@ const uid = () => Math.random().toString(36).slice(2, 10);
  */
 export function reduce(state: State, action: Action): State {
   switch (action.type) {
+    case 'hydrate':
+      // Replace the whole ledger with a stored one; anything missing keeps its default.
+      return {
+        equity: action.state.equity ?? state.equity,
+        positions: action.state.positions ?? [],
+        orders: action.state.orders ?? [],
+        fills: action.state.fills ?? [],
+        stats: action.state.stats ?? state.stats,
+      };
+
     case 'place': {
       const { symbol, side, kind, price, size, leverage, mark, step } = action;
       const fills: Fill[] = [];
@@ -255,6 +266,7 @@ export function usePaperAccount() {
       close: (id: string, mark: number, fraction = 1) => dispatch({ type: 'close', id, mark, fraction }),
       closeAll: (mark: number) => dispatch({ type: 'closeAll', mark }),
       liquidate: (ids: string[]) => dispatch({ type: 'liquidate', ids }),
+      hydrate: (state: Partial<State>) => dispatch({ type: 'hydrate', state }),
     }),
     [],
   );
@@ -264,3 +276,6 @@ export function usePaperAccount() {
 
 export const marginOf = (p: Position): number => p.margin;
 export { liquidationPrice };
+
+/** What a caller needs to persist this ledger. */
+export const snapshot = (state: State): State => state;
