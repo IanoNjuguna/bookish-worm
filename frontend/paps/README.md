@@ -41,6 +41,15 @@ frame as one document silently drops every message after the first.
 snapshot drops every delta in between, which shows up as a crossed spread; snapshots
 are taken with `X-Cache: MISS` only.
 
+The user stream (`/ws/user-api`, channel `userstream`) is not public. An `account_id`
+subscribe without credentials answers 401 "Authentication required", while the same
+connection with a random `vault_id` answers 404 "Vault not found" — vault streams resolve
+without auth, account streams refuse before resolving. `AUTH` is refused as "not
+available on this endpoint", so `session.logon` with an Ed25519 API wallet is the only
+door, and the key is one the Worker holds and the browser must not. Fills, liquidations
+and funding therefore cannot arrive on a socket the page opens. The frames and the parser
+traps are in `docs/user-stream.md`.
+
 ## Environment
 
     VITE_STRIKE_ENV=mainnet | testnet     defaults to mainnet
