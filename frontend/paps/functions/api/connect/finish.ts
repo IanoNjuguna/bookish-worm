@@ -1,5 +1,5 @@
 import { finishConnect } from '../../../src/server/connect';
-import { depsFor, json, readJson, route } from '../../../src/server/pages';
+import { clientIp, depsFor, json, readJson, route } from '../../../src/server/pages';
 import { sessionCookie } from '../../../src/server/session';
 
 /**
@@ -13,7 +13,11 @@ export const onRequestPost = route(async (ctx) => {
   const body = await readJson<{ token?: string; signature?: string }>(ctx.request);
   if (!body.token || !body.signature) return json(400, { error: 'token_and_signature_required' });
 
-  const account = await finishConnect(deps, { token: body.token, walletSignature: body.signature });
+  const account = await finishConnect(deps, {
+    token: body.token,
+    walletSignature: body.signature,
+    ip: clientIp(ctx.request),
+  });
   return json(
     200,
     {

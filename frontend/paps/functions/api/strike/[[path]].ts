@@ -19,7 +19,13 @@ export const onRequest = route(async (ctx) => {
   const body = method === 'GET' || method === 'HEAD' ? undefined : await ctx.request.text();
 
   const result = await proxyStrike(
-    { store: deps.store, master: deps.master, strike: deps.strike },
+    {
+      store: deps.store,
+      limiter: deps.limiter,
+      limits: deps.limits,
+      master: deps.master,
+      strike: deps.strike,
+    },
     {
       sessionToken: readSessionToken(ctx.request),
       method,

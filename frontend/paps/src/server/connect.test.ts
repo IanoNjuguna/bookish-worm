@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { finishConnect, startConnect, type ConnectDeps } from './connect';
 import { masterKey, openKey, toBase64, toHex } from './crypto';
-import { memoryStore } from './keystore';
+import { memoryRateLimitStore, memoryStore } from './keystore';
+import { DEFAULT_LIMITS, perMinute } from './rateLimit';
 import { publicKeyOf } from './sign';
 import { sessionHash } from './session';
 import { HttpError } from './types';
@@ -47,6 +48,8 @@ function strikeStub(opts: { publicKey?: () => string; expiredAt?: string; fail?:
 
 const deps = (over: Partial<ConnectDeps> = {}): ConnectDeps => ({
   store: memoryStore(() => NOW),
+  limiter: memoryRateLimitStore(),
+  limits: DEFAULT_LIMITS,
   master: masterKey(MASTER_B64),
   strike: strikeStub().transport,
   builderCode: 'paps',
@@ -136,5 +139,48 @@ describe('builder connect, key held by paps', () => {
     await expect(startConnect(d, { address: 'addr1_test' })).rejects.toMatchObject({
       code: 'challenge_failed',
     });
+  });
+});
+
+describe('sign-in is counted per client IP', () => {
+  it('stops one address hammering builder connect, and leaves another alone', async () => {
+    const stub = strikeStub();
+    const d = deps({
+      strike: stub.transport,
+      limits: { ...DEFAULT_LIMITS, connect: perMinute(2) },
+    });
+
+    await startConnect(d, { address: 'addr1_test', ip: '203.0.113.9' });
+    await startConnect(d, { address: 'addr1_test', ip: '203.0.113.9' });
+
+    // The third attempt must not reach Strike: that is the request that would cost the
+    // builder code a challenge, and the one a bot makes a thousand times.
+    await expect(
+      startConnect(d, { address: 'addr1_test', ip: '203.0.113.9' }),
+    ).rejects.toMatchObject({ status: 429, code: 'rate_limited' });
+    expect(stub.calls).toHaveLength(2);
+
+    // Another address is unaffected: one abusive client cannot deny sign-in to everyone.
+    await expect(startConnect(d, { address: 'addr1_test', ip: '198.51.100.4' })).resolves.toMatchObject(
+      { expiresInMs: 5 * 60_000 },
+    );
+  });
+
+  it('counts the finish step against the same address, so a start and a finish cannot loop', async () => {
+    const stub = strikeStub();
+    const d = deps({
+      strike: stub.transport,
+      limits: { ...DEFAULT_LIMITS, connect: perMinute(2) },
+    });
+
+    const started = await startConnect(d, { address: 'addr1_test', ip: '203.0.113.9' });
+    await expect(
+      finishConnect(d, { token: started.token, walletSignature: 'sig', ip: '203.0.113.9' }),
+    ).resolves.toMatchObject({ accountId: 'account-1' });
+
+    // Start and finish together have spent the two the address was given.
+    await expect(
+      startConnect(d, { address: 'addr1_test', ip: '203.0.113.9' }),
+    ).rejects.toMatchObject({ status: 429 });
   });
 });

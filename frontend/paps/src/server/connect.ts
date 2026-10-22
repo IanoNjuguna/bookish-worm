@@ -1,9 +1,10 @@
 import * as ed from '@noble/ed25519';
 import { sealKey, toHex } from './crypto';
 import { randomHex } from './crypto';
+import { enforce, ipBucket, type Limits } from './rateLimit';
 import { sessionHash } from './session';
 import { requestSignature, verifyBuilder, type StrikeTransport } from './strike';
-import { HttpError, type Store } from './types';
+import { HttpError, type RateLimitStore, type Store } from './types';
 
 /**
  * Builder connect, with the key never leaving the server.
@@ -14,12 +15,20 @@ import { HttpError, type Store } from './types';
  *
  * Pending challenges are single use and short lived: a nonce is worth 5 minutes at Strike
  * and a signature over it is worth exactly one account, so replaying the token must fail.
+ *
+ * Both steps are counted per client IP. This is the unauthenticated half of the service —
+ * anyone can ask paps to mint a keypair and ask Strike for a challenge — so it is the half
+ * an attacker can actually drive, and the ceiling is what stops one address from filling
+ * the pending table or getting the builder code throttled at the venue.
  */
 
 export const PENDING_TTL_MS = 5 * 60_000;
 
 export type ConnectDeps = {
   store: Store;
+  /** Counters live in D1 in production; see `keystore.ts`. */
+  limiter: RateLimitStore;
+  limits: Limits;
   master: Uint8Array;
   strike: StrikeTransport;
   builderCode: string;
@@ -45,8 +54,26 @@ export type ConnectedAccount = {
   expiresAt: number;
 };
 
-export async function startConnect(deps: ConnectDeps, args: { address: string }): Promise<StartedConnect> {
+/**
+ * One bucket per address for the whole flow: start and finish are two calls, not two
+ * limits. A request with no address to count falls into a shared bucket, which is
+ * stricter than skipping the check.
+ */
+const countConnect = (deps: ConnectDeps, ip: string | undefined, now: number): Promise<void> =>
+  enforce({
+    store: deps.limiter,
+    key: ipBucket(ip ?? 'unknown'),
+    spec: deps.limits.connect,
+    now,
+  });
+
+export async function startConnect(
+  deps: ConnectDeps,
+  args: { address: string; ip?: string },
+): Promise<StartedConnect> {
   const now = deps.now?.() ?? Date.now();
+  await countConnect(deps, args.ip, now);
+
   const privateKey = ed.utils.randomPrivateKey();
   const publicKeyHex = toHex(ed.getPublicKey(privateKey));
 
@@ -76,8 +103,11 @@ export async function startConnect(deps: ConnectDeps, args: { address: string })
 
 export async function finishConnect(
   deps: ConnectDeps,
-  args: { token: string; walletSignature: string },
+  args: { token: string; walletSignature: string; ip?: string },
 ): Promise<ConnectedAccount> {
+  const now = deps.now?.() ?? Date.now();
+  await countConnect(deps, args.ip, now);
+
   const pending = await deps.store.takePending(args.token);
   if (!pending) throw new HttpError(400, 'challenge_expired');
 

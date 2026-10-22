@@ -1,11 +1,12 @@
-import type { D1Like, KeyRecord, PendingChallenge, Store } from './types';
+import { refill } from './rateLimit';
+import type { D1Like, KeyRecord, PendingChallenge, RateLimitStore, Store } from './types';
 
 /**
- * Where sealed keys live.
+ * Where sealed keys live, and where rate-limit counters live.
  *
- * Two drivers: D1 for production and an in-memory one for tests and for a Worker with
- * no binding, which keeps the handlers testable without a database. Pending challenges
- * are single use, so `takePending` deletes as it reads.
+ * Two drivers for each: D1 for production and an in-memory one for tests and for a Worker
+ * with no binding, which keeps the handlers testable without a database. Pending
+ * challenges are single use, so `takePending` deletes as it reads.
  */
 
 export const CREATE_PENDING = `CREATE TABLE IF NOT EXISTS pending_challenges (
@@ -130,6 +131,63 @@ export function d1Store(db: D1Like): Store {
     },
     async deleteAccount(hash) {
       await db.prepare('DELETE FROM api_keys WHERE session_hash = ?').bind(hash).run();
+    },
+  };
+}
+
+export const CREATE_RATE_LIMITS = `CREATE TABLE IF NOT EXISTS rate_limit_buckets (
+  bucket TEXT PRIMARY KEY,
+  tokens REAL NOT NULL,
+  updated_at INTEGER NOT NULL
+)`;
+
+type Bucket = { tokens: number; updatedAt: number };
+
+/**
+ * Counters for one process, using the same refill maths as the D1 driver below.
+ *
+ * Correct for tests and for a Worker with no binding, and useless as a limit in
+ * production: every isolate would start full, and a restart would hand back a full
+ * allowance. `d1RateLimitStore` is the one that counts when it matters.
+ */
+export function memoryRateLimitStore(): RateLimitStore {
+  const buckets = new Map<string, Bucket>();
+  return {
+    async take(key, spec, now) {
+      const held = buckets.get(key);
+      const tokens = held ? refill(held.tokens, held.updatedAt, now, spec) : spec.capacity;
+      if (tokens < 1) return false;
+      buckets.set(key, { tokens: tokens - 1, updatedAt: now });
+      return true;
+    },
+  };
+}
+
+/**
+ * Refill and spend as one statement, so two isolates cannot both take the last token.
+ *
+ * SQLite refills from the row's own `updated_at` inside the update, and the `WHERE` on the
+ * conflict target means an empty bucket writes nothing at all: the upsert reports zero
+ * changed rows and the caller answers 429. `?4` is tokens per millisecond, and
+ * `MAX(0, now - updated_at)` matches `refill()`, where a clock that went backwards must
+ * not take tokens away.
+ */
+const TAKE_TOKEN = `INSERT INTO rate_limit_buckets (bucket, tokens, updated_at)
+VALUES (?1, ?2 - 1, ?3)
+ON CONFLICT(bucket) DO UPDATE SET
+  tokens = MIN(?2, MAX(0.0, rate_limit_buckets.tokens + MAX(0, ?3 - rate_limit_buckets.updated_at) * ?4)) - 1,
+  updated_at = ?3
+WHERE MIN(?2, MAX(0.0, rate_limit_buckets.tokens + MAX(0, ?3 - rate_limit_buckets.updated_at) * ?4)) >= 1`;
+
+/** Counters in D1: the row is the only state, so an isolate restart cannot reset a limit. */
+export function d1RateLimitStore(db: D1Like): RateLimitStore {
+  return {
+    async take(key, spec, now) {
+      const result = await db
+        .prepare(TAKE_TOKEN)
+        .bind(key, spec.capacity, now, spec.capacity / spec.perMs)
+        .run();
+      return result.meta.changes > 0;
     },
   };
 }

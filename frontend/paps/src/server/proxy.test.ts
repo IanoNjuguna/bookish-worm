@@ -1,26 +1,36 @@
 import * as ed from '@noble/ed25519';
 import { describe, expect, it } from 'vitest';
 import { masterKey, sealKey, sha256Hex, toBase64, toHex } from './crypto';
-import { memoryStore } from './keystore';
+import { memoryRateLimitStore, memoryStore } from './keystore';
 import { isAllowedPath, proxyStrike } from './proxy';
+import { DEFAULT_LIMITS, perMinute, type Limits } from './rateLimit';
 import { canonicalMessage, publicKeyOf, verifyMessage } from './sign';
 import { sessionHash } from './session';
+import type { Store } from './types';
 
 const MASTER_B64 = toBase64(new Uint8Array(32).fill(5));
 const KEY_HEX = toHex(ed.utils.randomPrivateKey());
 const NOW = 1_700_000_000_000;
 
-async function setup(opts: { expiresAt?: number } = {}) {
-  const store = memoryStore(() => NOW);
-  const sessionToken = 'session-token-abc';
+/** A clock the test can move, so a bucket can be seen refilling. */
+type Clock = { now: number };
+
+async function account(store: Store, sessionToken: string, expiresAt = 0) {
   await store.putAccount(await sessionHash(sessionToken), {
     accountId: 'account-1',
     address: 'addr1_test',
     apiWalletId: '42',
     publicKeyHex: publicKeyOf(KEY_HEX),
     sealedKey: await sealKey(masterKey(MASTER_B64), Uint8Array.from(Buffer.from(KEY_HEX, 'hex'))),
-    expiresAt: opts.expiresAt ?? 0,
+    expiresAt,
   });
+}
+
+async function setup(opts: { expiresAt?: number; limits?: Limits; clock?: Clock } = {}) {
+  const clock = opts.clock ?? { now: NOW };
+  const store = memoryStore(() => clock.now);
+  const sessionToken = 'session-token-abc';
+  await account(store, sessionToken, opts.expiresAt);
 
   const calls: { url: string; init: RequestInit }[] = [];
   const doFetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -33,11 +43,15 @@ async function setup(opts: { expiresAt?: number } = {}) {
 
   return {
     calls,
+    clock,
+    store,
     deps: {
       store,
       master: masterKey(MASTER_B64),
       strike: { origin: 'https://api.strikefinance.org', doFetch },
-      now: () => NOW,
+      limiter: memoryRateLimitStore(),
+      limits: opts.limits ?? DEFAULT_LIMITS,
+      now: () => clock.now,
     },
     sessionToken,
   };
@@ -130,5 +144,119 @@ describe('signing proxy', () => {
       bodyHash: await sha256Hex(body),
     });
     expect(verifyMessage(message, headers['X-API-Wallet-Signature'], publicKeyOf(KEY_HEX))).toBe(true);
+  });
+});
+
+describe('signing proxy rate limit', () => {
+  const ORDER = { method: 'POST', path: '/v2/order', body: '{"symbol":"ADA-USD","size":"1"}' };
+
+  it('answers 429 on call N+1 and the venue sees exactly N', async () => {
+    const N = 3;
+    const { deps, calls, sessionToken } = await setup({
+      limits: { ...DEFAULT_LIMITS, write: perMinute(N) },
+    });
+
+    for (let i = 0; i < N; i += 1) {
+      await proxyStrike(deps, { sessionToken, ...ORDER });
+    }
+    // The one over the line: refused at the door, not sent and then refused by Strike.
+    await expect(proxyStrike(deps, { sessionToken, ...ORDER })).rejects.toMatchObject({
+      status: 429,
+      code: 'rate_limited',
+    });
+
+    expect(calls).toHaveLength(N);
+    expect(calls.every((c) => c.url.endsWith('/v2/order'))).toBe(true);
+  });
+
+  it('states a cooldown instead of inviting a retry loop', async () => {
+    const { deps, sessionToken } = await setup({
+      limits: { ...DEFAULT_LIMITS, write: perMinute(1) },
+    });
+    await proxyStrike(deps, { sessionToken, ...ORDER });
+
+    const refused = await proxyStrike(deps, { sessionToken, ...ORDER }).catch((e) => e);
+    expect(refused.status).toBe(429);
+    // One token at one a minute is 60s away, and the number must be usable as-is.
+    expect(refused.retryAfterSeconds).toBe(60);
+  });
+
+  it('counts each session separately, so one cannot lock another out', async () => {
+    const { deps, store, calls } = await setup({
+      limits: { ...DEFAULT_LIMITS, write: perMinute(1) },
+    });
+    await account(store, 'other-session');
+
+    await proxyStrike(deps, { sessionToken: 'session-token-abc', ...ORDER });
+    await expect(
+      proxyStrike(deps, { sessionToken: 'session-token-abc', ...ORDER }),
+    ).rejects.toMatchObject({ status: 429 });
+
+    // The abusive session is out; the second one is untouched.
+    await expect(proxyStrike(deps, { sessionToken: 'other-session', ...ORDER })).resolves.toMatchObject(
+      { status: 200 },
+    );
+    expect(calls).toHaveLength(2);
+  });
+
+  it('spends reads from a looser bucket than writes', async () => {
+    const { deps, sessionToken } = await setup({
+      limits: { write: perMinute(1), read: perMinute(3), connect: perMinute(1) },
+    });
+
+    await proxyStrike(deps, { sessionToken, method: 'GET', path: '/v2/positions' });
+    await proxyStrike(deps, { sessionToken, ...ORDER });
+    await expect(proxyStrike(deps, { sessionToken, ...ORDER })).rejects.toMatchObject({
+      status: 429,
+    });
+
+    // A closed write bucket must not close the read one: the terminal has to keep showing
+    // prices while a user waits out a cooldown.
+    await expect(
+      proxyStrike(deps, { sessionToken, method: 'GET', path: '/v2/positions' }),
+    ).resolves.toMatchObject({ status: 200 });
+    await expect(
+      proxyStrike(deps, { sessionToken, method: 'GET', path: '/v2/openOrders' }),
+    ).resolves.toMatchObject({ status: 200 });
+  });
+
+  it('refills with time rather than staying closed until the isolate restarts', async () => {
+    const clock: Clock = { now: NOW };
+    const { deps, sessionToken } = await setup({
+      clock,
+      limits: { ...DEFAULT_LIMITS, write: perMinute(2) },
+    });
+
+    await proxyStrike(deps, { sessionToken, ...ORDER });
+    await proxyStrike(deps, { sessionToken, ...ORDER });
+    await expect(proxyStrike(deps, { sessionToken, ...ORDER })).rejects.toMatchObject({
+      status: 429,
+    });
+
+    // Two a minute is one every thirty seconds; half of that is not yet a token.
+    clock.now = NOW + 29_000;
+    await expect(proxyStrike(deps, { sessionToken, ...ORDER })).rejects.toMatchObject({
+      status: 429,
+    });
+
+    clock.now = NOW + 31_000;
+    await expect(proxyStrike(deps, { sessionToken, ...ORDER })).resolves.toMatchObject({
+      status: 200,
+    });
+  });
+
+  it('does not spend a token on a call it refuses for other reasons', async () => {
+    const { deps, sessionToken } = await setup({
+      limits: { ...DEFAULT_LIMITS, read: perMinute(1) },
+    });
+
+    await expect(
+      proxyStrike(deps, { sessionToken, method: 'GET', path: '/v2/withdraw' }),
+    ).rejects.toMatchObject({ status: 403 });
+
+    // The 403 was refused before the bucket; the one read it was allowed still works.
+    await expect(
+      proxyStrike(deps, { sessionToken, method: 'GET', path: '/v2/positions' }),
+    ).resolves.toMatchObject({ status: 200 });
   });
 });
