@@ -1,5 +1,4 @@
-import type { Identity } from '../../lib/identity/types';
-import { shortAddr } from '../../lib/format';
+import { shortAddress, type Identity } from '../../lib/identity/types';
 
 /**
  * Who you are, in one line each: the wallet, the Strike account it unlocked, and what
@@ -37,7 +36,7 @@ export function IdentityCard({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-[13px] text-fg">{me.wallet}</p>
-          <p className="num mt-0.5 truncate text-[11px] text-muted">{shortAddr(me.address)}</p>
+          <p className="num mt-0.5 truncate text-[11px] text-muted">{shortAddress(me.address)}</p>
         </div>
         <button onClick={onDisconnect} className="shrink-0 text-[11px] text-muted hover:text-fg">
           sign out

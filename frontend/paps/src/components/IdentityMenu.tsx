@@ -39,11 +39,13 @@ export function IdentityMenu({ identity, open: openProp, onOpenChange }: Props) 
           me ? 'border-line text-fg/80 hover:text-fg' : 'border-brand/50 text-brand hover:bg-brand/10',
         )}
       >
-        <IconWallet size={12} />
-        <span className="num normal-case tracking-normal">
+        <IconWallet size={13} />
+        {/* On a phone the chip is an icon: the header has four facts to fit and this is
+            the only element that can lose its label without losing its meaning. */}
+        <span className="num hidden normal-case tracking-normal sm:inline">
           {me ? (profile.handle || shortAddress(me.address)) : 'connect'}
         </span>
-        <IconChevronDown size={11} className={cn('transition-transform', open && 'rotate-180')} />
+        <IconChevronDown size={11} className={cn('hidden transition-transform sm:block', open && 'rotate-180')} />
       </button>
 
       {open && (

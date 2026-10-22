@@ -34,11 +34,9 @@ export function YouView({
   return (
     <div className="mx-auto w-full max-w-[520px] space-y-3 px-4 pb-6 pt-4">
       <div className="px-1">
-        <p className="text-[11px] uppercase tracking-[0.1em] text-muted">paper account</p>
-        <p className={pnl >= 0 ? 'num text-[34px] leading-none text-fg' : 'num text-[34px] leading-none text-short'}>
-          ${usd(equity)}
-        </p>
-        <p className={pnl >= 0 ? 'num mt-1 text-[12px] text-long' : 'num mt-1 text-[12px] text-short'}>
+        <p className="text-micro uppercase tracking-[0.1em] text-muted">paper account</p>
+        <p className="num text-hero leading-none text-fg">${usd(equity)}</p>
+        <p className={pnl >= 0 ? 'num mt-1 text-body text-long' : 'num mt-1 text-body text-short'}>
           {pnl >= 0 ? '+' : '−'}${usd(Math.abs(pnl))} since you started
         </p>
       </div>

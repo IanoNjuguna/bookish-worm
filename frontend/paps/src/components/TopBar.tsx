@@ -29,16 +29,16 @@ export function TopBar({
 }) {
   return (
     <header className="flex h-14 shrink-0 items-center gap-2.5 px-4">
-      <div className="flex min-w-0 items-baseline gap-2">
-        <span className="text-[15px] font-semibold tracking-tight">{symbol}</span>
-        <span className="text-[10px] uppercase tracking-[0.1em] text-muted">paper</span>
+      <div className="flex min-w-0 flex-1 items-baseline gap-1.5">
+        <span className="truncate text-title font-semibold tracking-tight whitespace-nowrap">{symbol}</span>
+        <span className="shrink-0 text-micro uppercase tracking-[0.1em] text-muted">paper</span>
       </div>
 
-      <div className="ml-auto flex items-baseline gap-2">
-        <span className="num text-[16px] leading-none">{ticker ? price(ticker.last) : '—'}</span>
+      <div className="ml-auto flex shrink-0 items-baseline gap-2">
+        <span className="num text-title leading-none">{ticker ? price(ticker.last) : '—'}</span>
         <span
           className={cn(
-            'num text-[12px]',
+            'num text-body',
             (ticker?.pct ?? 0) >= 0 ? 'text-long' : 'text-short',
           )}
         >
