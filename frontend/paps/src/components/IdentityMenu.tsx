@@ -4,7 +4,12 @@ import { cn } from '../lib/cn';
 import { shortAddress, type Identity, type Profile } from '../lib/identity/types';
 import type { useIdentity } from '../hooks/useIdentity';
 
-type Props = { identity: ReturnType<typeof useIdentity> };
+type Props = {
+  identity: ReturnType<typeof useIdentity>;
+  /** Optional: lets another surface (the You tab) open the sheet. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+};
 
 const LEV = [2, 5, 10, 20, 50];
 const RISK = [25, 50, 100, 250, 500];
@@ -14,8 +19,14 @@ const RISK = [25, 50, 100, 250, 500];
  * trader can personalise is here, because a settings page for six fields is a surface
  * nobody opens.
  */
-export function IdentityMenu({ identity }: Props) {
-  const [open, setOpen] = useState(false);
+export function IdentityMenu({ identity, open: openProp, onOpenChange }: Props) {
+  const [openState, setOpenState] = useState(false);
+  const open = openProp ?? openState;
+  const setOpen = (next: boolean | ((v: boolean) => boolean)) => {
+    const value = typeof next === 'function' ? next(open) : next;
+    setOpenState(value);
+    onOpenChange?.(value);
+  };
   const { identity: me, profile, wallets, error, busy, connectStrike, connectWithUtxos, disconnect, update, utxosConfigured } =
     identity;
 
