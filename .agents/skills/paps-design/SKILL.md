@@ -15,6 +15,30 @@ Generic dashboards share a silhouette: rounded cards, even gaps, one grey, one a
 numbers in the same face as prose, and every panel the same visual weight. A trader
 reads that as a mockup. The fixes below are cheap and do more than any illustration.
 
+## Vibe: quiet money
+
+paps is a phone app for people who find perps intimidating, so it borrows from
+portfolio-first consumer apps (Public, Robinhood, Stake) rather than from exchange
+terminals (OKX, Binance Pro). The feel is **quiet money**: the confidence of a bank app,
+the clarity of a weather app, and no casino.
+
+    space       20-24px gutters, sections separated by air rather than hairlines
+    type        large friendly numerals (32-40px hero price), humanist sans, almost no
+                uppercase micro-labels — those are terminal voice
+    shape       rounded 16-20px cards and floating pills; corner radius is the strongest
+                consumer-app signal and a terminal gives it up for free
+    motion      sheets spring and settle, cards fly with follow-through; nothing linear
+    words       "you'd lose $98 if ADA hits 0.183" beats "liq. 0.1830 (−19.6%)" for a
+                first-time perp trader
+
+Ban list, because gamification is the trap: confetti, sounds, streaks tied to wins,
+count-up animations on money, red flashing when down. The deck's playfulness comes from
+the gesture, not the paint.
+
+This does not cancel the terminal rules below where they still apply — mono numerals for
+columns, green/red only for direction, no invented numbers — it changes the shell around
+them: four tabs at the bottom, a header with four facts, tickets in sheets.
+
 ## Layout
 
 - **Square corners.** Panels are rectangles separated by 1px hairlines. Radius is a
