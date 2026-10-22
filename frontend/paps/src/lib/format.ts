@@ -29,6 +29,13 @@ export const compact = (v: number | string): string => {
 
 export const signed = (v: number, dp = 2): string => `${v >= 0 ? '+' : '−'}${usd(Math.abs(v), dp)}`;
 
+/** Signed money for a blotter column: `+$3.25`, `−$0.41`, an em dash when the value is not a number. */
+export const signedUsd = (v: number | string, dp = 2): string => {
+  const n = typeof v === 'string' ? Number(v) : v;
+  if (!Number.isFinite(n)) return '—';
+  return `${n >= 0 ? '+' : '−'}$${usd(Math.abs(n), dp)}`;
+};
+
 export const pct = (v: number, dp = 2): string => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(dp)}%`;
 
 export const clock = (ms: number): string =>
