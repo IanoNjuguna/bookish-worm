@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { finishConnect, startConnect, type ConnectDeps } from './connect';
 import { masterKey, openKey, toBase64, toHex } from './crypto';
-import { memoryStore } from './keystore';
+import { memoryRateLimitStore, memoryStore } from './keystore';
+import { DEFAULT_LIMITS } from './rateLimit';
 import { publicKeyOf } from './sign';
 import { sessionHash } from './session';
 import { HttpError } from './types';
@@ -47,6 +48,8 @@ function strikeStub(opts: { publicKey?: () => string; expiredAt?: string; fail?:
 
 const deps = (over: Partial<ConnectDeps> = {}): ConnectDeps => ({
   store: memoryStore(() => NOW),
+  limiter: memoryRateLimitStore(),
+  limits: DEFAULT_LIMITS,
   master: masterKey(MASTER_B64),
   strike: strikeStub().transport,
   builderCode: 'paps',

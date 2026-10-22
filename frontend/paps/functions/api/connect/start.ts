@@ -1,5 +1,5 @@
 import { startConnect } from '../../../src/server/connect';
-import { depsFor, json, readJson, route } from '../../../src/server/pages';
+import { clientIp, depsFor, json, readJson, route } from '../../../src/server/pages';
 
 /**
  * Step one of builder connect.
@@ -13,7 +13,7 @@ export const onRequestPost = route(async (ctx) => {
   const body = await readJson<{ address?: string }>(ctx.request);
   if (!body.address) return json(400, { error: 'address_required' });
 
-  const started = await startConnect(deps, { address: body.address });
+  const started = await startConnect(deps, { address: body.address, ip: clientIp(ctx.request) });
   return json(200, {
     token: started.token,
     message_to_sign: started.message_to_sign,
