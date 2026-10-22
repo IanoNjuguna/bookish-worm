@@ -1,8 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { readVenue } from '../lib/strike/venue';
 import { IDLE, VenueClient, type VenueState } from '../lib/strike/venue-client';
 
 export const POLL_MS = 30_000;
+
+export type VenueSession = {
+  state: VenueState;
+  /** Read now. A placement or a cancel calls this instead of waiting out the poll. */
+  refresh: () => void;
+};
 
 /**
  * The venue's account, positions and history for a connected session.
@@ -11,8 +17,9 @@ export const POLL_MS = 30_000;
  * one, every number here came from the venue: a read that fails leaves the previous numbers
  * in place and marks them stale, and a 401 stops the poll instead of hammering a dead key.
  */
-export function useVenueAccount(session: boolean): VenueState {
+export function useVenueAccount(session: boolean): VenueSession {
   const [state, setState] = useState<VenueState>(IDLE);
+  const client = useRef<VenueClient | null>(null);
 
   useEffect(() => {
     if (!session) {
@@ -21,26 +28,31 @@ export function useVenueAccount(session: boolean): VenueState {
     }
 
     let alive = true;
-    const client = new VenueClient({
+    const next = new VenueClient({
       read: readVenue,
       pollMs: POLL_MS,
-      onChange: (next) => {
-        if (alive) setState(next);
+      onChange: (s) => {
+        if (alive) setState(s);
       },
     });
-
-    client.start();
+    client.current = next;
+    next.start();
 
     // Coming back to a tab that slept should not show hour-old money.
-    const onFocus = () => void client.refresh();
+    const onFocus = () => void next.refresh();
     window.addEventListener('focus', onFocus);
 
     return () => {
       alive = false;
+      client.current = null;
       window.removeEventListener('focus', onFocus);
-      client.stop();
+      next.stop();
     };
   }, [session]);
 
-  return state;
+  const refresh = useCallback(() => {
+    void client.current?.refresh();
+  }, []);
+
+  return { state, refresh };
 }
