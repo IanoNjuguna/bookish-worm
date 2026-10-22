@@ -56,7 +56,7 @@ export function LiteView({
         <span>
           Paper equity <span className="num text-body text-fg">${usd(equity)}</span>
         </span>
-        <span className="text-muted">paper · simulated</span>
+        <span className="text-muted">demo · simulated</span>
       </div>
 
       <div className="flex items-end justify-between gap-3">

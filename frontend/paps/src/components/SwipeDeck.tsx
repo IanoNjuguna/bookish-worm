@@ -105,6 +105,17 @@ export function SwipeDeck({
   }, [top?.symbol]);
 
   if (!top) {
+    // An empty deck means one of two things, and they are not the same screen: markets
+    // are still arriving, or the round is genuinely over. Showing 'round 1 done +$0.00'
+    // to someone who has not swiped anything is the first thing a new trader would see.
+    if (roundStats.swipes === 0 && openPositions === 0) {
+      return (
+        <div className="flex h-full items-center justify-center px-6 text-small text-muted">
+          getting markets…
+        </div>
+      );
+    }
+
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4 px-6">
         <div className="w-full max-w-[360px] rounded-card border border-line bg-panel p-4">

@@ -1,58 +1,41 @@
-import type { MiniTicker } from '../hooks/useMiniTickers';
-import { price, pct } from '../lib/format';
-import { cn } from '../lib/cn';
 import { AgeBadge } from './AgeBadge';
 import { IdentityMenu } from './IdentityMenu';
 import type { useIdentity } from '../hooks/useIdentity';
 
 /**
- * Four facts, no more: which market, what it costs, which way it moved today, and whether
- * that number is still fresh. Everything else a terminal would put here — mark, index,
- * funding, equity — belongs to the tab that acts on it.
+ * The top bar answers three questions and no market ones.
+ *
+ * What is this (paps), what kind of account is it (demo), and is the data still arriving
+ * (the dot). The market facts deliberately live below it: the deck prints the symbol and
+ * price on the card, the Trade tab prints them in its own header, and Positions prints
+ * them per row. A second copy up here was duplication that cost the symbol its width —
+ * it truncated at 390px while carrying nothing the screen below did not already say.
  */
 export function TopBar({
-  symbol,
-  ticker,
-  lastAt,
   connected,
+  lastAt,
   identity,
   identityOpen,
   onIdentityOpen,
 }: {
-  symbol: string;
-  ticker?: MiniTicker;
-  lastAt: number;
   connected: boolean;
+  lastAt: number;
   identity: ReturnType<typeof useIdentity>;
   identityOpen: boolean;
   onIdentityOpen: (open: boolean) => void;
 }) {
   return (
-    <header className="flex h-14 shrink-0 items-center gap-2.5 px-4">
-      <div className="flex min-w-0 flex-1 items-baseline gap-1.5">
-        <span className="truncate text-title font-semibold tracking-tight whitespace-nowrap">{symbol}</span>
-        <span className="shrink-0 text-micro uppercase tracking-[0.1em] text-muted">paper</span>
-      </div>
+    <header className="flex h-14 shrink-0 items-center gap-2 px-4">
+      <span className="text-title font-semibold tracking-tight text-fg">
+        paps<span className="text-accent">.</span>
+      </span>
+      <span className="rounded-chip border border-line px-1.5 py-0.5 text-micro uppercase tracking-[0.1em] text-muted">
+        demo
+      </span>
 
-      <div className="ml-auto flex shrink-0 items-baseline gap-2">
-        <span className="num text-title leading-none">{ticker ? price(ticker.last) : '—'}</span>
-        <span
-          className={cn(
-            'num text-body',
-            (ticker?.pct ?? 0) >= 0 ? 'text-long' : 'text-short',
-          )}
-        >
-          {ticker ? pct(ticker.pct) : '—'}
-        </span>
-      </div>
-
-      <span className="flex items-center gap-2">
+      <span className="ml-auto flex shrink-0 items-center gap-2">
         <AgeBadge lastAt={lastAt} connected={connected} />
-        <IdentityMenu
-          identity={identity}
-          open={identityOpen}
-          onOpenChange={onIdentityOpen}
-        />
+        <IdentityMenu identity={identity} open={identityOpen} onOpenChange={onIdentityOpen} />
       </span>
     </header>
   );

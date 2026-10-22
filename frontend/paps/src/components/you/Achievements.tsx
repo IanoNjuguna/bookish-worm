@@ -35,7 +35,9 @@ export function Achievements({ stats, startEquity }: { stats: Stats; startEquity
               className={
                 earned
                   ? 'inline-flex items-center gap-1 rounded-chip bg-panel-2 px-2 py-1 text-small text-fg'
-                  : 'inline-flex items-center gap-1 rounded-chip border border-line px-2 py-1 text-small text-muted'
+                  /* Unearned sits a step below the panel, so five empty badges do not read
+                     as five achievements. */
+                  : 'inline-flex items-center gap-1 rounded-chip border border-line/50 bg-panel/40 px-2 py-1 text-small text-muted/60'
               }
             >
               {earned && <IconCheck size={11} stroke={2.5} className="shrink-0" />}

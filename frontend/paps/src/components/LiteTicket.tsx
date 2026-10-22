@@ -210,7 +210,7 @@ export function LiteTicket({
         className="mt-4 flex min-h-[52px] w-full items-center justify-center rounded-control bg-accent text-title font-semibold text-canvas transition-opacity active:opacity-80 disabled:opacity-40"
       >
         Open {side === 'LONG' ? 'long' : 'short'} {base}
-        <span className="ml-1.5 text-body font-medium opacity-80">· paper</span>
+        <span className="ml-1.5 text-body font-medium opacity-80">· demo</span>
       </button>
 
       <p className="mt-2.5 text-small leading-relaxed text-muted">

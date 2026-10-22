@@ -128,7 +128,7 @@ export function Blotter({
                   </tr>
                 );
               })}
-              {!positions.length && <Empty cols={11} text="No positions. Open a paper position to see it marked live." />}
+              {!positions.length && <Empty cols={11} text="No positions. Open a demo position to see it marked live." />}
             </tbody>
           </table>
         )}
@@ -191,7 +191,7 @@ export function Blotter({
             </thead>
             <tbody>
               <tr className="border-b border-line/50">
-                <Td>USD (paper)</Td>
+                <Td>USD (demo)</Td>
                 <Td num>${usd(equity + pnl)}</Td>
                 <Td num>${usd(margin)}</Td>
                 <Td num>${usd(equity + pnl - margin)}</Td>
