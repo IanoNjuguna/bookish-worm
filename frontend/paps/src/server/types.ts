@@ -13,7 +13,8 @@ export type D1Like = {
   prepare(sql: string): {
     bind(...values: unknown[]): {
       first<T>(): Promise<T | null>;
-      run(): Promise<unknown>;
+      /** `meta.changes` is how a conditional write reports whether it actually wrote. */
+      run(): Promise<{ meta: { changes: number } }>;
     };
   };
 };
@@ -26,6 +27,10 @@ export type ServerEnv = {
   BUILDER_CODE?: string;
   /** 0 by default: paps does not take a cut of a user's fees without being told to. */
   FEE_SHARE_BPS?: string;
+  /** Calls per minute. See `rateLimit.ts` for the defaults and the fallbacks. */
+  RATE_READ_PER_MIN?: string;
+  RATE_WRITE_PER_MIN?: string;
+  RATE_CONNECT_PER_MIN?: string;
   DB?: D1Like;
 };
 
@@ -74,7 +79,27 @@ export class HttpError extends Error {
     readonly status: number,
     readonly code: string,
     message?: string,
+    /** Set on 429, so the response can state a cooldown instead of inviting a retry loop. */
+    readonly retryAfterSeconds?: number,
   ) {
     super(message ?? code);
   }
 }
+
+/** A bucket: `capacity` tokens, refilled over `perMs` milliseconds. */
+export type RateSpec = {
+  capacity: number;
+  perMs: number;
+};
+
+/**
+ * Where rate-limit counters live.
+ *
+ * One method, because refilling and spending have to be one atomic step: read-then-write
+ * across two isolates lets both take the last token, and a limiter that can be beaten by
+ * concurrency is the same as no limiter under exactly the load it exists for.
+ */
+export type RateLimitStore = {
+  /** Refill from the stored timestamp, then take one token. False: empty, nothing spent. */
+  take(key: string, spec: RateSpec, now: number): Promise<boolean>;
+};

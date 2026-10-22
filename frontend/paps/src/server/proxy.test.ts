@@ -1,26 +1,36 @@
 import * as ed from '@noble/ed25519';
 import { describe, expect, it } from 'vitest';
 import { masterKey, sealKey, sha256Hex, toBase64, toHex } from './crypto';
-import { memoryStore } from './keystore';
+import { memoryRateLimitStore, memoryStore } from './keystore';
 import { isAllowedPath, proxyStrike } from './proxy';
+import { DEFAULT_LIMITS, type Limits } from './rateLimit';
 import { canonicalMessage, publicKeyOf, verifyMessage } from './sign';
 import { sessionHash } from './session';
+import type { Store } from './types';
 
 const MASTER_B64 = toBase64(new Uint8Array(32).fill(5));
 const KEY_HEX = toHex(ed.utils.randomPrivateKey());
 const NOW = 1_700_000_000_000;
 
-async function setup(opts: { expiresAt?: number } = {}) {
-  const store = memoryStore(() => NOW);
-  const sessionToken = 'session-token-abc';
+/** A clock the test can move, so a bucket can be seen refilling. */
+type Clock = { now: number };
+
+async function account(store: Store, sessionToken: string, expiresAt = 0) {
   await store.putAccount(await sessionHash(sessionToken), {
     accountId: 'account-1',
     address: 'addr1_test',
     apiWalletId: '42',
     publicKeyHex: publicKeyOf(KEY_HEX),
     sealedKey: await sealKey(masterKey(MASTER_B64), Uint8Array.from(Buffer.from(KEY_HEX, 'hex'))),
-    expiresAt: opts.expiresAt ?? 0,
+    expiresAt,
   });
+}
+
+async function setup(opts: { expiresAt?: number; limits?: Limits; clock?: Clock } = {}) {
+  const clock = opts.clock ?? { now: NOW };
+  const store = memoryStore(() => clock.now);
+  const sessionToken = 'session-token-abc';
+  await account(store, sessionToken, opts.expiresAt);
 
   const calls: { url: string; init: RequestInit }[] = [];
   const doFetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -33,11 +43,15 @@ async function setup(opts: { expiresAt?: number } = {}) {
 
   return {
     calls,
+    clock,
+    store,
     deps: {
       store,
       master: masterKey(MASTER_B64),
       strike: { origin: 'https://api.strikefinance.org', doFetch },
-      now: () => NOW,
+      limiter: memoryRateLimitStore(),
+      limits: opts.limits ?? DEFAULT_LIMITS,
+      now: () => clock.now,
     },
     sessionToken,
   };
