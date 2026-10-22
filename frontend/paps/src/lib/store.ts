@@ -52,7 +52,7 @@ type Action =
   | { type: 'closeAll'; mark: number }
   | { type: 'liquidate'; ids: string[] };
 
-const START_EQUITY = 10_000;
+export const START_EQUITY = 10_000;
 const TAKER_FEE = 0.0005;
 const LIQUIDATION_FEE = 0.01; // exchangeInfo reports 1%
 

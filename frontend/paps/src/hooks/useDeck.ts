@@ -15,55 +15,88 @@ export type DeckCard = {
   rank: number;
 };
 
+export type Round = {
+  cards: DeckCard[];
+  /** What this round is about, shown in the deck header. */
+  label: string;
+};
+
 /**
- * The deck is ordered by movement, not by taste: the loudest markets first, because a
- * swipe deck with dead cards teaches nothing. Funding is fetched per card — it is a
- * public endpoint, no key involved.
+ * Rounds, not one finite deck.
+ *
+ * Markets are infinite and attention is not, so each round of ten draws from a
+ * different bucket — movers, then funding, then volume, then where price sits in its
+ * range, then everything not yet seen. Rounds rotate, so the deck never dead-ends and
+ * no two consecutive rounds are the same list.
  */
+const BUCKETS = ['movers', 'volume', 'range', 'cheap', 'rest'] as const;
+type Bucket = (typeof BUCKETS)[number];
+
+const LABELS: Record<Bucket, string> = {
+  movers: 'by movement',
+  volume: 'by volume',
+  range: 'by range position',
+  cheap: 'by price',
+  rest: 'everything else',
+};
+
 export function useDeck(
   symbols: SymbolInfo[],
   tickers: Record<string, MiniTicker>,
-  take = 6,
+  take = 10,
   pinned: string[] = [],
-) {
+  round = 0,
+): Round {
   const [funding, setFunding] = useState<Record<string, number>>({});
 
-  const ranked = useMemo(() => {
+  const bucket = BUCKETS[round % BUCKETS.length];
+
+  const cards = useMemo(() => {
     const rows = symbols
       .map((s) => ({ symbol: s.symbol, t: tickers[s.symbol] }))
       .filter((r): r is { symbol: string; t: MiniTicker } => Boolean(r.t));
 
-    // A trader's watchlist is not a suggestion: those markets lead the deck even
-    // when they are not among today's movers.
+    const score = (r: { symbol: string; t: MiniTicker }): number => {
+      const rangePos = r.t.high > r.t.low ? (r.t.last - r.t.low) / (r.t.high - r.t.low) : 0.5;
+      switch (bucket) {
+        case 'movers':
+          return Math.abs(r.t.pct);
+        case 'volume':
+          return r.t.quoteVolume;
+        case 'range':
+          return Math.abs(rangePos - 0.5);
+        case 'cheap':
+          return 1 / Math.max(r.t.last, 1e-9);
+        default:
+          return -Math.abs(r.t.pct);
+      }
+    };
+
     const watched = pinned.filter((p) => rows.some((r) => r.symbol === p));
-    const rest = rows
+    const sorted = rows
       .filter((r) => !watched.includes(r.symbol))
-      .sort((a, b) => Math.abs(b.t.pct) - Math.abs(a.t.pct))
+      .sort((a, b) => score(b) - score(a))
       .map((r) => r.symbol);
 
-    return [...watched, ...rest].slice(0, Math.max(take, watched.length));
-  }, [symbols, tickers, take, pinned]);
+    return [...watched, ...sorted].slice(0, Math.max(take, watched.length));
+  }, [symbols, tickers, take, pinned, bucket]);
 
-  const key = ranked.join(',');
+  const key = cards.join(',');
 
   useEffect(() => {
-    if (!ranked.length) return;
-    const missing = ranked.filter((s) => funding[s] === undefined);
+    const missing = cards.filter((s) => funding[s] === undefined);
     if (!missing.length) return;
 
     let cancelled = false;
 
-    // One state update for the whole batch. The previous version looped and bailed on
-    // the first abort, which under StrictMode's double mount left every card after the
-    // first with an unknown funding rate.
     void Promise.all(
       missing.map(async (symbol) => {
         try {
           const rows = await get<MarkPrice[] | MarkPrice>(`/markPrice?symbol=${symbol}`);
           const row = Array.isArray(rows) ? rows[0] : rows;
           // This endpoint answers in the websocket event shape (r), not the documented
-          // REST shape (lastFundingRate), so read both.
-          const rate = (row as { lastFundingRate?: string; r?: string } | undefined);
+          // REST shape (lastFundingRate).
+          const rate = row as { lastFundingRate?: string; r?: string } | undefined;
           const value = rate?.lastFundingRate ?? rate?.r;
           return value !== undefined ? ([symbol, Number(value)] as const) : null;
         } catch {
@@ -79,24 +112,25 @@ export function useDeck(
     return () => {
       cancelled = true;
     };
-    // key covers the ranked list; funding is only read to skip refetches
+    // key covers the card list; funding is read only to skip refetches
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
-  const cards: DeckCard[] = ranked.map((symbol, i) => {
-    const t = tickers[symbol];
-    return {
-      symbol,
-      price: t.last,
-      pct: t.pct,
-      high: t.high,
-      low: t.low,
-      funding: funding[symbol] ?? Number.NaN,
-      markPrice: t.last,
-      quoteVolume: t.quoteVolume,
-      rank: i + 1,
-    };
-  });
-
-  return cards;
+  return {
+    label: `round ${round + 1} · ${LABELS[bucket]}`,
+    cards: cards.map((symbol, i) => {
+      const t = tickers[symbol];
+      return {
+        symbol,
+        price: t.last,
+        pct: t.pct,
+        high: t.high,
+        low: t.low,
+        funding: funding[symbol] ?? Number.NaN,
+        markPrice: t.last,
+        quoteVolume: t.quoteVolume,
+        rank: i + 1,
+      };
+    }),
+  };
 }
