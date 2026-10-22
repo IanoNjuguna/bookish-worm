@@ -62,3 +62,14 @@ export async function readJson<T>(request: Request): Promise<T> {
     throw new HttpError(400, 'invalid_json');
   }
 }
+
+/**
+ * Public proxy URL → venue path.
+ *
+ * The client calls `/api/strike/positions?symbol=ADA-USD`, i.e. without the venue's `/v2`
+ * prefix, because every route this proxy serves is under `/v2` and repeating it in our own
+ * URLs is a footgun: `/api/strike/v2/positions` would forward as `/v2/v2/positions`, which
+ * the allowlist then refuses with a 403 that looks like an auth problem.
+ */
+export const upstreamPath = (segments: string[], search: string): string =>
+  `/v2/${segments.filter(Boolean).join('/')}${search}`;

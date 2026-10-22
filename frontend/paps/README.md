@@ -117,8 +117,10 @@ for a key that can trade an account.
 
 The browser's half of the flow lives in `lib/identity/builder.ts` and calls
 `/api/connect/start` then `/api/connect/finish`. Signed venue calls go through
-`/api/strike/v2/...`, which signs `METHOD:PATH:TIMESTAMP:NONCE:SHA256(body)` with the held
-key and forwards only to an allowlist of routes paps uses.
+`/api/strike/<path>`, which maps onto the venue's `/v2/<path>` (our URLs do not repeat the
+`/v2`, because `/api/strike/v2/positions` would forward as `/v2/v2/positions`), signs
+`METHOD:PATH:TIMESTAMP:NONCE:SHA256(body)` with the held key, and forwards only to an
+allowlist of routes paps uses.
 
 The server code is in `src/server/` and imports no Workers globals, so every handler is
 unit tested against a fake Strike and an in-memory store. `functions/api/` is the thin
