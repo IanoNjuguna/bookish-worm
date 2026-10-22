@@ -42,6 +42,8 @@ export type Identity = {
   apiWalletId?: string;
   publicKeyHex?: string;
   feeShareBps?: number;
+  /** Unix ms when the API wallet stops working; 0 or absent means the venue told us nothing. */
+  expiresAt?: number;
 };
 
 export const shortAddress = (address: string, head = 8, tail = 6): string =>

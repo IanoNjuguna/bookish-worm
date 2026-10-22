@@ -98,8 +98,36 @@ traders — useful when demoing two accounts:
     opens on       pro · lite · swipe
     watchlist      markets that lead the deck
 
-Nothing here asks for a signature: connecting identifies, it does not authorise. Orders
-are paper and the wallet cannot be asked to move anything.
+Signing in with Strike does ask for a signature, and that is the point: the wallet signs
+Strike's consent message, which is what proves a human controls the address.
+
+## Holding the key
+
+paps holds the Strike API wallet key. Strike's consent text says as much ("you are
+entrusting your API wallet private key to this builder"), and a browser is the wrong place
+for a key that can trade an account.
+
+    where it lives   AES-GCM sealed in D1, one row per session, under MASTER_KEY
+    who sees it      the Worker, per request, never the browser and never a log
+    session          random token in an HttpOnly, Secure, SameSite=Strict cookie scoped
+                     to /api; only its SHA-256 is stored, so the table holds no credential
+    expiry           every proxied call checks the API wallet expiry and answers
+                     401 reconnect rather than failing upstream; Strike revokes the
+                     previous wallet on reconnect, so a session is never permanent
+
+The browser's half of the flow lives in `lib/identity/builder.ts` and calls
+`/api/connect/start` then `/api/connect/finish`. Signed venue calls go through
+`/api/strike/v2/...`, which signs `METHOD:PATH:TIMESTAMP:NONCE:SHA256(body)` with the held
+key and forwards only to an allowlist of routes paps uses.
+
+The server code is in `src/server/` and imports no Workers globals, so every handler is
+unit tested against a fake Strike and an in-memory store. `functions/api/` is the thin
+adapter that knows about `context`.
+
+`bun run dev` serves the SPA only, so the `/api` routes 404 locally. For the full stack:
+
+    bun run build
+    bunx wrangler pages dev dist --d1 DB=paps-keys --binding MASTER_KEY=$(openssl rand -base64 32)
 
 ## UTXOS, when you turn it on
 
@@ -119,3 +147,13 @@ doba's app or admin.
 One-time, in the dashboard: create the `paps` Pages project, then add `paps.doba.world`
 as a custom domain. Build output is `dist`, build command `bun run build`, root
 `frontend/paps` if Pages builds it from git rather than from a local deploy.
+
+The signing layer needs three things before the first real connect:
+
+    bunx wrangler d1 create paps-keys        # paste the id into wrangler.toml
+    bunx wrangler d1 migrations apply paps-keys --remote
+    bunx wrangler pages secret put MASTER_KEY   # openssl rand -base64 32
+
+`MASTER_KEY` seals every stored API wallet key. Losing it means every user reconnects;
+leaking it means every stored key is exposed. It belongs in a password manager, not in
+the repo, and rotating it invalidates all sessions by design.
