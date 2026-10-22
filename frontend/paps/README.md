@@ -173,6 +173,20 @@ click sends it. The rules it enforces:
 docs) and reports the 5 bps fallback as unknown when the schedule does not parse, rather
 than presenting the fallback as the venue's rate.
 
+## Deposits
+
+The deposit flow is server-side so far: quote, build-tx and confirm, each signed through the
+proxy, with amounts passed as lovelace strings because `Number(ada) * 1e6` loses lovelace past
+about nine billion ADA. Failures are states, and the two 400s are not the same failure:
+
+    amount_rejected   400 at quote: the venue refused the amount itself, which is what a
+                      deposit below its minimum looks like. The venue's own message is
+                      carried through, because that minimum is not documented anywhere
+    quote_expired     400 at build or confirm: the quote died at the venue, so re-quote
+    account_mismatch  403: the request_id belongs to another account
+    already_submitted 409: Strike already has this transaction
+    reconnect         401: the API wallet behind the session can no longer sign
+
 ## Limits
 
 A session cookie is a handle on a key that can trade. It is therefore counted, in two

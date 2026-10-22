@@ -219,6 +219,33 @@ describe('deposit quote', () => {
     expect(calls).toHaveLength(0);
   });
 
+  it('reads a refused amount as a refused amount, not an expiry', async () => {
+    const { deps, sessionToken } = await setup({
+      quote: { status: 400, body: { message: 'minimum deposit is 2000000 lovelace' } },
+    });
+
+    await expect(quoteDeposit(deps, { sessionToken, lovelace: '1000000' })).rejects.toMatchObject({
+      status: 400,
+      code: 'amount_rejected',
+      message: 'minimum deposit is 2000000 lovelace',
+    });
+  });
+
+  it('keeps a 400 at build as an expired quote, because the quote can die at the venue', async () => {
+    const { deps, sessionToken } = await setup({
+      build: { status: 400, body: { message: 'quote expired' } },
+    });
+
+    await expect(
+      buildDepositTx(deps, {
+        sessionToken,
+        requestId: 'req-1',
+        userAddress: 'addr1_user',
+        utxos: [UTXOS[0]],
+      }),
+    ).rejects.toMatchObject({ status: 400, code: 'quote_expired' });
+  });
+
   it('answers reconnect, not a quote, once the API wallet can no longer sign', async () => {
     const store = memoryStore(() => NOW);
     await store.putAccount(await sessionHash(SESSION), {
