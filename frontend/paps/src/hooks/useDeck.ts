@@ -25,19 +25,22 @@ export type Round = {
  * Rounds, not one finite deck.
  *
  * Markets are infinite and attention is not, so each round of ten draws from a
- * different bucket — movers, then funding, then volume, then where price sits in its
- * range, then everything not yet seen. Rounds rotate, so the deck never dead-ends and
- * no two consecutive rounds are the same list.
+ * different bucket. Rounds rotate, so the deck never dead-ends and no two consecutive
+ * rounds are the same list.
+ *
+ * The first round is the calm one on purpose: a stranger's first card should teach the
+ * gesture, not hand them a market that moved 12% today. Movement comes second, once the
+ * deck is a place they know how to be.
  */
-const BUCKETS = ['movers', 'volume', 'range', 'cheap', 'rest'] as const;
+const BUCKETS = ['calm', 'movers', 'volume', 'range', 'cheap'] as const;
 type Bucket = (typeof BUCKETS)[number];
 
 const LABELS: Record<Bucket, string> = {
+  calm: 'the calm ones',
   movers: 'by movement',
   volume: 'by volume',
   range: 'by range position',
   cheap: 'by price',
-  rest: 'everything else',
 };
 
 export function useDeck(
@@ -54,7 +57,10 @@ export function useDeck(
   const cards = useMemo(() => {
     const rows = symbols
       .map((s) => ({ symbol: s.symbol, t: tickers[s.symbol] }))
-      .filter((r): r is { symbol: string; t: MiniTicker } => Boolean(r.t));
+      .filter((r): r is { symbol: string; t: MiniTicker } => Boolean(r.t))
+      // A market with no traded volume is not calm, it is dead, and it is the worst
+      // possible first card: no fill, no spread, nothing to learn from.
+      .filter((r) => r.t.quoteVolume > 0);
 
     const score = (r: { symbol: string; t: MiniTicker }): number => {
       const rangePos = r.t.high > r.t.low ? (r.t.last - r.t.low) / (r.t.high - r.t.low) : 0.5;
@@ -67,8 +73,13 @@ export function useDeck(
           return Math.abs(rangePos - 0.5);
         case 'cheap':
           return 1 / Math.max(r.t.last, 1e-9);
-        default:
-          return -Math.abs(r.t.pct);
+        case 'calm': {
+          // Calm is two things: the day's move and the day's range. Sorting on the move
+          // alone put a market that closed flat after swinging 6% at the top of the deck,
+          // which is not what a first card should be.
+          const width = r.t.last > 0 ? ((r.t.high - r.t.low) / r.t.last) * 100 : 0;
+          return -(Math.abs(r.t.pct) * 0.6 + width * 0.4);
+        }
       }
     };
 

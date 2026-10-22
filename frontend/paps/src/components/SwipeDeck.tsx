@@ -262,7 +262,10 @@ export function SwipeDeck({
             </div>
 
             <div className="flex flex-wrap gap-1.5 px-4 pt-3">
-              <Chip>#{top.rank} mover</Chip>
+              {/* The first chip used to read "#1 mover", which was the deck position, not a
+                  fact about the market — on a calm first round it claimed a 0.3% move was
+                  the day's biggest. The day's range is true whatever the deck is sorted by. */}
+              <Chip>range {((top.high - top.low) / Math.max(top.price, 1e-9) * 100).toFixed(1)}%</Chip>
               <Chip>{pos > 0.8 ? 'near 24h high' : pos < 0.2 ? 'near 24h low' : 'mid range'}</Chip>
               <Chip>
                 {Number.isFinite(top.funding)
