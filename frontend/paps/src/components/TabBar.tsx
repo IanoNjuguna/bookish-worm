@@ -12,8 +12,9 @@ const TABS: { id: Tab; label: string }[] = [
 /**
  * Four tabs, four jobs: watch markets, take a view, manage what is open, manage yourself.
  *
- * A floating pill rather than a bar welded to the bottom edge: it reads as part of the
- * surface instead of as chrome, and it leaves room for the safe area on a phone.
+ * A bar welded to the bottom edge, not a floating pill: square top corners, one hairline
+ * in `line`, `panel` behind it. The tab is the control that carries the radius — the
+ * shell stays a rectangle.
  */
 export function TabBar({
   tab,
@@ -25,23 +26,24 @@ export function TabBar({
   openPositions: number;
 }) {
   return (
-    <nav className="pointer-events-none flex shrink-0 justify-center pb-[max(10px,env(safe-area-inset-bottom))] pt-2">
-      <div className="pointer-events-auto flex items-center gap-0.5 rounded-full border border-line/80 bg-panel/90 p-1 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.6)] backdrop-blur">
+    <nav className="shrink-0 border-t border-line bg-panel px-2 pb-[env(safe-area-inset-bottom)]">
+      <div className="flex h-14 items-center gap-1">
         {TABS.map((t) => (
           <button
             key={t.id}
+            type="button"
             onClick={() => onChange(t.id)}
             aria-current={tab === t.id ? 'page' : undefined}
             className={cn(
-              'relative rounded-full px-3.5 py-2 text-[12px] transition-colors',
-              tab === t.id ? 'bg-fg text-canvas' : 'text-muted hover:text-fg',
+              'flex h-10 flex-1 items-center justify-center gap-1 rounded-control text-small transition-colors',
+              tab === t.id ? 'bg-fg font-medium text-canvas' : 'text-muted hover:text-fg',
             )}
           >
             {t.label}
             {t.id === 'positions' && openPositions > 0 && (
               <span
                 className={cn(
-                  'num ml-1 text-[10px]',
+                  'num text-micro',
                   tab === t.id ? 'text-canvas/70' : 'text-brand',
                 )}
               >

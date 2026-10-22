@@ -82,11 +82,12 @@ export function LiteView({
         </div>
       </div>
 
-      {/* The chart's own surface is the panel: no second frame around it, and capped so
-          it cannot out-weight the price above or the ticket below. It is a flex column
+      {/* The chart's own surface is the panel: no second frame around it, and capped at
+          150px on a phone so the ticket starts above the fold. It is a flex column
           because a percentage height inside a min-height parent resolves to auto — the
-          chart collapsed to 2px until this became flex. */}
-      <div className="flex min-h-[168px] max-h-[214px] flex-1 flex-col overflow-hidden rounded-card bg-panel">
+          chart collapsed to 2px until this became flex, and `h-full` must not come back
+          here for the same reason. No `flex-1`: the cap is the point. */}
+      <div className="flex min-h-[150px] max-h-[190px] flex-col overflow-hidden rounded-card bg-panel">
         <ChartPanel bars={bars} interval={interval} onInterval={onInterval} error={chartError} />
       </div>
 

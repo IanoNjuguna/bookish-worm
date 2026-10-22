@@ -36,8 +36,9 @@ const THRESHOLD = 0.32;
  * deck (stack behind the card, depth ticks, one hero, chips for facts) and Plenty of
  * Fish's action row inside the card instead of under it.
  *
- * Density rule: four chips on the face, everything else behind Details. A card is
- * judged in under a second; a table is not.
+ * Density rule: three chips on the face, everything else behind Details. A card is
+ * judged in under a second; a table is not. Chrome around the card is two lines: the
+ * round above it, the money at risk below it.
  */
 export function SwipeDeck({
   cards,
@@ -106,17 +107,17 @@ export function SwipeDeck({
   if (!top) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4 px-6">
-        <div className="w-full max-w-[360px] border border-line bg-panel p-4">
-          <div className="text-[10px] uppercase tracking-[0.1em] text-muted">round {round + 1} done</div>
-          <div className="num mt-1 text-[26px] leading-none">
+        <div className="w-full max-w-[360px] rounded-card border border-line bg-panel p-4">
+          <div className="text-micro uppercase tracking-[0.1em] text-muted">round {round + 1} done</div>
+          <div className="num mt-1 text-hero leading-none">
             {roundStats.pnl >= 0 ? '+' : '−'}${usd(Math.abs(roundStats.pnl))}
           </div>
-          <div className="mt-3 grid grid-cols-3 gap-2 border-t border-line pt-3 text-[11px]">
+          <div className="mt-3 grid grid-cols-3 gap-2 border-t border-line pt-3 text-small">
             <Stat k="swipes" v={String(roundStats.swipes)} />
             <Stat k="open now" v={String(roundStats.openNow)} />
             <Stat k="equity" v={`$${usd(equity)}`} />
           </div>
-          <div className="mt-3 flex items-center gap-2 border-t border-line pt-2 text-[10px]">
+          <div className="mt-3 flex items-center gap-2 border-t border-line pt-2 text-micro">
             <span className={cn('h-1.5 w-1.5 rounded-full', objectiveMet ? 'bg-long' : 'bg-fg/25')} />
             <span className={objectiveMet ? 'text-long' : 'text-muted'}>
               {objectiveMet ? 'met' : 'missed'}: {objective.label}
@@ -129,22 +130,22 @@ export function SwipeDeck({
           {session && (
             <div className="mt-3 border-t border-line pt-2">
               <div className="flex items-baseline justify-between">
-                <span className="text-[10px] uppercase tracking-[0.08em] text-muted">session</span>
-                <span className="text-[10px] text-muted">{session.tierName} tier</span>
+                <span className="text-micro uppercase tracking-[0.08em] text-muted">session</span>
+                <span className="text-micro text-muted">{session.tierName} tier</span>
               </div>
               <div className="mt-1 flex items-end gap-3">
-                <span className="num text-[26px] leading-none">{session.grade}</span>
-                <span className="num text-[11px] text-muted">
+                <span className="num text-hero leading-none">{session.grade}</span>
+                <span className="num text-small text-muted">
                   {session.drawdown.toFixed(1)}% drawdown
                 </span>
               </div>
               {session.next && (
-                <p className="mt-1 text-[10px] text-muted">next tier: {session.next}</p>
+                <p className="mt-1 text-micro text-muted">next tier: {session.next}</p>
               )}
             </div>
           )}
 
-          <p className="mt-3 border-t border-line pt-2 text-[10px] text-muted">
+          <p className="mt-3 border-t border-line pt-2 text-micro text-muted">
             {openPositions} of {maxPositions} positions still open. They carry into the next
             round, and the next round draws from a different set of markets.
           </p>
@@ -152,7 +153,7 @@ export function SwipeDeck({
 
         <button
           onClick={onNextRound}
-          className="w-full max-w-[360px] border border-brand/50 py-3 text-[12px] font-semibold uppercase tracking-[0.1em] text-brand hover:bg-brand/10"
+          className="w-full max-w-[360px] rounded-control border border-brand/50 py-3 text-small font-semibold uppercase tracking-[0.1em] text-brand hover:bg-brand/10"
         >
           next round →
         </button>
@@ -174,31 +175,20 @@ export function SwipeDeck({
 
   return (
     <div className="relative flex h-full min-h-0 flex-col">
-      <div className="flex items-center justify-between border-b border-line px-3 py-2">
+      {/* the only line above the card: which round, and how much of it is left */}
+      <div className="flex items-center justify-between gap-3 border-b border-line px-3 py-2">
         <div className="flex items-center gap-1">
           {cards.slice(0, 8).map((c, i) => (
             <span
               key={c.symbol}
-              className={cn('h-[2px] w-4', i === 0 ? 'bg-fg' : 'bg-line')}
+              className={cn('h-0.5 w-4', i === 0 ? 'bg-fg' : 'bg-line')}
               title={`${i + 1} of ${cards.length}`}
             />
           ))}
         </div>
-        <span className="num whitespace-nowrap text-[10px] text-muted">
+        <span className="num whitespace-nowrap text-micro text-muted">
           {roundLabel} · {cards.length} left
-          <span className="hidden sm:inline">
-            {' '}
-            · ${usd(risk)} at {leverage}×
-          </span>
         </span>
-      </div>
-
-      <div className="flex items-center gap-2 border-b border-line px-3 py-1.5">
-        <span className={cn('h-1.5 w-1.5 rounded-full', objectiveMet ? 'bg-long' : 'bg-fg/25')} />
-        <span className="text-[10px] text-muted">
-          this round: <span className="text-fg/80">{objective.label}</span>
-        </span>
-        <span className="num ml-auto text-[10px] text-brand">+{objective.xp} xp</span>
       </div>
 
       <div
@@ -220,17 +210,17 @@ export function SwipeDeck({
           else setDrag({ x: 0, y: 0, active: false });
         }}
       >
-        <div className="relative w-full max-w-[366px]">
+        <div className="relative flex h-full w-full max-w-[366px] flex-col">
           {cards.length > 2 && (
-            <div className="absolute inset-x-5 top-5 h-full border border-line/40 bg-panel/40" />
+            <div className="absolute inset-x-5 top-5 h-full rounded-card border border-line/40 bg-panel/40" />
           )}
           {cards.length > 1 && (
-            <div className="absolute inset-x-2.5 top-2.5 h-full border border-line/70 bg-panel/70" />
+            <div className="absolute inset-x-2.5 top-2.5 h-full rounded-card border border-line/70 bg-panel/70" />
           )}
 
           <div
             className={cn(
-              'relative flex select-none flex-col overflow-hidden border bg-panel transition-transform',
+              'relative flex flex-1 select-none flex-col overflow-hidden rounded-card border bg-panel transition-transform',
               flying ? 'duration-200' : drag.active ? 'duration-75' : 'duration-200',
               drag.x > 0 ? 'border-long/60' : drag.x < 0 ? 'border-short/60' : 'border-line',
             )}
@@ -240,7 +230,7 @@ export function SwipeDeck({
             }}
           >
             {/* hero: the price series, framed the way a photo is framed */}
-            <div className="relative h-[240px] overflow-hidden border-b border-line">
+            <div className="relative min-h-[210px] flex-1 overflow-hidden border-b border-line">
               <svg viewBox="0 0 100 42" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
                 <defs>
                   <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
@@ -259,13 +249,13 @@ export function SwipeDeck({
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-panel via-panel/80 to-transparent px-4 pb-3 pt-8">
                 <div className="flex items-end justify-between">
                   <div>
-                    <div className="text-[15px] font-semibold">{top.symbol}</div>
-                    <div className="num mt-0.5 text-[30px] leading-none">{price(top.price)}</div>
+                    <div className="text-title font-semibold">{top.symbol}</div>
+                    <div className="num mt-0.5 text-hero leading-none">{price(top.price)}</div>
                   </div>
-                  <div className={cn('num text-right text-[12px]', up ? 'text-long' : 'text-short')}>
+                  <div className={cn('num text-right text-small', up ? 'text-long' : 'text-short')}>
                     {up ? '+' : '−'}
                     {Math.abs(top.pct).toFixed(2)}%
-                    <div className="text-[10px] text-muted">24h</div>
+                    <div className="text-micro text-muted">24h</div>
                   </div>
                 </div>
               </div>
@@ -286,7 +276,7 @@ export function SwipeDeck({
                 <span className="absolute top-0 h-full bg-fg/30" style={{ width: `${pos * 100}%` }} />
                 <span className="absolute -top-1 h-3 w-[2px] bg-fg" style={{ left: `${pos * 100}%` }} />
               </div>
-              <div className="num mt-1 flex justify-between text-[9px] text-muted">
+              <div className="num mt-1 flex justify-between text-micro text-muted">
                 <span>{price(top.low)}</span>
                 <span>24h range</span>
                 <span>{price(top.high)}</span>
@@ -294,7 +284,7 @@ export function SwipeDeck({
             </div>
 
             {details && (
-              <dl className="grid grid-cols-2 gap-2 border-t border-line px-4 py-3 text-[11px]">
+              <dl className="grid grid-cols-2 gap-2 border-t border-line px-4 py-3 text-small">
                 <Row k="liq. if long" v={withAway(liqLong, top.markPrice)} tone="short" />
                 <Row k="liq. if short" v={withAway(liqShort, top.markPrice)} />
                 <Row k="size" v={`${size.toLocaleString('en-US')} ${top.symbol.split('-')[0]}`} />
@@ -305,12 +295,12 @@ export function SwipeDeck({
             )}
 
             <div className="mt-auto flex items-center justify-between border-t border-line px-4 py-2">
-              <span className="text-[10px] text-muted">
+              <span className="text-micro text-muted">
                 {details ? 'less' : 'more'} · {size.toLocaleString('en-US')} {top.symbol.split('-')[0]}
               </span>
               <button
                 onClick={() => setDetails((v) => !v)}
-                className="border border-line px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] text-muted hover:text-fg"
+                className="rounded-control border border-line px-2 py-0.5 text-micro uppercase tracking-[0.08em] text-muted hover:text-fg"
               >
                 {details ? 'hide' : 'details'}
               </button>
@@ -326,7 +316,7 @@ export function SwipeDeck({
               >
                 <span
                   className={cn(
-                    'px-3 py-1 text-[16px] font-semibold uppercase tracking-[0.1em]',
+                    'px-3 py-1 text-title font-semibold uppercase tracking-[0.1em]',
                     dir === 'LONG' ? 'text-long' : 'text-short',
                   )}
                 >
@@ -340,47 +330,36 @@ export function SwipeDeck({
 
         {/* action row under the deck, the way Plenty of Fish places it */}
         <div className="mt-3 flex items-center justify-center gap-4">
-            <Action
-              label="undo"
-              tone="neutral"
-              disabled={!undo}
-              onClick={onUndo}
-              glyph="↺"
-            />
-            <Action label="pass" tone="neutral" onClick={() => commit('pass')} glyph="✕" />
-            <Action
-              label="short"
-              tone="short"
-              disabled={full}
-              onClick={() => commit('SHORT')}
-              glyph="↓"
-            />
-            <Action
-              label="long"
-              tone="long"
-              disabled={full}
-              onClick={() => commit('LONG')}
-              glyph="↑"
-            />
+          <Action
+            label="undo"
+            tone="neutral"
+            disabled={!undo}
+            onClick={onUndo}
+            glyph="↺"
+          />
+          <Action label="pass" tone="neutral" onClick={() => commit('pass')} glyph="✕" />
+          <Action
+            label="short"
+            tone="short"
+            disabled={full}
+            onClick={() => commit('SHORT')}
+            glyph="↓"
+          />
+          <Action
+            label="long"
+            tone="long"
+            disabled={full}
+            onClick={() => commit('LONG')}
+            glyph="↑"
+          />
         </div>
       </div>
 
-      <div className="flex h-9 shrink-0 items-center justify-between border-t border-line px-3">
-        <span className="num text-[10px] text-muted">
-          ${usd(risk)} at {leverage}× · equity ${usd(equity)} · {openPositions}/{maxPositions} open
+      {/* the only line below the card: what this swipe puts at risk */}
+      <div className="flex h-9 shrink-0 items-center border-t border-line px-3">
+        <span className="num text-micro text-muted">
+          risking <span className="text-fg">${usd(risk)}</span> · {leverage}× · margin ${usd(margin)}
         </span>
-        {full ? (
-          <span className="text-[10px] text-short">position cap reached · close one first</span>
-        ) : undo ? (
-          <button
-            onClick={onUndo}
-            className="num border border-brand/40 px-2 py-1 text-[10px] uppercase tracking-[0.08em] text-brand"
-          >
-            {undo.side === 'LONG' ? 'long' : 'short'} {undo.symbol} · undo
-          </button>
-        ) : (
-          <span className="text-[10px] text-muted">2s undo</span>
-        )}
       </div>
     </div>
   );
@@ -396,7 +375,7 @@ function withAway(liq: number, entry: number): string {
 function Stat({ k, v }: { k: string; v: string }) {
   return (
     <div>
-      <div className="text-[10px] text-muted">{k}</div>
+      <div className="text-micro text-muted">{k}</div>
       <div className="num">{v}</div>
     </div>
   );
@@ -404,7 +383,7 @@ function Stat({ k, v }: { k: string; v: string }) {
 
 function Chip({ children }: { children: React.ReactNode }) {
   return (
-    <span className="num border border-line bg-panel-2 px-1.5 py-0.5 text-[10px] text-fg/80">
+    <span className="num rounded-chip border border-line bg-panel-2 px-1.5 py-0.5 text-micro text-fg/80">
       {children}
     </span>
   );
@@ -413,7 +392,7 @@ function Chip({ children }: { children: React.ReactNode }) {
 function Row({ k, v, tone }: { k: string; v: string; tone?: 'short' }) {
   return (
     <div>
-      <dt className="text-[10px] text-muted">{k}</dt>
+      <dt className="text-micro text-muted">{k}</dt>
       <dd className={cn('num mt-0.5', tone === 'short' && 'text-short')}>{v}</dd>
     </div>
   );
@@ -438,7 +417,7 @@ function Action({
       disabled={disabled}
       aria-label={label}
       className={cn(
-        'flex h-12 w-12 items-center justify-center rounded-full border text-[16px] transition-colors',
+        'flex h-12 w-12 items-center justify-center rounded-control border text-title transition-colors',
         tone === 'neutral' && 'border-line text-fg/70 hover:text-fg',
         tone === 'long' && 'border-long text-long hover:bg-long/15',
         tone === 'short' && 'border-short text-short hover:bg-short/15',

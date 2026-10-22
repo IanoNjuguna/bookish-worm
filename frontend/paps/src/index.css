@@ -37,15 +37,17 @@
  *    `brand` is a legacy alias of the same accent colour, kept only so existing
  *    components resolve. New code writes `accent`.
  *
- * 3. RADIUS — exactly three, and no other radius values may be introduced.
- *      card     16px   --radius-card      a deck card, a panel, a sheet
- *      control  12px   --radius-control   a button, a field, a chip, a segment
- *      pill     999px  --radius-pill      tab bar, avatar, undo / action circles
- *    The pre-freeze utility names are aliased onto these three in
- *    tailwind.config.ts, so a component written before this block does not keep
- *    a fourth radius alive: rounded-2xl = card (16px, unchanged), rounded-xl and
- *    rounded-lg and rounded = control (12px; rounded-lg was 8px, the one visible
- *    change in this freeze), rounded-full = pill (unchanged in appearance).
+ * 3. RADIUS — boxy by default: a section is a rectangle with rounded corners, never a
+ *    pill. A pill-shaped container is the shape this product rejects, so 999px is
+ *    reserved for status dots and nothing else.
+ *      card     12px   --radius-card      a deck card, a panel, a sheet
+ *      control  10px   --radius-control   a button, a field, a segment, a tab
+ *      chip      8px   --radius-chip      a badge, a tag, a side label
+ *      pill    999px   --radius-pill      status dots only
+ *    The pre-freeze utility names are aliased onto these in tailwind.config.ts so a
+ *    component written before this block does not keep a fourth radius alive:
+ *    rounded-2xl = card, rounded-xl / lg / DEFAULT = control, rounded-full = pill.
+ *    Changing these four numbers re-skins every surface, which is the point.
  *
  * 4. TYPE SCALE — exactly five steps, named in the Tailwind fontSize theme.
  *      text-hero   34px  a hero numeral: account equity, the price a card is about
@@ -80,9 +82,10 @@
     --short: 240 83 78;
 
     /* 3. radius */
-    --radius-card: 16px;
-    --radius-control: 12px;
-    --radius-pill: 999px;
+    --radius-card: 12px;
+    --radius-control: 10px;
+    --radius-chip: 8px;
+  --radius-pill: 999px;
   }
 
   html,

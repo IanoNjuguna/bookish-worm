@@ -34,6 +34,9 @@ export default {
         /* 3. exactly three radii */
         card: 'var(--radius-card)',
         control: 'var(--radius-control)',
+        chip: 'var(--radius-chip)',
+        /* reserved for status dots and nothing else: a pill-shaped container is the
+           shape this design rejects */
         pill: 'var(--radius-pill)',
 
         /* pre-freeze utility names, aliased onto the same three so existing
