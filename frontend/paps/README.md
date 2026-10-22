@@ -133,6 +133,27 @@ adapter that knows about `context`.
     bun run build
     bunx wrangler pages dev dist --d1 DB=paps-keys --binding MASTER_KEY=$(openssl rand -base64 32)
 
+## Reading the account
+
+With a session the blotter stops being paper. `lib/strike/venue.ts` reads `account`,
+`positions`, `openOrders`, `history/funding` and `history/transaction` through
+`/api/strike/<path>` with `credentials: 'same-origin'`, and `hooks/useVenueAccount.ts`
+refreshes on a 30s poll and on window focus.
+
+    status    idle (no session) · loading · live · stale · reconnect
+    on error  the previous numbers stay, with their age, and that age is what turns red
+    on 401    the poll stops until connect runs again; it never retries a revoked key
+
+Amounts stay the strings the venue sent and are formatted at the edge, because an entry
+price is not a float. Three labels carry the state and they are deliberately separate: the
+header badge says `live` once a session exists, the Trade strip says `strike · demo
+orders`, and the ticket button still says `demo`, because no order leaves the browser in
+this build. The blotter's own header carries the age of the venue read.
+
+`lib/strike/fees.ts` parses the public `/v2/fee-tiers` (PascalCase today, camelCase in the
+docs) and reports the 5 bps fallback as unknown when the schedule does not parse, rather
+than presenting the fallback as the venue's rate.
+
 ## Limits
 
 A session cookie is a handle on a key that can trade. It is therefore counted, in two

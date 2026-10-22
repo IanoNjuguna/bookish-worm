@@ -17,12 +17,15 @@ export function TopBar({
   identity,
   identityOpen,
   onIdentityOpen,
+  live = false,
 }: {
   connected: boolean;
   lastAt: number;
   identity: ReturnType<typeof useIdentity>;
   identityOpen: boolean;
   onIdentityOpen: (open: boolean) => void;
+  /** True when a Strike session exists, so the badge stops claiming paper. */
+  live?: boolean;
 }) {
   return (
     <header className="flex h-14 shrink-0 items-center gap-2 px-4">
@@ -30,7 +33,7 @@ export function TopBar({
         paps<span className="text-accent">.</span>
       </span>
       <span className="rounded-chip border border-line px-1.5 py-0.5 text-micro uppercase tracking-[0.1em] text-muted">
-        demo
+        {live ? 'live' : 'demo'}
       </span>
 
       <span className="ml-auto flex shrink-0 items-center gap-2">
