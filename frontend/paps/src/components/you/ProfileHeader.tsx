@@ -29,8 +29,8 @@ export function ProfileHeader({
   // Another surface (the identity menu) can rename too; the field must follow it.
   useEffect(() => setDraft(handle), [handle]);
 
-  const fallback = address ? shortAddress(address) : 'guest';
-  const initial = (handle.trim() || address || 'g').charAt(0).toUpperCase();
+  const fallback = address ? shortAddress(address) : 'demo';
+  const initial = (handle.trim() || address || 'd').charAt(0).toUpperCase();
 
   const commit = () => {
     if (skipCommit.current) {
@@ -77,7 +77,7 @@ export function ProfileHeader({
           </div>
 
           <p className="mt-1 truncate text-small text-muted">
-            paper account · {wallet ?? 'guest'}
+            demo account · {wallet ?? 'this browser'}
           </p>
 
           {!address && (

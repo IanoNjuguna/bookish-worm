@@ -50,7 +50,7 @@ export function YouView({
       />
 
       <div className="px-1">
-        <p className="text-micro uppercase tracking-[0.1em] text-muted">paper account</p>
+        <p className="text-micro uppercase tracking-[0.1em] text-muted">demo account</p>
         <p className="num text-hero leading-none text-fg">${usd(equity)}</p>
         <p className={pnl >= 0 ? 'num mt-1 text-body text-long' : 'num mt-1 text-body text-short'}>
           {pnl >= 0 ? '+' : '−'}${usd(Math.abs(pnl))} since you started
@@ -85,7 +85,7 @@ export function YouView({
       />
 
       <p className="px-1 pt-1 text-[11px] leading-relaxed text-muted">
-        Paper trading. Prices come from Strike, the fills do not. A demo of a leverage
+        Demo trading. Prices come from Strike, the fills do not. A demo of a leverage
         interface is not an offering of leveraged derivatives.
       </p>
     </div>

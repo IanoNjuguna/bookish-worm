@@ -35,7 +35,7 @@ export function HowItWorks({ open, onClose }: { open: boolean; onClose: () => vo
         ))}
       </ol>
       <p className="mt-5 border-t border-line pt-3 text-small leading-relaxed text-muted">
-        Paper trading. A demo of a leverage interface is not an offering of leveraged
+        Demo trading. A demo of a leverage interface is not an offering of leveraged
         derivatives.
       </p>
     </Sheet>

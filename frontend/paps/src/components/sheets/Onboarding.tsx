@@ -15,8 +15,8 @@ const SLIDES: { title: string; body: string; hint: string }[] = [
     hint: 'The card draws the price at which you would be liquidated, before you commit.',
   },
   {
-    title: 'This money is paper',
-    body: 'Ten thousand simulated dollars, real Strike prices, simulated fills. Nothing moves, nothing can be withdrawn.',
+    title: 'This money is simulated',
+    body: 'Ten thousand simulated dollars, real Strike prices, simulated fills. Nothing moves, nothing can be withdrawn. That is what demo means here.',
     hint: 'Sign in only if you want this run to survive a refresh or a new device.',
   },
 ];
