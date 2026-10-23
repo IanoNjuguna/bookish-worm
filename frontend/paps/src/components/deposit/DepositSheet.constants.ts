@@ -20,6 +20,6 @@ export const SIGN_WARNING =
 
 /** The credit is not this screen's to report, and saying so stops a reload from looking broken. */
 export const PENDING_NOTE =
-  'strike credits the balance when the transfer settles. this screen stops at the hash, so reloading does not lose it.';
+  'strike credits the balance when the transfer settles. this screen does not poll, and it does not store the hash, so keep it: a reload clears this.';
 
 export const AMOUNT_NOTE = 'ada has 6 decimals. the minimum is whatever strike quotes.';

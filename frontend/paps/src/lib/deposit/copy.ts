@@ -45,7 +45,7 @@ const COPY: Record<DepositFailure['kind'], FailureCopy> = {
   },
   amount_rejected: {
     title: 'strike refused that amount',
-    body: 'a deposit below the venue minimum is refused exactly like this. the amount to try is in the message below.',
+    body: 'the venue refused this amount and said why below. a deposit below its minimum is refused exactly like this, so nothing is wrong with the app.',
   },
   rate_limited: {
     title: 'too many deposit calls',
