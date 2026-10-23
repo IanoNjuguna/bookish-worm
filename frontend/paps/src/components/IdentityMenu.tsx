@@ -34,10 +34,8 @@ export function IdentityMenu({ identity, open: openProp, onOpenChange }: Props) 
     error,
     busy,
     connectStrike,
-    connectStrikeUtxos,
     disconnect,
     update,
-    utxosConfigured,
   } = identity;
 
   return (
@@ -65,22 +63,8 @@ export function IdentityMenu({ identity, open: openProp, onOpenChange }: Props) 
               <div className="border-b border-line px-3 py-2 text-[10px] uppercase tracking-[0.1em] text-muted">
                 connect a wallet
               </div>
-              {utxosConfigured && (
-                <button
-                  disabled={busy}
-                  onClick={async () => {
-                    await connectStrikeUtxos();
-                    setOpen(false);
-                  }}
-                  className="flex w-full items-center justify-between bg-brand/10 px-3 py-2.5 text-left text-[12px] text-brand hover:bg-brand/20"
-                >
-                  Continue with Google
-                  <span className="text-[10px] uppercase tracking-[0.08em]">utxos</span>
-                </button>
-              )}
-
               <div className="border-t border-line px-3 py-1.5 text-[9px] uppercase tracking-[0.1em] text-muted">
-                or a browser wallet
+                a browser wallet
               </div>
 
               {wallets.length ? (
@@ -100,9 +84,8 @@ export function IdentityMenu({ identity, open: openProp, onOpenChange }: Props) 
                 ))
               ) : (
                 <p className="px-3 py-3 text-small leading-relaxed text-muted">
-                  {utxosConfigured
-                    ? 'No browser wallet found on this device. Install Eternl, Lace or Nami, or use Continue with Google above.'
-                    : 'No browser wallet found on this device. Install Eternl, Lace or Nami, then reload this page.'}
+                  No browser wallet on this device. Signing in needs a desktop extension, so
+                  install Eternl, Lace or Nami and reload.
                 </p>
               )}
 
