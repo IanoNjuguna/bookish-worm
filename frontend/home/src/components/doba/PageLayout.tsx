@@ -16,7 +16,10 @@ export default function PageLayout({
   className,
 }: PageLayoutProps) {
   return (
-    <div className="min-h-screen relative overflow-hidden flex flex-col justify-between">
+    // overflow-x-clip, not overflow-hidden: an overflow-hidden ancestor becomes the
+    // scroll container for position: sticky, which stops the paps feature column from
+    // sticking. clip trims the same overflow without creating that container.
+    <div className="min-h-screen relative overflow-x-clip flex flex-col justify-between">
       <VantaBackground />
       <Navbar />
 

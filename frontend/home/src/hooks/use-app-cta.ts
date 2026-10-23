@@ -24,9 +24,12 @@ const PAPS: AppCtaLink = { label: "Open paps", href: papsApp };
  */
 export function useAppCta(): UseAppCtaReturn {
   const { pathname } = useLocation();
+  // /paps and /paps/ are the same page to a visitor and to react-router's matching,
+  // so they must be the same page here too.
+  const path = pathname.replace(/\/+$/, "") || "/";
 
-  if (pathname === "/paps") return { links: [PAPS] };
-  if (pathname === "/") {
+  if (path === "/paps") return { links: [PAPS] };
+  if (path === "/") {
     return {
       links: [
         { label: "doba app", href: dobaApp },

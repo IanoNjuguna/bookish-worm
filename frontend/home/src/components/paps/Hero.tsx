@@ -1,7 +1,6 @@
 import { LiveStrip } from './LiveStrip';
 import { useHeroIntro } from './motion';
-
-const APP = 'https://paps.doba.world';
+import { papsApp } from '@/lib/site';
 
 export function Hero() {
   const ref = useHeroIntro<HTMLElement>('[data-line]');
@@ -30,7 +29,7 @@ export function Hero() {
 
           <div data-line className="mt-8 flex flex-wrap items-center gap-3">
             <a
-              href={APP}
+              href={papsApp}
               className="rounded-lg bg-paps-accent px-5 py-3 text-[14px] font-medium text-paps-canvas transition-transform hover:-translate-y-px"
             >
               Open the demo

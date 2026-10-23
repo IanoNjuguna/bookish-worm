@@ -16,6 +16,7 @@ const outDir = path.resolve(__dirname, 'dist');
 const prerenderRoutes = [
   "/",
   "/music",
+  "/paps",
   "/for-artists",
   "/how-it-works",
   "/about",
