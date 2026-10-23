@@ -3,6 +3,7 @@ import { createChart, type IChartApi, type ISeriesApi, type UTCTimestamp } from 
 import type { Bar } from '../hooks/useKlines';
 import { cn } from '../lib/cn';
 import { INTERVALS, type Interval } from '../lib/constants';
+import { CHART_FONT, CHART_GRID, CHART_LINE, CHART_TEXT } from '../lib/theme';
 
 type Props = { bars: Bar[]; interval: Interval; onInterval: (i: Interval) => void; error: string | null };
 
@@ -17,16 +18,16 @@ export function ChartPanel({ bars, interval, onInterval, error }: Props) {
     const c = createChart(host.current, {
       layout: {
         background: { color: 'transparent' },
-        textColor: '#8c8c8c',
-        fontFamily: 'Inter, system-ui, sans-serif',
+        textColor: CHART_TEXT,
+        fontFamily: CHART_FONT,
         fontSize: 11,
         // The default logo renders as a white box on a dark canvas; a credit line in
         // the app footer covers the licence instead.
         attributionLogo: false,
       },
-      grid: { vertLines: { color: 'rgba(255,255,255,0.04)' }, horzLines: { color: 'rgba(255,255,255,0.04)' } },
-      rightPriceScale: { borderColor: '#1f1f1f', scaleMargins: { top: 0.08, bottom: 0.08 } },
-      timeScale: { borderColor: '#1f1f1f', timeVisible: true, secondsVisible: false },
+      grid: { vertLines: { color: CHART_GRID }, horzLines: { color: CHART_GRID } },
+      rightPriceScale: { borderColor: CHART_LINE, scaleMargins: { top: 0.08, bottom: 0.08 } },
+      timeScale: { borderColor: CHART_LINE, timeVisible: true, secondsVisible: false },
       crosshair: { mode: 0 },
       autoSize: true,
     });
