@@ -20,6 +20,15 @@ WRANGLER="${WRANGLER:-wrangler@4}"
 
 missing=0
 
+# An unprovisioned pipeline SKIPS; a half-provisioned one FAILS.
+#
+# `main` used to go red on every paps push because CLOUDFLARE_API_TOKEN was never added, and a
+# permanently red main is worse than no deploy job: it trains everyone to ignore the check that
+# is supposed to mean "the Worker booted and signed". The distinction worth keeping is between
+# "nobody has provisioned this yet" (skip, with the same loud message) and "someone provisioned
+# it wrongly" (fail). release.yml already skips on an empty vars.AWS_ROLE_ARN for this reason.
+skip=0
+
 require() { # name hint
   if [ -z "${!1:-}" ]; then
     echo "::error title=paps deploy provisioning::$1 is not configured. $2"
@@ -27,8 +36,23 @@ require() { # name hint
   fi
 }
 
-require CLOUDFLARE_API_TOKEN \
-  'Add a Cloudflare API token with "Cloudflare Pages: Edit" and "D1: Edit" as the repo secret CLOUDFLARE_API_TOKEN.'
+if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
+  # The one check whose absence means "not provisioned", not "provisioned wrong".
+  skip=1
+  missing=0
+  echo "::warning title=paps deploy skipped::CLOUDFLARE_API_TOKEN is not set, so this run did not deploy paps. Add a Cloudflare API token with \"Cloudflare Pages: Edit\" and \"D1: Edit\" as the repo secret CLOUDFLARE_API_TOKEN, and the same push deploys."
+  echo
+  echo "Nothing was uploaded, and the previous deployment is still live."
+fi
+
+if [ "$skip" -eq 1 ]; then
+  [ -n "${GITHUB_OUTPUT:-}" ] && echo "deploy=skip" >>"$GITHUB_OUTPUT"
+  exit 0
+fi
+
+if [ -n "${GITHUB_OUTPUT:-}" ]; then
+  echo "deploy=yes" >>"$GITHUB_OUTPUT"
+fi
 require CLOUDFLARE_ACCOUNT_ID \
   'Add the account id (dash.cloudflare.com, right sidebar) as the repo variable CLOUDFLARE_ACCOUNT_ID.'
 require PAPS_D1_DATABASE_ID \

@@ -1,0 +1,73 @@
+name: Home — deploy to Pages
+
+# doba-home had no deploy job at all: Cloudflare Pages was being fed by hand from whatever
+# checkout happened to be open, which is how `doba-home.pages.dev` ended up three commits
+# behind `main`. Vercel also builds `frontend/home` and serves www.doba.world, so this job is
+# the second target rather than the only one, and it is the one that proves the prerender
+# works on a clean Linux runner.
+#
+# `paths` keeps it quiet: a paps-only change does not rebuild the marketing site.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/home/**'
+      - '.github/workflows/home-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Home — build, verify prerender, deploy
+    runs-on: ubuntu-latest
+    concurrency:
+      group: home-pages-deploy
+      cancel-in-progress: false
+    defaults:
+      run:
+        working-directory: frontend/home
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1
+
+      - run: bun install --frozen-lockfile
+
+      - name: Build
+        run: bun run build
+
+      - name: The prerender actually emitted the product landings
+        # A green `vite build` is not the gate. The bug this replaces was a build that passed
+        # while /paps shipped the homepage HTML, so the artefacts are asserted by content.
+        run: |
+          set -eu
+          for route in "" music paps; do
+            f="dist/${route:+$route/}index.html"
+            [ -f "$f" ] || { echo "::error title=prerender::$f was not emitted"; exit 1; }
+          done
+          grep -q 'Perps, with the risk written down' dist/paps/index.html \
+            || { echo "::error title=prerender::dist/paps/index.html has no paps content"; exit 1; }
+          grep -q 'rel="canonical" href="https://doba.world/paps"' dist/paps/index.html \
+            || { echo "::error title=prerender::dist/paps/index.html has the wrong canonical"; exit 1; }
+          grep -q 'rel="canonical" href="https://doba.world/music"' dist/music/index.html \
+            || { echo "::error title=prerender::dist/music/index.html has the wrong canonical"; exit 1; }
+          [ -f public/_redirects ] || { echo "::error title=redirects::frontend/home/public/_redirects is missing, so Pages deep links 404"; exit 1; }
+          echo "prerender ok: /, /music, /paps, plus _redirects"
+
+      - name: Deploy
+        # No token means "not provisioned yet", not "broken": skip with the same loud message
+        # instead of painting `main` red. The same secret turns this into a deploy.
+        run: |
+          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ]; then
+            echo "::warning title=doba-home deploy skipped::CLOUDFLARE_API_TOKEN is not set, so nothing was uploaded. Add a Cloudflare API token with \"Cloudflare Pages: Edit\" as the repo secret CLOUDFLARE_API_TOKEN and the next push to frontend/home deploys."
+            exit 0
+          fi
+          bunx wrangler@4 pages deploy dist --project-name doba-home --branch main
