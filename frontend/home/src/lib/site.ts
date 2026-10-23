@@ -12,12 +12,11 @@ export const dobaApp = "https://app.doba.world";
 
 /** The paps trading app. */
 /*
- * Points at the Pages deployment, not at `https://paps.doba.world`, because that host has no DNS
- * record yet and a hackathon submission cannot ship a CTA that resolves to nothing. Cloudflare
- * Pages only answers a custom hostname registered on the project, so the record cannot be a CNAME
- * from Spaceship alone: the domain comes back here the moment the doba.world zone exists.
+ * paps.doba.world is a custom domain on the Cloudflare Pages project `paps`, verified by CNAME at
+ * Spaceship (target: paps-3nz.pages.dev). If that host ever stops answering, the deployment it
+ * fronts is still https://paps-3nz.pages.dev and the swap is this one line.
  */
-export const papsApp = "https://paps-3nz.pages.dev";
+export const papsApp = "https://paps.doba.world";
 
 /** The paps app as it should read in copy, without the scheme. */
 export const papsAppLabel = papsApp.replace(/^https?:\/\//, "");
