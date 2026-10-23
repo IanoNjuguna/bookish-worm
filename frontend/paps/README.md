@@ -21,9 +21,13 @@ through the signing proxy after that.
                     the venue's ids come back
     liquidation     strike's isolated formula, first-tier maintenance margin, so it
                     is an estimate and the UI says so
+    deposits        endpoints only. quote, build-tx and confirm are live on the Worker and
+                    covered by tests, but nothing in the app calls them yet, so there is
+                    no deposit screen
 
-The header badge reads PAPER everywhere, and the ticket repeats it. Nothing in this
-app can move funds.
+The header badge reads `demo` until a Strike session exists and `live` after it, because
+the account behind the badge is real by then. Nothing in the demo path can move funds. A
+connected account can: a swipe arms a real venue order, and a second click sends it.
 
 ## Strike API notes
 
@@ -76,7 +80,8 @@ browser wallet (CIP-30) stays available for people who already have one.
 
     VITE_UTXOS_PROJECT_ID   from the utxos.dev dashboard; without it only CIP-30 works
     VITE_BUILDER_CODE       paps — registered on mainnet, not on testnet
-    fee                     requested at 0 bps; the builder's cut is taken by Strike
+    fee                     requested at 100 bps: 1% on top of Strike's own taker rate,
+                            charged by Strike and shown in the connect consent message
 
 Two build notes worth keeping: UTXOS is Mesh underneath and needs node crypto polyfills
 (`vite-plugin-node-polyfills`, crypto/buffer/stream only), and `libsodium-wrappers-sumo`
@@ -177,7 +182,9 @@ than presenting the fallback as the venue's rate.
 
 The deposit flow is server-side so far: quote, build-tx and confirm, each signed through the
 proxy, with amounts passed as lovelace strings because `Number(ada) * 1e6` loses lovelace past
-about nine billion ADA. Failures are states, and the two 400s are not the same failure:
+about nine billion ADA. The wallet signs and submits the built transaction, so real ADA can be
+deposited. Nothing in the app calls these routes yet: a deposit is an API and not a screen.
+Failures are states, and the two 400s are not the same failure:
 
     amount_rejected   400 at quote: the venue refused the amount itself, which is what a
                       deposit below its minimum looks like. The venue's own message is
