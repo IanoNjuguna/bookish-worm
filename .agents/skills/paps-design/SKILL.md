@@ -54,7 +54,7 @@ them: four tabs at the bottom, a header with four facts, tickets in sheets.
 
 ## Numbers
 
-- **All numerals in a mono face** (IBM Plex Mono), all labels in the sans (Inter).
+- **All numerals in a mono face** (IBM Plex Mono), all labels in the sans (Chivo).
   This single rule is what separates a terminal from a dashboard template.
 - `tabular-nums` everywhere so columns do not jitter as values tick.
 - Fixed decimals per instrument, taken from `pricePrecision`; never format a price by
@@ -65,11 +65,25 @@ them: four tabs at the bottom, a header with four facts, tickets in sheets.
 
 ## Colour
 
-    canvas      #0b0b0b        panels #121212 / #171717
-    hairline    #1f1f1f        body text #e8e8e8, muted #8c8c8c
-    long        #00b47a        short #f0534e
-    brand       doba pink, used only for the environment badge and the active market
+doba's dark theme, frozen in `frontend/paps/src/index.css`. The tokens there are the
+contract; this table is the same ladder in hex so a hand-written value can be checked.
 
+    canvas      #0b0b0e   hsl(240 10% 5%)    midnight, the page
+    panel       #101014   hsl(240 10% 7%)
+    panel-2     #1c1c22   hsl(240 10% 12%)   inputs, chips, pressed rows
+    hairline    #32323e   hsl(240 10% 22%)
+    fg          #fafafa   muted #9999a3  hsl(240 5% 62%) — 6.74:1 on panel
+    accent      #b992f6   hsl(263 85% 77%)  lavender
+    long        #00b47a   short #f0534e
+
+- **Lavender is the accent, not cyber-pink.** Pink (`#ff1f8a`) is doba's primary action
+  colour, but paps already spends red on direction (`short` is `#f0534e`, 31° of hue
+  away at the same chroma). At 11px on a PnL row the two read as one signal. Pink stays
+  brand only: the favicon dot and the wordmark.
+- Lavender marks the primary action and progress and nothing else. Never decoration,
+  never a direction, never a PnL number — green and red own that outright.
+- **`bg-accent` must set `text-canvas`.** Lavender is light (77%); canvas on accent is
+  7.96:1, white on accent is 2.46:1.
 - Green and red mean direction and PnL. Nothing decorative is ever green or red.
 - No amber. Warning states borrow red; absence is muted text.
 - Depth bars sit at 12–14% opacity; the number always outranks its bar.
