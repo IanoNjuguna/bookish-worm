@@ -7,16 +7,31 @@ import type { Identity } from './types';
  * handle we keep. Nothing here touches keys — the wallet signs, we only ask.
  */
 
-type Cip30Wallet = {
-  enable: () => Promise<{
-    getChangeAddress: () => Promise<string>;
-    getNetworkId: () => Promise<number>;
-    /** CIP-8 message signing; payload is hex, result carries a COSE signature. */
-    signData?: (
-      address: string,
-      payloadHex: string,
-    ) => Promise<{ signature: string; key: string }>;
-  }>;
+/**
+ * What an enabled wallet can do, narrowed to what paps calls.
+ *
+ * `getUtxos` answers the wallet's own unspent outputs as hex, which is the only shape strike
+ * will select deposit inputs from; `null` means the wallet is locked or wants pagination, and is
+ * a state to report rather than an error to throw. `signTx` and `submitTx` are the two calls
+ * that move coins, so they stay optional here and the deposit adapter refuses a wallet without
+ * them instead of inventing a fallback.
+ */
+export type Cip30Api = {
+  getChangeAddress: () => Promise<string>;
+  getNetworkId: () => Promise<number>;
+  /** CIP-8 message signing; payload is hex, result carries a COSE signature. */
+  signData?: (
+    address: string,
+    payloadHex: string,
+  ) => Promise<{ signature: string; key: string }>;
+  getUtxos?: (amount?: string, paginate?: unknown) => Promise<string[] | null>;
+  /** `partialSign` is set for a transaction the venue already built around other witnesses. */
+  signTx?: (txCborHex: string, partialSign?: boolean) => Promise<string>;
+  submitTx?: (txCborHex: string) => Promise<string>;
+};
+
+export type Cip30Wallet = {
+  enable: () => Promise<Cip30Api>;
   name?: string;
   icon?: string;
 };
@@ -28,6 +43,22 @@ declare global {
 }
 
 export type WalletOption = { id: string; name: string };
+
+/**
+ * The registry entry for a wallet, by id and then by the name the user saw.
+ *
+ * `Identity.wallet` stores the display name (`Eternl`, `Lace`), not the registry key, so a
+ * lookup by name is the normal case for a remembered session: a wallet that was present when
+ * the session was made may register under any id (`eternl`, `eternlWallet`, …).
+ */
+export function cip30Wallet(wallet: string | undefined): Cip30Wallet | null {
+  const api = typeof window === 'undefined' ? undefined : window.cardano;
+  if (!api || !wallet) return null;
+  const direct = api[wallet];
+  if (direct) return direct;
+  const byName = Object.values(api).find((w) => w?.name === wallet);
+  return byName ?? null;
+}
 
 export function availableWallets(): WalletOption[] {
   const api = typeof window === 'undefined' ? undefined : window.cardano;
