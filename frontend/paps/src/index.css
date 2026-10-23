@@ -8,34 +8,70 @@
  * paps is DARK-ONLY BY DESIGN. There is no light theme, no `dark:` variant and
  * no light/dark parity with the other apps in this monorepo. The surface below
  * *is* the surface; a second scheme would be a different product.
+ *
+ * The palette is doba's canonical dark theme (DESIGN.md): midnight canvas,
+ * midnight card, lavender accent. paps shares one brand with the rest of doba,
+ * so it shares one colour ladder. It keeps its own radii and its own density,
+ * because those are a trading decision rather than a brand one.
  * ============================================================================
  *
- * 1. CANVAS WARMTH — warm near-black, never a terminal blue-black.
- *    Every surface grey carries a ~30° hue bias (the amber axis) at 7-9%
- *    saturation, so the blacks read as stone and paper rather than as a monitor.
+ * 1. CANVAS — midnight, cool and neutral.
+ *    Every surface grey carries doba's 240° hue at 5-10% saturation, so the
+ *    blacks read as one dark surface lit from above rather than a terminal
+ *    blue-black or a warm stone.
  *
- *      canvas   hsl(30 9% 6%)   #110f0e   the page; warm enough to feel printed
- *      panel    hsl(30 8% 9%)   #191715   one step up: a card sitting on the page
- *      panel-2  hsl(30 7% 13%)  #23211f   two steps: an input, a chip, a pressed row
- *      line     hsl(30 8% 19%)  #34302d   the hairline; lighter than every surface it
- *                                         separates, so a border is a seam, not decor
+ *      canvas   hsl(240 10% 5%)   #0b0b0e   the page (doba midnight)
+ *      panel    hsl(240 10% 7%)   #101014   one step up: a card sitting on the page
+ *      panel-2  hsl(240 10% 12%)  #1c1c22   two steps: an input, a chip, a pressed row
+ *      line     hsl(240 10% 22%)  #32323e   the hairline; lighter than every surface it
+ *                                          separates, so a border is a seam, not decor
  *
- *    The ladder is deliberately shallow (6 -> 9 -> 13 -> 19) and monotonic:
+ *    The ladder is deliberately shallow (5 -> 7 -> 12 -> 22) and monotonic:
  *    elevation is told by light first, so a card is legible before it has a
- *    visible outline. fg hsl(35 16% 93%) #f0eeea and muted hsl(30 7% 60%)
- *    #a09992 stay on the same warm axis — a neutral #e8e8e8 beside this black
- *    reads blue, and that is exactly the tell being removed.
+ *    visible outline. The hairline is stated SOLID rather than as doba's
+ *    `white/8%`: that alpha composites to about #1f1f21 on this canvas, which
+ *    halves the seam's visibility in a 19-22px blotter row. On a dense data
+ *    surface a border has to survive being one pixel tall, so it gets a value
+ *    chosen at that size instead of an alpha chosen for a hero.
  *
- * 2. ONE ACCENT — hsl(214 62% 62%) #6296da.
- *    A single ink blue. It marks the primary action and progress — the one CTA,
- *    bar fills, meter and track progress — and nothing else. It may NOT be used
+ *    fg hsl(0 0% 98%) #fafafa sits at 18.76:1 on canvas. muted
+ *    hsl(240 5% 62%) #9999a3 sits at 6.74:1 on panel and 6.05:1 on panel-2.
+ *    doba states muted-foreground as `white/40`, which composites to 3.82:1 on
+ *    this panel and therefore misses the 4.5:1 floor that 10-11px labels need.
+ *    paps pins muted to the lightness that clears AA, not to the alpha that
+ *    looks right on a headline. Moving muted darker is a contrast regression in
+ *    every secondary fact on the surface.
+ *
+ * 2. ONE ACCENT — lavender hsl(263 85% 77%) #b992f6.
+ *    doba's secondary colour, and deliberately NOT cyber-pink (#ff1f8a), which
+ *    is doba's primary action colour. paps already spends red on direction:
+ *    --short is #f0534e, hsl(2 84% 62%). Pink sits at hsl(331 100% 56%) — 31°
+ *    of hue away at the same high chroma — so at 11px, on a PnL row, beside a
+ *    losing position, the two read as the same signal. Lavender is more than
+ *    100° clear of that red and reads cool on midnight, so the primary action
+ *    can never be mistaken for a loss. Pink remains brand only: the favicon dot
+ *    and the wordmark, nowhere on this surface.
+ *
+ *    Lavender marks the primary action and progress — the one CTA, bar fills,
+ *    meter and track progress — and nothing else. It may NOT be used
  *    decoratively: no accent icons, no accent labels, no accent border on a card
  *    that is not itself the action, no accent as a brand wash.
- *    Green (--long #00b47a) and red (--short #f0534e) are reserved for direction
- *    and PnL and are never the accent. Amber is banned outright (warning states
- *    borrow red; an amber CTA is the casino tell).
+ *    It is never a direction and never a PnL number. --long and --short own
+ *    that meaning outright; an accent-tinted numeral in a blotter column would
+ *    be a third state for the trader to decode, and the direction triad stays
+ *    exactly two.
+ *
+ *    Green (--long #00b47a, 7.29:1 on canvas) and red (--short #f0534e, 5.65:1)
+ *    are reserved for direction and PnL and are never the accent. Amber is
+ *    banned outright (warning states borrow red; an amber CTA is the casino
+ *    tell).
  *    `brand` is a legacy alias of the same accent colour, kept only so existing
  *    components resolve. New code writes `accent`.
+ *
+ *    FOREGROUND ON ACCENT: lavender at 77% lightness is a light fill, so
+ *    anything with `bg-accent` must set `text-canvas` — that pairing measures
+ *    7.96:1. White on accent is 2.46:1 and fg on accent is 2.36:1, both
+ *    unreadable, so no `bg-accent` element may inherit its text colour.
  *
  * 3. RADIUS — boxy by default: a section is a rectangle with rounded corners, never a
  *    pill. A pill-shaped container is the shape this product rejects, so 999px is
@@ -44,12 +80,16 @@
  *      control  10px   --radius-control   a button, a field, a segment, a tab
  *      chip      8px   --radius-chip      a badge, a tag, a side label
  *      pill    999px   --radius-pill      status dots only
+ *    These three already equal doba's `--radius` scale exactly (lg = md = sm on a
+ *    .75rem base), so the two systems agree here and neither has to move.
  *    The pre-freeze utility names are aliased onto these in tailwind.config.ts so a
  *    component written before this block does not keep a fourth radius alive:
  *    rounded-2xl = card, rounded-xl / lg / DEFAULT = control, rounded-full = pill.
  *    Changing these four numbers re-skins every surface, which is the point.
  *
- * 4. TYPE SCALE — exactly five steps, named in the Tailwind fontSize theme.
+ * 4. TYPE — Chivo for every label, IBM Plex Mono for every numeral, exactly five
+ *    steps named in the Tailwind fontSize theme. The FAMILY is doba's; the SCALE
+ *    below is paps's own and is deliberately not doba's marketing scale.
  *      text-hero   34px  a hero numeral: account equity, the price a card is about
  *      text-title  16px  a section title, a symbol in a header
  *      text-body   12px  the default; every sentence the trader is meant to read
@@ -68,16 +108,18 @@
 
 @layer base {
   :root {
-    /* 1. canvas warmth */
-    --canvas: 30 9% 6%;
-    --panel: 30 8% 9%;
-    --panel-2: 30 7% 13%;
-    --line: 30 8% 19%;
-    --fg: 35 16% 93%;
-    --muted: 30 7% 60%;
+    /* 1. canvas — midnight (doba dark). Ladder: 5 -> 7 -> 12 -> 22. */
+    --canvas: 240 10% 5%;
+    --panel: 240 10% 7%;
+    --panel-2: 240 10% 12%;
+    --line: 240 10% 22%;
+    --fg: 0 0% 98%;
+    --muted: 240 5% 62%;
 
-    /* 2. one accent, plus the two reserved direction colours */
-    --accent: 214 62% 62%;
+    /* 2. one accent (lavender, never cyber-pink), plus the two reserved
+          direction colours. --long and --short are frozen values: green and red
+          mean direction and PnL, and lavender never does. */
+    --accent: 263 85% 77%;
     --long: 0 180 122;
     --short: 240 83 78;
 
