@@ -8,6 +8,7 @@ import { TierProgress } from './you/TierProgress';
 import { Achievements } from './you/Achievements';
 import { Watchlist } from './you/Watchlist';
 import { AccountActions } from './you/AccountActions';
+import { DepositEntry } from './deposit/DepositEntry';
 
 /**
  * "You" is the only tab that is about the trader rather than the market: what they have
@@ -78,6 +79,9 @@ export function YouView({
           <span className="ml-2 text-muted">leverage, liquidation, funding</span>
         </button>
       )}
+
+      <DepositEntry identity={identity.identity} onReconnect={onOpenIdentity} />
+
       <AccountActions
         signedIn={Boolean(identity.identity)}
         onSignOut={identity.disconnect}

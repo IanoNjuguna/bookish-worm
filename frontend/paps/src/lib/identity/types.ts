@@ -29,6 +29,11 @@ export const DEFAULT_PROFILE: Profile = {
   stats: { xp: 0, cleanCloses: 0, liquidations: 0, rounds: 0, best: 0, worst: 0, peak: 10_000 },
 };
 
+/**
+ * `utxos` is legacy: the embedded wallet it named is no longer shipped, but a session stored
+ * in localStorage before it was removed still carries the value, and the deposit gate has to
+ * recognise it rather than trying to sign with a wallet that is not there.
+ */
 export type IdentityProvider = 'cip30' | 'utxos';
 
 export type Identity = {
