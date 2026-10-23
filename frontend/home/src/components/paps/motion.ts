@@ -19,22 +19,12 @@ export const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /** Reveal a block once, as it enters. Disabled entirely under reduced motion. */
-export function useReveal<T extends HTMLElement>(options?: {
-  y?: number;
-  delay?: number;
-  /** When the same element is also driven by a desktop ScrollTrigger, the reveal must
-   *  stay out of its way: `only: 'mobile'` keeps this hook below the pin breakpoint. */
-  only?: 'mobile';
-}) {
+export function useReveal<T extends HTMLElement>(options?: { y?: number; delay?: number }) {
   const ref = useRef<T | null>(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el || prefersReducedMotion()) return;
-    if (options?.only === 'mobile' && window.matchMedia('(min-width: 900px)').matches) {
-      gsap.set(el, { clearProps: 'opacity,transform' });
-      return;
-    }
 
     const tween = gsap.from(el, {
       y: options?.y ?? 18,
@@ -52,53 +42,6 @@ export function useReveal<T extends HTMLElement>(options?: {
   }, [options?.delay, options?.y]);
 
   return ref;
-}
-
-/**
- * The desktop-only set piece: three feature panels pinned while the page scrolls, each
- * fading in over the last. `gsap.matchMedia` reverts every trace when the viewport drops
- * below the breakpoint or motion is reduced, so a phone that rotates cannot inherit a
- * half-built pin.
- */
-export function usePinnedPanels(
-  hostRef: React.RefObject<HTMLElement | null>,
-  panelSelector: string,
-) {
-  useEffect(() => {
-    const host = hostRef.current;
-    if (!host || prefersReducedMotion()) return;
-
-    const mm = gsap.matchMedia();
-
-    mm.add('(min-width: 900px)', () => {
-      const panels = gsap.utils.toArray<HTMLElement>(panelSelector, host);
-      if (panels.length < 2) return;
-
-      gsap.set(panels.slice(1), { autoAlpha: 0, y: 24 });
-
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: host,
-          start: 'top top',
-          end: () => `+=${panels.length * 60}%`,
-          pin: true,
-          scrub: 0.6,
-          anticipatePin: 1,
-        },
-      });
-
-      panels.slice(1).forEach((panel, i) => {
-        tl.to(panels[i], { autoAlpha: 0, y: -24, duration: 0.4 }, i)
-          .to(panel, { autoAlpha: 1, y: 0, duration: 0.4 }, i);
-      });
-
-      return () => {
-        gsap.set(panels, { clearProps: 'all' });
-      };
-    });
-
-    return () => mm.revert();
-  }, [hostRef, panelSelector]);
 }
 
 /** One load-in timeline for the hero. Words rise; nothing counts up. */
