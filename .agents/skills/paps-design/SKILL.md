@@ -127,6 +127,16 @@ or four facts, and large decisive actions.
   Never show a count of the whole universe — markets are infinite, attention is not.
 - **A swipe is immediate, with two seconds of undo.** The undo is the safety, not the
   confirm: confirming kills the gesture, and no undo makes it dangerous.
+- **The gesture is tracked from the origin, never accumulated.** Record `clientX/clientY`
+  at pointerdown, keep it in a ref, and drive the card from offsets against that origin.
+  `movementX` is a mouse idea, and adding it to a value read out of state means the
+  offsets come from the render that installed the handler, so a 240px drag collapses into
+  one increment: the card moves 20px and the deck does not advance. `touch-action: none`
+  on the drag host, pointer capture on the host rather than `e.target`, and
+  `onPointerCancel` resetting the card are all part of the gesture, not polish — without
+  them the browser claims the pan and the deck is perfect with a mouse and dead on a
+  phone. Vertical wins only when it dominates the sideways drift, and a pass needs less
+  travel than a position because it opens nothing.
 - **Close the loop**: a cap on open positions, stated on screen, because after ten
   swipes the bottleneck is capital rather than choice.
 
