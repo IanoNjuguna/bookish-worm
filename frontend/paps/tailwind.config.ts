@@ -11,7 +11,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        /* 1. canvas warmth — one stepped ladder, warm hue on every step */
+        /* 1. canvas — doba midnight, one stepped ladder on the 240° axis */
         canvas: 'hsl(var(--canvas) / <alpha-value>)',
         panel: 'hsl(var(--panel) / <alpha-value>)',
         'panel-2': 'hsl(var(--panel-2) / <alpha-value>)',
@@ -48,7 +48,9 @@ export default {
         full: 'var(--radius-pill)',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        /* doba's sans. Arial is the fallback frontend/home also uses, so both
+           surfaces degrade to the same face if Google Fonts is blocked. */
+        sans: ['Chivo', 'Arial', 'sans-serif'],
         mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
       },
       fontSize: {
