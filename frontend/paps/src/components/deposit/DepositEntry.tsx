@@ -9,9 +9,9 @@ import type { DepositEntryProps } from './DepositSheet.types';
  * Where the deposit starts: one row in the account, and the sheet behind it.
  *
  * It is gated rather than hopeful. With no browser wallet there is nothing this flow could do, so
- * the row is not drawn at all; with a wallet but no strike session, or a session that came from
- * the embedded wallet, the row is drawn disabled and says which of those it is. A button that
- * opens a sheet that cannot proceed is worse than no button.
+ * the row is not drawn at all; with a wallet but no strike session, or a session left over from
+ * the embedded wallet this app no longer ships, the row is drawn disabled and says which of those
+ * it is. A button that opens a sheet that cannot proceed is worse than no button.
  *
  * The You tab is the choice of home: a deposit is an account action, the session already lives
  * here, and the identity popover in the header is 268px of fields that closes on an outside

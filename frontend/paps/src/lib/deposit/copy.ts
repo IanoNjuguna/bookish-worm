@@ -57,7 +57,7 @@ const COPY: Record<DepositFailure['kind'], FailureCopy> = {
   },
   wallet_unsupported: {
     title: 'this wallet cannot sign a cardano transaction here',
-    body: 'the deposit needs a browser wallet extension that reports utxos and signs cardano transactions. the embedded wallet cannot, so this deposit has to come from an extension.',
+    body: 'the deposit needs a browser wallet extension that reports utxos and signs cardano transactions.',
   },
   wallet_missing: {
     title: 'the wallet that signed you in is not in this browser',

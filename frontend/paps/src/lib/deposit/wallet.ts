@@ -40,7 +40,10 @@ export function depositBlocked(identity: Identity | null): string | null {
     return 'connect a wallet above and sign in to strike to deposit.';
   }
   if (identity.provider !== 'cip30') {
-    return 'this deposit needs a browser wallet extension. this session uses the embedded wallet.';
+    // Reachable from localStorage: a session stored by the embedded wallet this app no
+    // longer ships. There is no wallet in the browser to sign a cardano tx with, so the
+    // only fix is a fresh sign-in through an extension.
+    return 'this session came from a wallet this app no longer supports. reconnect with a browser extension to deposit.';
   }
   if (!cip30Wallet(identity.wallet)) {
     return `unlock ${identity.wallet} in this browser to deposit, then reload.`;
