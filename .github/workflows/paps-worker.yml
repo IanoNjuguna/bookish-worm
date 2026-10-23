@@ -75,14 +75,18 @@ jobs:
         with:
           bun-version: 1
       - name: Refuse to deploy without provisioning
+        id: preflight
         # First, and before the install: fails in seconds, before anything is uploaded, and
-        # names which piece is missing: the API token, the account id, the database id, or
-        # MASTER_KEY on the Pages project.
+        # names which piece is missing: the account id, the database id, or MASTER_KEY on the
+        # Pages project. An entirely unprovisioned pipeline (no API token) skips instead of
+        # failing, so a missing secret does not paint `main` red on every paps push.
         run: bash scripts/deploy-preflight.sh
       - run: bun install --frozen-lockfile
+        if: steps.preflight.outputs.deploy == 'yes'
       - name: Point wrangler.toml at the real database
         # The id is a repo variable rather than a commit, so the placeholder in wrangler.toml
         # is what a fresh clone has. Once it is replaced in the repo this step is a no-op.
+        if: steps.preflight.outputs.deploy == 'yes'
         run: |
           if grep -q 'REPLACE_WITH_D1_DATABASE_ID' wrangler.toml; then
             sed -i "s/REPLACE_WITH_D1_DATABASE_ID/${PAPS_D1_DATABASE_ID}/" wrangler.toml
@@ -91,9 +95,12 @@ jobs:
             echo "wrangler.toml already names a database id; leaving it alone"
           fi
       - name: Build
+        if: steps.preflight.outputs.deploy == 'yes'
         run: bun run build
       - name: Apply migrations to the real database
+        if: steps.preflight.outputs.deploy == 'yes'
         # Schema first. A wrong id fails here, loudly, before the app is deployed onto it.
         run: bunx wrangler@4 d1 migrations apply paps-keys --remote
       - name: Deploy
+        if: steps.preflight.outputs.deploy == 'yes'
         run: bunx wrangler@4 pages deploy dist --project-name paps --branch main
