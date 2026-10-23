@@ -110,7 +110,9 @@ export function IdentityMenu({ identity, open: openProp, onOpenChange }: Props) 
 
               <p className="border-t border-line px-3 py-2 text-[10px] text-muted">
                 Signing connects your wallet to Strike through the <span className="text-fg/70">paps</span> builder
-                at 0% fee. It cannot move funds, and every order in this app is paper.
+                at 1% on top of Strike's taker fee. The signature itself cannot move funds.
+                Orders are paper until you sign in; after that a swipe arms a real order that
+                you confirm in two steps.
               </p>
             </div>
           ) : (

@@ -17,7 +17,7 @@ const SLIDES: { title: string; body: string; hint: string }[] = [
   {
     title: 'This money is simulated',
     body: 'Ten thousand simulated dollars, real Strike prices, simulated fills. Nothing moves, nothing can be withdrawn. That is what demo means here.',
-    hint: 'Sign in only if you want this run to survive a refresh or a new device.',
+    hint: 'Signing in keeps this run and connects a real Strike account, where every order takes a second click before it is sent.',
   },
 ];
 
