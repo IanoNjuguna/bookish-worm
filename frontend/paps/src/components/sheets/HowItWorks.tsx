@@ -11,11 +11,11 @@ const SECTIONS: { h: string; body: string }[] = [
   },
   {
     h: 'What it costs',
-    body: 'A 0.05% fee on each fill. Funding every eight hours between longs and shorts, charged on the position, not on your balance. A liquidation closes at the mark and charges the venue’s 1% fee.',
+    body: 'A 0.05% fee on each fill, plus paps’s 1% when the order goes to the venue. Funding every eight hours between longs and shorts, charged on the position, not on your balance. A liquidation closes at the mark and charges the venue’s 1% fee.',
   },
   {
-    h: 'What is not real here',
-    body: 'Prices come from Strike. The fills are simulated, the money is simulated, and nothing leaves this browser. paps takes no fee on your trades — the builder rate is 0%.',
+    h: 'What is real, and what is not',
+    body: "Prices come from Strike. Until you sign in the fills are simulated, the money is simulated, and nothing leaves this browser. Sign in and the same swipe arms a real order on Strike, filled by the venue, with paps taking 1% on top of Strike's fee.",
   },
 ];
 
@@ -35,8 +35,8 @@ export function HowItWorks({ open, onClose }: { open: boolean; onClose: () => vo
         ))}
       </ol>
       <p className="mt-5 border-t border-line pt-3 text-small leading-relaxed text-muted">
-        Demo trading. A demo of a leverage interface is not an offering of leveraged
-        derivatives.
+        Demo trading here means simulated fills on real prices. A demo of a leverage
+        interface is not an offering of leveraged derivatives.
       </p>
     </Sheet>
   );

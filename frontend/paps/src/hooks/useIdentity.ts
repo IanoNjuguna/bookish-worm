@@ -49,7 +49,7 @@ export function useIdentity() {
     }
   }, []);
 
-  /** Strike builder connect: identity plus an API wallet, fee 0 bps. */
+  /** Strike builder connect: identity plus an API wallet, at the builder fee in FEE_SHARE_BPS. */
   const connectStrike = useCallback(async (walletId: string) => {
     setBusy(true);
     setError(null);
