@@ -5,6 +5,7 @@ import { DEFAULT_TIER, liquidationPrice, sizeForNotional, type Side } from '../l
 import { sparkPath } from '../hooks/useSparklines';
 import type { DeckCard } from '../hooks/useDeck';
 import type { Objective } from '../lib/progress';
+import { FALLBACK_WIDTH, SWIPE_THRESHOLD, resolveSwipe } from '../lib/swipe';
 
 type Props = {
   cards: DeckCard[];
@@ -28,8 +29,16 @@ type Props = {
   onNextRound: () => void;
 };
 
+/** What the card is drawn with. Render only: never read back for a decision. */
 type Drag = { x: number; y: number; active: boolean };
-const THRESHOLD = 0.32;
+const STILL: Drag = { x: 0, y: 0, active: false };
+
+/**
+ * The gesture as the browser reported it, held in a ref so a move never reads a value
+ * from the render that installed it. `x`/`y` are offsets from where the finger landed,
+ * which is the only measurement a touch device gives reliably.
+ */
+type Gesture = { pointerId: number; originX: number; originY: number; x: number; y: number };
 
 /**
  * Card anatomy borrowed from the two strongest swipe surfaces in Mobbin: Tinder's
@@ -61,11 +70,15 @@ export function SwipeDeck({
   session,
   onNextRound,
 }: Props) {
-  const [drag, setDrag] = useState<Drag>({ x: 0, y: 0, active: false });
+  const [drag, setDrag] = useState<Drag>(STILL);
   const [flying, setFlying] = useState<'LONG' | 'SHORT' | null>(null);
   const [details, setDetails] = useState(false);
   const width = useRef(0);
   const host = useRef<HTMLDivElement | null>(null);
+  /** The live gesture. Null whenever no finger is down. */
+  const gesture = useRef<Gesture | null>(null);
+  /** True while a committed card is flying out: a new drag must not start under it. */
+  const locked = useRef(false);
 
   const top = cards[0];
   const full = openPositions >= maxPositions;
@@ -73,21 +86,86 @@ export function SwipeDeck({
   const commit = useCallback(
     (side: Side | 'pass') => {
       if (!top) return;
+      // One release, one commit. A second press while the card is mid-flight would
+      // otherwise swipe the same card twice and open two positions from one gesture.
+      if (locked.current) return;
       if (side === 'pass') {
-        setDrag({ x: 0, y: 0, active: false });
+        setDrag(STILL);
         onPass(top);
         return;
       }
+      locked.current = true;
       setFlying(side);
       setDrag({ x: side === 'LONG' ? 600 : -600, y: 0, active: false });
       window.setTimeout(() => {
         onSwipe(top, side);
         setFlying(null);
-        setDrag({ x: 0, y: 0, active: false });
+        setDrag(STILL);
+        locked.current = false;
       }, 180);
     },
     [onPass, onSwipe, top],
   );
+
+  /**
+   * End the gesture the browser is reporting, and decide. Runs once per pointer: the ref
+   * is cleared before any decision, so `pointerup` + `pointercancel` on the same pointer
+   * cannot commit twice.
+   */
+  const endGesture = useCallback(
+    (pointerId: number, cancelled: boolean) => {
+      const live = gesture.current;
+      if (!live || live.pointerId !== pointerId) return;
+      gesture.current = null;
+
+      try {
+        host.current?.releasePointerCapture(pointerId);
+      } catch {
+        /* already released: the pointer left the document first */
+      }
+
+      // A cancelled pointer (the OS took the gesture, an alert opened) is not a swipe.
+      // Reset with the normal transition so the card slides home instead of sticking.
+      const outcome = cancelled ? null : resolveSwipe(live.x, live.y, width.current);
+      if (outcome) commit(outcome === 'PASS' ? 'pass' : outcome);
+      else setDrag(STILL);
+    },
+    [commit],
+  );
+
+  /**
+   * Start tracking from where the finger landed. Capture belongs to the host, not to
+   * `e.target`: the target is usually a span or an svg, and capture dies with the node
+   * the thumb happened to touch.
+   */
+  const startGesture = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (locked.current || gesture.current) return; // mid-flight, or a second finger
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    // The action circles and the details toggle sit inside the drag host. A press on one
+    // is a press, not the start of a swipe.
+    if ((e.target as HTMLElement | null)?.closest('button')) return;
+
+    width.current = host.current?.clientWidth ?? FALLBACK_WIDTH;
+    host.current?.setPointerCapture?.(e.pointerId);
+    gesture.current = {
+      pointerId: e.pointerId,
+      originX: e.clientX,
+      originY: e.clientY,
+      x: 0,
+      y: 0,
+    };
+    setDrag({ x: 0, y: 0, active: true });
+  }, []);
+
+  const moveGesture = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const live = gesture.current;
+    if (!live || live.pointerId !== e.pointerId) return;
+    // Offsets from the origin, never `movementX`: movement is unreliable for touch, and
+    // adding it to a value captured by this render collapses a drag into one increment.
+    live.x = e.clientX - live.originX;
+    live.y = e.clientY - live.originY;
+    setDrag({ x: live.x, y: live.y, active: true });
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -179,7 +257,10 @@ export function SwipeDeck({
   const range = Math.max(top.high - top.low, 1e-9);
   const pos = Math.min(1, Math.max(0, (top.price - top.low) / range));
   const dir = drag.x > 0 ? 'LONG' : 'SHORT';
-  const lean = Math.min(1, Math.abs(drag.x) / (width.current * THRESHOLD || 240));
+  const lean = Math.min(
+    1,
+    Math.abs(drag.x) / ((width.current || FALLBACK_WIDTH) * SWIPE_THRESHOLD),
+  );
   const series = spark[top.symbol] ?? [];
   const path = sparkPath(series, 100, 42);
   const up = top.pct >= 0;
@@ -205,21 +286,14 @@ export function SwipeDeck({
       <div
         ref={host}
         className="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-4 py-5"
-        onPointerDown={(e) => {
-          width.current = host.current?.clientWidth ?? 320;
-          (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
-          setDrag({ x: 0, y: 0, active: true });
-        }}
-        onPointerMove={(e) => {
-          if (!drag.active) return;
-          setDrag({ x: e.movementX + drag.x, y: drag.y, active: true });
-        }}
-        onPointerUp={() => {
-          if (!drag.active) return;
-          const past = Math.abs(drag.x) > (width.current * THRESHOLD || 120);
-          if (past) commit(drag.x > 0 ? 'LONG' : 'SHORT');
-          else setDrag({ x: 0, y: 0, active: false });
-        }}
+        // Without this the browser is entitled to claim a horizontal thumb drag as a pan
+        // and cancel the pointer stream, which is the whole "works with a mouse, dead on a
+        // phone" failure. The deck owns both axes for as long as a finger is down.
+        style={{ touchAction: 'none' }}
+        onPointerDown={startGesture}
+        onPointerMove={moveGesture}
+        onPointerUp={(e) => endGesture(e.pointerId, false)}
+        onPointerCancel={(e) => endGesture(e.pointerId, true)}
       >
         <div className="relative flex h-full w-full max-w-[366px] flex-col">
           {cards.length > 2 && (
