@@ -8,7 +8,10 @@ const APP = 'https://paps.doba.world';
 const REPO = 'https://github.com/IanoNjuguna/bookish-worm/tree/main/frontend/paps';
 
 const NOTS = [
-  ['It is not a real trade', 'Every fill is simulated at the live mark. Nothing is sent to a venue and no funds can move.'],
+  [
+    'It is not only paper',
+    'Without signing in, every fill is simulated at the live mark and nothing is sent to a venue. Connect a wallet and a swipe arms a real Strike order, confirmed in two steps, with real funds behind it.',
+  ],
   ['It is not custody', 'There is no deposit, no wallet connection required, and no key held in the browser.'],
   ['It is not advice', 'A demo of a leverage interface is not an offering of leveraged derivatives.'],
   ['It is not free of charges', 'Paper positions still pay the venue’s fee and funding, so the PnL you see is the PnL you would get.'],

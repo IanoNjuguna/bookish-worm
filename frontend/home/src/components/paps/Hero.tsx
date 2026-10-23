@@ -44,7 +44,7 @@ export function Hero() {
           </div>
 
           <p data-line className="mt-3 text-[12px] text-paps-muted">
-            no sign-up · nothing to install · not real money
+            no sign-up · nothing to install · paper money to start
           </p>
         </div>
 
