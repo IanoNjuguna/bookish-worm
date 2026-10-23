@@ -74,30 +74,22 @@ The header carries four facts only — symbol, price, 24h change, freshness.
 
 ## Identity
 
-Sign-in is one tap on a phone: **Continue with Google** through UTXOS, which creates an
-embedded non-custodial Cardano wallet and signs Strike's consent message from it. A
-browser wallet (CIP-30) stays available for people who already have one.
+Sign-in is a browser wallet: CIP-30 discovery on `window.cardano`, enabled on click, one
+consent signature, and the account comes back as a session. Desktop only, because a phone
+has no CIP-30 extension; the connect sheet says so rather than offering a dead button.
 
-    VITE_UTXOS_PROJECT_ID   from the utxos.dev dashboard; without it only CIP-30 works
+If mobile sign-in matters again, that is an embedded-wallet decision, not a config flag.
+The previous attempt (UTXOS, below) cost a 14.8 MB Mesh chunk and a set of node polyfills.
+
     VITE_BUILDER_CODE       paps — registered on mainnet, not on testnet
     fee                     requested at 100 bps: 1% on top of Strike's own taker rate,
                             charged by Strike and shown in the connect consent message
-
-Two build notes worth keeping: UTXOS is Mesh underneath and needs node crypto polyfills
-(`vite-plugin-node-polyfills`, crypto/buffer/stream only), and `libsodium-wrappers-sumo`
-ships a broken relative import that is aliased to its CJS build. Both live in
-`vite.config.ts` with the reason inline. The SDK is split into a `wallet` chunk so the
-deck still opens without it.
 
 
 An address is the identity; a profile is what it remembers.
 
     CIP-30 wallets     window.cardano, enabled on click, change address read from the
                        wallet — the same connector doba's other front ends use
-    UTXOS (utxos.dev)  wired as a provider but not bundled; see lib/identity/utxos.ts
-                       for the four-step switch-on. It needs a project id, and its type
-                       graph took tsc from 9s to over five minutes, so it stays out
-                       until there is something to authenticate against
 
 Preferences live in `localStorage` keyed by address, so switching wallets switches
 traders — useful when demoing two accounts:
@@ -231,13 +223,17 @@ both take the last token. Idle rows are only a timestamp, and can be pruned:
     bunx wrangler d1 execute paps-keys --remote --command \
       "DELETE FROM rate_limit_buckets WHERE updated_at < (strftime('%s','now') - 3600) * 1000"
 
-## UTXOS, when you turn it on
+## If you add an embedded wallet later
 
-    bun add @utxos/sdk
-    VITE_UTXOS_PROJECT_ID=...   VITE_NETWORK_ID=1
+What it cost last time, so the next attempt starts from facts:
 
-Then replace the throw in `connectUtxos()` with the four lines in that file. The rest of
-the app already speaks `Identity`.
+    @utxos/sdk         Mesh underneath, 14.8 MB raw in one chunk
+    vite config        node crypto/buffer/stream/util polyfills, plus a libsodium alias
+                       because libsodium-wrappers-sumo ships a broken relative import
+    tsc                the SDK's type graph took a bare typecheck past five minutes
+    manualChunks       do not force the SDK into its own chunk. Rollup gave the entry a
+                       static edge to it, so 15 MB of Mesh ran before first paint and threw
+                       `Class extends value undefined`. Let the dynamic import split.
 
 ## Deploy
 
