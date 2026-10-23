@@ -281,7 +281,7 @@ export default function App() {
   );
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden">
+    <div className="flex h-[100dvh] flex-col overflow-hidden">
       <TopBar
         connected={connected}
         lastAt={lastAt}

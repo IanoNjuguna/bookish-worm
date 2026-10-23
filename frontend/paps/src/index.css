@@ -130,10 +130,23 @@
   --radius-pill: 999px;
   }
 
+  /* 100dvh, not h-screen: on a phone `100vh` is the tall viewport with the URL bar hidden, so a
+     `h-screen` shell is taller than the visible area and the tab bar — the last child of that
+     column, position static — sits below the fold and scrolls away with the document. `dvh`
+     tracks the visible viewport, so the bar stays where it looks like it is. */
   html,
   body,
   #root {
     height: 100%;
+    height: 100dvh;
+  }
+
+  html,
+  body {
+    /* No document scroll: every scrollable region is inside the shell, so nothing can drag the
+       tab bar off the bottom or rubber-band the whole app. */
+    overflow: hidden;
+    overscroll-behavior: none;
   }
 
   body {
