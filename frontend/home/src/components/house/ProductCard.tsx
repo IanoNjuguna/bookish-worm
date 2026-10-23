@@ -29,7 +29,7 @@ export function ProductCard({ product }: ProductCardProps) {
         {description}
       </p>
 
-      <div className="mt-auto flex items-center justify-between gap-3 pt-2">
+      <div className="mt-auto flex flex-col gap-2 pt-2">
         <span className="font-display text-[11px] uppercase tracking-[0.15em] text-zinc-500 dark:text-zinc-400">
           {audience}
         </span>
