@@ -9,10 +9,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const outDir = path.resolve(__dirname, 'dist');
 
-// Routes to prerender for SEO
+// Routes to prerender for SEO. Every one of these ships real HTML in dist/, which is
+// what a crawler without JS and the first paint both see.
+// `/pre-drop` is deliberately absent: it is a redirect, and a prerendered <Navigate>
+// renders nothing worth serving.
 const prerenderRoutes = [
   "/",
-  "/pre-drop",
+  "/music",
   "/for-artists",
   "/how-it-works",
   "/about",

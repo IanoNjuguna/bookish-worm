@@ -15,8 +15,8 @@ const Navbar = () => {
         </a>
 
         <div className="hidden md:flex items-center gap-6">
-          <Link to="/pre-drop" className="text-sm font-bold text-midnight/70 dark:text-white/70 hover:text-cyber-pink dark:hover:text-cyber-pink transition-colors">
-            Pre-drop
+          <Link to="/music" className="text-sm font-bold text-midnight/70 dark:text-white/70 hover:text-cyber-pink dark:hover:text-cyber-pink transition-colors">
+            Music
           </Link>
           <Link to="/for-artists" className="text-sm font-bold text-midnight/70 dark:text-white/70 hover:text-cyber-pink dark:hover:text-cyber-pink transition-colors">
             For Artists

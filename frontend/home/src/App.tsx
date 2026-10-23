@@ -1,5 +1,5 @@
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
-import { lazy, Suspense, useEffect } from "react";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { lazy, Suspense, useEffect, type ReactNode } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,7 +14,7 @@ import Terms from "./pages/Terms.tsx";
 import Privacy from "./pages/Privacy.tsx";
 import MediaKit from "./pages/MediaKit.tsx";
 import Research from "./pages/Research.tsx";
-import PreDrop from "./pages/PreDrop.tsx";
+import Music from "./pages/Music.tsx";
 // The paps landing carries GSAP; lazy so the rest of the marketing site never pays for it.
 const Paps = lazy(() => import("./pages/Paps.tsx"));
 import NotFound from "./pages/NotFound.tsx";
@@ -27,8 +27,17 @@ const ScrollToTop = () => {
   return null;
 };
 
+interface AppRoutesProps {
+  /**
+   * The paps route element. The client passes a lazy chunk; the prerenderer passes
+   * the page directly, because `renderToString` cannot wait on a dynamic import and
+   * would otherwise emit the Suspense fallback instead of the landing.
+   */
+  paps: ReactNode;
+}
+
 // Route tree used by both the client (BrowserRouter) and SSR (StaticRouter).
-export const AppRoutes = () => (
+export const AppRoutes = ({ paps }: AppRoutesProps) => (
   <TooltipProvider>
     <Toaster />
     <Sonner />
@@ -45,24 +54,27 @@ export const AppRoutes = () => (
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/media-kit" element={<MediaKit />} />
       <Route path="/research" element={<Research />} />
-      <Route path="/pre-drop" element={<PreDrop />} />
-      <Route
-        path="/paps"
-        element={
-          <Suspense fallback={<div className="min-h-screen bg-[hsl(30_9%_6%)]" />}>
-            <Paps />
-          </Suspense>
-        }
-      />
+      <Route path="/music" element={<Music />} />
+      {/* The music landing used to live at /pre-drop. The host answers that with a
+          real 301 (vercel.json, public/_redirects); this is the same redirect for
+          anyone who reaches the old URL through the router alone. */}
+      <Route path="/pre-drop" element={<Navigate to="/music" replace />} />
+      <Route path="/paps" element={paps} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   </TooltipProvider>
 );
 
+const LazyPaps = () => (
+  <Suspense fallback={<div className="min-h-screen bg-background" />}>
+    <Paps />
+  </Suspense>
+);
+
 const App = () => (
   <BrowserRouter>
-    <AppRoutes />
+    <AppRoutes paps={<LazyPaps />} />
   </BrowserRouter>
 );
 

@@ -78,7 +78,7 @@ const PreDropSection = () => {
 
       <div className="text-center">
         <Link
-          to="/pre-drop"
+          to="/music"
           className="inline-flex items-center justify-center h-11 px-7 rounded-lg bg-cyber-pink hover:bg-cyber-pink/90 text-black font-bold text-xs uppercase tracking-widest transition-all duration-300 hover:scale-[1.03] active:scale-95 shadow-md"
         >
           Learn more

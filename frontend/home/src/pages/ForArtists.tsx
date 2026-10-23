@@ -51,7 +51,7 @@ export default function ForArtists() {
                 Release early on Doba, let super fans claim your song token, and funnel them when the full drop lands.
               </p>
               <Link
-                to="/pre-drop"
+                to="/music"
                 className="inline-flex items-center text-sm font-bold uppercase tracking-widest text-cyber-pink hover:underline"
               >
                 Learn about pre-drops →

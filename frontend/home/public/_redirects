@@ -1,0 +1,10 @@
+# Cloudflare Pages redirects for doba-home (the same dist that Vercel serves).
+#
+# /pre-drop was the music landing and is now /music. This has to be a real 301 for
+# anything that already links to the old URL, including browsers that never run the
+# client-side redirect in App.tsx.
+/pre-drop  /music  301
+
+# Fallback for unmatched paths. Pages serves an existing file first, so this never
+# shadows the prerendered directories in dist/ (music, paps, about, ...).
+/*  /index.html  200
