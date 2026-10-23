@@ -29,9 +29,11 @@ const Footer = () => {
               COMMUNITY
             </span>
             <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
-              <Link to="/for-artists" className="hover:text-cyber-pink transition-colors">For Artists</Link>
-              <span className="text-zinc-400 dark:text-white/20">·</span>
               <Link to="/music" className="hover:text-cyber-pink transition-colors">Music</Link>
+              <span className="text-zinc-400 dark:text-white/20">·</span>
+              <Link to="/paps" className="hover:text-cyber-pink transition-colors">paps</Link>
+              <span className="text-zinc-400 dark:text-white/20">·</span>
+              <Link to="/for-artists" className="hover:text-cyber-pink transition-colors">For Artists</Link>
               <span className="text-zinc-400 dark:text-white/20">·</span>
               <Link to="/research" className="hover:text-cyber-pink transition-colors">Research</Link>
               <span className="text-zinc-400 dark:text-white/20">·</span>
