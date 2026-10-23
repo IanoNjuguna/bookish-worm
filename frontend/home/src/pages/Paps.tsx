@@ -4,7 +4,7 @@ import { Hero } from '@/components/paps/Hero';
 import { FeaturePanels } from '@/components/paps/FeaturePanels';
 import { RiskLab } from '@/components/paps/RiskLab';
 import { useReveal } from '@/components/paps/motion';
-import { papsApp, papsLanding } from '@/lib/site';
+import { papsApp, papsAppLabel, papsLanding } from '@/lib/site';
 
 const REPO = 'https://github.com/IanoNjuguna/bookish-worm/tree/main/frontend/paps';
 
@@ -98,7 +98,7 @@ export default function Paps() {
             paps is built by <a href="/" className="text-paps-fg/80 hover:text-paps-fg">doba</a> for
             the Strike Finance hackathon. Market data by Strike.{' '}
             <a href={papsApp} className="text-paps-fg/80 hover:text-paps-fg">
-              paps.doba.world
+              {papsAppLabel}
             </a>{' '}
             ·{' '}
             <a href={REPO} className="text-paps-fg/80 hover:text-paps-fg">
