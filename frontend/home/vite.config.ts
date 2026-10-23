@@ -34,6 +34,7 @@ interface RenderResult {
     title?: { toString: () => string };
     meta?: { toString: () => string };
     link?: { toString: () => string };
+    script?: { toString: () => string };
   } | null;
 }
 
@@ -84,10 +85,14 @@ function dobaPrerenderPlugin(): Plugin {
           const helmetTitle = helmet?.title?.toString() ?? "";
           const helmetMeta = helmet?.meta?.toString() ?? "";
           const helmetLink = helmet?.link?.toString() ?? "";
+          // JSON-LD lives in a Helmet <script>; without this it is dropped from the
+          // prerendered head and only exists after hydration, which is exactly what
+          // structured data must not depend on.
+          const helmetScript = helmet?.script?.toString() ?? "";
 
           let html = template;
           html = html.replace(/<title>.*?<\/title>/s, helmetTitle);
-          html = html.replace(/<\/head>/, `${helmetMeta}${helmetLink}</head>`);
+          html = html.replace(/<\/head>/, `${helmetMeta}${helmetLink}${helmetScript}</head>`);
           html = html.replace(/<div id="root"><\/div>/, `<div id="root">${body}</div>`);
 
           const outputPath = path.join(outDir, route, "index.html");

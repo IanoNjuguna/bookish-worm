@@ -3,7 +3,7 @@ import { lazy, Suspense, useEffect, type ReactNode } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Index from "./pages/Index.tsx";
+import House from "./pages/House.tsx";
 import About from "./pages/About.tsx";
 import HowItWorks from "./pages/HowItWorks.tsx";
 import Docs from "./pages/Docs.tsx";
@@ -43,7 +43,7 @@ export const AppRoutes = ({ paps }: AppRoutesProps) => (
     <Sonner />
     <ScrollToTop />
     <Routes>
-      <Route path="/" element={<Index />} />
+      <Route path="/" element={<House />} />
       <Route path="/about" element={<About />} />
       <Route path="/how-it-works" element={<HowItWorks />} />
       <Route path="/docs" element={<Docs />} />

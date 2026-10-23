@@ -8,14 +8,12 @@ interface PageLayoutProps {
   children: ReactNode;
   maxWidth?: "4xl" | "5xl";
   className?: string;
-  floating?: ReactNode;
 }
 
 export default function PageLayout({
   children,
   maxWidth = "4xl",
   className,
-  floating,
 }: PageLayoutProps) {
   return (
     <div className="min-h-screen relative overflow-hidden flex flex-col justify-between">
@@ -32,7 +30,6 @@ export default function PageLayout({
         {children}
       </main>
 
-      {floating}
       <Footer />
     </div>
   );
