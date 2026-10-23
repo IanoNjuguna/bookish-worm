@@ -23,16 +23,19 @@ export default {
         // Scoped palette for the paps landing (/paps). paps has its own surface — warm
         // near-black, one ink-blue accent — and it must not borrow doba's pink, so it
         // arrives as a namespace rather than being mixed into the base tokens.
+        // Mirrors frontend/paps/src/index.css exactly. A landing that is "close to" the app's
+        // surface is a second palette nobody maintains: these are the same numbers, so the two
+        // surfaces cannot drift and the CTA here cannot disagree with the CTA in the nav.
         paps: {
-          canvas: 'hsl(30 9% 6%)',
-          panel: 'hsl(30 8% 9%)',
-          panel2: 'hsl(30 7% 13%)',
-          line: 'hsl(30 8% 19%)',
-          fg: 'hsl(35 16% 93%)',
-          muted: 'hsl(30 7% 60%)',
-          accent: 'hsl(214 62% 62%)',
-          long: 'hsl(158 100% 35%)',
-          short: 'hsl(1 84% 62%)',
+          canvas: 'hsl(240 10% 5%)',
+          panel: 'hsl(240 10% 7%)',
+          panel2: 'hsl(240 10% 12%)',
+          line: 'hsl(240 10% 22%)',
+          fg: 'hsl(0 0% 98%)',
+          muted: 'hsl(240 5% 62%)',
+          accent: 'hsl(263 85% 77%)',
+          long: 'rgb(0 180 122)',
+          short: 'rgb(240 83 78)',
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
