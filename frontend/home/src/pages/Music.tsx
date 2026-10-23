@@ -61,7 +61,7 @@ const research = [
   },
 ];
 
-export default function PreDrop() {
+export default function Music() {
   return (
     <>
       <Helmet>
@@ -70,13 +70,13 @@ export default function PreDrop() {
         <meta property="og:title" content="Pre-drop your music on Doba" />
         <meta property="og:description" content="Release music before the streaming platforms. Fans collect, stream free, and boost your launch." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://doba.world/pre-drop" />
+        <meta property="og:url" content="https://doba.world/music" />
         <meta property="og:image" content="https://doba.world/doba-og.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Pre-drop your music on Doba" />
         <meta name="twitter:description" content="Release music before the streaming platforms. Fans collect, stream free, and boost your launch." />
         <meta name="twitter:image" content="https://doba.world/doba-og.png" />
-        <link rel="canonical" href="https://doba.world/pre-drop" />
+        <link rel="canonical" href="https://doba.world/music" />
       </Helmet>
 
       <PageLayout maxWidth="5xl">

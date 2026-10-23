@@ -9,10 +9,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const outDir = path.resolve(__dirname, 'dist');
 
-// Routes to prerender for SEO
+// Routes to prerender for SEO. Every one of these ships real HTML in dist/, which is
+// what a crawler without JS and the first paint both see.
+// `/pre-drop` is deliberately absent: it is a redirect, and a prerendered <Navigate>
+// renders nothing worth serving.
 const prerenderRoutes = [
   "/",
-  "/pre-drop",
+  "/music",
+  "/paps",
   "/for-artists",
   "/how-it-works",
   "/about",
@@ -31,6 +35,7 @@ interface RenderResult {
     title?: { toString: () => string };
     meta?: { toString: () => string };
     link?: { toString: () => string };
+    script?: { toString: () => string };
   } | null;
 }
 
@@ -81,10 +86,14 @@ function dobaPrerenderPlugin(): Plugin {
           const helmetTitle = helmet?.title?.toString() ?? "";
           const helmetMeta = helmet?.meta?.toString() ?? "";
           const helmetLink = helmet?.link?.toString() ?? "";
+          // JSON-LD lives in a Helmet <script>; without this it is dropped from the
+          // prerendered head and only exists after hydration, which is exactly what
+          // structured data must not depend on.
+          const helmetScript = helmet?.script?.toString() ?? "";
 
           let html = template;
           html = html.replace(/<title>.*?<\/title>/s, helmetTitle);
-          html = html.replace(/<\/head>/, `${helmetMeta}${helmetLink}</head>`);
+          html = html.replace(/<\/head>/, `${helmetMeta}${helmetLink}${helmetScript}</head>`);
           html = html.replace(/<div id="root"><\/div>/, `<div id="root">${body}</div>`);
 
           const outputPath = path.join(outDir, route, "index.html");

@@ -1,4 +1,7 @@
 {
+  "redirects": [
+    { "source": "/pre-drop", "destination": "/music", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
